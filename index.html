@@ -665,8 +665,10 @@ window.doLogin = async function() {
         err.textContent='Empresa não encontrada. Contate o administrador.';
       }
     } else {
-      // colaborador — código validado depois
-      enterApp('colaborador','Colaborador','Acesso por Código');
+      // colaborador — valida código
+      await validarCodigo();
+      btn.textContent='Entrar'; btn.disabled=false;
+      return;
     }
   } catch(e) {
     err.textContent = e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Erro ao entrar. Tente novamente.';
@@ -810,24 +812,26 @@ async function loadRHDashboard() {
 
 // ── VALIDAR CÓDIGO (COLABORADOR) ──
 window.validarCodigo = async function() {
-  const codigo = (document.getElementById('colabCodeApp').value||'').trim().toUpperCase();
-  const errEl  = document.getElementById('codeError');
+  // Código digitado na tela de login
+  const codigo = (document.getElementById('colabCode').value||'').trim().toUpperCase();
+  const errEl  = document.getElementById('loginError');
+  const btn    = document.getElementById('loginBtnEl');
   errEl.textContent='';
   if(!codigo){errEl.textContent='Insira seu código.';return;}
+  btn.textContent='Verificando...'; btn.disabled=true;
   try {
     const q = query(collection(db,'nself_codigos'), where('codigo','==',codigo));
     const snap = await getDocs(q);
-    if(snap.empty){errEl.textContent='Código não encontrado.';return;}
+    if(snap.empty){errEl.textContent='Código não encontrado.';btn.textContent='Entrar';btn.disabled=false;return;}
     const docRef = snap.docs[0];
     const data   = docRef.data();
-    if(data.status==='usado'){errEl.textContent='Este código já foi utilizado.';return;}
-    if(data.status==='revogado'){errEl.textContent='Este código foi revogado.';return;}
+    if(data.status==='usado'){errEl.textContent='Este código já foi utilizado.';btn.textContent='Entrar';btn.disabled=false;return;}
+    if(data.status==='revogado'){errEl.textContent='Este código foi revogado.';btn.textContent='Entrar';btn.disabled=false;return;}
     window._state.codigoAtivo = {id:docRef.id,...data};
-    document.getElementById('sideRole').textContent='Colaborador';
-    document.getElementById('sideName').textContent = data.nomeDestinatario||'Colaborador';
-    navigateTo('colab-teste');
-    iniciarTeste();
+    enterApp('colaborador', data.nomeDestinatario||'Colaborador', 'Acesso por Código');
+    setTimeout(()=>{ navigateTo('colab-teste'); iniciarTeste(); }, 100);
   } catch(e){errEl.textContent='Erro ao validar código. Tente novamente.';}
+  btn.textContent='Entrar'; btn.disabled=false;
 };
 
 // ══════════════════════════════════════════
