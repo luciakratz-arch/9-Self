@@ -1096,36 +1096,55 @@ function renderTeste() {
 let _giSel = [], _giiSel = [];
 
 function renderGrupos() {
+  _giSel=[]; _giiSel=[];
   document.getElementById('progressBar').style.width='5%';
   document.getElementById('testeSubtitle').textContent='Etapa 1 de 5 — Identificação Inicial';
   document.getElementById('testeContent').innerHTML=`
-    <div class="question-card" style="margin-bottom:12px;">
-      <div class="q-num">INSTRUÇÕES</div>
-      <div class="q-text" style="font-size:13px;line-height:1.7;color:var(--gray);">
-        Você verá dois grupos de parágrafos. Em cada grupo, escolha o parágrafo que <strong>melhor descreve seu comportamento</strong> até hoje.<br>
-        Não precisa concordar com tudo — o importante é o tom geral. Se estiver difícil escolher, pode marcar dois, mas apenas em <strong>um</strong> dos grupos.
+    <div class="question-card" style="margin-bottom:16px;">
+      <div class="q-num" style="font-size:13px;font-weight:700;margin-bottom:12px;">INSTRUÇÕES</div>
+      <div style="font-size:13px;line-height:1.8;color:var(--gray);">
+        <p style="margin-bottom:8px;">Selecione um parágrafo em cada um dos dois grupos de afirmações. Ele deverá ser aquele que melhor espelha suas atitudes e comportamentos até o momento.</p>
+        <p style="margin-bottom:8px;">Não é preciso concordar inteiramente com cada palavra ou afirmativa no parágrafo escolhido! Você pode concordar com 80 ou 90% com o que se afirma nele e, ainda assim, considerá-lo preferível aos outros dois do grupo. Porém, é preciso que você concorde com o tom geral e com a "filosofia" em que ele se baseia.</p>
+        <p style="margin-bottom:8px;">Não analise excessivamente suas escolhas. Escolha o parágrafo que você <strong>"sente"</strong> que é o mais certo para você, mesmo que não concorde 100% com ele. A motivação e a ideia geral do parágrafo como um todo são mais importantes que suas partes individualmente. <strong>Siga sua intuição.</strong></p>
+        <p>Se não conseguir decidir em um dos grupos, pode escolher dois parágrafos, mas apenas em <strong>UM</strong> dos grupos (ex: C no Grupo I e X e Y no Grupo II).</p>
       </div>
     </div>
-    <div class="question-card" style="margin-bottom:12px;">
-      <div class="q-num">GRUPO I — Escolha 1 parágrafo</div>
-      ${['A','B','C'].map(l=>`
-        <div class="q-option-block" id="gi_${l}" onclick="selecionarGI('${l}')">
-          <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">${l}.</div>
-          <div style="font-size:13px;line-height:1.6;">${GRUPO_I[l]}</div>
-        </div>
-      `).join('')}
-    </div>
     <div class="question-card" style="margin-bottom:16px;">
-      <div class="q-num">GRUPO II — Escolha 1 parágrafo</div>
-      ${['X','Y','Z'].map(l=>`
-        <div class="q-option-block" id="gii_${l}" onclick="selecionarGII('${l}')">
-          <div style="font-weight:700;color:var(--teal);margin-bottom:4px;">${l}.</div>
-          <div style="font-size:13px;line-height:1.6;">${GRUPO_II[l]}</div>
-        </div>
-      `).join('')}
+      <div class="q-num" style="color:var(--purple);font-weight:700;font-size:14px;margin-bottom:16px;">GRUPO I — Selecione o parágrafo que mais combina com você</div>
+      <div class="q-option-block" id="gi_A" onclick="selecionarGI('A')">
+        <div style="font-weight:700;color:var(--purple);font-size:15px;margin-bottom:6px;">A.</div>
+        <div style="font-size:13px;line-height:1.7;">Até hoje, tendi a ser bastante independente e assertivo: para mim, a vida funciona melhor quando você a encara de frente. Defino minhas próprias metas, envolvo-me com as coisas e quero fazê-las acontecer. Não gosto de ficar de braços cruzados — quero realizar grandes coisas e causar impacto. Não ando em busca de confrontos, mas também não deixo que ninguém me pressione. Na maioria das vezes, sei o que quero e procuro consegui-lo. Geralmente entro de cabeça tanto no trabalho quanto na diversão.</div>
+      </div>
+      <div class="q-option-block" id="gi_B" onclick="selecionarGI('B')">
+        <div style="font-weight:700;color:var(--purple);font-size:15px;margin-bottom:6px;">B.</div>
+        <div style="font-size:13px;line-height:1.7;">Até hoje tenho sido uma pessoa tranquila e estou acostumado a "me virar" sozinho. Em sociedade, normalmente não chamo a atenção, e é raro que me imponha a qualquer custo. Não me sinto à vontade em posições de liderança nem em competições, como tanta gente. É provável que me julguem um tanto sonhador — é a imaginação que alimenta boa parte da emoção que sinto. Não me incomodo se não tiver de ser ativo o tempo inteiro.</div>
+      </div>
+      <div class="q-option-block" id="gi_C" onclick="selecionarGI('C')">
+        <div style="font-weight:700;color:var(--purple);font-size:15px;margin-bottom:6px;">C.</div>
+        <div style="font-size:13px;line-height:1.7;">Até hoje, tenho sido extremamente responsável e dedicado. Para mim é terrível não poder honrar meus compromissos ou colocar-me à altura das expectativas. Quero que as pessoas saibam que desejo ajudá-las e fazer o que acredito ser melhor para elas. Já fiz grandes sacrifícios para o bem dos outros, estivessem eles sabendo ou não. Muitas vezes esqueço de mim mesmo; faço o que tenho que fazer e depois — se sobrar tempo — relaxo (e faço o que realmente queria).</div>
+      </div>
+      <div id="giError" style="color:#FF6B6B;font-size:12px;margin-top:8px;min-height:16px;"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:14px;" onclick="confirmarGrupoI()">Confirmar escolha do Grupo I →</button>
     </div>
-    <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarGrupos()">Continuar →</button>
-    <div id="gruposError" style="color:#FF6B6B;font-size:12px;text-align:center;margin-top:8px;"></div>
+    <div id="grupoIIContainer" style="display:none;">
+      <div class="question-card" style="margin-bottom:16px;">
+        <div class="q-num" style="color:var(--teal);font-weight:700;font-size:14px;margin-bottom:16px;">GRUPO II — Selecione o parágrafo que mais combina com você</div>
+        <div class="q-option-block" id="gii_X" onclick="selecionarGII('X')">
+          <div style="font-weight:700;color:var(--teal);font-size:15px;margin-bottom:6px;">X.</div>
+          <div style="font-size:13px;line-height:1.7;">Sou uma pessoa que geralmente procura ter uma visão positiva e achar que as coisas correrão da melhor forma possível. Sempre encontro alguma coisa que me entusiasme e atividades diferentes com que me ocupar. Gosto de companhia e de ajudar os outros a serem felizes — gosto de compartilhar o bem-estar que sinto. (Nem sempre estou tão bem, mas tento não deixar transparecer!) Porém, para manter essa visão positiva, às vezes tive de adiar demais a resolução de alguns problemas pessoais.</div>
+        </div>
+        <div class="q-option-block" id="gii_Y" onclick="selecionarGII('Y')">
+          <div style="font-weight:700;color:var(--teal);font-size:15px;margin-bottom:6px;">Y.</div>
+          <div style="font-size:13px;line-height:1.7;">Sou uma pessoa que não esconde o que sente — todo mundo sabe quando não gosto de alguma coisa. Posso ser reservado, mas no fundo sou mais sensível do que deixo transparecer. Quero saber como as pessoas me julgam e com quem ou o que eu posso contar — na minha opinião sobre elas quase sempre é bem clara. Quando alguma coisa me aborrece, quero que os outros reajam e se afetem tanto quanto eu. Sei quais são as regras, mas não gosto que ninguém me diga o que fazer. Quero decidir por mim mesmo.</div>
+        </div>
+        <div class="q-option-block" id="gii_Z" onclick="selecionarGII('Z')">
+          <div style="font-weight:700;color:var(--teal);font-size:15px;margin-bottom:6px;">Z.</div>
+          <div style="font-size:13px;line-height:1.7;">Sou uma pessoa lógica e autocontrolada — não fico à vontade com os sentimentos. Sou competente — até perfeccionista — e prefiro trabalhar sozinho. Quando surgem conflitos ou problemas pessoais, procuro não envolver meus sentimentos. Há quem me considere muito frio e distante, mas não quero que minhas reações emocionais me afastem do que realmente me importa. Geralmente não demonstro minhas reações quando alguém me "incomoda".</div>
+        </div>
+        <div id="giiError" style="color:#FF6B6B;font-size:12px;margin-top:8px;min-height:16px;"></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:14px;" onclick="confirmarGrupos()">Continuar para o teste →</button>
+      </div>
+    </div>
   `;
 }
 
@@ -1137,6 +1156,7 @@ window.selecionarGI = function(l) {
     if(el) el.classList.toggle('selected',_giSel.includes(x));
   });
 };
+
 window.selecionarGII = function(l) {
   if(_giiSel.includes(l)) { _giiSel = _giiSel.filter(x=>x!==l); }
   else { if(_giiSel.length>=2) _giiSel.shift(); _giiSel.push(l); }
@@ -1146,15 +1166,24 @@ window.selecionarGII = function(l) {
   });
 };
 
+window.confirmarGrupoI = function() {
+  const err = document.getElementById('giError');
+  if(_giSel.length===0){err.textContent='Selecione pelo menos um parágrafo do Grupo I.';return;}
+  err.textContent='';
+  // Mostrar Grupo II
+  document.getElementById('grupoIIContainer').style.display='block';
+  document.getElementById('grupoIIContainer').scrollIntoView({behavior:'smooth'});
+};
+
 window.confirmarGrupos = function() {
-  const err = document.getElementById('gruposError');
-  if(_giSel.length===0||_giiSel.length===0){err.textContent='Selecione pelo menos um parágrafo em cada grupo.';return;}
+  const err = document.getElementById('giiError');
+  if(_giiSel.length===0){err.textContent='Selecione pelo menos um parágrafo do Grupo II.';return;}
   if(_giSel.length===2&&_giiSel.length===2){err.textContent='Você pode selecionar dois parágrafos apenas em UM dos grupos.';return;}
+  err.textContent='';
   TS.gi = _giSel[0]; TS.giExtra = _giSel[1]||null;
   TS.gii = _giiSel[0]; TS.giiExtra = _giiSel[1]||null;
-  // Gerar ordem de prioridade
-  const gi_ord = _giSel.length===2 ? [_giSel[0],_giSel[1], ...'ABC'.split('').filter(x=>!_giSel.includes(x))] : [TS.gi,...'ABC'.split('').filter(x=>x!==TS.gi)];
-  const gii_ord = _giiSel.length===2 ? [_giiSel[0],_giiSel[1], ...'XYZ'.split('').filter(x=>!_giiSel.includes(x))] : [TS.gii,...'XYZ'.split('').filter(x=>x!==TS.gii)];
+  const gi_ord = _giSel.length===2 ? [..._giSel,...'ABC'.split('').filter(x=>!_giSel.includes(x))] : [TS.gi,...'ABC'.split('').filter(x=>x!==TS.gi)];
+  const gii_ord = _giiSel.length===2 ? [..._giiSel,...'XYZ'.split('').filter(x=>!_giiSel.includes(x))] : [TS.gii,...'XYZ'.split('').filter(x=>x!==TS.gii)];
   TS.ordemPrioridade = gerarOrdemPrioridade(gi_ord, gii_ord);
   TS.etapa='m1'; _giSel=[]; _giiSel=[];
   renderTeste();
