@@ -43,6 +43,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);
   box-shadow:0 32px 80px rgba(0,0,0,0.4);
 }
 .login-logo{text-align:center;margin-bottom:32px;}
+.login-logo img.logo-main{width:140px;height:140px;object-fit:contain;margin-bottom:8px;}
 .login-logo .brand-number{
   font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;
   background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
@@ -95,18 +96,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);
   transition:transform .3s;
 }
 .sidebar-logo{
-  padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;gap:10px;
 }
+.sidebar-logo img.sl-img{width:42px;height:42px;object-fit:contain;}
 .sidebar-logo .s-number{
-  font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;
+  font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;
   background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   line-height:1;
 }
 .sidebar-logo .s-name{
-  font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(255,255,255,0.7);
+  font-family:'Cormorant Garamond',serif;font-size:10px;color:rgba(255,255,255,0.5);
   letter-spacing:3px;
 }
+/* RODAPÉ */
+.app-footer{
+  margin-left:var(--sidebar-w);
+  background:#fff;border-top:1px solid var(--border);
+  padding:10px 28px;display:flex;align-items:center;gap:10px;
+}
+.app-footer img{height:30px;object-fit:contain;opacity:0.8;}
+.app-footer span{font-size:11px;color:var(--gray);}
+@media(max-width:768px){.app-footer{margin-left:0;}}
 .sidebar-profile{
   padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.07);
 }
@@ -299,8 +311,7 @@ tr:hover td{background:#FAFAFE;}
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <div class="brand-number">9&amp;Self</div>
-      <div class="brand-name">SELF</div>
+      <img class="logo-main" src="nine%20self%20quadrado%20trasparente.png" alt="9&Self" onerror="this.style.display='none'"/>
       <div class="brand-tagline">Descubra sua personalidade</div>
     </div>
 
@@ -352,8 +363,11 @@ tr:hover td{background:#FAFAFE;}
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
-        <div class="s-number">9&amp;Self</div>
-        <div class="s-name">SELF</div>
+        <img class="sl-img" src="nine%20self%20quadrado%20trasparente.png" alt="9&Self" onerror="this.style.display='none'"/>
+        <div>
+          <div class="s-number">9&amp;Self</div>
+          <div class="s-name">SELF</div>
+        </div>
       </div>
       <div class="sidebar-profile">
         <div class="sp-role" id="sideRole">—</div>
@@ -523,7 +537,11 @@ tr:hover td{background:#FAFAFE;}
       </div>
 
     </div><!-- /main -->
-  </div>
+  </div><!-- /app-layout -->
+  <footer class="app-footer">
+    <img src="dra%20luciakratz%20transparente.png" alt="Dra. Lucia Kratz" onerror="this.style.display='none'"/>
+    <span>Desenvolvido por <strong>Dra. Lucia Kratz</strong> · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade 🦋</span>
+  </footer>
 </div>
 
 <!-- ══════════════════ MODAIS ══════════════════ -->
