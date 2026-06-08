@@ -482,21 +482,7 @@ tr:hover td{background:#FAFAFE;}
       </div>
 
       <!-- ── PÁGINAS COLABORADOR ── -->
-      <div class="page" id="page-colab-inicio">
-        <div style="padding:28px;">
-          <div class="code-hero">
-            <div style="font-size:40px;margin-bottom:12px;">🔮</div>
-            <h2>Bem-vindo ao 9&amp;Self</h2>
-            <p>Insira seu código de acesso para iniciar sua avaliação de personalidade</p>
-            <div class="code-input-wrap">
-              <input class="code-input" id="colabCodeApp" placeholder="SEU CÓDIGO" maxlength="8"
-                style="font-size:15px;letter-spacing:3px;"/>
-              <button class="code-submit" onclick="validarCodigo()">→</button>
-            </div>
-            <div id="codeError" style="color:#FF8FA3;font-size:12px;margin-top:10px;"></div>
-          </div>
-        </div>
-      </div>
+      <div class="page" id="page-colab-inicio" style="display:none;"></div>
 
       <div class="page" id="page-colab-teste">
         <div style="padding:28px;">
@@ -717,7 +703,6 @@ const NAVS = {
     {icon:'📄', label:'Laudos', page:'laudos'},
   ],
   colaborador: [
-    {icon:'🏠', label:'Início', page:'colab-inicio'},
     {icon:'🧠', label:'Minha Avaliação', page:'colab-teste'},
     {icon:'📄', label:'Meu Laudo', page:'colab-resultado'},
   ],
