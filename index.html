@@ -267,6 +267,19 @@ tr:hover td{background:#FAFAFE;}
 
 
 
+
+/* SUBTIPO CARDS */
+.subtipo-card{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:2px solid var(--border);border-radius:14px;
+  padding:16px;transition:all .2s;cursor:default;
+}
+.subtipo-card:first-child{border-color:var(--purple);background:rgba(123,0,196,0.04);}
+.subtipo-pos{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
+  color:var(--purple);min-width:32px;line-height:1;
+}
+
 /* SLIDERS */
 .pct-slider{
   flex:1;-webkit-appearance:none;height:6px;border-radius:4px;
@@ -1251,8 +1264,10 @@ window.confirmarGrupos = function() {
   TS.gi  = combos[0].combo[0];
   TS.gii = combos[0].combo[1];
 
-  TS.etapa='m1';
-  renderTeste();
+  // Pegar os 3 tipos mais prováveis e iniciar teste do primeiro
+  TS.filaValidacao = [...new Set(TS.ordemTipos)].slice(0, 3);
+  TS.prioIdx = 0;
+  iniciarM1ParaTipo(TS.filaValidacao[0]);
 };
 
 // ─── ETAPA 1+2 — 5 PERGUNTAS DO TIPO CANDIDATO + VALIDAÇÃO ────────────────
@@ -1412,44 +1427,118 @@ function calcularAsa() {
 
 // ─── ETAPA 4 — SUBTIPOS ─────────────────────────────────────────────────────
 
-function renderSubtipos() {
-  const idx   = TS.subIdx;
-  const total = PERGUNTAS_SUBTIPO.length;
-  if(idx>=total){ calcularSubtipos(); return; }
-  const pct = 75+Math.round((idx/total)*20);
-  document.getElementById('progressBar').style.width=pct+'%';
-  document.getElementById('testeSubtitle').textContent=`Etapa 5 de 5 — Subtipos (${idx+1}/${total})`;
-  const p = PERGUNTAS_SUBTIPO[idx];
-  const subNomes = {sp:'Autopreservação',sx:'Um a Um',so:'Social'};
-  document.getElementById('testeContent').innerHTML=`
-    <div class="question-card">
-      <div class="q-num">Pergunta ${idx+1}</div>
-      <div class="q-text">${p.texto}</div>
-      <div class="q-options">
-        <button class="q-option" onclick="responderSub('${p.sub}',1)">✅ Tenho essa tendência</button>
-        <button class="q-option" onclick="responderSub('${p.sub}',0)">❌ Não tenho essa tendência</button>
-      </div>
-    </div>
-  `;
-}
-
-window.responderSub = function(sub,v) {
-  TS.subScores[sub]+=v;
-  TS.subIdx++;
-  renderSubtipos();
+// Textos dos subtipos por tipo (Pergunta 2 do PDF, redação melhorada)
+const SUBTIPOS_TEXTOS = {
+  1: {
+    sex: "Tem padrões elevados para si e para quem ama. Busca relações intensas e idealizadas, esperando que o parceiro compartilhe os mesmos valores. Tende a se decepcionar quando as pessoas não correspondem às suas expectativas. É emotivo e exigente nas relações próximas.",
+    ap:  "É detalhista e perfeccionista nas coisas do cotidiano. Preocupa-se com saúde, finanças e bem-estar material. Cobra-se muito por não fazer o suficiente. Pode oscilar entre satisfazer todos os desejos e suprimi-los completamente.",
+    soc: "Mantém postura rígida e impecável socialmente. Tem regras claras sobre como as pessoas devem se comportar e se incomoda quando não são seguidas. Evita espontaneidade e tende a criticar quem não segue seus princípios.",
+  },
+  2: {
+    sex: "Tem uma forma sedutora de falar e de se conectar com as pessoas. Investe energia em conquistar quem admira, especialmente quando percebe resistência ou desafio. Age pelo impulso de se aproximar emocional e fisicamente dos outros.",
+    ap:  "Teme ser esquecido e não ter suas necessidades atendidas. Por isso, foca em satisfazer as necessidades alheias antes das próprias. Aparenta se sacrificar pelos outros, mas espera reconhecimento e reciprocidade em troca.",
+    soc: "Tem muito 'pé na terra' e ambição por espaço social, profissional e material. Precisa ser querido, admirado e aceito em seu círculo. Tem agenda cheia, gosta de fazer contatos e ser o centro das atenções para evitar ser esquecido.",
+  },
+  3: {
+    sex: "Valoriza pertencer a grupos próximos e se preocupa genuinamente com essas pessoas. Essa conexão o ajuda a perceber o impacto negativo que causa quando está focado apenas em suas metas.",
+    ap:  "Aprecia rituais exclusivos e grupos seletivos que o façam sentir diferenciado. É nessa dimensão que encontra criatividade e conceitos para superar desafios. Manifesta emotividade e compaixão sem se deixar envolver emocionalmente.",
+    soc: "Mede seu valor pelo êxito que obtém, pelo aplauso e pelos resultados. Acredita que precisa de uma imagem prestigiosa para se relacionar. Títulos, cargos e reconhecimento são muito importantes — identifica-se com seu papel social.",
+  },
+  4: {
+    sex: "Competitivo e intenso emocionalmente. Sua vida afetiva gira em torno de quem o atrai. Luta por realizações que o tornem aceitável aos olhos do outro, quer ser uma estrela, mas sente rancor de quem atinge os mesmos objetivos.",
+    ap:  "É o mais prático e materialista deste tipo. Ama as coisas boas da vida e é muito sensível à sensualidade do mundo. Tende a manter um estilo de vida além de suas possibilidades quando está emocionalmente envolvido.",
+    soc: "Sente vergonha do próprio desejo e de si mesmo. Tem sentimento de não-merecimento e pessimismo. É o mais sensível, refinado e artístico. Acredita que existe um jeito certo de ser e sente que nunca consegue se encaixar.",
+  },
+  5: {
+    sex: "Gosta de compartilhar segredos com pessoas íntimas. Sente-se impelido a se aproximar dos outros, mas com ansiedade e tendência a recuar de repente. Vive entre o distanciamento e o desejo de intensa proximidade.",
+    ap:  "É o mais caseiro e solitário. Precisa de um refúgio pessoal para se isolar do mundo e se recarregar. Monta guarda sobre seu espaço e privacidade. Tende a acumular recursos, especialmente dinheiro, como forma de segurança.",
+    soc: "É o mais intelectual e comunicativo deste tipo. Conquista pelo saber e qualificação. Gosta de ser visto como mestre da sabedoria e tornar-se indispensável. Sua interação social se pauta pelo debate de ideias e análise de tendências.",
+  },
+  6: {
+    sex: "Mascara inseguranças com autoafirmação ostensiva. Parece corajoso e confrontador — usa força, intimidação ou sedução para se proteger. Desafia a autoridade e busca ser visível e reconhecido como alguém forte.",
+    ap:  "É o mais tímido e dependente deste tipo. Por baixo da aparente fragilidade, há doçura. Oferece compromisso e solicitude esperando receber o mesmo em troca. Faz amizades devagar, observando longamente se pode confiar.",
+    soc: "Conquista pelo saber e qualificação, gosta de ser referência intelectual em seu grupo. Usa sua área de domínio para se tornar indispensável. Sua interação social é pautada pelo debate de ideias e pela análise crítica.",
+  },
+  7: {
+    sex: "Tem capacidade especial de convencer e vender suas ideias. Vive intensamente em todas as interações. Demonstra curiosidade ampla, raciocínio rápido e capacidade de fascinar os outros com seu entusiasmo.",
+    ap:  "É o mais ligado à família e ao prático. Cheio de energia e determinação. Ambicioso e trabalhador, faz questão de garantir que nunca falte nada para si e para os seus. Teme depender dos outros e ter privações.",
+    soc: "Dedica-se a causas nobres e ideais sociais. Abre mão de liberdade pessoal em nome do coletivo. Cultiva grupos de amigos que compartilham seus entusiasmos. É idealista e gosta de se envolver em causas sociais.",
+  },
+  8: {
+    sex: "Marca território com intensidade e carisma. Reage com paixão ao que lhe interessa e quer causar impacto na vida das pessoas. Pode ser ríspido com os mais íntimos. Encara relacionamentos como conquista.",
+    ap:  "Tem intolerância à frustração e quer satisfação a qualquer custo. Protege suas posses e investimentos com zelo. Faz questão de ter controle total. Tende a se viciar no trabalho para garantir renda e poder.",
+    soc: "Trata a amizade como um pacto profundo de lealdade e fraternidade. O abuso de confiança é algo que não consegue perdoar. Honra e lealdade são valores centrais — age com força para proteger seu grupo.",
+  },
+  9: {
+    sex: "Busca fusão total com o outro. Vive através da pessoa amada, que se torna o centro de sua identidade. A fusão com o outro parece ser a chave da felicidade — precisa que o outro se integre completamente a ele.",
+    ap:  "Prefere os prazeres simples e de fácil obtenção. Acomodado e de trato fácil, não pede muito da vida. Lida com a ansiedade envolvendo-se em rotinas e afazeres corriqueiros para evitar enfrentar desafios.",
+    soc: "Funde-se com o grupo e defende causas coletivas, não pessoais. Muito abnegado e autêntico. Tem vontade de fazer parte de um grupo mas não tem certeza de que pertence. Promove a paz e cumpre as expectativas do seu círculo.",
+  },
 };
 
-function calcularSubtipos() {
-  document.getElementById('progressBar').style.width='100%';
-  const sorted = Object.entries(TS.subScores).sort((a,b)=>b[1]-a[1]);
-  // Desempate: SP>SX>SO
-  const prioridade = ['sp','sx','so'];
-  sorted.sort((a,b)=> b[1]!==a[1] ? b[1]-a[1] : prioridade.indexOf(a[0])-prioridade.indexOf(b[0]));
-  TS.subDom = sorted[0][0];
-  TS.subInt = sorted[1][0];
-  TS.subRem = sorted[2][0];
-  salvarResultadoFinal();
+function renderSubtipos() {
+  const tipo = TS.tipoFinal;
+  const textos = SUBTIPOS_TEXTOS[tipo];
+  document.getElementById('progressBar').style.width='90%';
+  document.getElementById('testeSubtitle').textContent='Etapa Final — Subtipos';
+
+  document.getElementById('testeContent').innerHTML=`
+    <div class="question-card" style="margin-bottom:16px;">
+      <div class="q-num" style="font-weight:700;color:var(--dark);margin-bottom:8px;">SUBTIPOS — Hierarquize por conforto</div>
+      <div style="font-size:13px;color:var(--gray);line-height:1.6;">
+        Leia os três perfis abaixo e arraste-os (ou clique nas setas) para ordenar do que <strong>mais combina</strong> com você para o que <strong>menos combina</strong>.
+      </div>
+    </div>
+    <div id="subtipo-lista" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+      ${['sex','ap','soc'].map((sub,i) => `
+        <div class="subtipo-card" id="sub_${sub}" data-sub="${sub}" data-pos="${i}">
+          <div class="subtipo-pos" id="pos_${sub}">${i+1}º</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:12px;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">
+              ${ sub==='sex'?'Um a Um (Sexual)':sub==='ap'?'Autopreservação':'Social' }
+            </div>
+            <div style="font-size:13px;line-height:1.65;color:var(--dark);">${textos[sub]}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-left:8px;">
+            <button class="btn btn-outline btn-sm" onclick="moverSub('${sub}',-1)" title="Subir">↑</button>
+            <button class="btn btn-outline btn-sm" onclick="moverSub('${sub}',+1)" title="Descer">↓</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarSubtipos()">
+      Finalizar avaliação →
+    </button>
+  `;
+
+  // Estado da ordem
+  TS.subOrdem = ['sex','ap','soc'];
 }
+
+window.moverSub = function(sub, dir) {
+  const ordem = TS.subOrdem;
+  const idx   = ordem.indexOf(sub);
+  const novo  = idx + dir;
+  if(novo < 0 || novo >= ordem.length) return;
+  // Trocar
+  [ordem[idx], ordem[novo]] = [ordem[novo], ordem[idx]];
+  TS.subOrdem = ordem;
+  // Reordenar visualmente
+  const lista = document.getElementById('subtipo-lista');
+  const cards = ordem.map(s => document.getElementById('sub_'+s));
+  cards.forEach((card,i) => {
+    lista.appendChild(card);
+    document.getElementById('pos_'+ordem[i]).textContent = (i+1)+'º';
+  });
+};
+
+window.confirmarSubtipos = function() {
+  const ordem = TS.subOrdem;
+  TS.subDom = ordem[0];
+  TS.subInt = ordem[1];
+  TS.subRem = ordem[2];
+  salvarResultadoFinal();
+};
 
 async function salvarResultadoFinal() {
   document.getElementById('testeContent').innerHTML=`<div style="text-align:center;padding:48px;color:var(--gray);">Calculando seu perfil... 🔮</div>`;
