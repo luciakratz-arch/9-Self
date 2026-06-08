@@ -264,6 +264,15 @@ tr:hover td{background:#FAFAFE;}
   color:#fff;cursor:pointer;font-size:18px;
 }
 
+
+/* BLOCOS GRUPO I/II */
+.q-option-block{
+  border:2px solid var(--border);border-radius:12px;padding:14px 16px;
+  margin-bottom:8px;cursor:pointer;transition:all .2s;
+}
+.q-option-block:hover{border-color:var(--purple);background:rgba(123,0,196,0.04);}
+.q-option-block.selected{border-color:var(--purple);background:rgba(123,0,196,0.08);}
+
 /* RESPONSIVO */
 .hamburger{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--dark);}
 @media(max-width:768px){
@@ -837,179 +846,333 @@ window.validarCodigo = async function() {
 };
 
 // ══════════════════════════════════════════
-// TESTE COMPLETO — 3 MÓDULOS
+// TESTE COMPLETO — LÓGICA OFICIAL 9&SELF
 // ══════════════════════════════════════════
 
-// MÓDULO 1 — 45 perguntas (5 por tipo)
+// ── TABULAÇÃO GRUPO I + II → TIPO ──
+const TABELA_TIPO = {
+  'AX':7,'AY':8,'AZ':3,
+  'BX':9,'BY':4,'BZ':5,
+  'CX':2,'CY':6,'CZ':1,
+};
+
+// Ordem de prioridade quando há certeza dupla, simples ou nenhuma
+function gerarOrdemPrioridade(gi, gii) {
+  // gi = array ordenado ex: ['A','C','B'], gii = array ordenado ex: ['Y','X','Z']
+  const ordens = [];
+  for(let i=0;i<gi.length;i++)
+    for(let j=0;j<gii.length;j++)
+      ordens.push(gi[i]+gii[j]);
+  // Remove duplicatas
+  return [...new Set(ordens)];
+}
+
+// ── PERGUNTAS MÓDULO 1 — 45 COMPORTAMENTAIS OFICIAIS ──
 const PERGUNTAS_M1 = [
-  // TIPO 1 — O Perfeccionista
-  {id:'1a', tipo:1, texto:"Costumo me preocupar muito em fazer tudo da maneira correta e ética."},
-  {id:'1b', tipo:1, texto:"Tenho um crítico interno muito exigente que raramente está satisfeito."},
-  {id:'1c', tipo:1, texto:"Me incomoda quando as pessoas não seguem as regras ou padrões combinados."},
-  {id:'1d', tipo:1, texto:"Trabalho com afinco e senso de responsabilidade mesmo quando não é obrigado."},
-  {id:'1e', tipo:1, texto:"Tenho dificuldade em relaxar enquanto há algo errado ou incompleto ao meu redor."},
-  // TIPO 2 — O Prestativo
-  {id:'2a', tipo:2, texto:"Sinto satisfação genuína em ajudar as pessoas e antecipar suas necessidades."},
-  {id:'2b', tipo:2, texto:"Tenho dificuldade em pedir ajuda ou admitir que preciso de apoio."},
-  {id:'2c', tipo:2, texto:"Me adapto facilmente para agradar as pessoas que me importam."},
-  {id:'2d', tipo:2, texto:"Costumo colocar as necessidades dos outros antes das minhas."},
-  {id:'2e', tipo:2, texto:"Me sinto bem quando sou visto como indispensável para alguém."},
-  // TIPO 3 — O Realizador
-  {id:'3a', tipo:3, texto:"Sou muito orientado a metas e me motivo fortemente por conquistas visíveis."},
-  {id:'3b', tipo:3, texto:"Me preocupo com a imagem que transmito e quero ser visto como bem-sucedido."},
-  {id:'3c', tipo:3, texto:"Consigo me adaptar para parecer o que o ambiente espera de mim."},
-  {id:'3d', tipo:3, texto:"Trabalho intensamente e me sinto inquieto quando não estou sendo produtivo."},
-  {id:'3e', tipo:3, texto:"Tenho facilidade em focar nos resultados e deixar sentimentos para depois."},
-  // TIPO 4 — O Individualista
-  {id:'4a', tipo:4, texto:"Sinto que sou fundamentalmente diferente dos outros e busco minha identidade única."},
-  {id:'4b', tipo:4, texto:"Tenho emoções intensas e sou muito afetado pela beleza, arte e profundidade."},
-  {id:'4c', tipo:4, texto:"Costumo sentir que falta algo essencial em mim ou na minha vida."},
-  {id:'4d', tipo:4, texto:"Me atraio pelo que é raro, melancólico ou profundamente significativo."},
-  {id:'4e', tipo:4, texto:"Valorizo autenticidade acima de tudo — prefiro ser honesto a ser aprovado."},
-  // TIPO 5 — O Investigador
-  {id:'5a', tipo:5, texto:"Preciso entender profundamente as coisas antes de me sentir seguro para agir."},
-  {id:'5b', tipo:5, texto:"Prefiro observar e analisar do que participar ativamente de situações sociais."},
-  {id:'5c', tipo:5, texto:"Cuido cuidadosamente da minha energia e tempo, evitando demandas excessivas."},
-  {id:'5d', tipo:5, texto:"Me sinto mais confortável no mundo das ideias do que nas interações emocionais."},
-  {id:'5e', tipo:5, texto:"Valorizo privacidade e independência, precisando de muito espaço pessoal."},
-  // TIPO 6 — O Leal
-  {id:'6a', tipo:6, texto:"Costumo antecipar problemas e me preparo para cenários negativos."},
-  {id:'6b', tipo:6, texto:"Questiono autoridades e preciso testar a confiabilidade das pessoas."},
-  {id:'6c', tipo:6, texto:"Valorizo muito lealdade, confiança e segurança nos relacionamentos."},
-  {id:'6d', tipo:6, texto:"Tenho dúvidas frequentes sobre minhas decisões mesmo depois de tomá-las."},
-  {id:'6e', tipo:6, texto:"Me sinto mais seguro quando sei exatamente o que esperar das situações."},
-  // TIPO 7 — O Entusiasta
-  {id:'7a', tipo:7, texto:"Sou movido por novas experiências, possibilidades e aventuras."},
-  {id:'7b', tipo:7, texto:"Tenho dificuldade em focar em uma coisa só pois tantas me parecem interessantes."},
-  {id:'7c', tipo:7, texto:"Evito situações de dor, limitação ou monotonia buscando alternativas animadoras."},
-  {id:'7d', tipo:7, texto:"Sou naturalmente otimista e consigo reencadrar situações negativas rapidamente."},
-  {id:'7e', tipo:7, texto:"Me sinto sufocado por compromissos de longo prazo ou rotinas muito fixas."},
-  // TIPO 8 — O Desafiador
-  {id:'8a', tipo:8, texto:"Sou direto, assertivo e não tenho medo de confrontos quando necessário."},
-  {id:'8b', tipo:8, texto:"Detesto fraqueza, traição ou injustiça — reajo fortemente a isso."},
-  {id:'8c', tipo:8, texto:"Prefiro ter controle das situações e das pessoas ao meu redor."},
-  {id:'8d', tipo:8, texto:"Tenho muita energia e intensidade — faço tudo no máximo."},
-  {id:'8e', tipo:8, texto:"Protejo os vulneráveis e me posiciono contra quem abusa do poder."},
-  // TIPO 9 — O Pacificador
-  {id:'9a', tipo:9, texto:"Prefiro a paz e harmonia — evito conflitos sempre que possível."},
-  {id:'9b', tipo:9, texto:"Tenho dificuldade em dizer não e acabo concordando para não desagradar."},
-  {id:'9c', tipo:9, texto:"Me fundindo facilmente com o ambiente e as prioridades das outras pessoas."},
-  {id:'9d', tipo:9, texto:"Tenho um ritmo próprio e me sinto pressionado quando alguém me apress."},
-  {id:'9e', tipo:9, texto:"Consigo ver facilmente múltiplos lados de uma questão sem me posicionar."},
+  // TIPO 1
+  {tipo:1, texto:"Você costuma organizar seus espaços (armário, mesa, arquivos) seguindo uma lógica própria, com categorias, sequências ou padrões que você mantém ao longo do tempo."},
+  {tipo:1, texto:"Você prefere ambientes simples, limpos ou minimalistas porque isso facilita manter tudo em ordem e evita distrações."},
+  {tipo:1, texto:"Você tende a combinar objetos, roupas ou elementos da casa de forma harmoniosa, porque sente que \"cada coisa tem seu lugar\" e deve seguir um padrão."},
+  {tipo:1, texto:"Quando vê algo fora do lugar, desalinhado ou mal feito, você naturalmente ajusta, corrige ou melhora — mesmo sem ninguém pedir."},
+  {tipo:1, texto:"Você cria rotinas, listas ou métodos para garantir que as coisas sejam feitas da forma correta e no tempo certo."},
+  // TIPO 2
+  {tipo:2, texto:"Você costuma assumir tarefas que pessoas próximas pedem — mesmo quando já está com sua própria rotina cheia — porque sente que é natural ajudar quem você gosta."},
+  {tipo:2, texto:"É comum você perceber que está fazendo várias atividades dos outros junto com as suas, porque quer facilitar a vida de quem é importante para você."},
+  {tipo:2, texto:"Você demonstra carinho fazendo coisas práticas para agradar — como resolver algo para a pessoa, antecipar necessidades ou organizar algo para ela."},
+  {tipo:2, texto:"Você espera que a pessoa perceba o cuidado que você tem e, de alguma forma, também te priorize ou retribua a atenção."},
+  {tipo:2, texto:"Quando você se dedica muito a alguém, tende a notar se a pessoa reconhece ou valoriza o que você faz."},
+  // TIPO 3
+  {tipo:3, texto:"Você observa pessoas que considera referência e tende a ajustar seu comportamento para alcançar um padrão parecido — ou até superior — ao delas."},
+  {tipo:3, texto:"Você costuma aceitar projetos ou desafios apenas quando percebe que tem alta chance de entregar um bom resultado."},
+  {tipo:3, texto:"Mesmo quando está passando por dificuldades, você mantém a aparência de que está tudo bem e funcionando."},
+  {tipo:3, texto:"Você ajusta sua postura, forma de falar ou estilo conforme o ambiente para transmitir competência."},
+  {tipo:3, texto:"Você monitora como está sendo percebida e busca constantemente melhorar sua performance para manter uma imagem de eficiência."},
+  // TIPO 4
+  {tipo:4, texto:"Você escolhe roupas, acessórios ou objetos que expressem sua identidade, mesmo que não sigam o padrão das outras pessoas ao seu redor."},
+  {tipo:4, texto:"Você organiza seus espaços (quarto, mesa, casa) de um jeito que reflita seu estilo pessoal, priorizando estética, significado ou atmosfera."},
+  {tipo:4, texto:"Quando algo te afeta, você tende a se afastar um pouco para entender o que está sentindo antes de voltar a interagir."},
+  {tipo:4, texto:"Você percebe detalhes estéticos, simbólicos ou emocionais em músicas, filmes, ambientes ou conversas que outras pessoas geralmente não notam."},
+  {tipo:4, texto:"Você prefere conversas, atividades ou relações que tenham profundidade e significado, evitando interações superficiais."},
+  // TIPO 5
+  {tipo:5, texto:"Você não gosta que pessoas entrem no seu ambiente (casa, quarto, mesa, escritório) sem sua permissão e prefere controlar quem tem acesso ao seu espaço."},
+  {tipo:5, texto:"Você costuma manter uma reserva financeira e usa seus objetos, roupas ou equipamentos até o limite, evitando comprar coisas novas sem necessidade."},
+  {tipo:5, texto:"Quando um assunto te interessa, você passa horas pesquisando, estudando ou explorando o tema, a ponto de perder a noção do tempo ou do ambiente."},
+  {tipo:5, texto:"As pessoas ao seu redor costumam comentar que você é mais isolada, reservada ou pouco social, mesmo sem você fazer isso de propósito."},
+  {tipo:5, texto:"Você costuma ter ideias claras e detalhadas quando fala sobre algo que domina, mas se irrita ou perde a paciência quando outras pessoas são prolixas ou falam mais do que o necessário."},
+  // TIPO 6
+  {tipo:6, texto:"Mesmo quando você confia em alguém, continua observando, analisando e avaliando se a pessoa mantém coerência ao longo do tempo."},
+  {tipo:6, texto:"Você revisa detalhes, confirma informações ou verifica se algo está certo antes de tomar decisões importantes."},
+  {tipo:6, texto:"Você costuma imaginar cenários possíveis (bons e ruins) para se preparar antes de agir."},
+  {tipo:6, texto:"Você tende a procurar pessoas, regras, métodos ou estruturas que transmitam segurança e previsibilidade."},
+  {tipo:6, texto:"Você percebe rapidamente sinais de risco, inconsistência ou possíveis problemas ao seu redor, mesmo quando ninguém mais notou."},
+  // TIPO 7
+  {tipo:7, texto:"Você costuma procurar atividades, ideias ou experiências novas para manter o dia mais interessante e evitar sensação de monotonia."},
+  {tipo:7, texto:"Você se envolve em vários projetos, hobbies ou planos ao mesmo tempo, mudando de foco quando algo perde o brilho."},
+  {tipo:7, texto:"Você evita rotinas muito estruturadas ou ambientes que limitem sua liberdade de escolha."},
+  {tipo:7, texto:"Você passa tempo pensando, pesquisando ou planejando viagens, cursos, passeios ou novas possibilidades."},
+  {tipo:7, texto:"Você tende a manter a agenda cheia e prefere dias dinâmicos, com variedade de atividades, do que dias muito parados."},
+  // TIPO 8
+  {tipo:8, texto:"Você costuma se posicionar com firmeza quando algo importa para você, mesmo que isso gere tensão ou confronto."},
+  {tipo:8, texto:"As pessoas às vezes dizem que você parece \"brava\" ou \"intensa\", mesmo quando está apenas falando de forma direta."},
+  {tipo:8, texto:"Você vê discussões ou confrontos como algo natural e até produtivo, porque revelam quem é forte e confiável."},
+  {tipo:8, texto:"Você defende pessoas próximas com intensidade e não tolera injustiças contra elas."},
+  {tipo:8, texto:"Você evita demonstrar fragilidade ou pedir ajuda, preferindo resolver as coisas por conta própria."},
+  // TIPO 9
+  {tipo:9, texto:"Você acompanha o ritmo das pessoas ao seu redor para manter a harmonia no ambiente."},
+  {tipo:9, texto:"Você mantém rotinas tranquilas e previsíveis, evitando mudanças ou surpresas bruscas."},
+  {tipo:9, texto:"Você se adapta facilmente às escolhas e vontades dos outros para evitar tensões ou conflitos."},
+  {tipo:9, texto:"Você tende a deixar decisões ou tarefas complexas para depois quando sente que elas podem gerar estresse."},
+  {tipo:9, texto:"Você prefere ambientes calmos, interações previsíveis e relações estáveis, evitando confrontos diretos."},
 ];
 
-// MÓDULO 2 — Asa (3 perguntas A/B por tipo)
-const PERGUNTAS_ASA = {
-  1: [
-    {q:"Quando algo está errado, você tende a:", a:"Corrigir você mesmo silenciosamente", b:"Querer ajudar os outros a corrigirem", asaA:9, asaB:2},
-    {q:"Você se sente mais:", a:"Rígido com seus próprios padrões", b:"Preocupado com o bem-estar alheio", asaA:9, asaB:2},
-    {q:"Sua motivação principal é:", a:"Fazer o que é certo, mesmo sozinho", b:"Melhorar o mundo através das pessoas", asaA:9, asaB:2},
+// ── PERGUNTAS DE VALIDAÇÃO (3 por tipo) ──
+const VALIDACAO = {
+  1:[
+    "Você sente uma necessidade constante de fazer as coisas \"do jeito certo\", mesmo quando ninguém está olhando.",
+    "Você se irrita internamente quando percebe erros, injustiças ou falta de organização.",
+    "Você se cobra muito e raramente sente que fez \"o suficiente\"."
   ],
-  2: [
-    {q:"Você tende a:", a:"Ajudar e se conectar com todos", b:"Ajudar para se sentir especial e valorizado", asaA:1, asaB:3},
-    {q:"Quando não é reconhecido:", a:"Sente que falhou em seu dever", b:"Se sente injustiçado e ressentido", asaA:1, asaB:3},
-    {q:"Você se vê mais como:", a:"Alguém de princípios que cuida", b:"Alguém carismático que inspira", asaA:1, asaB:3},
+  2:[
+    "Você percebe que muitas vezes coloca as necessidades dos outros acima das suas.",
+    "Você sente que precisa ser importante para alguém para se sentir bem consigo mesma.",
+    "Você se frustra quando ajuda muito e não recebe reconhecimento ou reciprocidade."
   ],
-  3: [
-    {q:"Seu estilo é mais:", a:"Prestativo e voltado para relacionamentos", b:"Criativo e focado em imagem única", asaA:2, asaB:4},
-    {q:"Quando falha:", a:"Se preocupa com o que os outros pensam", b:"Sente que perdeu algo de si mesmo", asaA:2, asaB:4},
-    {q:"Você prefere ser reconhecido por:", a:"Sua generosidade e conexões", b:"Sua originalidade e profundidade", asaA:2, asaB:4},
+  3:[
+    "Você sente que precisa alcançar resultados para se sentir valiosa.",
+    "Você adapta sua imagem conforme o ambiente para causar boa impressão.",
+    "Você se sente desconfortável quando não está produzindo ou sendo eficiente."
   ],
-  4: [
-    {q:"Você busca sua identidade em:", a:"Realizações e sucessos visíveis", b:"Conexões profundas e análise interior", asaA:3, asaB:5},
-    {q:"Quando se sente incompreendido:", a:"Trabalha mais para provar seu valor", b:"Se retrai e observa de longe", asaA:3, asaB:5},
-    {q:"Seu lado forte é:", a:"Transformar emoção em realização", b:"Profundidade intelectual e sensibilidade", asaA:3, asaB:5},
+  4:[
+    "Você sente emoções intensas e profundas, mesmo quando não demonstra.",
+    "Você frequentemente sente que falta \"algo\" em você ou na sua vida.",
+    "Você busca significado e profundidade em tudo o que faz."
   ],
-  5: [
-    {q:"Você se preocupa mais com:", a:"Perder sua identidade única", b:"Perder sua segurança e apoio", asaA:4, asaB:6},
-    {q:"Em relacionamentos você busca:", a:"Conexão profunda e autenticidade", b:"Lealdade e confiança acima de tudo", asaA:4, asaB:6},
-    {q:"Sua maior dificuldade é:", a:"Sentir que não pertence a lugar algum", b:"Confiar plenamente nas pessoas", asaA:4, asaB:6},
+  5:[
+    "Você precisa de tempo sozinho para se recarregar e organizar sua mente.",
+    "Você evita depender dos outros e prefere resolver tudo por conta própria.",
+    "Você observa mais do que participa e analisa antes de agir."
   ],
-  6: [
-    {q:"Quando ansioso, você:", a:"Se isola para pensar e analisar", b:"Busca distração e novas possibilidades", asaA:5, asaB:7},
-    {q:"Você lida com o medo:", a:"Pesquisando e se preparando profundamente", b:"Agindo e buscando alternativas animadoras", asaA:5, asaB:7},
-    {q:"Você se vê mais como:", a:"Analítico e precavido", b:"Questionador e explorador", asaA:5, asaB:7},
+  6:[
+    "Você pensa muito nos possíveis riscos antes de tomar decisões.",
+    "Você busca segurança em pessoas, regras ou estruturas confiáveis.",
+    "Você alterna entre confiar e desconfiar, dependendo do contexto."
   ],
-  7: [
-    {q:"Sua energia vai para:", a:"Questionar e desafiar o status quo", b:"Planejar e imaginar novas possibilidades", asaA:8, asaB:6},
-    {q:"Você lida com limites:", a:"Os quebrando diretamente", b:"Os contornando criativamente", asaA:8, asaB:6},
-    {q:"Sua intensidade vem de:", a:"Força e assertividade", b:"Entusiasmo e otimismo", asaA:8, asaB:6},
+  7:[
+    "Você se entedia facilmente e busca novas experiências para se sentir viva.",
+    "Você evita ficar presa a rotinas, limitações ou emoções negativas.",
+    "Você pensa rápido e tem muitas ideias ao mesmo tempo."
   ],
-  8: [
-    {q:"Você se conecta com pessoas através de:", a:"Desafios e confrontos diretos", b:"Harmonia e aceitação", asaA:7, asaB:9},
-    {q:"Sua vulnerabilidade aparece quando:", a:"Está se divertindo e baixa a guarda", b:"Está em paz e sem conflitos", asaA:7, asaB:9},
-    {q:"No fundo você deseja:", a:"Liberdade e intensidade de vida", b:"Paz e união com tudo", asaA:7, asaB:9},
+  8:[
+    "Você assume o controle naturalmente quando percebe que algo está errado.",
+    "Você evita demonstrar vulnerabilidade para não se sentir fraca.",
+    "Você reage com intensidade quando sente injustiça ou desrespeito."
   ],
-  9: [
-    {q:"Quando evita conflitos é porque:", a:"Quer manter a harmonia genuína", b:"Não quer ferir nem ser ferido", asaA:8, asaB:1},
-    {q:"Sua força oculta é:", a:"Uma determinação intensa quando ativada", b:"Um senso moral muito firme", asaA:8, asaB:1},
-    {q:"Você se motiva por:", a:"Proteger quem ama de qualquer ameaça", b:"Fazer o que é correto e justo", asaA:8, asaB:1},
+  9:[
+    "Você evita conflitos e prefere manter a paz, mesmo sacrificando suas vontades.",
+    "Você tende a procrastinar decisões importantes para não se estressar.",
+    "Você se adapta aos outros e às situações para não gerar atrito."
   ],
 };
 
-// MÓDULO 3 — Subtipos (AP=Autopreservação, 1A1=Um-a-Um/Sexual, SOC=Social)
+// ── PERGUNTAS DAS ASAS (3 perguntas A/B por tipo) ──
+const ASAS_PERGUNTAS = {
+  1:{ asaA:9, asaB:2, perguntas:[
+    {a:"Você se percebe mais calmo, menos crítico e mais flexível ao lidar com erros.", b:"Você se percebe mais voltado para as pessoas próximas, atento ao impacto que causa nelas."},
+    {a:"Você tende a suavizar tensões e buscar harmonia, evitando rigidez.", b:"Você tende a orientar, ajudar e aperfeiçoar quem está ao seu redor."},
+    {a:"Você costuma desacelerar, aceitar ritmos mais tranquilos e reduzir autocobrança.", b:"Você costuma assumir responsabilidades emocionais e práticas pelas pessoas."},
+  ]},
+  2:{ asaA:1, asaB:3, perguntas:[
+    {a:"Você se percebe mais organizado, cuidadoso e atento a regras internas.", b:"Você se percebe mais competitivo, focado em metas e resultados."},
+    {a:"Você tende a agir de forma educada, controlada e estruturada.", b:"Você tende a agir de forma eficiente, prática e orientada a desempenho."},
+    {a:"Você costuma priorizar fazer o certo e manter padrões elevados.", b:"Você costuma priorizar eficácia, reconhecimento e produtividade."},
+  ]},
+  3:{ asaA:2, asaB:4, perguntas:[
+    {a:"Você se percebe mais acolhedor, atento ao grupo e sensível ao impacto emocional.", b:"Você se percebe mais criativo, introspectivo e voltado para diferenciação."},
+    {a:"Você tende a buscar proximidade e conexão com pessoas importantes.", b:"Você tende a buscar expressão pessoal e autenticidade."},
+    {a:"Você costuma ajustar seu comportamento para apoiar e agradar pessoas próximas.", b:"Você costuma ajustar seu comportamento para manter singularidade e profundidade."},
+  ]},
+  4:{ asaA:3, asaB:5, perguntas:[
+    {a:"Você se percebe mais orientado para metas e ação.", b:"Você se percebe mais analítico, reservado e observador."},
+    {a:"Você tende a buscar reconhecimento por realizações.", b:"Você tende a buscar compreensão e domínio intelectual."},
+    {a:"Você costuma se motivar por resultados concretos.", b:"Você costuma se motivar por entendimento profundo."},
+  ]},
+  5:{ asaA:4, asaB:6, perguntas:[
+    {a:"Você se percebe mais criativo, sensível e movido por interesses pessoais.", b:"Você se percebe mais cauteloso, atento a riscos e preocupado com segurança."},
+    {a:"Você tende a alternar entre proximidade intensa e afastamento.", b:"Você tende a buscar rotina, previsibilidade e isolamento protetor."},
+    {a:"Você costuma agir quando sente conexão emocional com o tema.", b:"Você costuma agir quando tem certeza suficiente e critérios claros."},
+  ]},
+  6:{ asaA:5, asaB:7, perguntas:[
+    {a:"Você se percebe mais analítico, reservado e focado em informação.", b:"Você se percebe mais otimista, ativo e aberto a novas experiências."},
+    {a:"Você tende a buscar segurança através de controle e vigilância.", b:"Você tende a buscar segurança através de movimento e variedade."},
+    {a:"Você costuma se preparar para riscos antes de agir.", b:"Você costuma agir para evitar ficar preso em preocupações."},
+  ]},
+  7:{ asaA:6, asaB:8, perguntas:[
+    {a:"Você se percebe mais ponderado, atento a riscos e cuidadoso ao decidir.", b:"Você se percebe mais assertivo, direto e impulsivo."},
+    {a:"Você tende a convencer com lógica e planejamento.", b:"Você tende a convencer com força, presença e intensidade."},
+    {a:"Você costuma reduzir velocidade para avaliar consequências.", b:"Você costuma acelerar para aproveitar oportunidades rapidamente."},
+  ]},
+  8:{ asaA:7, asaB:9, perguntas:[
+    {a:"Você se percebe mais acelerado, cheio de ideias e impulsivo.", b:"Você se percebe mais calmo, tolerante e flexível."},
+    {a:"Você tende a agir com intensidade e marcar território.", b:"Você tende a evitar conflitos e buscar estabilidade."},
+    {a:"Você costuma avançar rapidamente para assumir controle.", b:"Você costuma recuar para manter paz e equilíbrio."},
+  ]},
+  9:{ asaA:8, asaB:1, perguntas:[
+    {a:"Você se percebe mais decidido, firme e disposto a confrontar.", b:"Você se percebe mais organizado, metódico e preocupado com fazer o certo."},
+    {a:"Você tende a se unir intensamente a pessoas importantes.", b:"Você tende a buscar rotina, conforto e evitar desafios."},
+    {a:"Você costuma agir com força quando algo importa.", b:"Você costuma adiar ações para manter estabilidade."},
+  ]},
+};
+
+// ── PERGUNTAS SUBTIPOS ──
 const PERGUNTAS_SUBTIPO = [
-  {id:'ap1', subtipo:'ap', texto:"Minha prioridade principal é garantir minha segurança, saúde e recursos materiais."},
-  {id:'ap2', subtipo:'ap', texto:"Penso bastante em questões práticas: dinheiro, moradia, saúde e estabilidade."},
-  {id:'ap3', subtipo:'ap', texto:"Prefiro ambientes familiares e confortáveis — novidades me geram mais ansiedade que excitação."},
-  {id:'1a1_1', subtipo:'1a1', texto:"Me conecto profundamente com poucas pessoas — prefiro uma relação intensa a muitas superficiais."},
-  {id:'1a1_2', subtipo:'1a1', texto:"Sinto uma química ou repulsa muito forte pelas pessoas — raramente sou indiferente."},
-  {id:'1a1_3', subtipo:'1a1', texto:"Busco fusão, intensidade e cumplicidade total nos meus relacionamentos mais próximos."},
-  {id:'soc1', subtipo:'soc', texto:"Me preocupo com meu papel, posição e imagem dentro dos grupos que faço parte."},
-  {id:'soc2', subtipo:'soc', texto:"Tenho consciência clara de hierarquias sociais e como navegar nelas."},
-  {id:'soc3', subtipo:'soc', texto:"Minha energia vai para contribuir com causas, grupos e comunidades maiores que eu."},
+  {sub:'sp', texto:"Você costuma organizar sua rotina para garantir conforto físico, segurança e estabilidade no dia a dia."},
+  {sub:'sp', texto:"Você tende a evitar situações que possam gerar desgaste, risco ou imprevisibilidade."},
+  {sub:'sp', texto:"Você se sente mais tranquilo quando tem recursos, tempo e espaço suficientes para se manter bem."},
+  {sub:'sx', texto:"Você costuma direcionar muita energia para conexões intensas com pessoas específicas."},
+  {sub:'sx', texto:"Você tende a se envolver profundamente quando algo ou alguém desperta seu interesse."},
+  {sub:'sx', texto:"Você se sente mais vivo e motivado quando está em interações intensas, exclusivas ou de forte impacto."},
+  {sub:'so', texto:"Você costuma se envolver naturalmente em grupos, atividades coletivas ou ambientes sociais."},
+  {sub:'so', texto:"Você tende a perceber rapidamente dinâmicas de grupo, papéis sociais e necessidades coletivas."},
+  {sub:'so', texto:"Você se sente confortável participando, contribuindo ou mantendo presença em contextos sociais."},
 ];
 
-// NOMES DOS TIPOS
-const NOMES_TIPO = {
-  1:'Tipo 1 — O Perfeccionista',
-  2:'Tipo 2 — O Prestativo',
-  3:'Tipo 3 — O Realizador',
-  4:'Tipo 4 — O Individualista',
-  5:'Tipo 5 — O Investigador',
-  6:'Tipo 6 — O Leal',
-  7:'Tipo 7 — O Entusiasta',
-  8:'Tipo 8 — O Desafiador',
-  9:'Tipo 9 — O Pacificador',
-};
-const NOMES_SUBTIPO = {ap:'Autopreservação', '1a1':'Um-a-Um (Sexual)', soc:'Social'};
+// ── NOMES ──
+const NOMES_TIPO = {1:'Tipo 1 — O Reformista',2:'Tipo 2 — O Ajudante',3:'Tipo 3 — O Realizador',4:'Tipo 4 — O Individualista',5:'Tipo 5 — O Investigador',6:'Tipo 6 — O Leal',7:'Tipo 7 — O Entusiasta',8:'Tipo 8 — O Desafiador',9:'Tipo 9 — O Pacificador'};
+const NOMES_SUB = {sp:'Autopreservação',sx:'Um a Um (Sexual)',so:'Social'};
 
-// ── ESTADO DO TESTE ──
-let testeState = {
-  modulo: 1,
-  respostasM1: {},   // {tipo: pontos}
-  tipoVencedor: null,
-  respostasAsa: [],  // array de {asaA, asaB, escolha}
-  respostasSubtipo: {ap:0, '1a1':0, soc:0},
-  pergIdx: 0,
-  resultado: {},
+// ── GRUPO I TEXTOS ──
+const GRUPO_I = {
+  A: "Você tende a ser independente, direto e decidido. Prefere agir do que esperar, define suas próprias metas e gosta de fazer as coisas acontecerem. Não busca confronto, mas também não aceita pressão. Normalmente sabe o que quer e se envolve intensamente tanto no trabalho quanto no lazer.",
+  B: "Você costuma ser tranquilo, reservado e autossuficiente. Não gosta de chamar atenção e evita competir. Prefere ambientes calmos e não se sente confortável em posições de liderança. Sua imaginação e vida interna são fortes, e você não precisa estar ativo o tempo todo para se sentir bem.",
+  C: "Você costuma ser responsável, dedicado e comprometido. Faz o possível para atender expectativas e ajudar os outros, mesmo que isso exija sacrifícios pessoais. Muitas vezes coloca as necessidades alheias antes das suas e só relaxa depois de cumprir o que considera necessário.",
 };
+const GRUPO_II = {
+  X: "Você tende a manter uma visão positiva da vida e acredita que as coisas podem dar certo. Gosta de se envolver em atividades variadas, busca entusiasmo e tenta manter o clima leve. Às vezes adia problemas pessoais para preservar essa visão otimista.",
+  Y: "Você expressa claramente quando algo o incomoda. É sensível, mesmo que não demonstre sempre. Quer saber em quem pode confiar e costuma ter opiniões fortes sobre pessoas e situações. Não gosta que lhe digam o que fazer e prefere decidir por conta própria.",
+  Z: "Você é lógico, autocontrolado e prefere lidar com situações de forma racional. Evita envolver emoções em conflitos e tende a trabalhar sozinho. Algumas pessoas podem achar você distante, mas isso ajuda a manter o foco no que considera importante.",
+};
+
+// ── ESTADO GLOBAL DO TESTE ──
+let TS = {};
 
 function iniciarTeste() {
-  testeState = {modulo:1, respostasM1:{}, tipoVencedor:null, respostasAsa:[], respostasSubtipo:{ap:0,'1a1':0,soc:0}, pergIdx:0, resultado:{}};
-  for(let i=1;i<=9;i++) testeState.respostasM1[i]=0;
+  TS = {
+    etapa: 'grupos',          // grupos | m1 | validacao | asas | subtipos
+    // Grupo I/II
+    gi: null, gii: null,      // letra escolhida
+    giExtra: null, giiExtra: null, // segunda letra se dois parágrafos
+    ordemPrioridade: [],      // ex: ['CY','CX','CZ','AY',...]
+    prioIdx: 0,               // qual combinação estamos tentando validar
+    // M1
+    scoresM1: {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
+    m1Idx: 0,
+    // Validação
+    tipoTentado: null,
+    validacaoIdx: 0,
+    validacaoSim: 0,
+    // Resultado
+    tipoFinal: null,
+    asaVotos: {A:0,B:0},
+    asaIdx: 0,
+    asaDom: null, asaSec: null,
+    subScores: {sp:0,sx:0,so:0},
+    subIdx: 0,
+  };
   renderTeste();
 }
 
 function renderTeste() {
-  const {modulo, pergIdx} = testeState;
-  if(modulo===1) renderModulo1();
-  else if(modulo===2) renderModulo2();
-  else if(modulo===3) renderModulo3();
+  switch(TS.etapa) {
+    case 'grupos':      renderGrupos();     break;
+    case 'm1':          renderM1();         break;
+    case 'validacao':   renderValidacao();  break;
+    case 'asas':        renderAsas();       break;
+    case 'subtipos':    renderSubtipos();   break;
+  }
 }
 
-// ── MÓDULO 1 ──
-function renderModulo1() {
+// ─── ETAPA 0 — GRUPOS ───────────────────────────────────────────────────────
+
+let _giSel = [], _giiSel = [];
+
+function renderGrupos() {
+  document.getElementById('progressBar').style.width='5%';
+  document.getElementById('testeSubtitle').textContent='Etapa 1 de 5 — Identificação Inicial';
+  document.getElementById('testeContent').innerHTML=`
+    <div class="question-card" style="margin-bottom:12px;">
+      <div class="q-num">INSTRUÇÕES</div>
+      <div class="q-text" style="font-size:13px;line-height:1.7;color:var(--gray);">
+        Você verá dois grupos de parágrafos. Em cada grupo, escolha o parágrafo que <strong>melhor descreve seu comportamento</strong> até hoje.<br>
+        Não precisa concordar com tudo — o importante é o tom geral. Se estiver difícil escolher, pode marcar dois, mas apenas em <strong>um</strong> dos grupos.
+      </div>
+    </div>
+    <div class="question-card" style="margin-bottom:12px;">
+      <div class="q-num">GRUPO I — Escolha 1 parágrafo</div>
+      ${['A','B','C'].map(l=>`
+        <div class="q-option-block" id="gi_${l}" onclick="selecionarGI('${l}')">
+          <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">${l}.</div>
+          <div style="font-size:13px;line-height:1.6;">${GRUPO_I[l]}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="question-card" style="margin-bottom:16px;">
+      <div class="q-num">GRUPO II — Escolha 1 parágrafo</div>
+      ${['X','Y','Z'].map(l=>`
+        <div class="q-option-block" id="gii_${l}" onclick="selecionarGII('${l}')">
+          <div style="font-weight:700;color:var(--teal);margin-bottom:4px;">${l}.</div>
+          <div style="font-size:13px;line-height:1.6;">${GRUPO_II[l]}</div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarGrupos()">Continuar →</button>
+    <div id="gruposError" style="color:#FF6B6B;font-size:12px;text-align:center;margin-top:8px;"></div>
+  `;
+}
+
+window.selecionarGI = function(l) {
+  if(_giSel.includes(l)) { _giSel = _giSel.filter(x=>x!==l); }
+  else { if(_giSel.length>=2) _giSel.shift(); _giSel.push(l); }
+  ['A','B','C'].forEach(x=>{
+    const el=document.getElementById('gi_'+x);
+    if(el) el.classList.toggle('selected',_giSel.includes(x));
+  });
+};
+window.selecionarGII = function(l) {
+  if(_giiSel.includes(l)) { _giiSel = _giiSel.filter(x=>x!==l); }
+  else { if(_giiSel.length>=2) _giiSel.shift(); _giiSel.push(l); }
+  ['X','Y','Z'].forEach(x=>{
+    const el=document.getElementById('gii_'+x);
+    if(el) el.classList.toggle('selected',_giiSel.includes(x));
+  });
+};
+
+window.confirmarGrupos = function() {
+  const err = document.getElementById('gruposError');
+  if(_giSel.length===0||_giiSel.length===0){err.textContent='Selecione pelo menos um parágrafo em cada grupo.';return;}
+  if(_giSel.length===2&&_giiSel.length===2){err.textContent='Você pode selecionar dois parágrafos apenas em UM dos grupos.';return;}
+  TS.gi = _giSel[0]; TS.giExtra = _giSel[1]||null;
+  TS.gii = _giiSel[0]; TS.giiExtra = _giiSel[1]||null;
+  // Gerar ordem de prioridade
+  const gi_ord = _giSel.length===2 ? [_giSel[0],_giSel[1], ...'ABC'.split('').filter(x=>!_giSel.includes(x))] : [TS.gi,...'ABC'.split('').filter(x=>x!==TS.gi)];
+  const gii_ord = _giiSel.length===2 ? [_giiSel[0],_giiSel[1], ...'XYZ'.split('').filter(x=>!_giiSel.includes(x))] : [TS.gii,...'XYZ'.split('').filter(x=>x!==TS.gii)];
+  TS.ordemPrioridade = gerarOrdemPrioridade(gi_ord, gii_ord);
+  TS.etapa='m1'; _giSel=[]; _giiSel=[];
+  renderTeste();
+};
+
+// ─── ETAPA 1 — 45 PERGUNTAS M1 ──────────────────────────────────────────────
+
+function renderM1() {
+  const idx = TS.m1Idx;
   const total = PERGUNTAS_M1.length;
-  const idx   = testeState.pergIdx;
-  const pct   = Math.round((idx/total)*100);
-  document.getElementById('progressBar').style.width = pct+'%';
-  document.getElementById('testeSubtitle').textContent = `Módulo 1 de 3 — Pergunta ${idx+1} de ${total}`;
-  if(idx >= total) { calcularTipo(); return; }
+  if(idx>=total){ calcularOrdemM1(); return; }
+  const pct = Math.round(5 + (idx/total)*35);
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('testeSubtitle').textContent=`Etapa 2 de 5 — Pergunta ${idx+1} de ${total}`;
   const p = PERGUNTAS_M1[idx];
   document.getElementById('testeContent').innerHTML=`
     <div class="question-card">
-      <div class="q-num">Pergunta ${idx+1} de ${total}</div>
+      <div class="q-num">Pergunta ${idx+1}</div>
       <div class="q-text">${p.texto}</div>
       <div class="q-options">
         <button class="q-option" onclick="responderM1(2)">✅ Sim</button>
@@ -1020,142 +1183,208 @@ function renderModulo1() {
   `;
 }
 
-window.responderM1 = function(valor) {
-  const p = PERGUNTAS_M1[testeState.pergIdx];
-  testeState.respostasM1[p.tipo] += valor;
-  testeState.pergIdx++;
-  renderModulo1();
+window.responderM1 = function(v) {
+  TS.scoresM1[PERGUNTAS_M1[TS.m1Idx].tipo] += v;
+  TS.m1Idx++;
+  renderM1();
 };
 
-function calcularTipo() {
-  const scores = testeState.respostasM1;
-  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-  testeState.tipoVencedor = parseInt(sorted[0][0]);
-  // Confirmação: 3 perguntas de validação (já usamos as 5 do tipo como validação suficiente)
-  testeState.modulo = 2;
-  testeState.pergIdx = 0;
-  renderModulo2();
+function calcularOrdemM1() {
+  // Integrar ranking M1 na ordem de prioridade
+  // A ordem do Grupo I/II é principal; M1 serve como tie-breaker dentro dos tipos
+  // Reordenar ordemPrioridade priorizando os tipos com maior score M1
+  const scores = TS.scoresM1;
+  TS.ordemPrioridade.sort((a,b)=>{
+    const tipoA = TABELA_TIPO[a];
+    const tipoB = TABELA_TIPO[b];
+    if(!tipoA||!tipoB) return 0;
+    return (scores[tipoB]||0)-(scores[tipoA]||0);
+  });
+  // Mas mantém a primeira combinação dos Grupos como prioridade máxima
+  const primeira = TS.gi+TS.gii;
+  if(TS.ordemPrioridade.includes(primeira)){
+    TS.ordemPrioridade = [primeira,...TS.ordemPrioridade.filter(x=>x!==primeira)];
+  }
+  TS.etapa='validacao';
+  TS.prioIdx=0;
+  iniciarValidacao();
 }
 
-// ── MÓDULO 2 — ASA ──
-function renderModulo2() {
-  const tipo  = testeState.tipoVencedor;
-  const pergs = PERGUNTAS_ASA[tipo];
-  const idx   = testeState.pergIdx;
-  document.getElementById('progressBar').style.width = '66%';
-  document.getElementById('testeSubtitle').textContent = `Módulo 2 de 3 — Asa Dominante (${idx+1}/3)`;
-  if(idx >= pergs.length) { calcularAsa(); return; }
-  const p = pergs[idx];
+// ─── ETAPA 2 — VALIDAÇÃO ────────────────────────────────────────────────────
+
+function iniciarValidacao() {
+  const combo = TS.ordemPrioridade[TS.prioIdx];
+  if(!combo){ finalizarSemValidacao(); return; }
+  const tipo = TABELA_TIPO[combo];
+  if(!tipo){ TS.prioIdx++; iniciarValidacao(); return; }
+  TS.tipoTentado = tipo;
+  TS.validacaoIdx = 0;
+  TS.validacaoSim = 0;
+  renderValidacao();
+}
+
+function renderValidacao() {
+  const tipo = TS.tipoTentado;
+  const idx  = TS.validacaoIdx;
+  const pergs = VALIDACAO[tipo];
+  const combo = TS.ordemPrioridade[TS.prioIdx];
+  const pct = 40 + Math.round((idx/3)*20);
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('testeSubtitle').textContent=`Etapa 3 de 5 — Confirmação do Tipo`;
+  document.getElementById('testeContent').innerHTML=`
+    <div class="question-card" style="border-left:4px solid var(--purple);">
+      <div class="q-num" style="color:var(--purple);">Confirmação — ${NOMES_TIPO[tipo]}</div>
+      <div class="q-text">${pergs[idx]}</div>
+      <div class="q-options">
+        <button class="q-option" onclick="responderValidacao(true)">✅ Sim</button>
+        <button class="q-option" onclick="responderValidacao(false)">❌ Não</button>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--gray);margin-top:8px;">Pergunta ${idx+1} de 3 · Código ${combo}</div>
+  `;
+}
+
+window.responderValidacao = function(sim) {
+  if(sim) TS.validacaoSim++;
+  TS.validacaoIdx++;
+  if(TS.validacaoIdx===3){
+    if(TS.validacaoSim>=2){
+      TS.tipoFinal = TS.tipoTentado;
+      TS.etapa='asas';
+      TS.asaVotos={A:0,B:0}; TS.asaIdx=0;
+      renderTeste();
+    } else {
+      TS.prioIdx++;
+      iniciarValidacao();
+    }
+  } else {
+    renderValidacao();
+  }
+};
+
+function finalizarSemValidacao() {
+  // Se nenhum tipo validou, usa o com maior score M1
+  const sorted = Object.entries(TS.scoresM1).sort((a,b)=>b[1]-a[1]);
+  TS.tipoFinal = parseInt(sorted[0][0]);
+  TS.etapa='asas';
+  TS.asaVotos={A:0,B:0}; TS.asaIdx=0;
+  renderTeste();
+}
+
+// ─── ETAPA 3 — ASAS ─────────────────────────────────────────────────────────
+
+function renderAsas() {
+  const tipo = TS.tipoFinal;
+  const bloco = ASAS_PERGUNTAS[tipo];
+  const idx   = TS.asaIdx;
+  if(idx>=3){ calcularAsa(); return; }
+  document.getElementById('progressBar').style.width=(60+idx*5)+'%';
+  document.getElementById('testeSubtitle').textContent=`Etapa 4 de 5 — Asa Dominante (${idx+1}/3)`;
+  const p = bloco.perguntas[idx];
   document.getElementById('testeContent').innerHTML=`
     <div class="question-card">
-      <div class="q-num">Escolha a opção que mais combina com você</div>
-      <div class="q-text">${p.q}</div>
-      <div class="q-options" style="flex-direction:column;">
-        <button class="q-option" style="text-align:left;padding:12px 20px;" onclick="responderAsa('A',${p.asaA},${p.asaB})">
-          <strong>A)</strong> ${p.a}
+      <div class="q-num">Qual alternativa mais combina com você?</div>
+      <div class="q-options" style="flex-direction:column;gap:12px;margin-top:16px;">
+        <button class="q-option" style="text-align:left;padding:16px 20px;line-height:1.5;" onclick="responderAsa('A')">
+          <strong style="color:var(--purple);">A.</strong> ${p.a}
         </button>
-        <button class="q-option" style="text-align:left;padding:12px 20px;" onclick="responderAsa('B',${p.asaA},${p.asaB})">
-          <strong>B)</strong> ${p.b}
+        <button class="q-option" style="text-align:left;padding:16px 20px;line-height:1.5;" onclick="responderAsa('B')">
+          <strong style="color:var(--teal);">B.</strong> ${p.b}
         </button>
       </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--gray);margin-top:8px;">
+      A = Asa ${bloco.asaA} · B = Asa ${bloco.asaB}
     </div>
   `;
 }
 
-window.responderAsa = function(escolha, asaA, asaB) {
-  testeState.respostasAsa.push({escolha, asaA, asaB});
-  testeState.pergIdx++;
-  renderModulo2();
+window.responderAsa = function(v) {
+  TS.asaVotos[v]++;
+  TS.asaIdx++;
+  renderAsas();
 };
 
 function calcularAsa() {
-  const contagem = {};
-  testeState.respostasAsa.forEach(r=>{
-    const asa = r.escolha==='A' ? r.asaA : r.asaB;
-    contagem[asa] = (contagem[asa]||0) + 1;
-  });
-  const asaFinal = Object.entries(contagem).sort((a,b)=>b[1]-a[1])[0][0];
-  testeState.resultado.asa = asaFinal;
-  testeState.modulo = 3;
-  testeState.pergIdx = 0;
-  renderModulo3();
+  const bloco = ASAS_PERGUNTAS[TS.tipoFinal];
+  if(TS.asaVotos.A>=2){ TS.asaDom=bloco.asaA; TS.asaSec=bloco.asaB; }
+  else { TS.asaDom=bloco.asaB; TS.asaSec=bloco.asaA; }
+  TS.etapa='subtipos'; TS.subIdx=0;
+  renderTeste();
 }
 
-// ── MÓDULO 3 — SUBTIPO ──
-function renderModulo3() {
+// ─── ETAPA 4 — SUBTIPOS ─────────────────────────────────────────────────────
+
+function renderSubtipos() {
+  const idx   = TS.subIdx;
   const total = PERGUNTAS_SUBTIPO.length;
-  const idx   = testeState.pergIdx;
-  document.getElementById('progressBar').style.width = Math.round(66+(idx/total)*34)+'%';
-  document.getElementById('testeSubtitle').textContent = `Módulo 3 de 3 — Subtipo (${idx+1}/${total})`;
-  if(idx >= total) { calcularSubtipo(); return; }
+  if(idx>=total){ calcularSubtipos(); return; }
+  const pct = 75+Math.round((idx/total)*20);
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('testeSubtitle').textContent=`Etapa 5 de 5 — Subtipos (${idx+1}/${total})`;
   const p = PERGUNTAS_SUBTIPO[idx];
+  const subNomes = {sp:'Autopreservação',sx:'Um a Um',so:'Social'};
   document.getElementById('testeContent').innerHTML=`
     <div class="question-card">
-      <div class="q-num">Pergunta ${idx+1} de ${total}</div>
+      <div class="q-num">Pergunta ${idx+1}</div>
       <div class="q-text">${p.texto}</div>
       <div class="q-options">
-        <button class="q-option" onclick="responderSubtipo('${p.subtipo}',2)">✅ Sim</button>
-        <button class="q-option" onclick="responderSubtipo('${p.subtipo}',1)">🔸 Às vezes</button>
-        <button class="q-option" onclick="responderSubtipo('${p.subtipo}',0)">❌ Não</button>
+        <button class="q-option" onclick="responderSub('${p.sub}',2)">✅ Sim</button>
+        <button class="q-option" onclick="responderSub('${p.sub}',1)">🔸 Às vezes</button>
+        <button class="q-option" onclick="responderSub('${p.sub}',0)">❌ Não</button>
       </div>
     </div>
   `;
 }
 
-window.responderSubtipo = function(subtipo, valor) {
-  testeState.respostasSubtipo[subtipo] += valor;
-  testeState.pergIdx++;
-  renderModulo3();
+window.responderSub = function(sub,v) {
+  TS.subScores[sub]+=v;
+  TS.subIdx++;
+  renderSubtipos();
 };
 
-function calcularSubtipo() {
-  const scores = testeState.respostasSubtipo;
-  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-  testeState.resultado.subtipoDom  = sorted[0][0];
-  testeState.resultado.subtipoInt  = sorted[1][0];
-  testeState.resultado.subtipoRem  = sorted[2][0];
-  testeState.resultado.tipo = testeState.tipoVencedor;
-  salvarResultado();
+function calcularSubtipos() {
+  document.getElementById('progressBar').style.width='100%';
+  const sorted = Object.entries(TS.subScores).sort((a,b)=>b[1]-a[1]);
+  // Desempate: SP>SX>SO
+  const prioridade = ['sp','sx','so'];
+  sorted.sort((a,b)=> b[1]!==a[1] ? b[1]-a[1] : prioridade.indexOf(a[0])-prioridade.indexOf(b[0]));
+  TS.subDom = sorted[0][0];
+  TS.subInt = sorted[1][0];
+  TS.subRem = sorted[2][0];
+  salvarResultadoFinal();
 }
 
-// ── SALVAR RESULTADO NO FIRESTORE ──
-async function salvarResultado() {
-  const r   = testeState.resultado;
+async function salvarResultadoFinal() {
+  document.getElementById('testeContent').innerHTML=`<div style="text-align:center;padding:48px;color:var(--gray);">Calculando seu perfil... 🔮</div>`;
   const cod = window._state.codigoAtivo;
-  document.getElementById('progressBar').style.width='100%';
-  document.getElementById('testeContent').innerHTML=`<div style="text-align:center;padding:40px;color:var(--gray);">Calculando seu perfil... 🔮</div>`;
-
-  // Montar combinação de subtipo (ex: ap_1a1_soc)
-  const combinacao = [r.subtipoDom, r.subtipoInt, r.subtipoRem].join('_');
-
   try {
-    if(cod) {
-      // Atualizar código como usado
-      const {updateDoc:upd, doc:docRef2} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-      await updateDoc(doc(db,'nself_codigos', cod.id), {status:'usado', usadoEm: serverTimestamp()});
-      // Salvar laudo
+    if(cod){
+      await updateDoc(doc(db,'nself_codigos',cod.id),{status:'usado',usadoEm:serverTimestamp()});
       await addDoc(collection(db,'nself_laudos'),{
         nome: cod.nomeDestinatario||'Anônimo',
         empresa: cod.empresa||'PF',
         codigoId: cod.id,
-        tipo: r.tipo,
-        tipoNome: NOMES_TIPO[r.tipo],
-        asa: r.asa,
-        subtipoDominante: r.subtipoDom,
-        subtipoIntermediario: r.subtipoInt,
-        subtipoRemissivo: r.subtipoRem,
-        combinacao,
-        scoresM1: testeState.respostasM1,
+        tipo: TS.tipoFinal,
+        tipoNome: NOMES_TIPO[TS.tipoFinal],
+        asaDominante: TS.asaDom,
+        asaSecundaria: TS.asaSec,
+        subtipoDominante: TS.subDom,
+        subtipoIntermediario: TS.subInt,
+        subtipoRemissivo: TS.subRem,
+        scoresM1: TS.scoresM1,
+        scoresSubtipo: TS.subScores,
+        grupoI: TS.gi, grupoII: TS.gii,
         criadoEm: serverTimestamp(),
       });
     }
-  } catch(e){console.warn('Erro ao salvar:',e);}
+  } catch(e){ console.warn('Salvar resultado:',e); }
 
   // Mostrar resultado
-  document.getElementById('resultTipoCircle').textContent = r.tipo;
-  document.getElementById('resultTipoNome').textContent   = NOMES_TIPO[r.tipo];
-  document.getElementById('resultAsa').textContent        = `Asa ${r.asa}`;
-  document.getElementById('resultSubtipo').textContent    = NOMES_SUBTIPO[r.subtipoDom];
+  document.getElementById('resultTipoCircle').textContent = TS.tipoFinal;
+  document.getElementById('resultTipoNome').textContent   = NOMES_TIPO[TS.tipoFinal];
+  document.getElementById('resultAsa').textContent        = `Asa ${TS.asaDom} (dominante) · Asa ${TS.asaSec} (secundária)`;
+  document.getElementById('resultSubtipo').textContent    = NOMES_SUB[TS.subDom];
   navigateTo('colab-resultado');
   showToast('Avaliação concluída!','success');
 }
