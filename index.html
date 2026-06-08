@@ -1285,31 +1285,34 @@ window.responderM1 = function(v) {
 };
 
 function calcularOrdemM1() {
-  // Integrar ranking M1 na ordem de prioridade
-  // A ordem do Grupo I/II é principal; M1 serve como tie-breaker dentro dos tipos
-  // Reordenar ordemPrioridade priorizando os tipos com maior score M1
+  // LÓGICA CORRETA:
+  // 1. Tipo candidato principal = tipo da combinação de maior score nos Grupos I+II (já em TS.ordemTipos[0])
+  // 2. Se falhar validação, próximo candidato = tipo com maior score nas 45 perguntas
+  // 3. Construir fila: [tipo do grupo, ...restantes ordenados por score M1]
+
   const scores = TS.scoresM1;
-  TS.ordemPrioridade.sort((a,b)=>{
-    const tipoA = TABELA_TIPO[a];
-    const tipoB = TABELA_TIPO[b];
-    if(!tipoA||!tipoB) return 0;
-    return (scores[tipoB]||0)-(scores[tipoA]||0);
-  });
-  // Mas mantém a primeira combinação dos Grupos como prioridade máxima
-  const primeira = TS.gi+TS.gii;
-  if(TS.ordemPrioridade.includes(primeira)){
-    TS.ordemPrioridade = [primeira,...TS.ordemPrioridade.filter(x=>x!==primeira)];
-  }
-  TS.etapa='validacao';
-  TS.prioIdx=0;
+
+  // Tipo principal já definido pelos Grupos (ordemTipos[0])
+  const tipoPrincipal = TS.ordemTipos ? TS.ordemTipos[0] : TABELA_TIPO[TS.ordemPrioridade[0]];
+
+  // Ordenar todos os tipos por score M1, excluindo o principal
+  const outrosTipos = [1,2,3,4,5,6,7,8,9]
+    .filter(t => t !== tipoPrincipal)
+    .sort((a,b) => (scores[b]||0) - (scores[a]||0));
+
+  // Fila final: principal primeiro, depois os demais por score M1
+  TS.filaValidacao = [tipoPrincipal, ...outrosTipos];
+  TS.prioIdx = 0;
+  TS.etapa = 'validacao';
   iniciarValidacao();
 }
 
 // ─── ETAPA 2 — VALIDAÇÃO ────────────────────────────────────────────────────
 
 function iniciarValidacao() {
-  const tipo = TS.ordemTipos ? TS.ordemTipos[TS.prioIdx] : TABELA_TIPO[TS.ordemPrioridade[TS.prioIdx]];
-  if(!tipo){ finalizarSemValidacao(); return; }
+  const fila = TS.filaValidacao || TS.ordemTipos || [];
+  const tipo = fila[TS.prioIdx];
+  if(!tipo || TS.prioIdx >= fila.length){ finalizarSemValidacao(); return; }
   TS.tipoTentado = tipo;
   TS.validacaoIdx = 0;
   TS.validacaoSim = 0;
@@ -1318,41 +1321,52 @@ function iniciarValidacao() {
 
 function renderValidacao() {
   const tipo = TS.tipoTentado;
-  const idx  = TS.validacaoIdx;
-  const pergs = VALIDACAO[tipo];
-  const combo = TS.ordemPrioridade[TS.prioIdx];
-  const pct = 40 + Math.round((idx/3)*20);
-  document.getElementById('progressBar').style.width=pct+'%';
-  document.getElementById('testeSubtitle').textContent=`Etapa 3 de 5 — Confirmação do Tipo`;
+  // Validação usa as 5 perguntas do tipo já respondidas no M1
+  // Calcula automaticamente: score >= 3/5 = validado
+  const score = TS.scoresM1[tipo] || 0;
+  const total5 = PERGUNTAS_M1.filter(p=>p.tipo===tipo).length; // deve ser 5
+
+  document.getElementById('progressBar').style.width='62%';
+  document.getElementById('testeSubtitle').textContent='Confirmação do Tipo';
+
+  // Mostrar resultado da validação automática com base nas respostas já dadas
+  const validado = score >= 3;
+  const pct = Math.round((score/total5)*100);
+
   document.getElementById('testeContent').innerHTML=`
-    <div class="question-card" style="border-left:4px solid var(--purple);">
-      <div class="q-num" style="color:var(--purple);">Confirmação — ${NOMES_TIPO[tipo]}</div>
-      <div class="q-text">${pergs[idx]}</div>
-      <div class="q-options">
-        <button class="q-option" onclick="responderValidacao(true)">✅ Tenho essa tendência</button>
-        <button class="q-option" onclick="responderValidacao(false)">❌ Não tenho essa tendência</button>
+    <div class="question-card" style="border-left:4px solid var(--purple);text-align:center;padding:32px;">
+      <div class="q-num" style="color:var(--purple);font-size:13px;margin-bottom:8px;">VERIFICANDO SEU PERFIL</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-bottom:8px;">${NOMES_TIPO[tipo]}</div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:24px;">Compatibilidade com suas respostas: <strong style="color:var(--purple)">${pct}%</strong></div>
+      <div style="background:var(--border);border-radius:4px;height:8px;margin-bottom:24px;">
+        <div style="width:${pct}%;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--teal));transition:width .5s;"></div>
       </div>
+      ${validado
+        ? `<div style="color:#1a9460;font-size:14px;font-weight:600;margin-bottom:20px;">✅ Perfil confirmado!</div>
+           <button class="btn btn-primary" style="padding:14px 32px;" onclick="confirmarTipo()">Continuar →</button>`
+        : `<div style="color:var(--gray);font-size:13px;margin-bottom:20px;">Suas respostas indicam baixa compatibilidade com este perfil. Verificando próxima hipótese...</div>
+           <button class="btn btn-outline" style="padding:14px 32px;" onclick="proximaHipotese()">Verificar próxima hipótese →</button>`
+      }
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--gray);margin-top:8px;">Pergunta ${idx+1} de 3 · Código ${combo}</div>
   `;
 }
 
+window.confirmarTipo = function() {
+  TS.tipoFinal = TS.tipoTentado;
+  TS.etapa='asas';
+  TS.asaVotos={A:0,B:0}; TS.asaIdx=0;
+  renderTeste();
+};
+
+window.proximaHipotese = function() {
+  TS.prioIdx++;
+  iniciarValidacao();
+};
+
 window.responderValidacao = function(sim) {
+  // mantido por compatibilidade
   if(sim) TS.validacaoSim++;
   TS.validacaoIdx++;
-  if(TS.validacaoIdx===3){
-    if(TS.validacaoSim>=2){
-      TS.tipoFinal = TS.tipoTentado;
-      TS.etapa='asas';
-      TS.asaVotos={A:0,B:0}; TS.asaIdx=0;
-      renderTeste();
-    } else {
-      TS.prioIdx++;
-      iniciarValidacao();
-    }
-  } else {
-    renderValidacao();
-  }
 };
 
 function finalizarSemValidacao() {
