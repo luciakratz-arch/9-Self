@@ -266,6 +266,22 @@ tr:hover td{background:#FAFAFE;}
 
 
 
+
+/* SLIDERS */
+.pct-slider{
+  flex:1;-webkit-appearance:none;height:6px;border-radius:4px;
+  background:linear-gradient(90deg,var(--purple) 0%,var(--teal) 100%);
+  outline:none;cursor:pointer;
+}
+.pct-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--purple);cursor:pointer;box-shadow:0 2px 6px rgba(123,0,196,0.3);
+}
+.slider-pct{
+  font-weight:700;font-size:14px;color:var(--purple);min-width:40px;text-align:right;
+}
+.slider-block{background:var(--light);border-radius:12px;padding:16px;}
+
 /* BLOCOS DE PARÁGRAFO */
 .para-block{
   border:2px solid var(--border);border-radius:12px;padding:16px 18px;
@@ -1096,104 +1112,147 @@ let _giSel = [], _giiSel = [];
 function renderGrupos() {
   _giSel=[]; _giiSel=[];
   document.getElementById('progressBar').style.width='5%';
-  document.getElementById('testeSubtitle').textContent='Etapa 1 de 5 — Identificação Inicial';
+  document.getElementById('testeSubtitle').textContent='Fase 1 — Identificação Inicial';
   document.getElementById('testeContent').innerHTML=`
     <div class="question-card" style="margin-bottom:16px;">
       <div class="q-num" style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--dark);">INSTRUÇÕES</div>
       <div style="font-size:13px;line-height:1.8;color:var(--gray);">
-        <p style="margin-bottom:8px;">Selecione um parágrafo em cada um dos dois grupos de afirmações. Ele deverá ser aquele que melhor espelha suas atitudes e comportamentos até o momento.</p>
-        <p style="margin-bottom:8px;">Não é preciso concordar inteiramente com cada palavra ou afirmativa no parágrafo escolhido! Você pode concordar com 80 ou 90% com o que se afirma nele e, ainda assim, considerá-lo preferível aos outros dois do grupo. Porém, é preciso que você concorde com o tom geral e com a "filosofia" em que ele se baseia. Provavelmente você discordará de alguma parte de cada um dos parágrafos escolhidos. Não rejeite um parágrafo por causa de uma palavrinha ou frase! Lembre-se: o importante é a visão geral.</p>
-        <p style="margin-bottom:8px;">Não analise excessivamente suas escolhas. Escolha o parágrafo que você <strong>"sente"</strong> que é o mais certo para você, mesmo que não concorde 100% com ele. A motivação e a ideia geral do parágrafo como um todo são mais importantes que suas partes individualmente. <strong>Siga sua intuição.</strong></p>
-        <p>Se não conseguir decidir qual o parágrafo que melhor o descreve em qualquer dos dois grupos, pode escolher dois, mas só em <strong>um</strong> dos grupos: por exemplo, C no Grupo I e X e Y no Grupo II.</p>
+        <p style="margin-bottom:8px;">Leia cada parágrafo com atenção e indique <strong>o quanto ele combina com você</strong>, usando a barra de 0% a 100%.</p>
+        <p style="margin-bottom:8px;">Não é preciso concordar inteiramente — o importante é o tom geral e a "filosofia" do parágrafo. <strong>Siga sua intuição.</strong></p>
+        <p>Faça isso para os dois grupos.</p>
       </div>
     </div>
 
-    <div class="question-card" id="cardGrupoI" style="margin-bottom:16px;">
-      <div class="q-num" style="color:var(--purple);font-weight:700;font-size:14px;margin-bottom:16px;">GRUPO I — Selecione o parágrafo que mais combina com você</div>
+    <div class="question-card" style="margin-bottom:16px;">
+      <div class="q-num" style="color:var(--purple);font-weight:700;font-size:14px;margin-bottom:20px;">GRUPO I — Quanto cada parágrafo combina com você?</div>
 
-      <div class="para-block" id="gi_A" onclick="selecionarGI('A')">
-        <div class="para-letra" style="color:var(--purple);">A.</div>
-        <div class="para-texto">Até hoje, tendi a ser bastante independente e assertivo: para mim, a vida funciona melhor quando você a encara de frente. Defino minhas próprias metas, envolvo-me com as coisas e quero fazê-las acontecer. Não gosto de ficar de braços cruzados — quero realizar grandes coisas e causar impacto. Não ando em busca de confrontos, mas também não deixo que ninguém me pressione. Na maioria das vezes, sei o que quero e procuro consegui-lo. Geralmente entro de cabeça tanto no trabalho quanto na diversão.</div>
+      <div class="slider-block" style="margin-bottom:24px;">
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <span style="font-weight:800;color:var(--purple);font-size:16px;min-width:20px;">A.</span>
+          <div style="font-size:13px;line-height:1.75;color:var(--dark);">Até hoje, tendi a ser bastante independente e assertivo: para mim, a vida funciona melhor quando você a encara de frente. Defino minhas próprias metas, envolvo-me com as coisas e quero fazê-las acontecer. Não gosto de ficar de braços cruzados — quero realizar grandes coisas e causar impacto. Não ando em busca de confrontos, mas também não deixo que ninguém me pressione. Na maioria das vezes, sei o que quero e procuro consegui-lo. Geralmente entro de cabeça tanto no trabalho quanto na diversão.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+          <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_A" oninput="updateSliderLabel('A')"/>
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+          <span class="slider-pct" id="lbl_A">50%</span>
+        </div>
       </div>
 
-      <div class="para-block" id="gi_B" onclick="selecionarGI('B')">
-        <div class="para-letra" style="color:var(--purple);">B.</div>
-        <div class="para-texto">Até hoje tenho sido uma pessoa tranquila e estou acostumado a "me virar" sozinho. Em sociedade, normalmente não chamo a atenção, e é raro que me imponha a qualquer custo. Não me sinto à vontade em posições de liderança nem em competições, como tanta gente. É provável que me julguem um tanto sonhador — é a imaginação que alimenta boa parte da emoção que sinto. Não me incomodo se não tiver de ser ativo o tempo inteiro.</div>
+      <div class="slider-block" style="margin-bottom:24px;">
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <span style="font-weight:800;color:var(--purple);font-size:16px;min-width:20px;">B.</span>
+          <div style="font-size:13px;line-height:1.75;color:var(--dark);">Até hoje tenho sido uma pessoa tranquila e estou acostumado a "me virar" sozinho. Em sociedade, normalmente não chamo a atenção, e é raro que me imponha a qualquer custo. Não me sinto à vontade em posições de liderança nem em competições, como tanta gente. É provável que me julguem um tanto sonhador — é a imaginação que alimenta boa parte da emoção que sinto. Não me incomodo se não tiver de ser ativo o tempo inteiro.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+          <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_B" oninput="updateSliderLabel('B')"/>
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+          <span class="slider-pct" id="lbl_B">50%</span>
+        </div>
       </div>
 
-      <div class="para-block" id="gi_C" onclick="selecionarGI('C')">
-        <div class="para-letra" style="color:var(--purple);">C.</div>
-        <div class="para-texto">Até hoje, tenho sido extremamente responsável e dedicado. Para mim é terrível não poder honrar meus compromissos ou colocar-me à altura das expectativas. Quero que as pessoas saibam que desejo ajudá-las e fazer o que acredito ser melhor para elas. Já fiz grandes sacrifícios para o bem dos outros, estivessem eles sabendo ou não. Muitas vezes esqueço de mim mesmo; faço o que tenho que fazer e depois — se sobrar tempo — relaxo (e faço o que realmente queria).</div>
+      <div class="slider-block" style="margin-bottom:24px;">
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <span style="font-weight:800;color:var(--purple);font-size:16px;min-width:20px;">C.</span>
+          <div style="font-size:13px;line-height:1.75;color:var(--dark);">Até hoje, tenho sido extremamente responsável e dedicado. Para mim é terrível não poder honrar meus compromissos ou colocar-me à altura das expectativas. Quero que as pessoas saibam que desejo ajudá-las e fazer o que acredito ser melhor para elas. Já fiz grandes sacrifícios para o bem dos outros, estivessem eles sabendo ou não. Muitas vezes esqueço de mim mesmo; faço o que tenho que fazer e depois — se sobrar tempo — relaxo (e faço o que realmente queria).</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+          <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_C" oninput="updateSliderLabel('C')"/>
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+          <span class="slider-pct" id="lbl_C">50%</span>
+        </div>
       </div>
 
-      <div id="giError" style="color:#FF6B6B;font-size:12px;margin-top:8px;min-height:16px;"></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:14px;" onclick="confirmarGrupoI()">Confirmar Grupo I e continuar →</button>
+      <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarGrupoI()">Confirmar Grupo I e continuar →</button>
     </div>
 
     <div id="cardGrupoII" style="display:none;">
       <div class="question-card" style="margin-bottom:16px;">
-        <div class="q-num" style="color:var(--teal);font-weight:700;font-size:14px;margin-bottom:16px;">GRUPO II — Selecione o parágrafo que mais combina com você</div>
+        <div class="q-num" style="color:var(--teal);font-weight:700;font-size:14px;margin-bottom:20px;">GRUPO II — Quanto cada parágrafo combina com você?</div>
 
-        <div class="para-block" id="gii_X" onclick="selecionarGII('X')">
-          <div class="para-letra" style="color:var(--teal);">X.</div>
-          <div class="para-texto">Sou uma pessoa que geralmente procura ter uma visão positiva e achar que as coisas correrão da melhor forma possível. Sempre encontro alguma coisa que me entusiasme e atividades diferentes com que me ocupar. Gosto de companhia e de ajudar os outros a serem felizes — gosto de compartilhar o bem-estar que sinto. (Nem sempre estou tão bem, mas tento não deixar transparecer!) Porém, para manter essa visão positiva, às vezes tive de adiar demais a resolução de alguns problemas pessoais.</div>
+        <div class="slider-block" style="margin-bottom:24px;">
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <span style="font-weight:800;color:var(--teal);font-size:16px;min-width:20px;">X.</span>
+            <div style="font-size:13px;line-height:1.75;color:var(--dark);">Sou uma pessoa que geralmente procura ter uma visão positiva e achar que as coisas correrão da melhor forma possível. Sempre encontro alguma coisa que me entusiasme e atividades diferentes com que me ocupar. Gosto de companhia e de ajudar os outros a serem felizes — gosto de compartilhar o bem-estar que sinto. (Nem sempre estou tão bem, mas tento não deixar transparecer!) Porém, para manter essa visão positiva, às vezes tive de adiar demais a resolução de alguns problemas pessoais.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+            <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_X" oninput="updateSliderLabel('X')"/>
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+            <span class="slider-pct" id="lbl_X">50%</span>
+          </div>
         </div>
 
-        <div class="para-block" id="gii_Y" onclick="selecionarGII('Y')">
-          <div class="para-letra" style="color:var(--teal);">Y.</div>
-          <div class="para-texto">Sou uma pessoa que não esconde o que sente — todo mundo sabe quando não gosto de alguma coisa. Posso ser reservado, mas no fundo sou mais sensível do que deixo transparecer. Quero saber como as pessoas me julgam e com quem ou o que eu posso contar — na minha opinião sobre elas quase sempre é bem clara. Quando alguma coisa me aborrece, quero que os outros reajam e se afetem tanto quanto eu. Sei quais são as regras, mas não gosto que ninguém me diga o que fazer. Quero decidir por mim mesmo.</div>
+        <div class="slider-block" style="margin-bottom:24px;">
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <span style="font-weight:800;color:var(--teal);font-size:16px;min-width:20px;">Y.</span>
+            <div style="font-size:13px;line-height:1.75;color:var(--dark);">Sou uma pessoa que não esconde o que sente — todo mundo sabe quando não gosto de alguma coisa. Posso ser reservado, mas no fundo sou mais sensível do que deixo transparecer. Quero saber como as pessoas me julgam e com quem ou o que eu posso contar — na minha opinião sobre elas quase sempre é bem clara. Quando alguma coisa me aborrece, quero que os outros reajam e se afetem tanto quanto eu. Sei quais são as regras, mas não gosto que ninguém me diga o que fazer. Quero decidir por mim mesmo.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+            <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_Y" oninput="updateSliderLabel('Y')"/>
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+            <span class="slider-pct" id="lbl_Y">50%</span>
+          </div>
         </div>
 
-        <div class="para-block" id="gii_Z" onclick="selecionarGII('Z')">
-          <div class="para-letra" style="color:var(--teal);">Z.</div>
-          <div class="para-texto">Sou uma pessoa lógica e autocontrolada — não fico à vontade com os sentimentos. Sou competente — até perfeccionista — e prefiro trabalhar sozinho. Quando surgem conflitos ou problemas pessoais, procuro não envolver meus sentimentos. Há quem me considere muito frio e distante, mas não quero que minhas reações emocionais me afastem do que realmente me importa. Geralmente não demonstro minhas reações quando alguém me "incomoda".</div>
+        <div class="slider-block" style="margin-bottom:24px;">
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <span style="font-weight:800;color:var(--teal);font-size:16px;min-width:20px;">Z.</span>
+            <div style="font-size:13px;line-height:1.75;color:var(--dark);">Sou uma pessoa lógica e autocontrolada — não fico à vontade com os sentimentos. Sou competente — até perfeccionista — e prefiro trabalhar sozinho. Quando surgem conflitos ou problemas pessoais, procuro não envolver meus sentimentos. Há quem me considere muito frio e distante, mas não quero que minhas reações emocionais me afastem do que realmente me importa. Geralmente não demonstro minhas reações quando alguém me "incomoda".</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+            <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_Z" oninput="updateSliderLabel('Z')"/>
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+            <span class="slider-pct" id="lbl_Z">50%</span>
+          </div>
         </div>
 
-        <div id="giiError" style="color:#FF6B6B;font-size:12px;margin-top:8px;min-height:16px;"></div>
-        <button class="btn btn-primary" style="width:100%;margin-top:16px;padding:14px;" onclick="confirmarGrupos()">Iniciar avaliação →</button>
+        <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarGrupos()">Iniciar avaliação →</button>
       </div>
     </div>
   `;
 }
 
-window.selecionarGI = function(l) {
-  // SELEÇÃO ÚNICA — desmarca todos e marca só o clicado
-  _giSel = [l];
-  ['A','B','C'].forEach(x=>{
-    const el = document.getElementById('gi_'+x);
-    if(el) el.classList.toggle('para-selected', x===l);
-  });
-};
-
-window.selecionarGII = function(l) {
-  // SELEÇÃO ÚNICA — desmarca todos e marca só o clicado
-  _giiSel = [l];
-  ['X','Y','Z'].forEach(x=>{
-    const el = document.getElementById('gii_'+x);
-    if(el) el.classList.toggle('para-selected', x===l);
-  });
+window.updateSliderLabel = function(l) {
+  const val = document.getElementById('sl_'+l).value;
+  document.getElementById('lbl_'+l).textContent = val+'%';
+  document.getElementById('lbl_'+l).style.color = val>60?'var(--purple)':val<40?'var(--gray)':'var(--teal)';
 };
 
 window.confirmarGrupoI = function() {
-  const err = document.getElementById('giError');
-  if(_giSel.length===0){err.textContent='Selecione um parágrafo do Grupo I antes de continuar.';return;}
-  err.textContent='';
-  document.getElementById('cardGrupoI').style.opacity='0.6';
-  document.getElementById('cardGrupoI').style.pointerEvents='none';
   document.getElementById('cardGrupoII').style.display='block';
   setTimeout(()=>document.getElementById('cardGrupoII').scrollIntoView({behavior:'smooth'}),100);
 };
 
 window.confirmarGrupos = function() {
-  const err = document.getElementById('giiError');
-  if(_giiSel.length===0){err.textContent='Selecione um parágrafo do Grupo II antes de continuar.';return;}
-  err.textContent='';
-  TS.gi  = _giSel[0];  TS.giExtra  = null;
-  TS.gii = _giiSel[0]; TS.giiExtra = null;
-  const gi_ord  = [TS.gi,  ...'ABC'.split('').filter(x=>x!==TS.gi)];
-  const gii_ord = [TS.gii, ...'XYZ'.split('').filter(x=>x!==TS.gii)];
-  TS.ordemPrioridade = gerarOrdemPrioridade(gi_ord, gii_ord);
-  TS.etapa='m1'; _giSel=[]; _giiSel=[];
+  // Ler percentuais
+  const pctGI  = { A: parseInt(document.getElementById('sl_A').value), B: parseInt(document.getElementById('sl_B').value), C: parseInt(document.getElementById('sl_C').value) };
+  const pctGII = { X: parseInt(document.getElementById('sl_X').value), Y: parseInt(document.getElementById('sl_Y').value), Z: parseInt(document.getElementById('sl_Z').value) };
+
+  // Guardar percentuais no estado
+  TS.pctGI  = pctGI;
+  TS.pctGII = pctGII;
+
+  // Gerar todas as combinações com score = pctGI * pctGII
+  const combos = [];
+  for(const gi of ['A','B','C']) {
+    for(const gii of ['X','Y','Z']) {
+      const tipo = TABELA_TIPO[gi+gii];
+      if(tipo) combos.push({ combo: gi+gii, tipo, score: pctGI[gi] * pctGII[gii] });
+    }
+  }
+  // Ordenar do maior score para o menor
+  combos.sort((a,b)=>b.score-a.score);
+  TS.ordemPrioridade = combos.map(x=>x.combo);
+  TS.ordemTipos      = combos.map(x=>x.tipo);
+  TS.gi  = combos[0].combo[0];
+  TS.gii = combos[0].combo[1];
+
+  TS.etapa='m1';
   renderTeste();
 };
 
@@ -1249,10 +1308,8 @@ function calcularOrdemM1() {
 // ─── ETAPA 2 — VALIDAÇÃO ────────────────────────────────────────────────────
 
 function iniciarValidacao() {
-  const combo = TS.ordemPrioridade[TS.prioIdx];
-  if(!combo){ finalizarSemValidacao(); return; }
-  const tipo = TABELA_TIPO[combo];
-  if(!tipo){ TS.prioIdx++; iniciarValidacao(); return; }
+  const tipo = TS.ordemTipos ? TS.ordemTipos[TS.prioIdx] : TABELA_TIPO[TS.ordemPrioridade[TS.prioIdx]];
+  if(!tipo){ finalizarSemValidacao(); return; }
   TS.tipoTentado = tipo;
   TS.validacaoIdx = 0;
   TS.validacaoSim = 0;
