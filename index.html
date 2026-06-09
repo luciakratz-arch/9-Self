@@ -552,8 +552,8 @@ tr:hover td{background:#FAFAFE;}
                 <div style="font-size:15px;font-weight:600;" id="resultAsa">—</div>
               </div>
               <div style="background:var(--light);border-radius:10px;padding:12px;">
-                <div style="font-size:11px;color:var(--gray);">Subtipo</div>
-                <div style="font-size:15px;font-weight:600;" id="resultSubtipo">—</div>
+                <div style="font-size:11px;color:var(--gray);">Subtipo (Dom · Int · Rem)</div>
+                <div style="font-size:13px;font-weight:600;" id="resultSubtipo">—</div>
               </div>
             </div>
           </div>
@@ -1064,8 +1064,8 @@ const PERGUNTAS_SUBTIPO = [
 ];
 
 // ── NOMES ──
-const NOMES_TIPO = {1:'Tipo 1 — O Reformista',2:'Tipo 2 — O Ajudante',3:'Tipo 3 — O Realizador',4:'Tipo 4 — O Individualista',5:'Tipo 5 — O Investigador',6:'Tipo 6 — O Leal',7:'Tipo 7 — O Entusiasta',8:'Tipo 8 — O Desafiador',9:'Tipo 9 — O Pacificador'};
-const NOMES_SUB = {sp:'Autopreservação',sx:'Um a Um (Sexual)',so:'Social'};
+const NOMES_TIPO = {1:'Perfeição e Excelência (Traço Tipo 1)',2:'Prestativo e Relacional (Traço Tipo 2)',3:'Performance e Imagem (Traço Tipo 3)',4:'Autêntico e Profundo (Traço Tipo 4)',5:'Observador e Privacidade (Traço Tipo 5)',6:'Precavido e Questionador (Traço Tipo 6)',7:'Visionário e Otimista (Traço Tipo 7)',8:'Desafiador e Controlador (Traço Tipo 8)',9:'Harmônico e Diplomático (Traço Tipo 9)'};
+const NOMES_SUB = {sp:'Autopreservação',sx:'1 a 1',so:'Social'};
 
 // ── GRUPO I TEXTOS ──
 const GRUPO_I = {
@@ -1495,7 +1495,7 @@ function renderSubtipos() {
           <div class="subtipo-pos" id="pos_${sub}">${i+1}º</div>
           <div style="flex:1;">
             <div style="font-weight:700;font-size:12px;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">
-              ${ sub==='sex'?'Um a Um (Sexual)':sub==='ap'?'Autopreservação':'Social' }
+              ${ sub==='sex'?'1 a 1':sub==='ap'?'Autopreservação':'Social' }
             </div>
             <div style="font-size:13px;line-height:1.65;color:var(--dark);">${textos[sub]}</div>
           </div>
@@ -1566,10 +1566,12 @@ async function salvarResultadoFinal() {
   } catch(e){ console.warn('Salvar resultado:',e); }
 
   // Mostrar resultado
+  const nomeSub = {'sex':'1 a 1','ap':'Autopreservação','so':'Social','soc':'Social'};
   document.getElementById('resultTipoCircle').textContent = TS.tipoFinal;
   document.getElementById('resultTipoNome').textContent   = NOMES_TIPO[TS.tipoFinal];
   document.getElementById('resultAsa').textContent        = `Asa ${TS.asaDom} (dominante) · Asa ${TS.asaSec} (secundária)`;
-  document.getElementById('resultSubtipo').textContent    = NOMES_SUB[TS.subDom];
+  document.getElementById('resultSubtipo').textContent    = 
+    `${nomeSub[TS.subDom]||TS.subDom} · ${nomeSub[TS.subInt]||TS.subInt} · ${nomeSub[TS.subRem]||TS.subRem}`;
   navigateTo('colab-resultado');
   showToast('Avaliação concluída!','success');
 }
