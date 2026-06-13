@@ -326,11 +326,13 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     HDR = f'| {nome}  |  {cargo} |'
 
     # ── Page templates ──────────────────────────────────────────────────
+    FOOTER_COLOR = HexColor('#7B1D6B')  # mesma cor do canto da capa
+
     def footer_mag(c):
-        c.setFillColor(MAG); c.rect(0,0,PW,1.1*cm,fill=1,stroke=0)
+        c.setFillColor(FOOTER_COLOR); c.rect(0,0,PW,1.4*cm,fill=1,stroke=0)
         c.setFont('Helvetica-Bold',6.5); c.setFillColor(WHITE)
-        c.drawCentredString(PW/2,0.62*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF')
-        c.drawCentredString(PW/2,0.28*cm,'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES')
+        c.drawCentredString(PW/2,0.85*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF')
+        c.drawCentredString(PW/2,0.50*cm,'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES')
 
     def cover_cb(c, doc):
         c.saveState()
@@ -373,10 +375,10 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
         c.saveState()
         c.setFont('Helvetica-Bold',6.5); c.setFillColorRGB(1,1,1,alpha=0.7)
-        c.drawCentredString(PW/2,0.62*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF')
-        c.drawCentredString(PW/2,0.28*cm,'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES')
+        c.drawCentredString(PW/2,0.85*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF')
+        c.drawCentredString(PW/2,0.50*cm,'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES')
         c.setFont('Helvetica',8)
-        c.drawRightString(PW-1.5*cm,0.38*cm,'1')
+        c.drawRightString(PW-1.5*cm,0.55*cm,'1')
         c.restoreState()
 
     def inner_cb(c, doc):
@@ -387,7 +389,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         c.drawString(ML,PH-1.55*cm,HDR)
         footer_mag(c)
         c.setFont('Helvetica',8); c.setFillColor(WHITE)
-        c.drawRightString(PW-1.5*cm,0.38*cm,str(doc.page))
+        c.drawRightString(PW-1.5*cm,0.55*cm,str(doc.page))
         c.restoreState()
 
     def hdr():
