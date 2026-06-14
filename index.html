@@ -557,9 +557,10 @@ tr:hover td{background:#FAFAFE;}
               </div>
             </div>
           </div>
-          <button class="btn btn-primary" style="font-size:15px;padding:14px 32px;" onclick="showToast('Laudo gerado com sucesso!','success')">
+          <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;" onclick="baixarLaudo()">
             ⬇ Baixar Laudo PDF
           </button>
+          <div id="pdfStatus" style="margin-top:14px;font-size:13px;color:var(--gray);min-height:20px;"></div>
           <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #7B1D6B;border-radius:14px;padding:20px 22px;text-align:left;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
               <span style="font-size:20px;">⚠️</span>
@@ -1568,7 +1569,7 @@ async function salvarResultadoFinal() {
   try {
     if(cod){
       await updateDoc(doc(db,'nself_codigos',cod.id),{status:'usado',usadoEm:serverTimestamp()});
-      await addDoc(collection(db,'nself_laudos'),{
+      const laudoRef = await addDoc(collection(db,'nself_laudos'),{
         nome: cod.nomeDestinatario||'Anônimo',
         empresa: cod.empresa||'PF',
         codigoId: cod.id,
@@ -1584,6 +1585,7 @@ async function salvarResultadoFinal() {
         grupoI: TS.gi, grupoII: TS.gii,
         criadoEm: serverTimestamp(),
       });
+      window._state.laudoDocId = laudoRef.id;
     }
   } catch(e){ console.warn('Salvar resultado:',e); }
 
@@ -1598,7 +1600,78 @@ async function salvarResultadoFinal() {
   showToast('Avaliação concluída!','success');
 }
 
-// ── CONSTANTES DE URL ──
+  // ── GERAR E BAIXAR PDF ──
+  // URL da Cloud Function (deploy no Firebase Functions)
+  const CF_GERAR_PDF = 'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarLaudoPDF';
+
+  window.baixarLaudo = async function() {
+    const btn = document.getElementById('btnDownloadPdf');
+    const status = document.getElementById('pdfStatus');
+
+    // Se já temos a URL gerada, baixar direto
+    if(window._state.laudoUrl) {
+      const a = document.createElement('a');
+      a.href = window._state.laudoUrl;
+      a.download = `Laudo_9Self_${window._state.laudoNome||'resultado'}.pdf`;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Gerando laudo...';
+    status.textContent = 'Aguarde, estamos preparando seu laudo personalizado...';
+
+    const cod = window._state.codigoAtivo || {};
+    const payload = {
+      tipo:      TS.tipoFinal,
+      asa:       TS.asaDom,
+      subDom:    TS.subDom,
+      subInt:    TS.subInt,
+      subRem:    TS.subRem,
+      nome:      cod.nomeDestinatario || 'Participante',
+      cargo:     cod.cargo || '',
+      codigoId:  cod.id || '',
+    };
+
+    try {
+      const resp = await fetch(CF_GERAR_PDF, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+      });
+
+      if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+
+      if(data.url) {
+        window._state.laudoUrl  = data.url;
+        window._state.laudoNome = (cod.nomeDestinatario||'resultado').replace(/\s+/g,'_');
+        // Salvar URL no Firestore para o painel admin
+        if(window._state.laudoDocId) {
+          try {
+            await updateDoc(doc(db,'nself_laudos', window._state.laudoDocId),
+              {pdfUrl: data.url, pdfPath: data.path||'', geradoEm: serverTimestamp()});
+          } catch(_) {}
+        }
+        status.textContent = '✅ Laudo pronto!';
+        btn.textContent = '⬇ Baixar Laudo PDF';
+        btn.disabled = false;
+        // Iniciar download automaticamente
+        window.baixarLaudo();
+      } else {
+        throw new Error('URL não retornada');
+      }
+    } catch(e) {
+      console.error('Erro ao gerar PDF:', e);
+      btn.disabled = false;
+      btn.textContent = '⬇ Baixar Laudo PDF';
+      status.innerHTML = `<span style="color:#c00;">⚠ Não foi possível gerar o laudo agora. 
+        <a href="mailto:contato@9self.com.br" style="color:#7B1D6B;">Entre em contato.</a></span>`;
+    }
+  };
 const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
 function gerarLinkTeste(codigo) {
   return `${BASE_URL}/teste?code=${codigo}`;
