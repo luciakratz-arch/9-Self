@@ -493,8 +493,8 @@ tr:hover td{background:#FAFAFE;}
           <div class="page-subtitle">Histórico de todos os laudos do sistema</div>
           <div class="table-card" style="margin-top:16px;">
             <table>
-              <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Data</th><th>Laudo</th></tr></thead>
-              <tbody id="laudosTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+              <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
+              <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -620,23 +620,39 @@ tr:hover td{background:#FAFAFE;}
 <!-- Modal Editar Código -->
 <div class="modal-overlay" id="modalEditarCodigo">
   <div class="modal">
-    <h3>Editar Dados do Paciente</h3>
+    <h3>Editar e Reenviar Teste</h3>
     <input type="hidden" id="editCodId"/>
+    <input type="hidden" id="editCodCodigo"/>
     <div class="form-row">
-      <label>Nome <span style="color:#B00">*</span></label>
+      <label>Nome do destinatário <span style="color:#B00">*</span></label>
       <input type="text" id="editCodNome" placeholder="Nome completo"/>
     </div>
     <div class="form-row">
-      <label>WhatsApp <span style="color:#B00">*</span></label>
+      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
       <input type="tel" id="editCodWhatsapp" placeholder="(11) 99999-9999"/>
     </div>
     <div class="form-row">
-      <label>E-mail <span style="color:#B00">*</span></label>
-      <input type="email" id="editCodEmail" placeholder="email@exemplo.com"/>
+      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="email" id="editCodEmail" placeholder="pessoa@email.com"/>
+    </div>
+    <div class="form-row">
+      <label>Empresa</label>
+      <select id="editCodEmpresa">
+        <option value="pf">— Pessoa Física (direto)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Código do paciente</label>
+      <input type="text" id="editCodCodigoDisplay" readonly
+        style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
+    </div>
+    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
+      🔗 Link: <span id="editPreviewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modalEditarCodigo')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarEdicaoCodigo()">Salvar Alterações</button>
+      <button class="btn btn-outline" onclick="salvarEdicaoCodigo()">💾 Salvar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoEnviarWhatsApp()">💬 Salvar e Enviar WhatsApp</button>
     </div>
   </div>
 </div>
@@ -882,8 +898,8 @@ async function loadCodigos() {
         <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
         <td style="display:flex;gap:6px;align-items:center;">
           ${wbtn}
-          <button class="btn btn-outline btn-sm" title="Editar"
-            onclick="editarCodigo('${d.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.email||''}','${c.whatsapp||''}')">✏️</button>
+          <button class="btn btn-outline btn-sm" title="Editar e Reenviar"
+            onclick="editarCodigo('${d.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.email||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button>
           <button class="btn btn-danger btn-sm" title="Excluir"
             onclick="excluirCodigo('${d.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
         </td></tr>`;
@@ -1814,28 +1830,54 @@ window.salvarCodigo = async function() {
 };
 
 // ── EDITAR CÓDIGO ──
-window.editarCodigo = function(id, nome, email, whatsapp) {
-  // Preencher modal de edição
-  document.getElementById('editCodId').value       = id;
-  document.getElementById('editCodNome').value     = nome;
-  document.getElementById('editCodEmail').value    = email;
-  document.getElementById('editCodWhatsapp').value = whatsapp;
+window.editarCodigo = function(id, nome, email, whatsapp, codigo, empresa) {
+  document.getElementById('editCodId').value            = id;
+  document.getElementById('editCodCodigo').value        = codigo;
+  document.getElementById('editCodNome').value          = nome;
+  document.getElementById('editCodEmail').value         = email;
+  document.getElementById('editCodWhatsapp').value      = whatsapp;
+  document.getElementById('editCodCodigoDisplay').value = codigo;
+  document.getElementById('editPreviewLink').textContent = gerarLinkTeste(codigo);
+  // Preencher empresa no select
+  const sel = document.getElementById('editCodEmpresa');
+  // Manter opção correta selecionada
+  [...sel.options].forEach(o => { o.selected = (o.value === (empresa||'pf')); });
   openModal('modalEditarCodigo');
 };
 
-window.salvarEdicaoCodigo = async function() {
+async function _salvarEdicaoBase() {
   const id       = document.getElementById('editCodId').value;
   const nome     = document.getElementById('editCodNome').value.trim();
   const email    = document.getElementById('editCodEmail').value.trim();
   const whatsapp = document.getElementById('editCodWhatsapp').value.trim();
-  if(!nome || !email || !whatsapp) { showToast('Preencha todos os campos.','error'); return; }
+  const empresa  = document.getElementById('editCodEmpresa').value;
+  if(!nome || !email || !whatsapp) { showToast('Preencha todos os campos obrigatórios.','error'); return null; }
+  await updateDoc(doc(db,'nself_codigos',id), {
+    nomeDestinatario: nome, email, whatsapp,
+    empresa: empresa==='pf' ? null : empresa,
+  });
+  return { id, nome, email, whatsapp, empresa,
+    codigo: document.getElementById('editCodCodigo').value };
+}
+
+window.salvarEdicaoCodigo = async function() {
   try {
-    await updateDoc(doc(db,'nself_codigos',id), {
-      nomeDestinatario: nome, email, whatsapp
-    });
+    const r = await _salvarEdicaoBase();
+    if(!r) return;
     closeModal('modalEditarCodigo');
     showToast('Dados atualizados!','success');
     loadCodigos();
+  } catch(e) { showToast('Erro ao atualizar.','error'); }
+};
+
+window.salvarEdicaoEnviarWhatsApp = async function() {
+  try {
+    const r = await _salvarEdicaoBase();
+    if(!r) return;
+    closeModal('modalEditarCodigo');
+    showToast('Dados atualizados! Abrindo WhatsApp...','success');
+    loadCodigos();
+    window.open(gerarLinkWhatsApp(r.whatsapp, r.nome, r.codigo), '_blank');
   } catch(e) { showToast('Erro ao atualizar.','error'); }
 };
 
@@ -1917,18 +1959,91 @@ window.navigateTo = function(page) {
 };
 
 async function loadLaudos(){
-  const tbody=document.getElementById('laudosTable');
-  try{
-    const snap=await getDocs(collection(db,'nself_laudos'));
-    if(snap.empty){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';return;}
-    tbody.innerHTML=snap.docs.map(d=>{
-      const l=d.data();
-      return`<tr><td>${l.nome||'—'}</td><td>${l.empresa||'PF'}</td><td>${l.tipo||'—'}</td><td>${l.asa||'—'}</td>
-      <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-      <td><button class="btn btn-teal btn-sm">⬇ PDF</button></td></tr>`;
+  const tbody = document.getElementById('laudosTable');
+  try {
+    const snap = await getDocs(collection(db,'nself_laudos'));
+    if(snap.empty){
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
+      return;
+    }
+    const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+    tbody.innerHTML = snap.docs.map(d => {
+      const l   = d.data();
+      const lid = d.id;
+      const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
+                  .map(s => NS[s]||s||'—').join(' · ');
+      // Estado do botão PDF
+      const btnPdf = l.pdfUrl
+        ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
+        : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
+      return `<tr>
+        <td>${l.nome||'—'}</td>
+        <td>${l.empresa||'PF'}</td>
+        <td>${l.tipoNome||l.tipo||'—'}</td>
+        <td>Asa ${l.asaDominante||l.asa||'—'}</td>
+        <td style="font-size:11px;">${sub}</td>
+        <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td id="pdfcell_${lid}">${btnPdf}</td>
+      </tr>`;
     }).join('');
-  }catch(e){console.warn(e);}
+  } catch(e){ console.warn(e); }
 }
+
+// Gerar PDF de um laudo legado ou sem URL — chama Cloud Function e atualiza tabela
+window.gerarPdfLaudo = async function(laudoId) {
+  const cell = document.getElementById(`pdfcell_${laudoId}`);
+  if(cell) cell.innerHTML = `<span style="font-size:12px;color:#888;">⏳ Gerando...</span>`;
+
+  try {
+    // Buscar dados do laudo no Firestore
+    const { getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await getDoc(doc(db,'nself_laudos', laudoId));
+    if(!snap.exists()) throw new Error('Laudo não encontrado');
+    const l = snap.data();
+
+    // Verificar se já foi gerado enquanto esperava
+    if(l.pdfUrl) {
+      if(cell) cell.innerHTML = `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`;
+      return;
+    }
+
+    const CF = 'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarLaudoPDF';
+    const resp = await fetch(CF, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        tipo:     l.tipo,
+        asa:      l.asaDominante || l.asa,
+        subDom:   l.subtipoDominante   || 'AP',
+        subInt:   l.subtipoIntermediario || '1A1',
+        subRem:   l.subtipoRemissivo   || 'SOC',
+        nome:     l.nome || 'Participante',
+        cargo:    l.cargo || '',
+        codigoId: l.codigoId || laudoId,
+      }),
+    });
+
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    if(!data.url) throw new Error('Sem URL');
+
+    // Salvar URL no Firestore para próxima vez
+    await updateDoc(doc(db,'nself_laudos', laudoId), {
+      pdfUrl: data.url, pdfPath: data.path||'', geradoEm: serverTimestamp()
+    });
+
+    // Atualizar célula com link de download direto
+    if(cell) cell.innerHTML = `<a href="${data.url}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`;
+    // Disparar download automaticamente
+    const a = document.createElement('a');
+    a.href = data.url; a.download = `Laudo_${l.nome||'resultado'}.pdf`;
+    a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+  } catch(e) {
+    console.error('Erro PDF laudo:', e);
+    if(cell) cell.innerHTML = `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}')" style="color:#c00;" title="${e.message}">⚠ Tentar novamente</button>`;
+  }
+};
 
 // ── LOGOUT ──
 window.doLogout = async function() {
