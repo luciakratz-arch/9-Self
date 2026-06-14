@@ -480,7 +480,7 @@ tr:hover td{background:#FAFAFE;}
           </div>
           <div class="table-card">
             <table>
-              <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link do Teste</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
               <tbody id="codigosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
             </table>
           </div>
@@ -565,9 +565,7 @@ tr:hover td{background:#FAFAFE;}
               <span style="font-size:20px;">⚠️</span>
               <strong style="color:#7B1D6B;font-size:13px;letter-spacing:.5px;text-transform:uppercase;">ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</strong>
             </div>
-            <p style="color:#2C2C2C;font-size:13px;line-height:1.7;margin:0;">
-              Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu processo e veja o laudo como um companheiro de caminhada.
-            </p>
+            <p style="color:#2C2C2C;font-size:13px;line-height:1.7;margin:0;">Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu processo e veja o laudo como um companheiro de caminhada.</p>
           </div>
         </div>
       </div>
@@ -613,7 +611,7 @@ tr:hover td{background:#FAFAFE;}
   </div>
 </div>
 
-<!-- Modal Liberar Novo Teste -->
+<!-- Modal Novo Código -->
 <div class="modal-overlay" id="modalNovoCodigo">
   <div class="modal">
     <h3>Liberar Novo Teste</h3>
@@ -640,7 +638,7 @@ tr:hover td{background:#FAFAFE;}
       <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
     </div>
     <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
-      🔗 Link gerado: <span id="previewLink" style="color:#7B1D6B;word-break:break-all;"></span>
+      🔗 Link: <span id="previewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="gerarCodigoPreview()">🔄 Novo Código</button>
@@ -835,32 +833,27 @@ async function loadCodigos() {
   const tbody = document.getElementById('codigosTable');
   try {
     const snap = await getDocs(collection(db,'nself_codigos'));
-    if(snap.empty){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr>';return;}
+    if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr>';return;}
     tbody.innerHTML = snap.docs.map(d=>{
       const c = d.data();
-      const statusCls = {
-        'Pendente':'pill-gray','Respondido':'pill-blue','Expirado':'pill-red','disponivel':'pill-green'
-      };
-      const linkTeste = c.linkTeste || gerarLinkTeste(c.codigo);
-      const pdfPath   = c.pdfPath || '';
-      const whatsBtn  = c.whatsapp
-        ? `<a href="${gerarLinkWhatsApp(c.whatsapp, c.nomeDestinatario||'', c.codigo)}" target="_blank" class="btn btn-outline btn-sm" title="Enviar WhatsApp">💬</a>`
+      const statusCls = {'Pendente':'pill-gray','Respondido':'pill-blue','disponivel':'pill-green','revogado':'pill-red'};
+      const link  = c.linkTeste || gerarLinkTeste(c.codigo||'');
+      const pdf   = c.pdfPath || '';
+      const wbtn  = c.whatsapp
+        ? `<a href="${gerarLinkWhatsApp(c.whatsapp,c.nomeDestinatario||'',c.codigo)}" target="_blank" class="btn btn-outline btn-sm" title="WhatsApp">💬</a>`
         : '';
       return `<tr>
         <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
         <td>${c.nomeDestinatario||'—'}</td>
         <td>${c.empresa||'Pessoa Física'}</td>
-        <td style="font-size:11px;max-width:160px;word-break:break-all;">
-          <a href="${linkTeste}" target="_blank" style="color:#7B1D6B;">${linkTeste}</a>
-        </td>
+        <td style="font-size:11px;max-width:140px;word-break:break-all;">
+          <a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
         <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
         <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
-        <td style="display:flex;gap:6px;">
-          ${whatsBtn}
+        <td style="display:flex;gap:6px;">${wbtn}
           <button class="btn btn-danger btn-sm" title="Excluir"
-            onclick="excluirCodigo('${d.id}','${c.status||'Pendente'}','${pdfPath}')">🗑</button>
-        </td>
-      </tr>`;
+            onclick="excluirCodigo('${d.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
+        </td></tr>`;
     }).join('');
   } catch(e){console.warn(e);}
 }
@@ -1605,12 +1598,19 @@ async function salvarResultadoFinal() {
   showToast('Avaliação concluída!','success');
 }
 
-  const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
-
-  // Gera link com código embutido
-  function gerarLinkTeste(codigo) {
-    return `${BASE_URL}/teste?code=${codigo}`;
-  }
+// ── CONSTANTES DE URL ──
+const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
+function gerarLinkTeste(codigo) {
+  return `${BASE_URL}/teste?code=${codigo}`;
+}
+function gerarLinkWhatsApp(whatsapp, nome, codigo) {
+  const msg = encodeURIComponent(
+    `Olá, ${nome}! Seu link exclusivo para o teste 9&Self está pronto:\n` +
+    `${gerarLinkTeste(codigo)}\n\nAcesse e responda com calma. 🌟`
+  );
+  const num = whatsapp.replace(/\D/g,'');
+  return `https://wa.me/55${num}?text=${msg}`;
+}
 
 // ── GERAR CÓDIGO PREVIEW ──
 window.gerarCodigoPreview = function() {
@@ -1620,20 +1620,64 @@ window.gerarCodigoPreview = function() {
   const prev = document.getElementById('previewLink');
   if(prev) prev.textContent = gerarLinkTeste(c);
 };
-    const link = encodeURIComponent(gerarLinkTeste(codigo));
-    const msg  = encodeURIComponent(
-      `Olá, ${nome}! Seu link exclusivo para o teste 9&Self está pronto:\n` +
-      `${gerarLinkTeste(codigo)}\n\nAcesse e responda com calma. 🌟`
-    );
-    const num = whatsapp.replace(/\D/g,'');
-    return `https://wa.me/55${num}?text=${msg}`;
-  }
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let c='';for(let i=0;i<6;i++)c+=chars[Math.floor(Math.random()*chars.length)];
-  document.getElementById('codGerado').value=c;
+
+// ── SALVAR CÓDIGO ──
+window.salvarCodigo = async function() {
+  const nome     = document.getElementById('codNome').value.trim();
+  const email    = document.getElementById('codEmail').value.trim();
+  const whatsEl  = document.getElementById('codWhatsapp');
+  const whatsapp = whatsEl ? whatsEl.value.trim() : '';
+  const emp      = document.getElementById('codEmpresa').value;
+  let codigo     = document.getElementById('codGerado').value.trim();
+  if(!codigo) { window.gerarCodigoPreview(); codigo = document.getElementById('codGerado').value; }
+  if(!nome)     { showToast('Informe o nome do destinatário.','error'); return; }
+  if(!email)    { showToast('E-mail é obrigatório.','error'); return; }
+  if(!whatsapp) { showToast('WhatsApp é obrigatório.','error'); return; }
+  try {
+    const linkTeste = gerarLinkTeste(codigo);
+    await addDoc(collection(db,'nself_codigos'),{
+      codigo, nomeDestinatario:nome, email, whatsapp,
+      empresa: emp==='pf' ? null : emp,
+      tipo: emp==='pf' ? 'PF' : 'B2B',
+      status: 'Pendente',
+      linkTeste,
+      criadoEm: serverTimestamp()
+    });
+    closeModal('modalNovoCodigo');
+    window.open(gerarLinkWhatsApp(whatsapp, nome, codigo), '_blank');
+    showToast(`Código ${codigo} gerado! Abrindo WhatsApp...`,'success');
+    if(window._state.profile==='admin') loadCodigos();
+  } catch(e) { showToast('Erro ao salvar código.','error'); }
 };
 
-// ── SALVAR EMPRESA ──
+// ── EXCLUIR CÓDIGO ──
+window.excluirCodigo = async function(id, status, pdfPath) {
+  const msg = status==='Respondido'
+    ? 'Excluir este registro e deletar o PDF permanentemente?'
+    : 'Apagar este código pendente?';
+  if(!confirm(msg)) return;
+  try {
+    if(status==='Respondido' && pdfPath) {
+      try {
+        const { getStorage, ref, deleteObject } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
+        await deleteObject(ref(getStorage(), pdfPath));
+      } catch(_) {}
+    }
+    await deleteDoc(doc(db,'nself_codigos', id));
+    showToast('Registro excluído.','success');
+    loadCodigos();
+  } catch(e) { showToast('Erro ao excluir.','error'); }
+};
+
+// ── REVOGAR CÓDIGO ──
+window.revogarCodigo = async function(id) {
+  if(!confirm('Revogar este código?')) return;
+  try{
+    await updateDoc(doc(db,'nself_codigos',id),{status:'revogado'});
+    showToast('Código revogado.','success');
+    loadCodigos();
+  }catch(e){showToast('Erro.','error');}
+};
 window.salvarEmpresa = async function() {
   const nome   = document.getElementById('empNome').value.trim();
   const resp   = document.getElementById('empResponsavel').value.trim();
@@ -1655,63 +1699,23 @@ window.salvarEmpresa = async function() {
   }
 };
 
-// ── SALVAR CÓDIGO (Liberar Novo Teste) ──
+// ── SALVAR CÓDIGO ──
 window.salvarCodigo = async function() {
-  const nome      = document.getElementById('codNome').value.trim();
-  const email     = document.getElementById('codEmail').value.trim();
-  const whatsapp  = document.getElementById('codWhatsapp') ? document.getElementById('codWhatsapp').value.trim() : '';
-  const emp       = document.getElementById('codEmpresa').value;
-  let codigo      = document.getElementById('codGerado').value.trim();
-  if(!codigo) { gerarCodigoPreview(); codigo = document.getElementById('codGerado').value; }
-  if(!nome)      { showToast('Informe o nome do destinatário.','error'); return; }
-  if(!email)     { showToast('E-mail é obrigatório.','error'); return; }
-  if(!whatsapp)  { showToast('WhatsApp é obrigatório.','error'); return; }
+  const nome  = document.getElementById('codNome').value.trim();
+  const email = document.getElementById('codEmail').value.trim();
+  const emp   = document.getElementById('codEmpresa').value;
+  let codigo  = document.getElementById('codGerado').value.trim();
+  if(!codigo) { gerarCodigoPreview(); codigo=document.getElementById('codGerado').value; }
+  if(!nome){showToast('Informe o nome do destinatário.','error');return;}
   try {
-    const linkTeste = gerarLinkTeste(codigo);
     await addDoc(collection(db,'nself_codigos'),{
-      codigo, nomeDestinatario: nome, email, whatsapp,
-      empresa: emp === 'pf' ? null : emp,
-      tipo: emp === 'pf' ? 'PF' : 'B2B',
-      status: 'Pendente',
-      linkTeste,
-      criadoEm: serverTimestamp()
+      codigo,nomeDestinatario:nome,email,empresa:emp==='pf'?null:emp,
+      tipo:emp==='pf'?'PF':'B2B',status:'disponivel',criadoEm:serverTimestamp()
     });
     closeModal('modalNovoCodigo');
-    // Abrir WhatsApp automaticamente
-    window.open(gerarLinkWhatsApp(whatsapp, nome, codigo), '_blank');
-    showToast(`Código ${codigo} gerado! Link enviado via WhatsApp.`, 'success');
-    if(window._state.profile === 'admin') loadCodigos();
-  } catch(e) { showToast('Erro ao salvar código.', 'error'); }
-};
-
-// ── EXCLUIR CÓDIGO / LAUDO ──
-window.excluirCodigo = async function(id, status, pdfPath) {
-  const msg = status === 'Respondido'
-    ? 'Excluir este registro e deletar o PDF do servidor permanentemente?'
-    : 'Apagar este código pendente?';
-  if(!confirm(msg)) return;
-  try {
-    if(status === 'Respondido' && pdfPath) {
-      // Deletar PDF no Firebase Storage
-      const { getStorage, ref, deleteObject } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
-      const storage = getStorage();
-      const fileRef = ref(storage, pdfPath);
-      await deleteObject(fileRef).catch(() => {}); // ignora se não existir
-    }
-    await deleteDoc(doc(db,'nself_codigos', id));
-    showToast('Registro excluído.','success');
-    loadCodigos();
-  } catch(e) { showToast('Erro ao excluir.','error'); }
-};
-
-// ── REVOGAR CÓDIGO (legado — mantido por compatibilidade) ──
-window.revogarCodigo = async function(id) {
-  if(!confirm('Revogar este código?')) return;
-  try{
-    await updateDoc(doc(db,'nself_codigos',id),{status:'revogado'});
-    showToast('Código revogado.','success');
-    loadCodigos();
-  }catch(e){showToast('Erro.','error');}
+    showToast(`Código ${codigo} gerado!`,'success');
+    if(window._state.profile==='admin') loadCodigos();
+  } catch(e){showToast('Erro ao salvar código.','error');}
 };
 
 // ── NAVEGAÇÃO COM CARREGAMENTO ──
