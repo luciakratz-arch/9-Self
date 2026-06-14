@@ -231,8 +231,6 @@ tr:hover td{background:#FAFAFE;}
 .test-progress{background:var(--border);border-radius:4px;height:6px;margin-bottom:28px;}
 .test-progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--teal));transition:width .4s;}
 .question-card{background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border);margin-bottom:16px;}
-.duel-card{transition:all .15s ease;}
-.duel-card:hover{border-color:var(--purple);box-shadow:0 4px 16px rgba(123,29,107,0.12);transform:translateY(-2px);}
 .question-card .q-num{font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
 .question-card .q-text{font-size:15px;font-weight:500;line-height:1.5;}
 .q-options{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
@@ -482,7 +480,7 @@ tr:hover td{background:#FAFAFE;}
           </div>
           <div class="table-card">
             <table>
-              <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Tipo</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link do Teste</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
               <tbody id="codigosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
             </table>
           </div>
@@ -562,6 +560,15 @@ tr:hover td{background:#FAFAFE;}
           <button class="btn btn-primary" style="font-size:15px;padding:14px 32px;" onclick="showToast('Laudo gerado com sucesso!','success')">
             ⬇ Baixar Laudo PDF
           </button>
+          <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #7B1D6B;border-radius:14px;padding:20px 22px;text-align:left;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:20px;">⚠️</span>
+              <strong style="color:#7B1D6B;font-size:13px;letter-spacing:.5px;text-transform:uppercase;">ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</strong>
+            </div>
+            <p style="color:#2C2C2C;font-size:13px;line-height:1.7;margin:0;">
+              Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu processo e veja o laudo como um companheiro de caminhada.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -606,16 +613,20 @@ tr:hover td{background:#FAFAFE;}
   </div>
 </div>
 
-<!-- Modal Novo Código -->
+<!-- Modal Liberar Novo Teste -->
 <div class="modal-overlay" id="modalNovoCodigo">
   <div class="modal">
-    <h3>Gerar Código de Acesso</h3>
+    <h3>Liberar Novo Teste</h3>
     <div class="form-row">
-      <label>Nome do destinatário</label>
+      <label>Nome do destinatário <span style="color:#B00">*</span></label>
       <input type="text" id="codNome" placeholder="Nome completo"/>
     </div>
     <div class="form-row">
-      <label>E-mail (opcional)</label>
+      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="tel" id="codWhatsapp" placeholder="(11) 99999-9999"/>
+    </div>
+    <div class="form-row">
+      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
       <input type="email" id="codEmail" placeholder="pessoa@email.com"/>
     </div>
     <div class="form-row" id="codEmpresaRow">
@@ -628,14 +639,13 @@ tr:hover td{background:#FAFAFE;}
       <label>Código gerado</label>
       <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
     </div>
+    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
+      🔗 Link gerado: <span id="previewLink" style="color:#7B1D6B;word-break:break-all;"></span>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="gerarCodigoPreview()">🔄 Novo Código</button>
       <button class="btn btn-outline" onclick="closeModal('modalNovoCodigo')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarCodigo()">Salvar</button>
-    </div>
-    <div id="acoesEnvioCodigo" style="display:none;gap:8px;margin-top:12px;">
-      <button class="btn btn-outline" onclick="enviarPorEmail()" style="flex:1;">📧 Enviar por E-mail</button>
-      <button class="btn btn-outline" onclick="enviarPorWhatsApp()" style="flex:1;">💬 Enviar via WhatsApp</button>
+      <button class="btn btn-primary" onclick="salvarCodigo()">Liberar e Enviar WhatsApp</button>
     </div>
   </div>
 </div>
@@ -646,7 +656,7 @@ tr:hover td{background:#FAFAFE;}
 <!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, query, where, orderBy, serverTimestamp }
+import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -825,18 +835,31 @@ async function loadCodigos() {
   const tbody = document.getElementById('codigosTable');
   try {
     const snap = await getDocs(collection(db,'nself_codigos'));
-    if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr>';return;}
+    if(snap.empty){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr>';return;}
     tbody.innerHTML = snap.docs.map(d=>{
-      const c=d.data();
-      const statusMap={'disponivel':'pill-green','usado':'pill-blue','expirado':'pill-red'};
+      const c = d.data();
+      const statusCls = {
+        'Pendente':'pill-gray','Respondido':'pill-blue','Expirado':'pill-red','disponivel':'pill-green'
+      };
+      const linkTeste = c.linkTeste || gerarLinkTeste(c.codigo);
+      const pdfPath   = c.pdfPath || '';
+      const whatsBtn  = c.whatsapp
+        ? `<a href="${gerarLinkWhatsApp(c.whatsapp, c.nomeDestinatario||'', c.codigo)}" target="_blank" class="btn btn-outline btn-sm" title="Enviar WhatsApp">💬</a>`
+        : '';
       return `<tr>
         <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
         <td>${c.nomeDestinatario||'—'}</td>
         <td>${c.empresa||'Pessoa Física'}</td>
-        <td>${c.tipo||'PF'}</td>
+        <td style="font-size:11px;max-width:160px;word-break:break-all;">
+          <a href="${linkTeste}" target="_blank" style="color:#7B1D6B;">${linkTeste}</a>
+        </td>
         <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-        <td><span class="pill ${statusMap[c.status]||'pill-gray'}">${c.status||'disponivel'}</span></td>
-        <td><button class="btn btn-danger btn-sm" onclick="revogarCodigo('${d.id}')">Revogar</button></td>
+        <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+        <td style="display:flex;gap:6px;">
+          ${whatsBtn}
+          <button class="btn btn-danger btn-sm" title="Excluir"
+            onclick="excluirCodigo('${d.id}','${c.status||'Pendente'}','${pdfPath}')">🗑</button>
+        </td>
       </tr>`;
     }).join('');
   } catch(e){console.warn(e);}
@@ -899,73 +922,6 @@ function gerarOrdemPrioridade(gi, gii) {
   // Remove duplicatas
   return [...new Set(ordens)];
 }
-
-// ── BANCO DE AFIRMAÇÕES DOS DUELOS (ESTRUTURA: COMPORTAMENTO + MOTIVO) ──
-const AFIRMACOES_DUELO = {
-  1: [
-    "Organizo meus espaços e crio rotinas detalhadas porque sinto uma obrigação interna de evitar o erro e garantir que as coisas saiam do único jeito que considero correto.",
-    "Assumo e corrijo tarefas que os outros deixaram malfeitas porque não suporto a sensação de desleixo ou de que os padrões éticos e técnicos foram desrespeitados.",
-    "Adio o meu descanso e sacrifico momentos de lazer porque minha mente insiste que eu só terei o direito de relaxar após cumprir todas as minhas obrigações com perfeição.",
-    "Aponto falhas, desalinhamentos ou erros operacionais de forma direta porque tenho um desejo genuíno de aprimorar o ambiente e ensinar os outros a buscarem a excelência.",
-    "Policio rigorosamente minhas próprias atitudes e palavras porque tenho um medo profundo de ser julgado como alguém irresponsável, injusto ou descuidado."
-  ],
-  2: [
-    "Assumo tarefas e resolvo problemas dos outros — mesmo com a minha rotina cheia — porque quero demonstrar que sou útil e garantir que as pessoas gostem e dependam de mim.",
-    "Antecipo as necessidades e foco em cuidar do bem-estar de quem está ao seu redor porque essa é a minha forma de me sentir seguro, valorizado e importante no grupo.",
-    "Demonstro carinho fazendo favores práticos e presentes personalizados porque espero, inconscientemente, receber a mesma prioridade e atenção em troca.",
-    "Escondo minhas dores e evito pedir ajuda ou demonstrar carências porque acredito que expressar necessidades pessoais é um sinal de egoísmo que pode afastar as pessoas.",
-    "Acumulo um ressentimento silencioso ou me magoo com facilidade porque percebo que as pessoas aceitam a minha ajuda, mas não retribuem a dedicação na mesma intensidade."
-  ],
-  3: [
-    "Escolho projetos de alta visibilidade e foco obsessivamente em bater metas porque preciso do sucesso concreto e do aplauso para sentir que tenho valor pessoal.",
-    "Ajusto minha postura, vestuário e forma de falar conforme o ambiente porque quero transmitir uma imagem impecável de competência, eficiência e sucesso.",
-    "Mantenho uma aparência de que está tudo excelente — mesmo exausto ou passando por crises — porque detesto demonstrar vulnerabilidade ou parecer fracassado perante os outros.",
-    "Atropelo processos ou centralizo tarefas na minha equipe porque tenho pressa de entregar o resultado e não suporto lidar com a lentidão ou o sentimentalismo alheio.",
-    "Faço networking estratégico e monitoro referências de sucesso porque busco moldar meu comportamento para alcançar o topo do prestígio profissional."
-  ],
-  4: [
-    "Escolho roupas, decorações e projetos com toques originais ou exóticos porque quero expressar minha identidade única e me distanciar de padrões massificados ou comuns.",
-    "Foco minha atenção naquilo que sinto que está em falta na minha vida ou nas minhas relações porque sou movido por uma nostalgia de alcançar um ideal de felicidade perfeito e profundo.",
-    "Permito que meu humor e flutuações emocionais ditem o ritmo do meu trabalho porque me recuso a agir de forma mecânica ou artificial em tarefas que não tenham significado real.",
-    "Me afasto, me isolo ou adoto uma postura distante em discussões coletivas porque sinto que ninguém é capaz de compreender a real complexidade e profundidade dos meus sentimentos.",
-    "Busco conversas intensas sobre dores ou dilemas existenciais porque preciso criar conexões autênticas de um para um e detesto interações superficiais de circunstância."
-  ],
-  5: [
-    "Controlo rigidamente o acesso das pessoas ao meu espaço, tempo e privacidade porque preciso proteger minha energia vital contra demandas emocionais sufocantes.",
-    "Passo horas isolado pesquisando e estudando temas complexos porque preciso acumular conhecimento e dados lógicos antes de me sentir seguro para agir no mundo real.",
-    "Adoto uma postura fria, racional e de 'esfinge' diante de conflitos porque prefiro analisar os fatos como um observador desapegado para não me esgotar emocionalmente.",
-    "Mantenho uma reserva financeira rígida e uso meus objetos até o limite porque quero garantir minha autossuficiência total e evitar depender do suporte de terceiros.",
-    "Retenho minhas opiniões e informações estratégicas no trabalho porque prefiro processar tudo em segredo e evitar que as pessoas invadam meu fluxo de pensamento."
-  ],
-  6: [
-    "Mapeio obsessivamente o pior cenário catastrófico e os riscos ocultos de qualquer plano porque preciso criar defesas preventivas antes que o perigo aconteça.",
-    "Reviso detalhes, confirmo informações e hesito antes de tomar decisões porque tenho um medo paralisante de errar e ser punido ou desamparado pela estrutura.",
-    "Observo e testo continuamente a lealdade e a coerência das pessoas ao longo do tempo porque preciso ter certeza absoluta sobre em quem posso realmente confiar.",
-    "Busco rigidamente manuais claros, comitês ou estruturas validadas porque preciso de um porto seguro externo que garanta previsibilidade e minimize o risco.",
-    "Desafio dogmas, adoto posturas firmes e confronto hierarquias de forma audaz porque ataco o perigo de frente para provar que sou forte e imbatível."
-  ],
-  7: [
-    "Busco ativamente novos estímulos, planos e opções divertidas porque escolho o prazer imediato como uma estratégia consciente para escapar do tédio, da dor ou da tristeza.",
-    "Envolvo-me em vários projetos ou hobbies ao mesmo tempo, mas mudo de foco rapidamente porque quero fugir da rotina burocrática e chata assim que a ideia perde o brilho inicial.",
-    "Evito rotinas fechadas ou agendas muito amarradas porque quero manter minhas opções e saídas de emergência abertas para preservar minha total liberdade de escolha.",
-    "Passo horas planejando viagens, cursos e novas possibilidades porque o processo mental de idealizar o futuro me causa mais prazer e entusiasmo do que a própria execução diária.",
-    "Uso o bom humor e faço justificativas intelectuais rápidas (racionalização) em conflitos porque quero aliviar o clima pesado e desarmar cobranças práticas imediatas."
-  ],
-  8: [
-    "Assumo o comando de reuniões e dito as regras do jogo de forma automática porque preciso manter o controle absoluto sobre o ambiente e garantir que as coisas andem rápido.",
-    "Exijo a verdade nua e crua e confronto as pessoas olho no olho porque detesto hipocrisia corporativa e quero testar quem é realmente forte e leal ao meu lado.",
-    "Blindo minha alma e escondo qualquer sinal de cansaço ou fragilidade porque acredito que demonstrar vulnerabilidade é um convite perigoso para que os outros me dominem.",
-    "Defendo minha equipe e aliados eleitos com fúria realizadora porque assumo o papel de escudo protetor contra injustiças ou opressões de forças externas.",
-    "Ignoro burocracias lentas e bato de frente com lideranças que considero fracas porque me recuso a submeter minha força de trabalho a ordens ineficientes."
-  ],
-  9: [
-    "Acompanho o ritmo e aceito as escolhas e vontades das pessoas ao meu redor porque prefiro anular meus próprios desejos a gerar um atrito ou quebrar a harmonia.",
-    "Adio tarefas complexas ou evito conversas difíceis de posicionamento porque quero fugir do estresse imediato e preservar minha paz interna a qualquer custo.",
-    "Respondo 'tanto faz' ou finjo que concordo com o grupo de forma mansa porque uso a teimosia silenciosa e a resistência passiva como defesa para não ser controlado.",
-    "Escuto pacientemente múltiplos lados de uma briga sem emitir julgamento porque quero conciliar as diferenças e mediar a paz, evitando tomar um partido que gere exclusão.",
-    "Me apego a rotinas previsíveis, confortáveis e afazeres corriqueiros porque quero entorpecer a mente e me esquivar de pressões ou cobranças de alta urgência."
-  ]
-};
 
 // ── PERGUNTAS MÓDULO 1 — 45 COMPORTAMENTAIS OFICIAIS ──
 const PERGUNTAS_M1 = [
@@ -1337,152 +1293,100 @@ window.confirmarGrupos = function() {
   TS.gi  = combos[0].combo[0];
   TS.gii = combos[0].combo[1];
 
-  // Pegar os 3 tipos mais prováveis e iniciar o Duelo de Cartas
+  // Pegar os 3 tipos mais prováveis e iniciar teste do primeiro
   TS.filaValidacao = [...new Set(TS.ordemTipos)].slice(0, 3);
-  if(TS.filaValidacao.length < 2) {
-    // fallback: completa com os próximos tipos da ordem geral, caso haja poucas hipóteses distintas
-    for(const t of TS.ordemTipos) {
-      if(!TS.filaValidacao.includes(t)) TS.filaValidacao.push(t);
-      if(TS.filaValidacao.length >= 2) break;
-    }
-  }
   TS.prioIdx = 0;
-  iniciarM1ParaTipo();
+  iniciarM1ParaTipo(TS.filaValidacao[0]);
 };
 
-// ─── ETAPA 1+2 — DUELO DE CARTAS (FORCED CHOICE, 5 RODADAS, CORTE 4/5) ────
+// ─── ETAPA 1+2 — 5 PERGUNTAS DO TIPO CANDIDATO + VALIDAÇÃO ────────────────
 
-function iniciarM1ParaTipo() {
-  // Inicia o Round 1 do duelo: Hipótese 1 (esquerda) vs Hipótese 2 (direita)
-  const fila = TS.filaValidacao;
-  TS.duelo = {
-    esquerda: fila[0],
-    direita:  fila[1],
-    terceira: fila[2] || null,
-    round: 1,
-    idxRodada: 0,
-    votos: { esq: 0, dir: 0 }
-  };
+function iniciarM1ParaTipo(tipo) {
+  TS.tipoTentado  = tipo;
+  TS.m1RespostasAtual = []; // respostas das 5 perguntas deste tipo
+  TS.m1Idx = 0;
   TS.etapa = 'm1';
   renderM1();
 }
 
 function renderM1() {
-  const d = TS.duelo;
-  const idx = d.idxRodada;
+  const tipo  = TS.tipoTentado;
+  const pergs = PERGUNTAS_M1.filter(p => p.tipo === tipo);
+  const idx   = TS.m1Idx;
 
-  if(idx >= 5) { finalizarRodadaDuelo(); return; }
+  if(idx >= pergs.length) { validarTipoAtual(); return; }
 
-  const pct = 20 + Math.round(((d.round-1)*5 + idx)/10 * 60);
+  const hipotese = TS.prioIdx + 1;
+  const pct = 20 + Math.round((TS.prioIdx/3)*20) + Math.round((idx/5)*15);
   document.getElementById('progressBar').style.width = pct + '%';
   document.getElementById('testeSubtitle').textContent =
-    `Duelo de Cartas — Round ${d.round} — Rodada ${idx+1} de 5`;
+    `Hipótese ${hipotese} — Pergunta ${idx+1} de 5`;
 
-  const textoEsq = AFIRMACOES_DUELO[d.esquerda][idx];
-  const textoDir = AFIRMACOES_DUELO[d.direita][idx];
-
+  const p = pergs[idx];
   document.getElementById('testeContent').innerHTML = `
-    <div class="question-card" style="margin-bottom:16px;text-align:center;">
-      <div class="q-num" style="font-size:13px;font-weight:700;margin-bottom:4px;color:var(--dark);">
-        Qual frase descreve melhor o que te move de verdade?
-      </div>
-      <div style="font-size:12px;color:var(--gray);">Escolha apenas uma das duas cartas.</div>
-    </div>
-    <div style="display:flex;gap:16px;flex-wrap:wrap;">
-      <div class="question-card duel-card" style="flex:1;min-width:240px;cursor:pointer;border-left:4px solid var(--purple);" onclick="responderDuelo('esq')">
-        <div class="q-num" style="color:var(--purple);font-size:12px;margin-bottom:8px;">CARTA A</div>
-        <div class="q-text">${textoEsq}</div>
-      </div>
-      <div class="question-card duel-card" style="flex:1;min-width:240px;cursor:pointer;border-left:4px solid var(--teal);" onclick="responderDuelo('dir')">
-        <div class="q-num" style="color:var(--teal);font-size:12px;margin-bottom:8px;">CARTA B</div>
-        <div class="q-text">${textoDir}</div>
+    <div class="question-card">
+      <div class="q-num">Pergunta ${idx+1} de 5</div>
+      <div class="q-text">${p.texto}</div>
+      <div class="q-options">
+        <button class="q-option" onclick="responderM1(1)">✅ Tenho essa tendência</button>
+        <button class="q-option" onclick="responderM1(0)">❌ Não tenho essa tendência</button>
       </div>
     </div>
   `;
 }
 
-window.responderDuelo = function(lado) {
-  const d = TS.duelo;
-  d.votos[lado]++;
-  d.idxRodada++;
+window.responderM1 = function(v) {
+  TS.m1RespostasAtual.push(v);
+  TS.m1Idx++;
   renderM1();
 };
 
-function finalizarRodadaDuelo() {
-  const d = TS.duelo;
-  const { esq, dir } = d.votos;
-  const max = Math.max(esq, dir);
-  const vencedor = esq > dir ? d.esquerda : d.direita;
-  const perdedor = esq > dir ? d.direita : d.esquerda;
+function validarTipoAtual() {
+  const score   = TS.m1RespostasAtual.reduce((a,b)=>a+b, 0);
+  const tipo    = TS.tipoTentado;
+  const validado = score >= 3;
+  const pct     = Math.round((score/5)*100);
+  const hipotese = TS.prioIdx + 1;
 
-  if(max >= 4) {
-    // Corte atingido — define o tipo
-    TS.tipoTentado = vencedor;
-    exibirResultadoDuelo(true, vencedor, max);
-    return;
-  }
-
-  if(d.round === 1 && d.terceira) {
-    // Empate técnico — gira a 3ª opção: perdedor x terceira hipótese
-    TS.duelo = {
-      esquerda: perdedor,
-      direita: d.terceira,
-      terceira: null,
-      round: 2,
-      idxRodada: 0,
-      votos: { esq: 0, dir: 0 }
-    };
-    exibirTransicaoRound2();
-    return;
-  }
-
-  // Sem 4/5 mesmo após girar as 3 opções — inconclusivo
-  exibirResultadoDuelo(false, null, max);
-}
-
-function exibirTransicaoRound2() {
-  document.getElementById('progressBar').style.width = '50%';
-  document.getElementById('testeSubtitle').textContent = 'Duelo de Cartas — Preparando Round 2';
-  document.getElementById('testeContent').innerHTML = `
-    <div class="question-card" style="border-left:4px solid var(--purple);text-align:center;padding:32px;">
-      <div style="color:var(--purple);font-weight:600;margin-bottom:8px;">⚖️ Resultado equilibrado no Round 1</div>
-      <div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
-        Vamos testar sua tendência principal contra uma terceira possibilidade.
-      </div>
-      <button class="btn btn-primary" style="padding:14px 32px;" onclick="renderM1()">
-        Continuar para o Round 2 →
-      </button>
-    </div>
-  `;
-}
-
-function exibirResultadoDuelo(validado, tipo, votos) {
-  document.getElementById('progressBar').style.width = '60%';
+  document.getElementById('progressBar').style.width = (35 + TS.prioIdx*10) + '%';
   document.getElementById('testeSubtitle').textContent = 'Confirmação do Perfil';
 
   document.getElementById('testeContent').innerHTML = `
     <div class="question-card" style="border-left:4px solid var(--purple);text-align:center;padding:32px;">
-      ${validado ? `
-        <div class="q-num" style="color:var(--purple);font-size:12px;margin-bottom:8px;">
-          PADRÃO IDENTIFICADO COM CONSISTÊNCIA ${votos}/5
-        </div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:6px;">
-          ${NOMES_TIPO[tipo]}
-        </div>
-        <div style="color:#1a9460;font-weight:600;margin:20px 0;">✅ Perfil confirmado!</div>
-        <button class="btn btn-primary" style="padding:14px 32px;" onclick="confirmarTipo()">
-          Continuar →
-        </button>
-      ` : `
-        <div style="color:var(--mag);font-weight:600;margin-bottom:8px;">⚠️ Resultado Inconclusivo</div>
-        <div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
-          Suas respostas variaram bastante entre os perfis testados.<br>
-          Para um resultado preciso, recomendamos refazer o teste com mais atenção.
-        </div>
-        <button class="btn btn-primary" style="padding:14px 32px;" onclick="reiniciarTeste()">
-          🔄 Refazer o teste
-        </button>
-      `}
+      <div class="q-num" style="color:var(--purple);font-size:12px;margin-bottom:8px;">
+        HIPÓTESE ${hipotese} — VERIFICANDO
+      </div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:6px;">
+        ${NOMES_TIPO[tipo]}
+      </div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:20px;">
+        Compatibilidade: <strong style="color:var(--purple)">${pct}%</strong>
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:8px;margin-bottom:24px;">
+        <div style="width:${pct}%;height:100%;border-radius:4px;
+          background:linear-gradient(90deg,var(--purple),var(--teal));"></div>
+      </div>
+      ${validado
+        ? `<div style="color:#1a9460;font-weight:600;margin-bottom:20px;">✅ Perfil confirmado!</div>
+           <button class="btn btn-primary" style="padding:14px 32px;" onclick="confirmarTipo()">
+             Continuar →
+           </button>`
+        : hipotese < 3
+          ? `<div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
+               Baixa compatibilidade com este perfil. Verificando a próxima hipótese...
+             </div>
+             <button class="btn btn-outline" style="padding:14px 32px;" onclick="proximaHipotese()">
+               Verificar próxima hipótese →
+             </button>`
+          : `<div style="color:var(--mag);font-weight:600;margin-bottom:8px;">⚠️ Resultado Inconclusivo</div>
+             <div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
+               Suas respostas variaram bastante entre os perfis testados.<br>
+               Para um resultado preciso, recomendamos refazer o teste com mais atenção.
+             </div>
+             <button class="btn btn-primary" style="padding:14px 32px;" onclick="reiniciarTeste()">
+               🔄 Refazer o teste
+             </button>`
+      }
     </div>
   `;
 }
@@ -1493,6 +1397,14 @@ window.confirmarTipo = function() {
   TS.asaVotos = {A:0, B:0};
   TS.asaIdx = 0;
   renderTeste();
+};
+
+window.proximaHipotese = function() {
+  TS.prioIdx++;
+  const fila  = TS.filaValidacao;
+  const proximo = fila[TS.prioIdx];
+  if(!proximo) { reiniciarTeste(); return; }
+  iniciarM1ParaTipo(proximo);
 };
 
 window.reiniciarTeste = function() {
@@ -1693,14 +1605,32 @@ async function salvarResultadoFinal() {
   showToast('Avaliação concluída!','success');
 }
 
+  const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
+
+  // Gera link com código embutido
+  function gerarLinkTeste(codigo) {
+    return `${BASE_URL}/teste?code=${codigo}`;
+  }
+
 // ── GERAR CÓDIGO PREVIEW ──
 window.gerarCodigoPreview = function() {
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c=''; for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('codGerado').value = c;
+  const prev = document.getElementById('previewLink');
+  if(prev) prev.textContent = gerarLinkTeste(c);
+};
+    const link = encodeURIComponent(gerarLinkTeste(codigo));
+    const msg  = encodeURIComponent(
+      `Olá, ${nome}! Seu link exclusivo para o teste 9&Self está pronto:\n` +
+      `${gerarLinkTeste(codigo)}\n\nAcesse e responda com calma. 🌟`
+    );
+    const num = whatsapp.replace(/\D/g,'');
+    return `https://wa.me/55${num}?text=${msg}`;
+  }
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let c='';for(let i=0;i<6;i++)c+=chars[Math.floor(Math.random()*chars.length)];
   document.getElementById('codGerado').value=c;
-  window._ultimoCodigo = null;
-  const acoes = document.getElementById('acoesEnvioCodigo');
-  if(acoes) acoes.style.display = 'none';
 };
 
 // ── SALVAR EMPRESA ──
@@ -1725,55 +1655,56 @@ window.salvarEmpresa = async function() {
   }
 };
 
-// ── SALVAR CÓDIGO ──
+// ── SALVAR CÓDIGO (Liberar Novo Teste) ──
 window.salvarCodigo = async function() {
-  const nome  = document.getElementById('codNome').value.trim();
-  const email = document.getElementById('codEmail').value.trim();
-  const emp   = document.getElementById('codEmpresa').value;
-  let codigo  = document.getElementById('codGerado').value.trim();
-  if(!codigo) { gerarCodigoPreview(); codigo=document.getElementById('codGerado').value; }
-  if(!nome){showToast('Informe o nome do destinatário.','error');return;}
+  const nome      = document.getElementById('codNome').value.trim();
+  const email     = document.getElementById('codEmail').value.trim();
+  const whatsapp  = document.getElementById('codWhatsapp') ? document.getElementById('codWhatsapp').value.trim() : '';
+  const emp       = document.getElementById('codEmpresa').value;
+  let codigo      = document.getElementById('codGerado').value.trim();
+  if(!codigo) { gerarCodigoPreview(); codigo = document.getElementById('codGerado').value; }
+  if(!nome)      { showToast('Informe o nome do destinatário.','error'); return; }
+  if(!email)     { showToast('E-mail é obrigatório.','error'); return; }
+  if(!whatsapp)  { showToast('WhatsApp é obrigatório.','error'); return; }
   try {
+    const linkTeste = gerarLinkTeste(codigo);
     await addDoc(collection(db,'nself_codigos'),{
-      codigo,nomeDestinatario:nome,email,empresa:emp==='pf'?null:emp,
-      tipo:emp==='pf'?'PF':'B2B',status:'disponivel',criadoEm:serverTimestamp()
+      codigo, nomeDestinatario: nome, email, whatsapp,
+      empresa: emp === 'pf' ? null : emp,
+      tipo: emp === 'pf' ? 'PF' : 'B2B',
+      status: 'Pendente',
+      linkTeste,
+      criadoEm: serverTimestamp()
     });
-    showToast(`Código ${codigo} gerado!`,'success');
-    if(window._state.profile==='admin') loadCodigos();
-
-    // guarda dados do último código gerado para as ações de envio
-    window._ultimoCodigo = { nome, email, codigo };
-    const acoes = document.getElementById('acoesEnvioCodigo');
-    if(acoes) acoes.style.display = 'flex';
-  } catch(e){showToast('Erro ao salvar código.','error');}
+    closeModal('modalNovoCodigo');
+    // Abrir WhatsApp automaticamente
+    window.open(gerarLinkWhatsApp(whatsapp, nome, codigo), '_blank');
+    showToast(`Código ${codigo} gerado! Link enviado via WhatsApp.`, 'success');
+    if(window._state.profile === 'admin') loadCodigos();
+  } catch(e) { showToast('Erro ao salvar código.', 'error'); }
 };
 
-// ── MONTAR MENSAGEM DE ORIENTAÇÃO ──
-function montarMensagemOrientacao(nome, codigo) {
-  return `Olá, ${nome}! Você foi convidado para realizar a sua Avaliação de Personalidade 9&Self (Dra. Lucia Kratz). Para garantir a precisão do seu laudo, o teste funcionará em formato de "Duelo de Cartas". Avalie não apenas o comportamento, mas o MOTIVO REAL de cada frase. Acesse: https://9andself.web.app e insira seu Código Único: ${codigo}.`;
-}
-
-// ── ENVIAR POR E-MAIL ──
-window.enviarPorEmail = function() {
-  const dados = window._ultimoCodigo;
-  if(!dados){showToast('Gere um código primeiro.','error');return;}
-  if(!dados.email){showToast('Este destinatário não possui e-mail cadastrado.','error');return;}
-  const msg = montarMensagemOrientacao(dados.nome, dados.codigo);
-  const assunto = 'Convite - Avaliação de Personalidade 9&Self';
-  const url = `mailto:${dados.email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(msg)}`;
-  window.location.href = url;
+// ── EXCLUIR CÓDIGO / LAUDO ──
+window.excluirCodigo = async function(id, status, pdfPath) {
+  const msg = status === 'Respondido'
+    ? 'Excluir este registro e deletar o PDF do servidor permanentemente?'
+    : 'Apagar este código pendente?';
+  if(!confirm(msg)) return;
+  try {
+    if(status === 'Respondido' && pdfPath) {
+      // Deletar PDF no Firebase Storage
+      const { getStorage, ref, deleteObject } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
+      const storage = getStorage();
+      const fileRef = ref(storage, pdfPath);
+      await deleteObject(fileRef).catch(() => {}); // ignora se não existir
+    }
+    await deleteDoc(doc(db,'nself_codigos', id));
+    showToast('Registro excluído.','success');
+    loadCodigos();
+  } catch(e) { showToast('Erro ao excluir.','error'); }
 };
 
-// ── ENVIAR POR WHATSAPP ──
-window.enviarPorWhatsApp = function() {
-  const dados = window._ultimoCodigo;
-  if(!dados){showToast('Gere um código primeiro.','error');return;}
-  const msg = montarMensagemOrientacao(dados.nome, dados.codigo);
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-};
-
-// ── REVOGAR CÓDIGO ──
+// ── REVOGAR CÓDIGO (legado — mantido por compatibilidade) ──
 window.revogarCodigo = async function(id) {
   if(!confirm('Revogar este código?')) return;
   try{
@@ -1821,21 +1752,9 @@ window.doLogout = async function() {
 // ── MODAL ──
 window.openModal = function(id){
   document.getElementById(id).classList.add('open');
-  if(id==='modalNovoCodigo') {
-    gerarCodigoPreview();
-    window._ultimoCodigo = null;
-    const acoes = document.getElementById('acoesEnvioCodigo');
-    if(acoes) acoes.style.display = 'none';
-  }
+  if(id==='modalNovoCodigo') gerarCodigoPreview();
 };
-window.closeModal = function(id){
-  document.getElementById(id).classList.remove('open');
-  if(id==='modalNovoCodigo') {
-    window._ultimoCodigo = null;
-    const acoes = document.getElementById('acoesEnvioCodigo');
-    if(acoes) acoes.style.display = 'none';
-  }
-};
+window.closeModal = function(id){document.getElementById(id).classList.remove('open');};
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
 });
