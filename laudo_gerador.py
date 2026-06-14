@@ -121,8 +121,12 @@ def carregar_secoes(tipo):
 
 
 def split_pipes(texto):
-    """Divide um texto por ' | ' em lista de itens, removendo espaços extras."""
-    return [item.strip() for item in texto.split('|') if item.strip()]
+    """Divide um texto por ' | ' em lista de itens, removendo espaços extras.
+    Se não houver '|', tenta dividir por linhas em branco (\\n\\n)."""
+    if '|' in texto:
+        return [item.strip() for item in texto.split('|') if item.strip()]
+    partes = [t.strip() for t in re.split(r'\n\s*\n', texto.strip()) if t.strip()]
+    return partes if len(partes) > 1 else ([texto.strip()] if texto.strip() else [])
 
 
 def split_double_pipes(texto):
@@ -142,15 +146,15 @@ def split_titulo_texto(item, sep=':'):
 # ESTILOS
 # ══════════════════════════════════════════════════════════════════════════
 sBody  = ParagraphStyle('Body',     fontName='Helvetica',         fontSize=10.5, leading=17, textColor=DARK, spaceAfter=7,  alignment=TA_JUSTIFY)
-sSecT  = ParagraphStyle('SecT',     fontName='Helvetica-Bold',    fontSize=14,   leading=19, textColor=MAG,  spaceAfter=2)
-sSubT  = ParagraphStyle('SubT',     fontName='Helvetica-Bold',    fontSize=11,   leading=15, textColor=TEAL, spaceAfter=3,  spaceBefore=8)
+sSecT  = ParagraphStyle('SecT',     fontName='Helvetica-Bold',    fontSize=14,   leading=19, textColor=MAG,  spaceAfter=2, keepWithNext=True)
+sSubT  = ParagraphStyle('SubT',     fontName='Helvetica-Bold',    fontSize=11,   leading=15, textColor=TEAL, spaceAfter=3,  spaceBefore=8, keepWithNext=True)
 sBul   = ParagraphStyle('Bul',      fontName='Helvetica',         fontSize=10.5, leading=17, textColor=DARK, spaceAfter=4,  leftIndent=14, alignment=TA_JUSTIFY)
 sHdr   = ParagraphStyle('Hdr',      fontName='Helvetica',         fontSize=8.5,  leading=12, textColor=GMID)
-sLvlG  = ParagraphStyle('LvlG',     fontName='Helvetica-Bold',    fontSize=11,   leading=15, textColor=MAG,  spaceAfter=2,  spaceBefore=6)
-sLvlS  = ParagraphStyle('LvlS',     fontName='Helvetica-Bold',    fontSize=10.5, leading=15, textColor=TEAL, spaceAfter=1,  spaceBefore=4)
+sLvlG  = ParagraphStyle('LvlG',     fontName='Helvetica-Bold',    fontSize=11,   leading=15, textColor=MAG,  spaceAfter=2,  spaceBefore=6, keepWithNext=True)
+sLvlS  = ParagraphStyle('LvlS',     fontName='Helvetica-Bold',    fontSize=10.5, leading=15, textColor=TEAL, spaceAfter=1,  spaceBefore=4, keepWithNext=True)
 sLvlB  = ParagraphStyle('LvlB',     fontName='Helvetica',         fontSize=10.5, leading=17, textColor=DARK, spaceAfter=4,  leftIndent=10, alignment=TA_JUSTIFY)
 sFable = ParagraphStyle('Fable',    fontName='Helvetica-Oblique', fontSize=10.5, leading=18, textColor=DARK, spaceAfter=8,  leftIndent=14, rightIndent=14, alignment=TA_JUSTIFY)
-sTB    = ParagraphStyle('TB',       fontName='Helvetica-Bold',    fontSize=10.5, leading=16, textColor=TEAL, spaceAfter=1)
+sTB    = ParagraphStyle('TB',       fontName='Helvetica-Bold',    fontSize=10.5, leading=16, textColor=TEAL, spaceAfter=1, keepWithNext=True)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -254,24 +258,93 @@ class DualGrid(Flowable):
 
 
 class FableBox(Flowable):
-    def __init__(self, paras, author):
-        super().__init__(); self.paras=paras; self.author=author
-        self._st = ParagraphStyle('FBx', fontName='Helvetica-Oblique', fontSize=10.5, leading=18, textColor=DARK, spaceAfter=8, leftIndent=4, rightIndent=4, alignment=TA_JUSTIFY)
-        self._ast = ParagraphStyle('FAu', fontName='Helvetica-Oblique', fontSize=9.5, textColor=GMID, alignment=TA_RIGHT)
+    """Caixa lavanda com borda magenta para a Fábula.
+    Suporta split() do ReportLab: se não couber numa página, divide
+    os parágrafos entre páginas, mantendo a borda em cada parte."""
+
+    def __init__(self, paras, author=''):
+        super().__init__()
+        self.paras  = paras
+        self.author = author
+        self._st  = ParagraphStyle('FBx', fontName='Helvetica-Oblique',
+                                   fontSize=10.5, leading=18, textColor=DARK,
+                                   spaceAfter=8, leftIndent=4, rightIndent=4,
+                                   alignment=TA_JUSTIFY)
+        self._ast = ParagraphStyle('FAu', fontName='Helvetica-Oblique',
+                                   fontSize=9.5, textColor=GMID, alignment=TA_RIGHT)
+        self._PAD = 16   # padding interno horizontal
+        self._VPD = 12   # padding vertical topo/base
+
+    def _para_heights(self, avail_w):
+        """Retorna lista de alturas de cada parágrafo na largura disponível."""
+        inner = avail_w - 2 * self._PAD
+        heights = []
+        for par in self.paras:
+            _, h = Paragraph(par, self._st).wrap(inner, 9999)
+            heights.append(h + 8)   # +8 = spaceAfter
+        return heights
+
     def wrap(self, aw, ah):
-        self._w=aw; h=24
-        for par in self.paras:
-            _,ph=Paragraph(par,self._st).wrap(aw-32,9999); h+=ph+8
-        _,ah2=Paragraph(self.author,self._ast).wrap(aw-32,9999); h+=ah2+16
-        self._h=h; return (aw,self._h)
+        self._w = aw
+        heights  = self._para_heights(aw)
+        inner    = aw - 2 * self._PAD
+        _, ath   = Paragraph(self.author, self._ast).wrap(inner, 9999)
+        self._h  = self._VPD + sum(heights) + ath + self._VPD
+        return (aw, self._h)
+
+    def split(self, aw, ah):
+        """Divide os parágrafos entre duas FableBox se necessário."""
+        heights = self._para_heights(aw)
+        inner   = aw - 2 * self._PAD
+        _, ath  = Paragraph(self.author, self._ast).wrap(inner, 9999)
+
+        disponivel = ah - 2 * self._VPD - ath - 8
+        if disponivel <= 0:
+            return []   # não cabe nada — ReportLab tentará nova página
+
+        acum  = 0
+        corte = 0
+        for i, h in enumerate(heights):
+            if acum + h > disponivel:
+                break
+            acum += h
+            corte = i + 1
+
+        if corte == 0:
+            return []   # nem o primeiro parágrafo cabe
+
+        if corte >= len(self.paras):
+            return [self]   # cabe tudo
+
+        # Parte 1: parágrafos [0, corte) — sem autoria
+        parte1 = FableBox(self.paras[:corte], author='')
+        # Parte 2: parágrafos [corte, fim) — com autoria
+        parte2 = FableBox(self.paras[corte:], author=self.author)
+        return [parte1, parte2]
+
     def draw(self):
-        c=self.canv
-        c.setFillColor(HexColor('#F3EEFB')); c.roundRect(0,0,self._w,self._h,6,fill=1,stroke=0)
-        c.setStrokeColor(MAG); c.setLineWidth(0.5); c.roundRect(0,0,self._w,self._h,6,fill=0,stroke=1)
-        y=self._h-16
+        c   = self.canv
+        w, h = self._w, self._h
+        # Fundo lavanda + borda magenta
+        c.setFillColor(HexColor('#F3EEFB'))
+        c.roundRect(0, 0, w, h, 6, fill=1, stroke=0)
+        c.setStrokeColor(MAG)
+        c.setLineWidth(0.5)
+        c.roundRect(0, 0, w, h, 6, fill=0, stroke=1)
+        # Parágrafos
+        y = h - self._VPD
         for par in self.paras:
-            pp=Paragraph(par,self._st); _,ph=pp.wrap(self._w-32,9999); y-=ph; pp.drawOn(c,16,y); y-=8
-        ap=Paragraph(self.author,self._ast); _,ah2=ap.wrap(self._w-32,9999); y-=ah2+8; ap.drawOn(c,16,y)
+            pp = Paragraph(par, self._st)
+            _, ph = pp.wrap(w - 2 * self._PAD, 9999)
+            y -= ph
+            pp.drawOn(c, self._PAD, y)
+            y -= 8
+        # Autoria
+        if self.author:
+            ap = Paragraph(self.author, self._ast)
+            _, ah = ap.wrap(w - 2 * self._PAD, 9999)
+            y -= ah + 4
+            ap.drawOn(c, self._PAD, y)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -280,6 +353,15 @@ class FableBox(Flowable):
 def p(t):      return Paragraph(t, sBody)
 def bl(t):     return Paragraph(f'• {t}', sBul)
 def sp(h=0.3): return Spacer(1, h*cm)
+
+
+def pmulti(texto):
+    """Divide texto por linhas em branco (\\n\\n) em múltiplos Paragraphs.
+    Se não houver quebra dupla, retorna lista com 1 elemento."""
+    partes = [trecho.strip() for trecho in re.split(r'\n\s*\n', texto.strip()) if trecho.strip()]
+    if not partes:
+        return [p('')]
+    return [p(trecho) for trecho in partes]
 
 
 def subsection(title, *content):
@@ -445,7 +527,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     # ══════════════════════════════════════════════════ INTRODUÇÃO
     story.append(KeepTogether([
-        Paragraph('Introdução', sSecT), SecLine(), sp(0.15), hdr(), sp(0.2),
+        Paragraph('Introdução', sSecT), SecLine(), sp(0.15),
         p('O <b>9&Self</b> é um instrumento de identificação de características pessoais e profissionais '
           'desenvolvido pelas especialistas <b>Dra. Lúcia Kratz</b> e <b>Ryuza Gonçalves</b>. '
           'O teste fundamenta-se nos traços de personalidade do Eneagrama — a partir dos estudos '
@@ -478,27 +560,102 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     # ══════════════════════════════════════════════════ TIPOLOGIA
     story.append(PageBreak())
+    tip_paras = pmulti(sec.get('TIPOLOGIA', ''))
+    # Parágrafo de voz (1ª pessoa): detectado por aspas iniciais
+    def is_voz(txt):
+        return txt.strip().startswith('"') or txt.strip().startswith('\u201c')
+
     story.append(KeepTogether([
-        Paragraph('Tipologia da Personalidade', sSecT), SecLine(), sp(0.15), hdr(), sp(0.2),
-        p(sec.get('TIPOLOGIA', '')),
+        Paragraph('Tipologia da Personalidade', sSecT), SecLine(), sp(0.15),
+        tip_paras[0],
     ]))
-    story += subsection('Padrão na Infância',
-        p(sec.get('PADRAO_INFANCIA', '')),
+    for paragrafo in tip_paras[1:]:
+        txt_raw = paragrafo.text if hasattr(paragrafo, 'text') else ''
+        if is_voz(txt_raw):
+            story.append(sp(0.15))
+            story.append(QuoteBox(txt_raw))
+        else:
+            story.append(paragrafo)
+
+    # Caixa de aviso filosófico (igual para todos os tipos)
+    story.append(sp(0.3))
+    AVISO_FILOSOFIA = (
+        '<b>⚠ ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</b><br/><br/>'
+        'Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um '
+        'rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua '
+        'autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se '
+        'fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento '
+        'presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, '
+        'sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu '
+        'processo e veja o laudo como um companheiro de caminhada.'
     )
+    story.append(InfoBox(AVISO_FILOSOFIA))
+
+    pad_paras = pmulti(sec.get('PADRAO_INFANCIA', ''))
+    story += subsection('Padrão na Infância', pad_paras[0])
+    for paragrafo in pad_paras[1:]:
+        story.append(paragrafo)
 
     # ══════════════════════════════════════════════════ PONTOS FORTES/FRACOS
-    pf_partes = sec.get('PONTOS_FORTES', '').rsplit('\n', 1)
-    pfx_partes = sec.get('PONTOS_FRACOS', '').rsplit('\n', 1)
-    pf_texto, pf_itens = (pf_partes[0], split_pipes(pf_partes[1])) if len(pf_partes) == 2 else (sec.get('PONTOS_FORTES',''), [])
-    pfx_texto, pfx_itens = (pfx_partes[0], split_pipes(pfx_partes[1])) if len(pfx_partes) == 2 else (sec.get('PONTOS_FRACOS',''), [])
+    def parse_pontos(raw, label):
+        """Suporta dois formatos:
+        - Antigo: 'texto introdutório\\nitem1 | item2 | ...'
+        - Novo:   'item1 | item2 | ...' (sem texto introdutório)
+        """
+        partes = raw.rsplit('\n', 1)
+        if len(partes) == 2 and '|' in partes[1]:
+            return partes[0].strip(), split_pipes(partes[1])
+        itens = split_pipes(raw)
+        if len(itens) > 1:
+            return '', itens
+        return raw, []
+
+    pf_texto, pf_itens = parse_pontos(sec.get('PONTOS_FORTES', ''), 'fortes')
+    pfx_texto, pfx_itens = parse_pontos(sec.get('PONTOS_FRACOS', ''), 'fracos')
+
+    intro_pf_pfx = f'{pf_texto} {pfx_texto}'.strip()
+    if not intro_pf_pfx:
+        intro_pf_pfx = (
+            f'Todo perfil de personalidade carrega consigo um conjunto de atributos que, quando bem '
+            f'canalizados, se tornam diferenciais competitivos genuínos. Da mesma forma, existem '
+            f'tendências comportamentais que, sem a devida consciência, podem limitar o desempenho '
+            f'e gerar atritos nos relacionamentos pessoais e profissionais. O mapeamento abaixo '
+            f'sintetiza os principais pontos de força e os pontos de atenção do perfil <b>{nome_tipo}</b>.'
+        )
+
+    def dual_list_table(h1, h2, c1, c2, hcolor=None):
+        """Tabela de 2 colunas com altura automática por linha (para itens longos)."""
+        hcolor = hcolor or MAG
+        n = max(len(c1), len(c2))
+        header_style = ParagraphStyle('DLH', fontName='Helvetica-Bold', fontSize=10.5, textColor=WHITE, alignment=1)
+        cell_style = ParagraphStyle('DLC', fontName='Helvetica', fontSize=10, leading=14, textColor=DARK, alignment=TA_JUSTIFY)
+        data = [[Paragraph(h1, header_style), Paragraph(h2, header_style)]]
+        for i in range(n):
+            v1 = c1[i] if i < len(c1) else ''
+            v2 = c2[i] if i < len(c2) else ''
+            data.append([Paragraph(v1, cell_style), Paragraph(v2, cell_style)])
+        t = Table(data, colWidths=[TW/2, TW/2], repeatRows=1)
+        style = [
+            ('BACKGROUND',(0,0),(-1,0),hcolor),
+            ('TOPPADDING',(0,0),(-1,0),8), ('BOTTOMPADDING',(0,0),(-1,0),8),
+            ('GRID',(0,0),(-1,-1),0.4,GLIN),
+            ('VALIGN',(0,0),(-1,-1),'TOP'),
+            ('LEFTPADDING',(0,0),(-1,-1),10), ('RIGHTPADDING',(0,0),(-1,-1),10),
+            ('TOPPADDING',(0,1),(-1,-1),8), ('BOTTOMPADDING',(0,1),(-1,-1),8),
+        ]
+        for i in range(1, n+1):
+            if (i-1) % 2 == 0:
+                style.append(('BACKGROUND',(0,i),(-1,i),GLT))
+        t.setStyle(TableStyle(style))
+        return t
 
     story.append(PageBreak())
     story.append(KeepTogether([
         Paragraph('Pontos Fortes e Fracos da Personalidade', sSecT),
-        SecLine(), sp(0.15), hdr(), sp(0.4),
-        p(f'{pf_texto} {pfx_texto}'.strip()),
+        SecLine(), sp(0.15),
+        p(intro_pf_pfx),
         sp(0.2),
-        DualGrid('✓  Pontos Fortes','⚠  Pontos Fracos', pf_itens, pfx_itens),
+        dual_list_table('✓  Pontos Fortes','⚠  Pontos Fracos', pf_itens, pfx_itens),
     ]))
 
     # ══════════════════════════════════════════════════ SUBTIPO
@@ -508,7 +665,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     story.append(KeepTogether([
         Paragraph('Subtipo da Personalidade', sSecT),
-        SecLine(), sp(0.15), hdr(), sp(0.2),
+        SecLine(), sp(0.15),
         Paragraph(f'Influência das Personalidades | {nome_asa} |', sSubT), sp(0.05),
         p(asa_niveis[0] if asa_niveis else ''),
     ]))
@@ -523,11 +680,14 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     # ══════════════════════════════════════════════════ ESTILO DE TRABALHO
     story.append(PageBreak())
+    amb_paras = pmulti(sec.get('AMBIENTE_TRABALHO', ''))
     story.append(KeepTogether([
-        Paragraph('Estilo de Trabalho', sSecT), SecLine(), sp(0.15), hdr(), sp(0.2),
+        Paragraph('Estilo de Trabalho', sSecT), SecLine(), sp(0.15),
         Paragraph('Ambiente de Trabalho:', sSubT), sp(0.05),
-        p(sec.get('AMBIENTE_TRABALHO', '')),
+        amb_paras[0],
     ]))
+    for paragrafo in amb_paras[1:]:
+        story.append(paragrafo)
 
     # ESTRESSE — separa a citação entre aspas como QuoteBox
     estresse_txt = sec.get('ESTRESSE', '')
@@ -542,30 +702,32 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         citacao = m.group(1)
         if not citacao.startswith('"'):
             citacao = f'"{citacao}"'
-        story += subsection('Estresse da Personalidade:',
-            p(antes),
-            sp(0.1),
-            QuoteBox(citacao),
-            sp(0.15),
-            p(depois),
-        )
+        bloco_estresse = list(pmulti(antes)) + [sp(0.1), QuoteBox(citacao)]
+        if depois:
+            bloco_estresse += [sp(0.15)] + list(pmulti(depois))
+        story += subsection('Estresse da Personalidade:', *bloco_estresse)
     else:
-        story += subsection('Estresse da Personalidade:', p(estresse_txt))
+        story += subsection('Estresse da Personalidade:', *pmulti(estresse_txt))
 
     # COMUNICAÇÃO + DualGrid Estilo ao Falar / Linguagem Corporal
     fala_itens = split_pipes(sec.get('FALA', ''))
     corporal_itens = split_pipes(sec.get('LINGUAGEM_CORPORAL', ''))
-    comunicacao_content = [p(sec.get('COMUNICACAO', ''))]
+    comunicacao_content = list(pmulti(sec.get('COMUNICACAO', '')))
     if fala_itens and corporal_itens:
         comunicacao_content += [
             sp(0.2),
-            DualGrid('🗣 Estilo ao Falar','🤝 Linguagem Corporal', fala_itens, corporal_itens, hcolor=TEAL),
+            KeepTogether([
+                Paragraph('Estilo de Comunicação:', sTB), sp(0.05),
+                dual_list_table('🗣 Estilo ao Falar','🤝 Linguagem Corporal', fala_itens, corporal_itens, hcolor=TEAL),
+            ]),
         ]
     elif corporal_itens:
         comunicacao_content += [
             sp(0.2),
-            Paragraph('Linguagem Corporal:', sTB),
-        ] + [bl(item) for item in corporal_itens]
+            KeepTogether(
+                [Paragraph('Linguagem Corporal:', sTB)] + [bl(item) for item in corporal_itens]
+            ),
+        ]
     story += subsection('Comunicação:', *comunicacao_content)
 
     # FEEDBACK: pontos cegos / filtros + diretrizes
@@ -577,7 +739,10 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         p('Evite que as tendências automáticas do seu estilo no Eneagrama interfiram na sua forma de '
           'liderar e desenvolver pessoas.'),
         sp(0.15),
-        DualGrid('🎯 Pontos Cegos','🔍 Filtros e Distorções', cegos_itens, filtros_itens, hcolor=TEAL),
+        KeepTogether([
+            Paragraph('Pontos Cegos e Filtros:', sTB), sp(0.05),
+            dual_list_table('🎯 Pontos Cegos','🔍 Filtros e Distorções', cegos_itens, filtros_itens, hcolor=TEAL),
+        ]),
     ]
     if feedback_itens:
         feedback_content += [sp(0.2), FBBox('Diretrizes para o Feedback:', feedback_itens)]
@@ -588,12 +753,12 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     story.append(PageBreak())
 
     lid_block = [
-        Paragraph('Liderança e Motivação', sSecT), SecLine(), sp(0.15), hdr(), sp(0.2),
+        Paragraph('Liderança e Motivação', sSecT), SecLine(), sp(0.15),
         Paragraph('Tendências na Liderança:', sSubT), sp(0.05),
-        p(sec.get('LIDERANCA', '')),
     ]
+    lid_block += pmulti(sec.get('LIDERANCA', ''))
     if sec.get('TENDENCIAS_LIDERANCA'):
-        lid_block.append(p(sec.get('TENDENCIAS_LIDERANCA', '')))
+        lid_block += pmulti(sec.get('TENDENCIAS_LIDERANCA', ''))
     if aspectos_itens:
         lid_block += [Paragraph('Principais Aspectos a Desenvolver:', sSubT), sp(0.05)]
         for item in aspectos_itens:
@@ -608,41 +773,58 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     motivacao_itens = split_pipes(sec.get('MOTIVACAO', ''))
     story += subsection('Motivação:', *[bl(item) for item in motivacao_itens])
 
-    # AUTODOMÍNIO
+    # AUTODOMÍNIO — incorporado em Níveis de Saúde (Máximo/Moderado/Baixo)
     autodominio_itens = split_pipes(sec.get('AUTODOMINIO', ''))
-    niveis_autodom = []
+    autodominio_textos = []
     for item in autodominio_itens:
-        titulo, texto = split_titulo_texto(item)
-        titulo_fmt = f'Nível {titulo}' if titulo else ''
-        niveis_autodom.append(nivel(titulo_fmt, texto))
-    story += subsection('Autodomínio:', *niveis_autodom)
+        _, texto = split_titulo_texto(item)
+        autodominio_textos.append(texto)
+    while len(autodominio_textos) < 3:
+        autodominio_textos.append('')
 
     # ══════════════════════════════════════════════════ HÁBITOS POSITIVOS
-    habitos_itens = split_double_pipes(sec.get('HABITOS', ''))
+    habitos_raw = sec.get('HABITOS', '')
     story.append(PageBreak())
 
     habitos_block = [
         Paragraph('Crie Hábitos Positivos para sua Personalidade', sSecT),
-        SecLine(), sp(0.15), hdr(), sp(0.2),
+        SecLine(), sp(0.15),
         p(f'O tipo {nome_tipo} deve desenvolver deliberadamente os seguintes hábitos saudáveis:'),
+        sp(0.15),
     ]
-    primeiro_habito = True
-    for item in habitos_itens:
-        titulo, texto = split_titulo_texto(item)
-        bloco = KeepTogether([Paragraph(f'<b>{titulo}</b>', sTB), p(texto)]) if titulo else p(texto)
-        if primeiro_habito:
-            habitos_block.append(bloco)
-            primeiro_habito = False
-        else:
-            story_extra = bloco
     story.append(KeepTogether(habitos_block))
-    if len(habitos_itens) > 1:
-        for item in habitos_itens[1:]:
+
+    # Renderizar hábitos: suporta || (separador de hábito), | (hábito simples) e \n\n (parágrafos)
+    # Divide primeiro em parágrafos por \n\n
+    blocos_habito = [b.strip() for b in re.split(r'\n\s*\n', habitos_raw.strip()) if b.strip()]
+    for bloco in blocos_habito:
+        # Cada bloco pode ter itens separados por || ou |
+        if '||' in bloco:
+            itens = [i.strip() for i in bloco.split('||') if i.strip()]
+        elif '|' in bloco and ':' not in bloco[:30]:
+            # Hábitos simples separados por |
+            itens = [i.strip() for i in bloco.split('|') if i.strip()]
+        elif '|' in bloco:
+            itens = [i.strip() for i in bloco.split('|') if i.strip()]
+        else:
+            itens = [bloco]
+        for item in itens:
             titulo, texto = split_titulo_texto(item)
-            if titulo:
-                story.append(KeepTogether([Paragraph(f'<b>{titulo}</b>', sTB), p(texto)]))
+            if titulo and texto:
+                story.append(KeepTogether([
+                    Paragraph(f'<b>{titulo}:</b>', sTB),
+                    sp(0.05),
+                    p(texto),
+                    sp(0.1),
+                ]))
             else:
-                story.append(p(texto))
+                # Parágrafo simples (ex: "Boas Práticas e Tarefas Concretas:" ou item de lista)
+                txt = (titulo or '') + (texto or '')
+                if txt.startswith('•') or txt.startswith('-'):
+                    story.append(bl(txt.lstrip('•- ').strip()))
+                else:
+                    story.append(p(txt))
+                story.append(sp(0.08))
 
     # FRASES COMUNS
     frases_itens = split_pipes(sec.get('FRASES_COMUNS', ''))
@@ -650,90 +832,206 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     # ══════════════════════════════════════════════════ NÍVEIS DE SAÚDE
     niveis_itens = split_pipes(sec.get('NIVEIS_SAUDE', ''))
-    # niveis_itens vem como [titulo1, texto1, titulo2, texto2, ...]
     niveis_pares = []
-    for i in range(0, len(niveis_itens) - 1, 2):
-        titulo_raw = re.sub(r'^N\d+:\s*', '', niveis_itens[i]).strip()
-        niveis_pares.append((titulo_raw, niveis_itens[i+1]))
+    if len(niveis_itens) == 9:
+        # Novo formato: cada item é "Título: texto completo"
+        for item in niveis_itens:
+            titulo_raw, texto = split_titulo_texto(item, sep=':')
+            titulo_raw = (titulo_raw or '').rstrip(':').strip()
+            niveis_pares.append((titulo_raw, texto))
+    else:
+        # Formato antigo: [titulo1, texto1, titulo2, texto2, ...]
+        for i in range(0, len(niveis_itens) - 1, 2):
+            titulo_raw = re.sub(r'^N\d+:\s*', '', niveis_itens[i]).strip()
+            niveis_pares.append((titulo_raw, niveis_itens[i+1]))
 
     story.append(PageBreak())
     health_block = [
         Paragraph('Níveis de Saúde da Personalidade', sSecT),
-        SecLine(), sp(0.15), hdr(), sp(0.2),
+        SecLine(), sp(0.15),
         p(f'A personalidade é dinâmica e se move ao longo de <b>9 níveis de desenvolvimento e maturidade '
           f'individual</b>. Vale ressaltar que pressões e fatores externos podem alterar temporariamente '
           f'esses níveis no tipo {nome_tipo}.'),
         sp(0.2),
         Paragraph('a) Nível Saudável (Elevado)', sLvlG),
     ]
+    if autodominio_textos[0]:
+        health_block.append(p(autodominio_textos[0]))
     if len(niveis_pares) > 0:
         titulo, texto = niveis_pares[0]
         health_block.append(nivel(f'Nível 1 - {titulo}', texto))
     story.append(KeepTogether(health_block))
 
     grupos = {3: 'b) Nível Médio', 6: 'c) Nível Não Saudável'}
+    autodominio_por_grupo = {3: autodominio_textos[1], 6: autodominio_textos[2]}
     for idx in range(1, min(len(niveis_pares), 9)):
         if idx in grupos:
-            story.append(Paragraph(grupos[idx], sLvlG))
+            cabecalho_grupo = [Paragraph(grupos[idx], sLvlG)]
+            if autodominio_por_grupo.get(idx):
+                cabecalho_grupo.append(p(autodominio_por_grupo[idx]))
+            story.append(KeepTogether(cabecalho_grupo))
         titulo, texto = niveis_pares[idx]
         story.append(nivel(f'Nível {idx+1} - {titulo}', texto))
 
-    # ══════════════════════════════════════════════════ DESENVOLVIMENTO
+    # ══════════════════════════════════════════════════ DESENVOLVIMENTO (conceitual + específico)
+    P1_DESENV = ('O verdadeiro processo de autodesenvolvimento não consiste em moldar uma nova '
+         'personalidade ou em tentar se encaixar em um ideal de perfeição inalcançável. '
+         'Pelo contrário, trata-se de um profundo e corajoso movimento de desconstrução. '
+         'A personalidade que manifestamos no dia a dia nada mais é do que uma armadura de '
+         'sobrevivência, uma estratégia psíquica refinada que aprendemos a estruturar ainda '
+         'na infância para garantir afeto, segurança e pertencimento no mundo. Ao longo dos '
+         'anos, passamos a confundir quem nós realmente somos com o peso dessa engrenagem '
+         'defensiva. O ecossistema 9&Self nasce justamente para iluminar essas barreiras '
+         'invisíveis, oferecendo a lucidez necessária para que você possa liderar a si mesmo '
+         'com maestria, integridade e clareza de propósito.')
+    P2_DESENV = ('Evoluir exige, fundamentalmente, aprender a tolerar o desconforto de se enxergar '
+         'sem máscaras. Quando tomamos consciência dos nossos automatismos, dos nossos filtros '
+         'mentais e dos gatilhos que disparam as nossas reações automáticas de estresse, '
+         'deixamos de ser reféns da nossa reatividade e passamos a habitar o lugar da escolha '
+         'consciente. O autodesenvolvimento legítimo não anula as suas características natas; '
+         'ele flexibiliza as suas defesas. Ele permite que o realizador acesse a '
+         'vulnerabilidade, que o planejador encontre a coragem, que o cuidador respeite os '
+         'próprios limites e que o estrategista aprecie o valor da pausa. É um convite para '
+         'sair da periferia do comportamento mecânico e assumir a centralidade da sua própria '
+         'existência.')
+    P3_DESENV = ('A jornada de transformação andragógica proposta neste laudo é um mapa dinâmico '
+         'para o transbordo pessoal e profissional. O crescimento sustentável não acontece '
+         'por meio de grandes saltos heroicos isolados, mas sim na consistência das pequenas '
+         'escolhas diárias e na vigilância amorosa sobre os nossos pontos cegos. Ao abraçar '
+         'este caminho, você não apenas potencializa a sua performance e a sua inteligência '
+         'relacional, mas também constrói um espaço interno de paz e autonomia. Lembre-se de '
+         'que a sua personalidade é apenas o ponto de partida, o canal por onde você se '
+         'comunica com o ecossistema à sua volta. O seu verdadeiro eu, contudo, reside na '
+         'sua capacidade de transcender esse mecanismo, transformando o conhecimento adquirido '
+         'em sabedoria prática e em liderança inspiradora para a vida.')
+
+    sTitDC = ParagraphStyle('TitDC', fontName='Helvetica-Bold', fontSize=14,
+                            leading=20, textColor=MAG, alignment=1,
+                            spaceAfter=14, spaceBefore=4)
+
+    # Texto específico do tipo (da tag DESENVOLVIMENTO)
+    dev_paras = pmulti(sec.get('DESENVOLVIMENTO', ''))
+
+    # Tudo em PageBreak único — título + conceitual + específico + infobox
     story.append(PageBreak())
     story.append(KeepTogether([
-        Paragraph('Desenvolvimento e Evolução da Personalidade', sSecT),
-        SecLine(), sp(0.15), hdr(), sp(0.2),
-        p(sec.get('DESENVOLVIMENTO', '')),
+        Paragraph('O Despertar da Consciência: O Caminho do Autodesenvolvimento', sTitDC),
+        SecLine(), sp(0.25),
+        p(P1_DESENV),
     ]))
+    story.append(sp(0.2))
+    story.append(p(P2_DESENV))
+    story.append(sp(0.2))
+    story.append(p(P3_DESENV))
+    story.append(sp(0.3))
+    # Texto específico do tipo flui continuamente
+    for paragrafo in dev_paras:
+        story.append(paragrafo)
+        story.append(sp(0.15))
     if sec.get('INFOBOX_DESENVOLVIMENTO'):
         story.append(InfoBox(sec.get('INFOBOX_DESENVOLVIMENTO', '')))
 
     # ══════════════════════════════════════════════════ FÁBULA
     fabula_txt = sec.get('FABULA', '')
-    fabula_titulo = 'Marcenaria'
     fabula_corpo = fabula_txt
-    if ':' in fabula_txt[:30]:
-        fabula_titulo, _, fabula_corpo = fabula_txt.partition(':')
-        fabula_titulo = fabula_titulo.strip()
-        fabula_corpo = fabula_corpo.strip()
+    fabula_titulo = f'A Fábula do {nome_tipo}'
+    if ':' in fabula_txt[:40]:
+        possivel_titulo, _, resto = fabula_txt.partition(':')
+        # Só trata como título se for curto (nome próprio, não a frase inteira)
+        if len(possivel_titulo) < 30:
+            fabula_titulo = possivel_titulo.strip()
+            fabula_corpo = resto.strip()
 
-    paragrafos_fabula = [s.strip() for s in re.split(r'(?<=[.!?])\s+(?=[A-ZÀ-Ú])', fabula_corpo) if s.strip()]
-    # Agrupa frases em parágrafos de tamanho razoável (~2-3 frases cada)
-    paras_finais = []
-    buf = []
-    for frase in paragrafos_fabula:
-        buf.append(frase)
-        if sum(len(x) for x in buf) > 220:
+    if '\n\n' in fabula_corpo or '\n \n' in fabula_corpo:
+        paras_finais = [t.strip() for t in re.split(r'\n\s*\n', fabula_corpo.strip()) if t.strip()]
+    else:
+        paragrafos_fabula = [s.strip() for s in re.split(r'(?<=[.!?])\s+(?=[A-ZÀ-Ú])', fabula_corpo) if s.strip()]
+        # Agrupa frases em parágrafos de tamanho razoável (~2-3 frases cada)
+        paras_finais = []
+        buf = []
+        for frase in paragrafos_fabula:
+            buf.append(frase)
+            if sum(len(x) for x in buf) > 220:
+                paras_finais.append(' '.join(buf))
+                buf = []
+        if buf:
             paras_finais.append(' '.join(buf))
-            buf = []
-    if buf:
-        paras_finais.append(' '.join(buf))
 
     story.append(PageBreak())
+    titulo_fabula_par = Paragraph(fabula_titulo,
+        ParagraphStyle('FT',fontName='Helvetica-Bold',fontSize=17,textColor=MAG,
+                       alignment=1,spaceAfter=12,spaceBefore=4))
     story.append(KeepTogether([
-        Paragraph('Fábula', sSecT), SecLine(), sp(0.15), hdr(), sp(0.2),
-        Paragraph(fabula_titulo,
-            ParagraphStyle('FT',fontName='Helvetica-Bold',fontSize=17,textColor=MAG,alignment=1,spaceAfter=12,spaceBefore=4)),
+        Paragraph('Fábula', sSecT), SecLine(), sp(0.15),
+        sp(0.2), titulo_fabula_par,
     ]))
+    # Um único FableBox — o split() cuida da quebra de página se necessário
     story.append(FableBox(paras_finais, 'Autor Desconhecido'))
 
+    # PERGUNTAS DA FÁBULA
+    perguntas_txt = sec.get('PERGUNTAS_FABULA', '').strip()
+    if perguntas_txt:
+        perguntas = split_pipes(perguntas_txt)
+        story.append(sp(0.3))
+        story.append(KeepTogether([
+            Paragraph('Reflexões sobre a Fábula', sSubT), sp(0.1),
+        ]))
+        # Estilo das perguntas
+        sPerq = ParagraphStyle('Perq', fontName='Helvetica-Bold', fontSize=10,
+                               leading=15, textColor=DARK, spaceBefore=10, spaceAfter=4)
+        # Linhas pontilhadas para escrita manual
+        def linha_resposta():
+            """Retorna uma tabela com 4 linhas cinza-claras para escrita manual."""
+            rows = [['']] * 4
+            t = Table(rows, colWidths=[TW], rowHeights=[18]*4)
+            t.setStyle(TableStyle([
+                ('LINEBELOW', (0,0), (-1,-1), 0.5, HexColor('#CCCCCC')),
+                ('TOPPADDING', (0,0), (-1,-1), 0),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+            ]))
+            return t
+        for idx, pergunta in enumerate(perguntas, 1):
+            story.append(Paragraph(f'{idx}. {pergunta}', sPerq))
+            story.append(sp(0.05))
+            story.append(linha_resposta())
+            story.append(sp(0.15))
+
     # PLAYLIST
-    playlist_txt = sec.get('PLAYLIST', '')
-    story.append(KeepTogether([
-        sp(0.8),
-        Paragraph('Playlist da Personalidade', sSubT), sp(0.05),
-        p('Se desejar assistir a vídeos detalhados sobre o seu perfil, basta acessar o endereço '
-          'eletrônico abaixo para acompanhar uma seleção de conteúdos preparados sobre a sua '
-          'personalidade. Recomenda-se iniciar a partir do vídeo 3 desta lista de reprodução.'),
-        sp(0.15),
-        Table([[Paragraph(
+    playlist_txt = sec.get('PLAYLIST', '').strip()
+    musicas = split_pipes(playlist_txt)
+    is_link = playlist_txt.lower().startswith('link') or 'http' in playlist_txt.lower()
+
+    if is_link:
+        playlist_conteudo = Table([[Paragraph(
             re.sub(r'^(Link da Playlist[^:]*:)', r'<b>\1</b>\n', playlist_txt),
             ParagraphStyle('LK',fontName='Helvetica',fontSize=10,textColor=TEAL,leading=16,alignment=1))
         ]], colWidths=[TW], style=TableStyle([
             ('BACKGROUND',(0,0),(-1,-1),TBOX),('LINEBEFORE',(0,0),(0,-1),3,TEAL),
             ('TOPPADDING',(0,0),(-1,-1),12),('BOTTOMPADDING',(0,0),(-1,-1),12),
             ('LEFTPADDING',(0,0),(-1,-1),16),('RIGHTPADDING',(0,0),(-1,-1),16),
-        ])),
+        ]))
+        playlist_intro = ('Se desejar assistir a vídeos detalhados sobre o seu perfil, basta acessar o endereço '
+            'eletrônico abaixo para acompanhar uma seleção de conteúdos preparados sobre a sua '
+            'personalidade. Recomenda-se iniciar a partir do vídeo 3 desta lista de reprodução.')
+    else:
+        linhas_musicas = ''.join(f'• {m}<br/>' for m in musicas).rstrip('<br/>')
+        playlist_conteudo = Table([[Paragraph(
+            linhas_musicas,
+            ParagraphStyle('LK',fontName='Helvetica',fontSize=10,textColor=TEAL,leading=18,alignment=0))
+        ]], colWidths=[TW], style=TableStyle([
+            ('BACKGROUND',(0,0),(-1,-1),TBOX),('LINEBEFORE',(0,0),(0,-1),3,TEAL),
+            ('TOPPADDING',(0,0),(-1,-1),12),('BOTTOMPADDING',(0,0),(-1,-1),12),
+            ('LEFTPADDING',(0,0),(-1,-1),16),('RIGHTPADDING',(0,0),(-1,-1),16),
+        ]))
+        playlist_intro = ('Esta é uma seleção musical que reflete os temas, emoções e jornada de '
+            'desenvolvimento da sua personalidade. Recomenda-se ouvir com atenção às letras e melodias.')
+
+    story.append(PageBreak())
+    story.append(KeepTogether([
+        Paragraph('Playlist da Personalidade', sSecT), SecLine(), sp(0.15),
+        p(playlist_intro),
+        sp(0.15),
+        playlist_conteudo,
     ]))
 
     doc.build(story)

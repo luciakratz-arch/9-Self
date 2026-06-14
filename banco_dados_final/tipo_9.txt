@@ -1,29 +1,155 @@
-# ARQUIVO DE CONTEÚDO — Traço Tipo 9 — Harmônico e Diplomático
+# ARQUIVO DE CONTEÚDO — Traço tipo Harmônico e Diplomático — Harmônico e Diplomático
 # Banco de Dados 9&Self · Dra. Lucia Kratz · CRP 09/20590
 
+=== TIPOLOGIA ===
+As pessoas do tipo "Harmônico e Diplomático" possuem uma capacidade extraordinária de compreender simultaneamente múltiplos pontos de vista, criando pontes de entendimento genuíno onde outros só conseguem ver muros intransponíveis. São indivíduos profundamente acolhedores, pacientes, receptivos e dotados de uma empatia tão ampla e inclusiva que os torna mediadores naturais e pacificadores legítimos em qualquer ambiente humano complexo. Em seu estado saudável, são líderes integradores de rara sabedoria, conciliadores habilidosos e construtores de comunidades profundas — capazes de unir opostos, estabilizar crises e criar climas de cooperação genuína onde todos se sentem incluídos, respeitados e valorizados como partes essenciais do todo. Quando integrados, sua paz não é passividade — é uma força tranquila e poderosa que transforma coletivos inteiros.
+
+No entanto, por trás da serenidade aparente e da receptividade generosa habita uma ferida silenciosa e central que raramente é nomeada: a sensação profunda de que seus próprios desejos, opiniões, vontades e necessidades não têm peso suficiente para justificar o risco de um conflito, de uma discordância, de um atrito que possa romper a harmonia do ambiente ou afastar as pessoas. A paixão arquetípica do tipo Harmônico e Diplomático é a Indolência — não a preguiça física e visível, mas uma indolência de si mesmo: um adormecer progressivo dos próprios sonhos, desejos, vontades e potencial para manter ao custo o que for necessário a harmonia ao redor. O tipo Harmônico e Diplomático perde-se de si mesmo quando a paz que cultiva com tanto cuidado é, na verdade, a anestesia cuidadosa do que genuinamente sente, quando o consenso que busca esconde a recusa de se posicionar e quando a fuga do conflito externo se torna um conflito interno crônico e silencioso com a própria identidade progressivamente adormecida.
+
+"Eu passo a vida toda mediando os outros, ajustando climas, suavizando arestas — e quando alguém finalmente me pergunta o que EU quero, o que EU penso, o que EU sinto, eu trava completamente. Não porque não saiba. É que aprendi tão cedo que o que eu quero cria atrito, incomoda, rompe equilíbrios, que acabei desligando esse sensor quase por completo. O pior é que às vezes fico tão absolutamente focado em manter a paz ao redor que perco de vista que fui eu mesmo quem sumiu no processo. Eu concordo com tudo, não discordo de nada — e no final, ninguém sabe quem eu realmente sou. Às vezes nem eu sei mais." 
+
+=== PADRAO_INFANCIA ===
+Na infância, o indivíduo do tipo Harmônico e Diplomático frequentemente experimentou a sensação de que suas opiniões, desejos e necessidades legítimas não tinham peso ou relevância no ambiente familiar. Percebeu de forma sutil que expressar sua individualidade, fazer birras ou se posicionar de forma enérgica gerava conflitos entre os adultos ou resultava no seu afastamento e isolamento afetivo pela casa.
+
+Como estratégia de sobrevivência emocional, ele aprendeu a se misturar ao cenário e a ficar invisível para manter o afeto e a harmonia familiar. Descobriu que, para não perturbar a paz da casa, era melhor acomodar-se às vontades alheias e engolir seus próprios sentimentos, desenvolvendo a crença de que não vale a pena criar caso e de que manter-se neutro e pacífico é a única armadura segura contra o desamparo e a rejeição do mundo exterior.
+
+Cresceu adotando uma postura de esquiva contra o que pudesse gerar tensões. Construiu uma identidade baseada na adaptabilidade dócil, guardando sua raiva e suas contrariedades legítimas sob uma camada espessa de esquecimento de si, desenvolvendo uma voz interior que proíbe qualquer confronto direto para garantir que ele nunca seja a causa da desunião do grupo.
+
+=== INTERACAO_SOCIAL ===
+Nas interações sociais, o tipo Harmônico e Diplomático é agradável, receptivo, modesto e estabelece conexões baseadas na aceitação incondicional e no respeito mútuo. Sabe ouvir a todos com profunda paciência analítica, criando atmosferas de acolhimento onde as pessoas se sentem psicologicamente seguras para desabafar, detestando climas de agressividade escancarada, vaidades ou competições ríspidas que quebrem a harmonia.
+
+Transmite uma imagem de serenidade, equilíbrio e confiabilidade, atuando como o ponto de equilíbrio em reuniões tensas. No entanto, quando é forçado a se posicionar de forma imediata ou a escolher um lado em disputas políticas densas, adota uma postura evasiva, concordando superficialmente com todos ou utilizando o silêncio e rodeios cordiais para adiar a definição e não criar atritos.
+
+Em uma faixa menos saudável, pode adotar um comportamento de resistência passiva extrema, dizendo 'sim' com a boca, mas sabotando a execução através da lentidão ou do esquecimento sistemático das tarefas. Tende a desconfiar de ambientes de trabalho excessivamente competitivos ou barulhentos, preferindo culturas colaborativas calmas e interpretando cobranças operacionais incisivas da liderança como agressões à sua paz de espírito.
+
 === PONTOS_FORTES ===
-O perfil Harmônico e Diplomático manifesta os seus pontos fortes através de uma postura profundamente conciliadora, pacífica, paciente e acolhedora. No ambiente profissional, a sua capacidade ímpar de ouvir diferentes perspetivas sem julgar e a sua habilidade natural para mediar conflitos criam ambientes de trabalho harmoniosos, estáveis e altamente colaborativos, tornando-o um porto seguro e um elemento de coesão essencial para qualquer equipa.
-Conciliador | Paciente | Diplomático | Tolerante | Acolhedor | Estável
+Excepcional capacidade de mediação, diplomacia e habilidade para conciliar múltiplos pontos de vista e resolver conflitos interpessoais | Alta paciência, postura acolhedora e facilidade para criar ambientes de trabalho psicologicamente seguros e colaborativos | Forte espírito de equipe, promovendo a equidade, a harmonia e o suporte mútuo entre todos os colaboradores | Adaptabilidade, flexibilidade e resiliência para manter a calma e a serenidade em situações de alta pressão ou crise | Postura confiável, integradora e determinação silenciosa para dar andamento a processos consolidados.
 
 === PONTOS_FRACOS ===
-Por focar excessivamente na manutenção da paz externa e na fuga de qualquer tipo de atrito, os pontos fracos deste perfil surgem na forma de uma inércia paralisante, procrastinação e forte tendência à autoanulação. A sua gritante dificuldade em dizer "não", em posicionar-se de forma assertiva e a inclinação a adiar decisões críticas podem gerar passividade social, acumulação de ressentimentos silenciosos e resistência velada a mudanças rápidas.
-Procrastinador | Passivo | Acomodado | Indeciso | Autoanulador | Inerte
+Tendência crônica à procrastinação de decisões difíceis e ao adiamento de confrontos necessários por medo de quebrar a harmonia | Dificuldade real para dizer 'não', impor limites profissionais saudáveis e expressar as próprias opiniões com assertividade | Resistência passiva velada, acumulando insatisfações silenciosas que se manifestam através de teimosia crônica ou esquecimentos | Tendência a se anular perante as vontades alheias, perdendo o foco de suas próprias metas e prioridades operacionais | Anestesia mental e acomodação a rotinas conhecidas, resistindo a mudanças inovadoras bruscas que exijam esforço imediato.
+
+=== AMBIENTE_TRABALHO ===
+No ambiente de trabalho, o tipo Harmônico e Diplomático performa em sua máxima potência em culturas colaborativas, humanizadas, baseadas no espírito de equipe, transparentes e que ofereçam estabilidade de processos, prazos realistas e ausência de pressões agressivas contínuas. Valoriza o respeito mútuo, a equidade e o reconhecimento silencioso de seus esforços.
+
+No entanto, sua lentidão para iniciar tarefas difíceis e a falta de posicionamento firme em momentos de crise podem gerar a percepção de que é alguém apático, acomodado ou descompromissado com a alta performance da equipe. Diante de pressões ríspidas, sua insatisfação torna-se visível imediatamente através de um silêncio absoluto, respostas monossilábicas e expressões faciais de distanciamento passivo.
+
+Sente-se profundamente estressado, sufocado e esgotado em cenários caóticos, hipercompetitivos, barulhentos, onde impera o confronto direto contínuo, a cobrança por decisões agressivas imediatas ou onde a liderança adota uma postura puramente impositiva, ríspida e sem espaço para o diálogo integrador. Nesses ambientes, sua energia despenca e ele se desliga mentalmente do front.
+
+=== ESTRESSE ===
+Situações de estresse agudo ocorrem quando o tipo Harmônico e Diplomático se sente encurralado por conflitos abertos inevitáveis, quando suas fronteiras de paz são invadidas por pressões ríspidas ou quando é forçado a assumir responsabilidades operacionais sem o suporte do grupo. Nesse momento, ele intensifica a esquiva, adota uma postura de apatia e se tranca em uma fortaleza de teimosia silenciosa e negação.
+
+Se a pressão ou a sensação de fragmentação relacional persistirem, ocorre uma involução para a linha de desintegração do tipo Precavido e Questionador. Nesse estágio, o pacífico e adaptável tipo Harmônico e Diplomático assume o pior da ansiedade do questionador: ele se torna hipervigilante, desconfiado, ansioso e extremamente reativo de forma defensiva. Passa a enxergar ameaças e segundas intenções em comunicações operacionais comuns, bombardeia o ambiente com dúvidas pessimistas, perde a paciência com os colaboradores e adota uma postura rígida e defensiva na tentativa de encontrar um chão firme de segurança para sua mente exausta.
+
+=== COMUNICACAO ===
+Sua comunicação é diplomática, mansa, inclusiva e repleta de termos que buscam acolher todas as opiniões da mesa. Sabe acalmar os ânimos e mediar tensões com maestria. No entanto, por dar extrema atenção à harmonia, seu discurso pode soar excessivamente longo, prolixo, indireto ou vago quando a equipe precisa de um direcionamento firme, firmeza técnica ou uma tomada de decisão imediata, gerando rodeios exaustivos para não melindrar ninguém.
+
+=== FALA ===
+Discurso focado em conciliação, cooperação e equilíbrio; uso frequente de termos como 'vamos ver com calma', 'o que vocês acham?', 'tudo bem por mim', 'harmonia', 'equipe' e expressões de suavização. Mostra-se altamente defensivo através do silêncio se for pressionado de forma agressiva.
+
+=== LINGUAGEM_CORPORAL ===
+Postura corporal relaxada, movimentos suaves e cadenciados, expressão facial acolhedora e olhar terno que transmite paz imediata. Revela reações de bicos sutis ou desabamento dos ombros quando contrariado, mantendo um vestuário confortável, discreto, com tons neutros ou suaves e alinhados a estilos casuais e práticos.
+
+=== PONTOS_CEGOS ===
+Não perceber que sua resistência passiva e silêncio defensivo irritam a equipe tanto quanto um confronto direto, gerando gargalos por falta de posicionamento | Ignorar que fingir que está tudo bem e contornar problemas graves sabota a governança real do negócio.
+
+=== FILTROS_DISTORCOES ===
+Filtrar a realidade através da lente do conforto e da paz, interpretando demandas de velocidade ou feedbacks construtivos legítimos como ataques à sua integridade ou tentativas de gerar conflito | Medo constante de ser fragmentado, separado do grupo ou forçado a enfrentar a dor da desunião.
+
+=== FEEDBACK_ITENS ===
+Utilize sua habilidade de mediação para unir a equipe, mas expresse suas opiniões e decisões técnicas com firmeza e clareza imediatas | Desenvolva a consistência para iniciar e concluir tarefas difíceis dentro dos prazos, combatendo a procrastinação | Aprenda a dizer 'não' e coloque limites claros nas demandas profissionais para não sobrecarregar sua própria agenda | Lembre-se de que o conflito construtivo é necessário para o crescimento e inovação do negócio.
+
+=== LIDERANCA ===
+Como líder, o tipo Harmônico e Diplomático atua de forma exemplar, integradora, justa e altamente diplomática. Lidera através do consenso, promovendo uma gestão horizontalizada onde todos os liderados têm voz e voto, criando ambientes de altíssima segurança psicológica e espírito cooperativo mútuo. Contudo, corre o risco crônico de adotar uma liderança omissa e lenta, adiando demissões necessárias ou alinhamentos corretivos duros pelo medo obsessivo de gerar atritos na equipe, o que prejudica a performance.
+
+=== TENDENCIAS_LIDERANCA ===
+Liderança baseada no consenso coletivo, foco absoluto no clima e na harmonia organizacional, gestão por processos estáveis, estilo pacificador e inclusivo de tomada de decisões.
+
+=== ASPECTOS_DESENVOLVER ===
+Aprender a despertar a energia da assertividade (o instinto realizador da ação concreta) e assumir o leme de suas próprias metas com posicionamento firme, compreendendo que se posicionar com autoridade e enfrentar conflitos legítimos não destrói os vínculos, mas sim fortalece o respeito mútuo e garante a governança real do ecossistema.
+
+=== MOTIVACAO ===
+Paz interna, harmonia relacional, estabilidade de processos, consenso coletivo, combinados calmos, cooperação mútua, aceitação incondicional, previsibilidade e ausência de atritos agressivos. Sentem-se altamente motivados em equipes unidas pelo afeto onde possam mediar o crescimento coletivo sem pressões desumanas.
+
+=== AUTODOMINIO ===
+Máximo: Altamente integrado, autoconsciente, dinâmico, focado e profundamente conectado com a realidade prática. Manifesta uma sabedoria integradora extraordinária, realiza suas metas com consistência e velocidade exemplares e demonstra uma serenidade pacífica e realizadora perante o mundo.
+
+Moderado: Visto como o mediador diplomático. Flutua entre o suporte acolhedor e a acomodação procrastinadora, adiando decisões complexas e expressando insatisfação silenciosa ou lentidão através da linguagem corporal quando confrontado com a agressividade do ambiente.
+
+Baixo: Atua como um bloco de concreto apático e negligente. Torna-se obstinado na negação da realidade, projeta uma teimosia silenciosa impenetrável perante a equipe, abandona totalmente as responsabilidades e se anestesia em distrações fúteis por medo de enfrentar a dor da fragmentação.
+
+=== HABITOS ===
+Praticar o hábito diário de eleger a tarefa mais difícil da agenda e executá-la imediatamente na primeira hora da manhã | Expressar sua discordância técnica de forma direta em uma reunião, sustentando sua opinião com dados lógicos sem pedir desculpas por isso | Realizar caminhadas ou exercícios de impacto para ativar a energia corporal e combater a inércia mental da procrastinação.
+
+Boas Práticas e Tarefas Concretas:
+
+• Ritual do "Eu Quero": Toda manhã, antes de checar qualquer mensagem ou rede social, escreva em um caderno 3 respostas para: "O que EU quero fazer hoje?" — não o que os outros esperam, não o que seria mais harmonioso. O que você quer.
+
+• Técnica da Discordância Saudável: Uma vez por semana, expresse uma opinião contrária à maioria em uma reunião ou conversa — com dados, com respeito, mas sem pedir desculpas. Registre como se sentiu antes, durante e depois.
+
+• Protocolo da Tarefa Difícil em Primeiro Lugar: Identifique a tarefa mais pesada ou desagradável da semana e execute-a nas primeiras 2 horas do dia mais produtivo. Use um timer de 25 minutos (Pomodoro) e bloqueie todas as notificações durante esse período.
+
+• Diário de Posicionamentos: Ao final de cada semana, registre 3 situações em que você se posicionou claramente — e anote o resultado real. O exercício consolida a evidência de que se posicionar não destrói vínculos; muitas vezes os fortalece.
+
+=== FRASES_COMUNS ===
+Vamos analisar todas as opiniões com calma, o importante é encontrarmos um consenso que funcione para todos. | Por mim está tudo bem, o que o grupo decidir está ótimo, não quero criar caso. | Sei que esse problema é chato, mas é melhor deixarmos o clima esfriar antes de tomarmos uma decisão drástica. | Gosto de trabalhar em ambientes tranquilos onde as pessoas se respeitam e não ficam competindo de forma agressiva. | Eu concordo com o seu ponto de vista, mas também entendo perfeitamente o lado da outra pessoa. | Não vale a pena nos desgastarmos com esses conflitos miúdos, as coisas vão se ajeitar sozinhas com o tempo.
+
+=== NIVEIS_SAUDE ===
+Autoconsciência e Serenidade Dinâmica: Neste patamar de integração, o indivíduo liberta-se do medo da fragmentação e do apego à inércia defensiva. Torna-se profundamente autoconsciente, dinâmico, focado e plenamente conectado com a realidade prática. Sua presença irradia uma paz legítima e realizadora, sendo capaz de mediar as maiores crises do mundo com profunda sabedoria, agindo com firmeza assertiva e unindo as pessoas com total generosidade, amor e estabilidade integradora.
+
+Receptividade e Diplomacia Equilibrada: Desenvolve uma percepção clara das reais necessidades do ambiente e utiliza sua doçura consciente para aproximar os opostos com moderação, paciência e respeito às individualidades alheias.
+
+Pacificação e Cooperação Ativa: Atua como um elo de sustentação comunitária extraordinário, estruturando acordos coletivos eficientes e imprimindo consistência e harmonia em projetos de grande valor prático para a sociedade.
+
+Acomodação e Desejo de Agradar: Começa a direcionar sua energia para a busca obsessiva por manter o conforto e evitar tensões, tornando-se excessivamente focado em se adaptar às vontades alheias, minimizando seus próprios desejos para não perturbar a paz.
+
+Procrastinação e Resistência Passiva: Passa a adotar uma postura de pressa cadenciada, adiando decisões complexas por medo de errar ou gerar atritos, engessando a execução por falta de posicionamento firme e interpretando cobranças incisivas como agressões à sua estabilidade.
+
+Anestesia Mental e Teimosia Silenciosa: Sente a necessidade constante de se apegar à sua autoimagem de alguém pacífico e sem problemas para camuflar sua raiva contida, tornando-se apático, negligente com suas metas e fechando-se em um silêncio defensivo impenetrável perante a equipe.
+
+Negligência Absoluta e Inflexibilidade Evasiva: Temem a separação e o isolamento total. Para salvar a autoimagem de harmônicos, tornam-se amargos, apáticos e adotam uma negação rígida da realidade que recusa qualquer intervenção prática ou alinhamento de metas.
+
+Ansiedade Desconfiada e Desintegração Hipervigilante: Manifestam os traços ansiosos e inquiridores do tipo Precavido e Questionador sob forte pressão; tornam-se excessivamente preocupados, projetam acusações de segundas intenções em aliados inocentes e explodem em reações defensivas ou pânico para encobrir o medo do desamparo.
+
+Colapso e Automutilação Passiva: Colapso existencial completo, entregando-se a uma paralisia e anestesia total de funções, depressão por esgotamento severo ou sabotando de forma destrutiva a própria vida e saúde por não suportar conviver com a angústia da fragmentação que tentou evitar a vida inteira.
+
+=== DESENVOLVIMENTO ===
+O caminho de crescimento e evolução do tipo Harmônico e Diplomático exige que ele saia da periferia da passividade e compreenda que a verdadeira paz não nasce da negação do conflito, mas sim da coragem de se posicionar. Ele precisa aprender a integrar a sua linha de evolução em direção ao tipo Realizador e Motivador, resgatando a sua força realizadora, o foco na performance, o amor pelas próprias metas, a eficiência executiva e o orgulho legítimo pelo seu próprio sucesso material, materializando seus dons extraordinários no mundo.
+
+A cura começa quando ele assume o comando de sua própria vida com presença real. O movimento para que transforme seu comportamento em uma atitude evoluída exige desarmar a indolência de si, sair do casulo da acomodação e colocar seu carisma conciliador e sua sabedoria a serviço da liderança focada, enérgica, realizadora, assertiva e unida pela entrega consistente de valor e resultados de alta performance para toda a comunidade.
+
+=== INFOBOX_DESENVOLVIMENTO ===
+O tipo Harmônico e Diplomático evolui quando se move em direção às características saudáveis do tipo Realizador e Motivador, aprendendo a resgatar o seu valor pessoal, a focar em suas metas e objetivos individuais com paixão, a agir com velocidade e eficiência prática e a assumir o brilho de suas realizações sem o medo obsessivo de quebrar a conexão com as pessoas.
+
+=== FABULA ===
+As Ferramentas da Oficina: Contam as antigas histórias que, no coração de uma pacífica oficina de madeira, houve uma estranha e calorosa reunião. Foi uma assembleia legítima, na verdade, na qual as ferramentas se juntaram para alinhar suas diferenças e restabelecer a harmonia do ambiente. O martelo estava exercendo a presidência com toda a sua firmeza habitual, mas os participantes da oficina começaram a sussurrar que ele precisaria renunciar ao cargo. A causa? Ele fazia demasiado barulho e, além do mais, passava todo o tempo golpeando as superfícies com uma impaciência ríspida que deixava a equipe tensa.
+
+O martelo escutou o parecer da assembleia, aceitou sua culpa perante as regras estabelecidas, mas, adotando uma postura defensiva de alinhamento, pediu que também fosse expulso o parafuso, dizendo que ele dava muitas voltas e rodeios burocráticos para conseguir atingir qualquer resultado prático, atrasando o andamento das entregas. Diante do ataque direto à sua competência, o parafuso concordou em se retirar para manter a segurança do grupo, mas, por sua vez, exigiu a demissão imediata da lixa. Ele dizia com convicção que ela era muito áspera e hipercítica no tratamento com os demais, entrando sempre em atritos desnecessários no dia a dia.
+
+A lixa acatou a decisão da governança com uma única ressalva protetiva: exigiu que fosse expulso também o metro. Ela argumentou que ele passava o tempo todo medindo e julgando os outros estritamente segundo a sua própria medida, como se fosse o único padrão perfeito, correto e infalível de toda a marcenaria. Nesse momento de alerta máximo e desconfiança velada, a pesada porta de carvalho se abriu e entrou o marceneiro. Ele manteve a serenidade, foi até a bancada e juntou todas as ferramentas para iniciar o trabalho do dia. O marceneiro utilizou o martelo para fixar, a lixa para afinar as asperezas, o metro para garantir a precisão e o parafuso para dar a união e a firmeza necessárias. Finalmente, aquela rústica e bruta madeira de carvalho se converteu em um fino, sofisticado e resistente móvel de qualidade.
+
+Quando o dia terminou e a marcenaria ficou novamente no mais absoluto silêncio, a assembleia reativou a discussão com um clima totalmente transformado. Foi então que o serrote, agindo com profunda lucidez e espírito integrador, tomou a palavra e disse: "Senhores, ficou demonstrado que temos defeitos operacionais e pontos de atenção, mas o marceneiro trabalha focando estritamente em nossas qualidades, ressaltando nossos pontos valiosos. Assim, não pensemos em nossos pontos fracos e concentremo-nos em nossos pontos fortes". Dessa forma, a assembleia entendeu que o martelo era forte, o parafuso unia e dava força, a lixa era especial para limpar e afinar asperezas e o metro era preciso e exato. Sentiram-se, então, uma equipe capaz de produzir móveis de qualidade, e uma grande alegria tomou conta de todos pela oportunidade e segurança de trabalharem juntos.
+
+=== PERGUNTAS_FABULA ===
+As ferramentas ficaram tão ocupadas apontando os defeitos umas das outras que perderam o foco do que poderiam construir juntas. Em que área da sua vida você tem gastado mais energia administrando a harmonia ao redor do que construindo algo significativo para si mesmo? | O metro foi acusado de medir os outros pela sua própria régua. Que régua invisível você carrega sobre como as pessoas "deveriam" se comportar para não te incomodar — e como essa régua silenciosa tem gerado ressentimentos que você nunca expressa? | No final, foi o serrote quem tomou a palavra e reorientou a assembleia. Qual é a opinião, ideia ou verdade que você carrega há muito tempo e ainda não disse — porque esperava o momento perfeito, o ambiente ideal ou a certeza de que ninguém se magoaria?
+
+=== PLAYLIST ===
+Link da Playlist: https://youtube.com/playlist?list=PLkqM2ogZH7ixluTtUpfow0Rli0RK2sv5&si=MC9MDB0ScfNrPzRd
+
+=== ASA_8 ===
+Nível saudável: Apresentam uma combinação poderosa entre a habilidade de harmonizar e conciliar do tipo Harmônico e Diplomático com a assertividade e confiança natural do tipo Desafiador e Controlador. São líderes integradores, muito mais confiantes, expressivos e diretos na comunicação das suas opiniões e desejos, sem perderem o tato diplomático.
+Nível médio: Tornam-se indivíduos consideravelmente mais obstinados, teimosos e inflexíveis na busca pelos seus objetivos ou na defesa dos seus pontos de vista, o que pode gerar conflitos inesperados com o meio. Apresentam uma forte tendência a reprimir emoções profundas.
+Nível baixo: Desabam num padrão de total indolência mascarado por explosões súbitas de agressividade e tirania. Tornam-se implacáveis e egocêntricos na preservação do seu próprio conforto e rotinas, rejeitando qualquer feedback ou autoridade com desdém e hostilidade.
 
 === ASA_1 ===
 Nível saudável: O indivíduo é visto como uma pessoa sonhadora, mas com os pés no chão. Possui comportamentos marcadamente mais criativos, imaginativos e idealistas, demonstrando uma capacidade rara de sintetizar diferentes escolas de pensamento ou pontos de vista numa visão de um mundo ideal. São figuras amigáveis, tranquilizadoras, focadas no desejo genuíno de ajudar o próximo e com a capacidade de ouvir o outro sem emitir julgamentos.
 Nível médio: Procuram fazer com que a ordem externa e as regras sejam um meio de organizar o seu próprio mundo interior. Podem manifestar um sutil complexo de superioridade moral e um viés puritano que dá ao seu estilo um toque excessivamente formal, rígido e correto.
 Nível baixo: A busca por ordem transforma-se numa teimosia intransigente e paralisante. Tornam-se pessoas apáticas, frias e moralistas, usando o apego a regras insignificantes para punir silenciosamente os outros e camuflar a sua incapacidade de agir.
 
-=== ASA_8 ===
-Nível saudável: Apresentam uma combinação poderosa entre a habilidade de harmonizar e conciliar do Tipo 9 com a assertividade e confiança natural do Tipo 8. São líderes integradores, muito mais confiantes, expressivos e diretos na comunicação das suas opiniões e desejos, sem perderem o tato diplomático.
-Nível médio: Tornam-se indivíduos consideravelmente mais obstinados, teimosos e inflexíveis na busca pelos seus objetivos ou na defesa dos seus pontos de vista, o que pode gerar conflitos inesperados com o meio. Apresentam uma forte tendência a reprimir emoções profundas.
-Nível baixo: Desabam num padrão de total indolência mascarado por explosões súbitas de agressividade e tirania. Tornam-se implacáveis e egocêntricos na preservação do seu próprio conforto e rotinas, rejeitando qualquer feedback ou autoridade com desdém e hostilidade.
-
 === SUBTIPO_AP_1A1_SOC ===
-Os tipos Harmônico e Diplomáticos com a combinação Autopreservação dominante, 1 a 1 secundária e Social Reprimido focam a sua energia na busca pelos prazeres simples, confortáveis e de fácil obtenção na vida prática para afastar a ansiedade do mundo exterior. São pessoas de trato muito fácil, agradáveis, mas consideravelmente pouco ambiciosas e acomodadas. A influência do 1a1 na segunda posição traz uma intensidade afetiva e um magnetismo romântico que é vivido quase inteiramente em segredo ou direcionado a um parceiro exclusivo. Devido ao instinto social reprimido, revelam um comportamento mais egoísta e uma inércia à mudança acentuada, gerando um forte isolamento.
+Os tipos Harmônico e Diplomáticos com a combinação Autopreservação dominante, 1 a 1 secundária e Social Reprimido focam a sua energia na busca pelos prazeres simples, confortáveis e de fácil obtenção na vida prática para afastar a ansiedade do mundo exterior. São pessoas de trato muito fácil, agradáveis, mas consideravelmente pouco ambiciosas e acomodadas. A influência do 1 a 1 na segunda posição traz uma intensidade afetiva e um magnetismo romântico que é vivido quase inteiramente em segredo ou direcionado a um parceiro exclusivo. Devido ao instinto social reprimido, revelam um comportamento mais egoísta e uma inércia à mudança acentuada, gerando um forte isolamento.
 
 === SUBTIPO_AP_SOC_1A1 ===
-Esta configuração apresenta o Autopreservação dominante, o Social secundário e o 1 a 1 Reprimido. Buscam o conforto material e a estabilidade da rotina diária como o seu porto seguro contra o estresse. O instinto social em segunda posição faz com que canalizem a sua prestatividade e gentileza para o ambiente de trabalho ou comunidade, onde gostam de ser vistos como pessoas colaborativas. Contudo, devido ao instinto 1a1 reprimido, revelam uma grande barreira para estabelecer conexões íntimas ou vulneráveis de um para um.
+Esta configuração apresenta o Autopreservação dominante, o Social secundário e o 1 a 1 Reprimido. Buscam o conforto material e a estabilidade da rotina diária como o seu porto seguro contra o estresse. O instinto social em segunda posição faz com que canalizem a sua prestatividade e gentileza para o ambiente de trabalho ou comunidade, onde gostam de ser vistos como pessoas colaborativas. Contudo, devido ao instinto 1 a 1 reprimido, revelam uma grande barreira para estabelecer conexões íntimas ou vulneráveis de um para um.
 
 === SUBTIPO_1A1_AP_SOC ===
 Com o instinto de 1 a 1 dominante, Autopreservação secundário e Social Reprimido, este perfil procura a fusão absoluta e a harmonia total através de um relacionamento exclusivo de um para um. Projetam toda a sua identidade e desejos no parceiro ou num amigo íntimo, tendendo a anular as suas próprias vontades para agradar o outro e evitar qualquer risco de abandono. A Autopreservação secundária traz o gosto por criar um ambiente doméstico aconchegante, estético e seguro. Como possuem o instinto social reprimido, sentem forte desconforto em expor-se publicamente.
@@ -32,72 +158,7 @@ Com o instinto de 1 a 1 dominante, Autopreservação secundário e Social Reprim
 Apresenta o 1 a 1 dominante, Social secundário e Autopreservação Reprimida. Procuram o magnetismo pessoal através do compartilhamento de ideais de paz, união e harmonia de pessoa para pessoa. O social na segunda posição confere a este perfil uma excelente capacidade de transitar e mediar conflitos em grupos com extrema doçura e carisma. Como possuem a Autopreservação reprimida, sofrem de uma gritante falta de cuidado com a própria saúde, finanças pessoais e limites físicos, doando a sua energia vital para manter o equilíbrio dos outros.
 
 === SUBTIPO_SOC_1A1_AP ===
-Nesta combinação, o instinto Social é dominante, o 1 a 1 é secundário e a Autopreservação é Reprimida. São os verdadeiros embaixadores da paz coletiva nas organizações, focados em criar ambientes altamente colaborativos, serenos e acolhedores onde todos se sintam incluídos. O 1a1 secundário traz o magnetismo necessário para cativar e ouvir as pessoas individualmente com profunda empatia. Devido à Autopreservação reprimida, há uma total negligência em relação às suas próprias necessidades físicas de descanso e alimentação saudável.
+Nesta combinação, o instinto Social é dominante, o 1 a 1 é secundário e a Autopreservação é Reprimida. São os verdadeiros embaixadores da paz coletiva nas organizações, focados em criar ambientes altamente colaborativos, serenos e acolhedores onde todos se sintam incluídos. O 1 a 1 secundário traz o magnetismo necessário para cativar e ouvir as pessoas individualmente com profunda empatia. Devido à Autopreservação reprimida, há uma total negligência em relação às suas próprias necessidades físicas de descanso e alimentação saudável.
 
 === SUBTIPO_SOC_AP_1A1 ===
-Caracterizado pelo Social dominante, Autopreservação secundário e 1 a 1 Reprimido. Focam a sua energia em construir e preservar a estabilidade nas relações sociais e o equilíbrio do grupo, sendo figuras extremamente queridas que transmitem paz e segurança por onde passam. A Autopreservação secundária confere o tino prático e o pragmatismo para executar tarefas rotineiras com disciplina. No entanto, por terem o instinto 1a1 reprimido, revelam o nível mais acentuado de passividade social e desapego das suas próprias paixões pessoais.
-
-=== TIPOLOGIA ===
-As pessoas do tipo Harmônico e Diplomático possuem uma orientação vital inteiramente focada na manutenção da paz interna, na conciliação de diferenças e na fuga obstinada de qualquer tipo de conflito, atrito ou tensão no ambiente. São presenças serenas, pacientes, tolerantes e dotadas de uma capacidade rara de ouvir múltiplas perspetivas sem emitir julgamentos. Contudo, enfrentam o fantasma da inércia e da autoanulação crônica, tendendo a adiar decisões críticas (procrastinação) e a esquivar-se de posicionamentos firmes para evitar perturbar a harmonia das relações.
-
-=== PADRAO_INFANCIA ===
-Na infância, cresceram em ambientes onde os conflitos eram destrutivos ou onde sentiram que as suas opiniões, desejos e voz não tinham vez nem espaço. Aprenderam cedo que a melhor forma de sobreviver e manter a estabilidade era tornarem-se invisíveis, acomodando-se às vontades dos adultos e fundindo-se com a rotina para não causar problemas.
-
-=== INTERACAO_SOCIAL ===
-As suas interações sociais são marcadamente agradáveis, gentis, acolhedoras e livres de exigências. São os verdadeiros mediadores e diplomatas do convívio humano, transitando com suavidade por qualquer grupo. No entanto, a sua participação é frequentemente passiva; preferem manter-se em segundo plano e submeter-se às preferências dos outros do que iniciar ações ou expressar desejos que possam gerar debates ou confrontos diretos.
-
-=== AMBIENTE_TRABALHO ===
-No ambiente de trabalho, as pessoas do tipo Harmônico e Diplomático funcionam como o verdadeiro porto seguro e o elemento de coesão essencial da equipa. Destacam-se pela paciência, tolerância e por uma habilidade natural para mediar conflitos e integrar diferentes perspetivas sem emitir julgamentos, criando climas organizacionais serenos. Contudo, a sua gritante dificuldade em dizer "não", a resistência em priorizar tarefas urgentes e a inclinação crônica a procrastinar decisões complexas podem amarrar a operação.
-
-=== ESTRESSE ===
-O estresse surge de forma aguda quando este perfil é arrancado da sua zona de conforto de forma abrupta, quando é forçado a mediar conflitos violentos ou quando as cobranças corporativas por posicionamentos assertivos esmagam a sua paz interna. Sob forte pressão, entram em involução (transe) e vão buscar o comportamento menos saudável do Tipo 6: tornam-se surpreendentemente ansiosos, céticos, desconfiados, hipervigilantes e cheios de medos antecipatórios, travando a sua capacidade de ação por completo.
-
-=== COMUNICACAO ===
-A sua comunicação é difusa, diplomática, ponderada e repleta de termos que visam suavizar as arestas das situações corporativas. Escutam com paciência absoluta. No entanto, quando sob estresse laboral, a sua fala torna-se excessivamente prolixa, divagante e esquiva. Adotam o silêncio confortável ou o adiamento contínuo da conversa crítica como estratégias para fugir do confronto direto.
-
-=== LIDERANCA ===
-Como líderes, adotam um estilo altamente inclusivo, democrático e focado no consenso absoluto do grupo, garantindo que todos os pontos de vista sejam acolhidos e ouvidos. São figuras queridas e acessíveis. Contudo, pecam gravemente pela falta de direção firme, firmeza operacional e coragem para demitir, punir ou cortar processos ineficientes, tendendo a deixar que os problemas se arrastem na esperança de que se resolvam sozinhos.
-
-=== TENDENCIAS_LIDERANCA ===
-Lideram pelo consenso, pela inclusão e pela harmonia do grupo. São figuras queridas e acessíveis. Têm enorme dificuldade em tomar decisões difíceis, demitir ou cortar processos. Tendem a deixar conflitos sem resolução na esperança de que se dissipem sozinhos.
-
-=== ASPECTOS_DESENVOLVER ===
-Posicionar-se com assertividade: Pratique verbalizar a sua opinião sincera logo no início das reuniões, entendendo que divergir não significa quebrar o vínculo afetivo. | Despertar para a ação imediata: Estabeleça um sistema rígido de prazos diários para as tarefas importantes, combatendo o impulso de se distrair com afazeres insignificantes. | Dizer não sem culpa: Aprenda a impor limites claros às demandas alheias para proteger a sua própria energia vital e foco operacional.
-
-=== MOTIVACAO ===
-Preservar a sua paz interna, serenidade espiritual e harmonia absoluta no ambiente ao redor. | Evitar a todo o custo conflitos diretos, atritos relacionais, tensões e situações de rejeição. | Sentir-se plenamente incluído, aceito e parte integrante de um grupo colaborativo estável. | Manter rotinas previsíveis, confortáveis e livres de pressões de urgência.
-
-=== AUTODOMINIO ===
-MÁXIMO: Presença integrada e realizadora. Desperta do transe da inércia e age com imensa força focado no presente, liderando a diplomacia com uma firmeza e energia impressionantes para transformar a realidade. | MODERADO: Conciliador, calmo e tolerante; sujeito a comportamentos de acomodação, procrastinação velada e autoanulação para evitar perturbar a harmonia do grupo. | BAIXO: Inerte e apático. Abandona-se por completo num estado de preguiça mental e passividade agressiva crônica, recusando-se a agir e tornando-se um peso morto que sabota silenciosamente os processos da equipa.
-
-=== HABITOS ===
-Rastrear a autoanulação automática: Anote quantas vezes ao dia você respondeu "tanto faz" ou "o que você preferir" para escolhas simples da rotina. || Exercitar a priorização de choque: Crie o hábito de executar a tarefa mais difícil e complexa do seu dia logo na primeira hora da manhã, quebrando o ciclo de procrastinação. || Verbalizar a discórdia saudável: Force a sua mente a apresentar pelo menos um argumento divergente e construtivo durante debates corporativos, exercitando a sua voz.
-
-=== FRASES_COMUNS ===
-Vamos manter a calma, tudo vai se resolver da melhor forma possível se não criarmos problemas. | Por mim está tudo bem, prefiro seguir a decisão que for melhor para o grupo. | Detesto discussões barulhentas e climas de alta tensão ou cobrança imediata. | Amanhã eu resolvo esse assunto com mais calma e paciência. | Não vale a pena brigar por coisas tão pequenas; prefiro a paz. | Sinto-me confortável quando as coisas seguem uma rotina estável e previsível.
-
-=== FILTROS_DISTORCOES ===
-Hipervigilância contra o conflito aberto, a tensão relacional imediata ou o desgaste de energia. | Filtrar o mundo selecionando dados que mantenham uma ilusão de tranquilidade idealizada.
-
-=== LINGUAGEM_CORPORAL ===
-Expressão facial serena, plácida e relaxada. | Gestos lentos, suaves e postura corporal descontraída. | Inclinação à passividade motora ou ao conforto físico do espaço. | Roupas discretas, funcionais e que não chamem atenção de forma extravagante.
-
-=== PONTOS_CEGOS ===
-Não perceber que o seu silêncio defensivo e adiamento de decisões geram gargalos crônicos e irritação na equipe. | Acreditar que a raiva não existe dentro de si, acumulando ressentimentos passivo-agressivos.
-
-=== FEEDBACK_ITENS ===
-Apresente a sua opinião sincera logo no início dos debates corporativos, sem esperar o consenso total. | Aceite que feedbacks críticos fazem parte do crescimento, e não de uma tentativa de exclusão social. | Assuma o compromisso de verbalizar limites operacionais firmes à governança.
-
-=== NIVEIS_SAUDE ===
-N1: Paz autêntica e presença plena | N2: Harmonia produtiva | N3: Diplomacia equilibrada | N4: Acomodação moderada | N5: Procrastinação crescente | N6: Passividade defensiva | N7: Autoanulação crônica | N8: Inércia paralisante | N9: Dissociação e colapso
-=== DESENVOLVIMENTO ===
-O Tipo 9 realiza o seu salto quântico de desenvolvimento ao migrar para a faixa saudável do Tipo 3, despertando do transe da preguiça para agir no mundo com alta produtividade, eficiência, foco em resultados ambiciosos e assumindo o valor e o mérito da sua própria voz.
-
-=== INFOBOX_DESENVOLVIMENTO ===
-A paz verdadeira do Tipo 9 não está na ausência de conflito — está na presença corajosa. Ao integrar o Tipo 3, descobre que a sua voz tem valor e que agir no mundo não destrói a harmonia, mas a fortalece.
-
-=== FABULA ===
-A Tartaruga e a Lebre: Conta-se que uma lebre, muito orgulhosa de sua rapidez mental e agilidade física, desafiou uma tartaruga para uma corrida. Assim que foi dada a largada, a lebre distanciou-se com enorme velocidade e, vendo a lentidão da tartaruga, pensou: "Ela está tão longe que eu bem posso deitar-me à sombra destes arbustos e tirar uma soneca relaxante." Adormeceu profundamente, sonhando com uma vitória cheia de glamour e facilidade. Entretanto, a tartaruga, mantendo a constância, o foco prático e a disciplina firme passo a passo, passou pela lebre adormecida sem se desviar do caminho e cruzou a meta final, sagrando-se campeã. A lebre acordou sobressaltada e, ao perceber que a dispersão e o excesso de confiança a tinham feito perder, reconheceu o valor da consistência, parabenizando a tartaruga com um gesto de maturidade.
-
-=== PLAYLIST ===
-Link da Playlist Tipo 9: https://youtube.com/playlist?list=PLkqM2ogZH7ixzL2UNjZZAnabele
+Caracterizado pelo Social dominante, Autopreservação secundário e 1 a 1 Reprimido. Focam a sua energia em construir e preservar a estabilidade nas relações sociais e o equilíbrio do grupo, sendo figuras extremamente queridas que transmitem paz e segurança por onde passam. A Autopreservação secundária confere o tino prático e o pragmatismo para executar tarefas rotineiras com disciplina. No entanto, por terem o instinto 1 a 1 reprimido, revelam o nível mais acentuado de passividade social e desapego das suas próprias paixões pessoais.
