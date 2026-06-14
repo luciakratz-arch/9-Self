@@ -886,7 +886,37 @@ window.validarCodigo = async function() {
     if(snap.empty){errEl.textContent='Código não encontrado.';btn.textContent='Entrar';btn.disabled=false;return;}
     const docRef = snap.docs[0];
     const data   = docRef.data();
-    if(data.status==='usado'){errEl.textContent='Este código já foi utilizado.';btn.textContent='Entrar';btn.disabled=false;return;}
+    if(data.status==='usado'){
+      // Buscar laudo já gerado para mostrar resultado
+      window._state.codigoAtivo = {id:docRef.id,...data};
+      enterApp('colaborador', data.nomeDestinatario||'Colaborador', 'Acesso por Código');
+      setTimeout(async ()=>{
+        const q2 = query(collection(db,'nself_laudos'), where('codigoId','==',docRef.id));
+        const ls  = await getDocs(q2);
+        if(!ls.empty){
+          const laudo = ls.docs[0].data();
+          const laudoId = ls.docs[0].id;
+          // Preencher tela de resultado com dados do Firestore
+          const NOMES = {'1':'Perfeição e Excelência','2':'Prestativo e Relacional','3':'Performance e Imagem','4':'Autêntico e Profundo','5':'Observador e Privacidade','6':'Precavido e Questionador','7':'Visionário e Otimista','8':'Desafiador e Controlador','9':'Harmônico e Diplomático'};
+          document.getElementById('resultTipoCircle').textContent = laudo.tipo;
+          document.getElementById('resultTipoNome').textContent   = laudo.tipoNome || NOMES[laudo.tipo] || '—';
+          document.getElementById('resultAsa').textContent        = `Asa ${laudo.asaDominante} (dominante) · Asa ${laudo.asaSecundaria} (secundária)`;
+          document.getElementById('resultSubtipo').textContent    = `${laudo.subtipoDominante} · ${laudo.subtipoIntermediario} · ${laudo.subtipoRemissivo}`;
+          window._state.laudoDocId = laudoId;
+          if(laudo.pdfUrl) window._state.laudoUrl = laudo.pdfUrl;
+          // Reconstituir TS mínimo para baixarLaudo()
+          window.TS = window.TS || {};
+          TS.tipoFinal = laudo.tipo;
+          TS.asaDom    = laudo.asaDominante;
+          TS.subDom    = laudo.subtipoDominante;
+          TS.subInt    = laudo.subtipoIntermediario;
+          TS.subRem    = laudo.subtipoRemissivo;
+        }
+        navigateTo('colab-resultado');
+      }, 100);
+      btn.textContent='Entrar'; btn.disabled=false;
+      return;
+    }
     if(data.status==='revogado'){errEl.textContent='Este código foi revogado.';btn.textContent='Entrar';btn.disabled=false;return;}
     window._state.codigoAtivo = {id:docRef.id,...data};
     enterApp('colaborador', data.nomeDestinatario||'Colaborador', 'Acesso por Código');
@@ -1601,39 +1631,58 @@ async function salvarResultadoFinal() {
 }
 
   // ── GERAR E BAIXAR PDF ──
-  // URL da Cloud Function (deploy no Firebase Functions)
   const CF_GERAR_PDF = 'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarLaudoPDF';
 
   window.baixarLaudo = async function() {
-    const btn = document.getElementById('btnDownloadPdf');
+    const btn    = document.getElementById('btnDownloadPdf');
     const status = document.getElementById('pdfStatus');
+    const cod    = window._state.codigoAtivo || {};
+    const nome   = cod.nomeDestinatario || 'resultado';
 
-    // Se já temos a URL gerada, baixar direto
+    // CASO 1: URL já disponível (gerada anteriormente ou salva no Firestore)
     if(window._state.laudoUrl) {
       const a = document.createElement('a');
-      a.href = window._state.laudoUrl;
-      a.download = `Laudo_9Self_${window._state.laudoNome||'resultado'}.pdf`;
-      a.target = '_blank';
+      a.href     = window._state.laudoUrl;
+      a.download = `Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+      a.target   = '_blank';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       return;
     }
 
-    btn.disabled = true;
-    btn.textContent = '⏳ Gerando laudo...';
-    status.textContent = 'Aguarde, estamos preparando seu laudo personalizado...';
+    // CASO 2: Buscar URL no Firestore (laudo já gerado em sessão anterior)
+    if(window._state.laudoDocId) {
+      try {
+        const { getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        const snap = await getDoc(doc(db,'nself_laudos', window._state.laudoDocId));
+        if(snap.exists() && snap.data().pdfUrl) {
+          window._state.laudoUrl = snap.data().pdfUrl;
+          window.baixarLaudo();
+          return;
+        }
+      } catch(_) {}
+    }
 
-    const cod = window._state.codigoAtivo || {};
+    // CASO 3: Chamar Cloud Function para gerar PDF
+    if(!window.TS || !window.TS.tipoFinal) {
+      showToast('Dados do teste não encontrados. Refaça o teste.','error');
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = '⏳ Gerando laudo...';
+    status.textContent = 'Aguarde, preparando seu laudo personalizado...';
+
     const payload = {
-      tipo:      TS.tipoFinal,
-      asa:       TS.asaDom,
-      subDom:    TS.subDom,
-      subInt:    TS.subInt,
-      subRem:    TS.subRem,
-      nome:      cod.nomeDestinatario || 'Participante',
-      cargo:     cod.cargo || '',
-      codigoId:  cod.id || '',
+      tipo:     TS.tipoFinal,
+      asa:      TS.asaDom,
+      subDom:   TS.subDom,
+      subInt:   TS.subInt,
+      subRem:   TS.subRem,
+      nome:     cod.nomeDestinatario || 'Participante',
+      cargo:    cod.cargo || '',
+      codigoId: cod.id   || '',
     };
 
     try {
@@ -1642,34 +1691,28 @@ async function salvarResultadoFinal() {
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify(payload),
       });
-
       if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
+      if(!data.url) throw new Error('URL não retornada');
 
-      if(data.url) {
-        window._state.laudoUrl  = data.url;
-        window._state.laudoNome = (cod.nomeDestinatario||'resultado').replace(/\s+/g,'_');
-        // Salvar URL no Firestore para o painel admin
-        if(window._state.laudoDocId) {
-          try {
-            await updateDoc(doc(db,'nself_laudos', window._state.laudoDocId),
-              {pdfUrl: data.url, pdfPath: data.path||'', geradoEm: serverTimestamp()});
-          } catch(_) {}
-        }
-        status.textContent = '✅ Laudo pronto!';
-        btn.textContent = '⬇ Baixar Laudo PDF';
-        btn.disabled = false;
-        // Iniciar download automaticamente
-        window.baixarLaudo();
-      } else {
-        throw new Error('URL não retornada');
+      window._state.laudoUrl = data.url;
+      if(window._state.laudoDocId) {
+        try {
+          await updateDoc(doc(db,'nself_laudos', window._state.laudoDocId),
+            {pdfUrl: data.url, pdfPath: data.path||'', geradoEm: serverTimestamp()});
+        } catch(_) {}
       }
+      status.textContent  = '✅ Laudo pronto!';
+      btn.textContent     = '⬇ Baixar Laudo PDF';
+      btn.disabled        = false;
+      window.baixarLaudo(); // download automático
+
     } catch(e) {
-      console.error('Erro ao gerar PDF:', e);
-      btn.disabled = false;
+      btn.disabled    = false;
       btn.textContent = '⬇ Baixar Laudo PDF';
-      status.innerHTML = `<span style="color:#c00;">⚠ Não foi possível gerar o laudo agora. 
+      status.innerHTML = `<span style="color:#c00;">⚠ Não foi possível gerar agora. 
         <a href="mailto:contato@9self.com.br" style="color:#7B1D6B;">Entre em contato.</a></span>`;
+      console.error('Erro PDF:', e);
     }
   };
 const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
