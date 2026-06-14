@@ -1,0 +1,164 @@
+# ARQUIVO DE CONTEÚDO — Traço tipo Precavido e Questionador — Precavido e Questionador
+# Banco de Dados 9&Self · Dra. Lucia Kratz · CRP 09/20590
+
+=== TIPOLOGIA ===
+As pessoas do tipo "Precavido e Questionador" possuem um talento extraordinário para a antecipação cirúrgica de riscos, a construção de alianças sólidas e duradouras e a criação de estruturas organizacionais que resistem ao tempo e às crises. São indivíduos leais, trabalhadores incansáveis, profundamente responsáveis e dotados de uma capacidade rara de proteger o grupo contra falhas sistêmicas e ameaças que outros simplesmente não enxergam no horizonte. Em seu estado saudável, são os pilares invisíveis das organizações — defensores incansáveis da equipe, guardiões dos processos e construtores de comunidades profundas baseadas na lealdade genuína, na transparência institucional e no respeito mútuo. Quando integrados, sua coragem de questionar o que todos aceitam sem pensar é o que salva organizações inteiras de decisões desastrosas.
+
+No entanto, por trás dessa lealdade inabalável e dessa vigilância constante habita uma ferida profunda e central: a sensação de que o mundo é fundamentalmente imprevisível e perigoso, e que sem estruturas externas claras, aliados confiáveis ao redor e diretrizes explícitas sobre o que esperar, o desamparo e a traição são inevitáveis. A paixão arquetípica do tipo Precavido e Questionador é o Medo — não apenas o medo circunstancial e passageiro, mas uma ansiedade antecipatória crônica que escaneia continuamente o ambiente em busca de ameaças antes mesmo que elas existam, que questiona as intenções de todos e que oscila entre a busca por autoridades externas confiáveis (fobia) e a rebeldia contra essas mesmas autoridades (contrafobia) como formas opostas e igualmente ansiosas de gerenciar a angústia interna. O tipo Precavido e Questionador perde-se de si mesmo quando o planejamento preventivo saudável se torna paralisação, quando a lealdade genuína se torna dependência e quando a busca pela certeza absoluta o impede de agir no presente sempre imperfeito.
+
+"Eu sei que penso demais nos problemas que ainda nem aconteceram. Mas alguém tem que pensar. Se eu não me preocupar, quem vai garantir que estamos preparados para o que pode dar errado? O que me assusta de verdade não é o fracasso em si — é ser pego completamente de surpresa, sem ter visto os sinais, sem saber o que fazer, sozinho no meio de uma crise sem ninguém confiável ao meu lado. É exatamente esse pesadelo — o do desamparo inesperado — que me mantém acordado às 3 da manhã, revendo cada detalhe, cada combinado, cada possibilidade." 
+
+=== PADRAO_INFANCIA ===
+Na infância, o indivíduo do tipo Precavido e Questionador frequentemente experimentou uma sensação sutil ou explícita de imprevisibilidade e falta de apoio seguro em suas figuras de autoridade primárias. Percebeu que as regras mudavam sem aviso, ou sentiu que o ambiente era instável e carente de uma orientação consistente que lhe permitisse desenvolver sua autonomia com total tranquilidade.
+
+Como estratégia de sobrevivência emocional, ele desenvolveu uma antena hipervigilante voltada para as intenções dos adultos ao seu redor. Aprendeu que, para não ser pego de surpresa por punições ou crises, precisava antecipar o pior cenário possível e questionar as reais motivações das pessoas, desenvolvendo a crença de que o mundo é um lugar inerentemente perigoso e que a obediência leal ou o questionamento contínuo são as únicas defesas contra o desamparo.
+
+Cresceu dividindo o mundo entre "quem está comigo" e "quem está contra mim". Construiu uma identidade baseada na lealdade aos seus pares, guardando suas dúvidas em um loop mental contínuo de tomada de decisão, desenvolvendo uma voz interior rígida (o advogado do diabo) que policia cada passo para garantir que todas as contingências de erro foram calculadas.
+
+=== INTERACAO_SOCIAL ===
+Nas interações sociais, o tipo Precavido e Questionador é caloroso, leal, cooperativo e altamente comprometido com o cumprimento de acordos. Valoriza a transparência, a honestidade relacional e detesta agendas ocultas, jogos de poder ou mudanças repentinas nos combinados sem justificativa lógica, preferindo interações claras, baseadas no respeito mútuo e na construção de alianças de longo prazo.
+
+Transmite uma imagem de confiabilidade, responsabilidade e espírito de equipe. Sabe criar um forte senso de camaradagem, defendendo os interesses dos colaboradores perante a alta gestão. No entanto, quando se sente inseguro ou percebe falta de clareza nas intenções do ambiente, adota uma postura defensiva, questionando excessivamente as diretrizes e demonstrando uma desconfiança velada.
+
+Em uma faixa menos saudável, pode adotar um comportamento de testar a lealdade das pessoas através de provocações ou distanciamentos estratégicos. Tende a desconfiar de ambientes institucionais excessivamente informais ou instáveis, preferindo estruturas previsíveis e interpretando silêncios operacionais da liderança como sinais de conspiração, rejeição ou demissão iminente.
+
+=== PONTOS_FORTES ===
+Excepcional senso de responsabilidade, lealdade inabalável e dedicação extrema ao grupo | Alta capacidade para gerenciar crises, antecipar riscos e estruturar planos de contingência | Forte espírito de equipe, promovendo a cooperação, a equidade e o suporte mútuo | Disciplina operacional, consistência no cumprimento de prazos e respeito aos combinados | Postura precavida, garantindo que os processos operem com total segurança e governança.
+
+=== PONTOS_FRACOS ===
+Tendência crônica à ansiedade antecipatória, sofrendo por problemas que ainda não aconteceram | Dificuldade real para tomar decisões rápidas devido ao loop obsessivo de dúvidas e análises | Postura excessivamente defensiva, desconfiada ou cética em relação a novas ideias e mudanças | Tendência a adotar uma visão pessimista ou focada estritamente no pior cenário possível | Rigidez com processos e manuais pelo medo paralisante de cometer erros operacionais.
+
+=== AMBIENTE_TRABALHO ===
+No ambiente de trabalho, o tipo Precavido e Questionador performa em sua máxima potência em culturas estruturadas, transparentes, baseadas em processos claros, governança explícita e que valorizem a meritocracia e a lealdade. Necessita de feedbacks consistentes da liderança e de um clima de cooperação legítima.
+
+No entanto, sua tendência em prever apenas os problemas e questionar as inovações pode gerar a percepção de que é alguém resistente a mudanças ou pessimista perante a equipe. Diante de diretrizes ambíguas, sua ansiedade e impaciência tornam-se visíveis através de questionamentos incisivos, tom de voz defensivo e expressões faciais de preocupação contínua.
+
+Sente-se profundamente estressado, desmotivado e desamparado em cenários caóticos, instáveis, onde as regras mudam a todo momento, onde impera a informalidade irresponsável ou onde a liderança adota uma postura distante, imprevisível e sem critérios claros de segurança. Nesses ambientes, seu estresse explode e ele entra em alerta máximo.
+
+=== ESTRESSE ===
+Situações de estresse agudo ocorrem quando o tipo Precavido e Questionador se sente desamparado por falta de diretrizes claras, quando percebe riscos iminentes de falha na operação ou quando sente que a lealdade do grupo foi quebrada. Nesse momento, ele intensifica o controle por processos, torna-se hipervigilante e bombardeia a equipe com dúvidas e cobranças defensivas.
+
+Se a pressão ou a sensação de instabilidade persistirem, ocorre uma involução para a linha de desintegração do tipo Realizador e Motivador. Nesse estágio, o precavido e cooperativo tipo Precavido e Questionador adota o pior da performance competitiva: ele se torna workaholic de forma frenética, foca obsessivamente na imagem externa de eficiência e passa a correr de um lado para o outro de maneira superficial para provar seu valor, mascarando suas profundas inseguranças e paralisando o planejamento real por pressa em exibir resultados imediatos.
+
+=== COMUNICACAO ===
+Sua comunicação é direta, estruturada, focada nos fatos e repleta de ressalvas técnicas para garantir a segurança da informação. Utiliza dados validados e alinhamentos explícitos para fundamentar suas opiniões. No entanto, quando sob estresse, seu tom de voz pode soar excessivamente inquiridor, corretivo ou ansioso, dando a impressão de que está promovendo uma sabatina ou duvidando da competência dos interlocutores.
+
+=== FALA ===
+Discurso focado em segurança, alinhamento e contingências; uso frequente de termos como 'e se der errado?', 'precisamos garantir', 'está alinhado?', 'regras claras' e 'segurança do processo'. Mostra-se altamente defensivo se sua lealdade ou intenções forem colocadas em xeque.
+
+=== LINGUAGEM_CORPORAL ===
+Olhar atento e analítico, postura corporal que oscila entre a prontidão defensiva (músculos tensos) e o acolhimento cooperativo. Expressões faciais que revelam preocupação ou dúvida através de cenhos franzidos, mantendo um vestuário adequado, correto e alinhado às normas formais do ambiente.
+
+=== PONTOS_CEGOS ===
+Não perceber que seu excesso de questionamentos e foco nos riscos pode ser interpretado pela equipe como boicote, pessimismo crônico ou falta de confiança no potencial do projeto | Ignorar que a busca pela certeza absoluta paralisa a inovação prática.
+
+=== FILTROS_DISTORCOES ===
+Filtrar a realidade através da lente da ameaça latente, enxergando segundas intenções ou riscos catastróficos em mudanças operacionais comuns | Medo constante de ser traído, enganado ou deixado sozinho perante uma crise.
+
+=== FEEDBACK_ITENS ===
+Utilize sua habilidade preventiva para apontar riscos, mas acrescente soluções práticas e elogios aos acertos já realizados | Desenvolva a coragem para decidir e agir mesmo diante de margens de incerteza operacional | Controle o uso de tom de voz inquiridor ou defensivo em alinhamentos de rotina | Lembre-se de que a equipe precisa de direcionamento seguro e entusiasmo para inovar.
+
+=== LIDERANCA ===
+Como líder, o tipo Precavido e Questionador atua como um verdadeiro protetor e construtor de alianças. Sua gestão é baseada no espírito de equipe, na governança por processos seguros e na transparência total de informações. Sabe ouvir, acolher demandas de segurança e criar ambientes de alta previsibilidade. Contudo, corre o risco constante de centralizar decisões e engessar a operação pelo medo obsessivo de que erros aconteçam sob sua responsabilidade, sufocando a autonomia dos liderados.
+
+=== TENDENCIAS_LIDERANCA ===
+Liderança baseada na governança clara, foco na proteção da equipe, gestão de riscos cirúrgica, meritocracia técnica estável e lealdade mútua.
+
+=== ASPECTOS_DESENVOLVER ===
+Flexibilizar a necessidade de certeza absoluta e desenvolver a autoconfiança interna, compreendendo que a verdadeira segurança não está nos manuais externos ou na aprovação de autoridades, mas na sua própria capacidade de responder criativamente aos imprevistos da vida.
+
+=== MOTIVACAO ===
+Segurança, previsibilidade, lealdade mútua, clareza de diretrizes, combinados explícitos, suporte do grupo, transparência de intenções e governança por processos. Sentem-se altamente motivados em equipes unidas por propósitos nobres e que operem sob regras claras e estáveis.
+
+=== AUTODOMINIO ===
+Máximo: Altamente integrado, autoconfiante, corajoso e profundamente conectado com a realidade prática. Manifesta uma fé inabalável em si e no grupo, lidera com lucidez exemplar e demonstra uma serenidade acolhedora diante de crises reais.
+
+Moderado: Visto como o defensor precavido. Flutua entre a dedicação brilhante e a dúvida ansiosa, questionando diretrizes e expressando preocupação crônica através da linguagem corporal quando confrontado com a instabilidade do ambiente.
+
+Baixo: Atua como um conspirador autoritário e intolerante. Torna-se fanaticamente apegado a regras rígidas, projeta acusações severas de traição em aliados inocentes e explode em reações agressivas (contrafóbicas) ou paralisia fóbica total por medo do desamparo.
+
+=== HABITOS ===
+Praticar o hábito diário de respirar conscientemente e focar na solução em vez de rodar o loop do "pior cenário possível" | Tomar decisões de médio impacto dentro de um prazo fixo, proibindo-se de reanalisar os dados após a escolha | Elogiar publicamente a lealdade e os acertos da equipe antes de cobrar alinhamentos de processos.
+
+Boas Práticas e Tarefas Concretas:
+
+• Protocolo da Decisão com Prazo: Para qualquer decisão de médio impacto, estabeleça um prazo máximo de 48 horas. Ao fim desse prazo, decida com os dados disponíveis e proíba-se de reanalisar por 7 dias. Registre o resultado real versus o cenário de risco que imaginava.
+
+• Diário de Evidências de Confiança: Toda semana, anote 3 situações em que alguém foi leal, confiável ou honesto com você. O exercício treina o cérebro a registrar evidências positivas que o viés da ameaça costuma filtrar.
+
+• Técnica do "E se der certo?": Para cada preocupação registrada, escreva também o cenário oposto: "E se der certo, o que acontece?" Pratique elaborar os dois lados com a mesma riqueza de detalhes.
+
+• Check-in Semanal de Autoconfiança: Toda sexta-feira, liste 3 decisões que você tomou na semana sem ter certeza absoluta — e que deram certo. O exercício consolida a confiança na própria bússola interna.
+
+=== FRASES_COMUNS ===
+Se vamos mudar o processo, precisamos planejar todas as contingências para o caso de dar errado. | Essa diretriz está muito ambígua, eu preciso saber exatamente quem é o responsável final. | Gosto de trabalhar em equipe onde todos jogam limpo e cumprem os combinados. | Fico profundamente ansioso quando sinto que as regras mudam no meio do jogo sem aviso. | Eu sou leal a essa liderança, mas preciso de clareza total sobre as reais intenções do projeto. | É melhor sermos realistas e precavidos do que otimistas ingênuos e sermos pegos de surpresa.
+
+=== NIVEIS_SAUDE ===
+Autoconfiança e Coragem: Neste patamar de integração, o indivíduo liberta-se do medo do desamparo e da dependência de garantias externas. Torna-se profundamente autoconfiante, corajoso e conectado com a realidade prática. Sua presença irradia uma segurança serena, demonstrando uma lealdade legítima e uma capacidade extraordinária de guiar o grupo com lucidez, coragem e fé prática diante das maiores incertezas da vida.
+
+Confiabilidade e Cooperação: Desenvolve uma percepção clara das intenções alheias e utiliza seu discernimento consciente para construir laços de cooperação mútua baseados no respeito e na equidade.
+
+Dedicação e Prontidão: Atua como um pilar de sustentação organizacional, estruturando planos preventivos eficientes e imprimindo consistência e responsabilidade em projetos de valor prático para a comunidade.
+
+Obrigação e Vigilância Preventiva: Começa a direcionar sua energia para a busca obsessiva por garantias e segurança, tornando-se excessivamente focado em prever riscos, mapear manuais e testar a confiabilidade do ambiente.
+
+Ansiedade e Teimosia Defensiva: Passa a adotar uma postura de dúvida crônica e ceticismo, engessando processos por medo de errar e interpretando a falta de clareza da liderança como uma ameaça direta à sua estabilidade profissional.
+
+Hipervigilância e Autoritarismo Defensivo: Sente a necessidade constante de se apegar a dogmas ou autoridades rígidas para combater sua ansiedade interna, tornando-se julgador, impaciente e projetando acusações de incompetência ou segundas intenções na equipe.
+
+Paranoia e Inflexibilidade Crítica: Temem a traição e o abandono total perante a crise. Para salvar a autoimagem de leais, tornam-se amargos, paranoicos e adotam uma inflexibilidade tacanha que recusa qualquer acordo ou mudança inovadora.
+
+Atropelamento e Desintegração Competitiva: Manifestam os traços hiperativos e workaholics do tipo Realizador e Motivador sob forte pressão; tornam-se excessivamente focados na imagem de eficiência a qualquer custo e explodem em correria superficial para encobrir o medo do fracasso.
+
+Colapso e Autossabotagem Conspiratória: Colapso emocional completo, podendo entrar em surtos de pânico severos, depressão por esgotamento ou sabotar de forma destrutiva as próprias alianças e conquistas por não suportar conviver com a angústia da desconfiança absoluta.
+
+=== DESENVOLVIMENTO ===
+O caminho de crescimento e evolução do tipo Precavido e Questionador exige que ele faça as pazes com a incerteza inerente à vida e compreenda que nenhuma estrutura externa pode garantir segurança absoluta. Ele precisa aprender a integrar a sua linha de evolução em direção ao tipo Harmônico e Diplomático, resgatando o valor da paz interna, do relaxamento mental, da aceitação serena dos acontecimentos e da confiança fluida na vida, desarmando o estado de alerta contínuo.
+
+A cura começa quando ele confia em sua própria bússola interna. O movimento para que transforme seu comportamento em uma atitude evoluída exige desarmar o loop da ansiedade antecipatória, sair da postura defensiva de cobrança e colocar sua impressionante lealdade e capacidade preventiva a serviço da liderança estável, pacífica, integradora e unida pelo afeto legítimo e pela harmonia relacional.
+
+=== INFOBOX_DESENVOLVIMENTO ===
+O tipo Precavido e Questionador evolui quando se move em direção às características saudáveis do tipo Harmônico e Diplomático, aprendendo a relaxar a mente analítica, a desarmar o estado de hipervigilância, a aceitar os fluxos naturais dos acontecimentos com leveza e a encontrar paz interna e serenidade relacional independentemente das circunstâncias externas.
+
+=== FABULA ===
+As Ferramentas da Marcenaria: Contam as antigas histórias que, no coração de uma pacífica oficina de madeira, houve uma estranha e calorosa reunião. Foi uma assembleia legítima, na verdade, na qual as ferramentas se juntaram para alinhar suas diferenças e restabelecer a harmonia do ambiente. O martelo estava exercendo a presidência com toda a sua firmeza habitual, mas os participantes da oficina começaram a sussurrar que ele precisaria renunciar ao cargo. A causa apontada pelo grupo? Ele fazia demasiado barulho e, além do mais, passava todo o tempo golpeando as superfícies com uma impaciência ríspida que deixava a equipe tensa.
+
+O martelo escutou o parecer da assembleia, aceitou sua culpa perante as regras estabelecidas, mas, adotando uma postura defensiva de alinhamento, pediu que também fosse expulso o parafuso. Ele argumentou com firmeza que o parafuso dava muitas voltas e rodeios burocráticos para conseguir atingir qualquer resultado prático, atrasando o andamento das entregas. Diante do ataque direto à sua competência, o parafuso concordou em se retirar para manter a segurança do grupo, mas, por sua vez, exigiu a demissão imediata da lixa. Ele dizia com convicção que ela era muito áspera e hipercítica no tratamento com os demais, entrando sempre em atritos desnecessários no dia a dia.
+
+A lixa acatou a decisão da governança com uma única ressalva protetiva: exigiu que fosse expulso também o metro. Ela argumentou que ele passava o tempo todo medindo e julgando os outros estritamente segundo a sua própria medida, como se fosse o único padrão perfeito e infalível de toda a oficina. Nesse momento de alerta máximo e desconfiança velada, a pesada porta de carvalho se abriu e entrou o marceneiro. Ele manteve a serenidade, foi até a bancada e juntou todas as ferramentas para iniciar o trabalho do dia. O marceneiro utilizou o martelo para fixar, a lixa para afinar as asperezas, o metro para garantir a precisão e o parafuso para dar a união e a firmeza necessárias. Finalmente, aquela rústica e bruta madeira de carvalho se converteu em um fino, sofisticado e resistente móvel de qualidade.
+
+Quando o dia terminou e a marcenaria ficou novamente no mais absoluto silêncio, a assembleia reativou a discussão com um clima totalmente transformado. Foi então que o serrote, agindo com profunda lucidez e espírito integrador, tomou a palavra e disse: "Senhores, ficou explicitamente demonstrado que todos nós temos defeitos operacionais e pontos de atenção, mas o marceneiro trabalha focando estritamente em nossas qualidades, ressaltando nossos pontos valiosos. Portanto, não pensemos mais em nossos pontos fracos e concentremo-nos com total lealdade em nossos pontos fortes". Dessa forma, a assembleia compreendeu que o martelo era forte e realizador, o parafuso unia e dava sustentação estável, a lixa era especial para limpar e afinar imperfeições e o metro era exato, preciso e garantia a governança do projeto. Sentiram-se, então, uma verdadeira equipe de alta performance, capaz de produzir móveis de excelência inigualável, e uma grande e legítima alegria tomou conta de todos pela oportunidade e segurança de trabalharem unidos.
+
+=== PERGUNTAS_FABULA ===
+As ferramentas queriam expulsar umas às outras pelos defeitos — mas o único que sabia usá-las era o marceneiro. Em que situação da sua vida você está "expulsando" aliados ou descartando recursos valiosos porque focou nos defeitos em vez das qualidades? | O martelo exercia a presidência, mas a assembleia queria que ele renunciasse por ser barulhento. Quais aspectos da sua personalidade você esconde ou reprime por medo de que sejam mal interpretados pela equipe — e o que esses aspectos constroem quando usados pelo marceneiro certo? | Quando o marceneiro entrou, ele simplesmente trabalhou — sem participar das discussões. Que decisão ou ação importante você tem adiado esperando por mais certeza, mais alinhamento ou mais garantias que talvez nunca cheguem?
+
+=== PLAYLIST ===
+Link da Playlist: https://youtube.com/playlist?list=PLkqM2ogZH7ixluTtUpfow0Rli0RK2sv5&si=MC9MDB0ScfNrPzRd
+
+=== ASA_5 ===
+Nível saudável: Indivíduos que sobressaem em áreas técnicas e de análise profunda, atuando como excelentes gestores de riscos. Mostram-se dedicados aos estudos e às discussões conceituais, sentindo-se atraídos por sistemas com regras e parâmetros lógicos bem claros, como as ciências exatas e o direito.
+Nível médio: Tornam-se pessoas consideravelmente mais sérias, independentes e reservadas. Evitam buscar consolo ou conselhos emocionais com os outros, preferindo recolher-se em seus espaços controlados. Buscam a segurança por meio de sistemas de crenças rígidos.
+Nível baixo: Manifestam comportamentos de reatividade defensiva e grande isolamento social. Ao se sentirem ameaçados, tendem a projetar a culpa das suas inseguranças nas estruturas ao redor, adotando posturas reacionárias e agressivas.
+
+=== ASA_7 ===
+Nível saudável: Pessoas nitidamente mais animadas, comunicativas, dinâmicas e voltadas para o entrosamento social. Conseguem equilibrar a precaução natural com uma postura otimista e uma mente cheia de ideias criativas para o futuro. Usam o bom humor para desarmar tensões e construir redes de cooperação sólidas.
+Nível médio: A ansiedade subjacente se disfarça em uma busca por atividades constantes e novos planos para evitar encarar os próprios medos. Tornam-se mais inquietos, centralizadores e dependentes da aprovação do grupo.
+Nível baixo: Desabam em um padrão de hiperatividade desordenada e desespero velado. Tornam-se altamente instáveis nas suas decisões e compromissos, agindo de forma esquiva para fugir de responsabilidades pesadas.
+
+=== SUBTIPO_AP_1A1_SOC ===
+Os tipos Precavidos Fóbicos com a combinação Autopreservação dominante, 1 a 1 secundária e Social Reprimido focam intensamente na construção de alianças calorosas e afetuosas em círculos muito restritos para aplacar o medo do mundo externo. Buscam a estabilidade financeira e a segurança doméstica de forma minuciosa, organizando rotinas à risca. O instinto 1 a 1 secundário faz com que depositem toda a sua confiança num parceiro ou amigo íntimo, de quem esperam proteção absoluta. Devido ao instinto social reprimido, desconfiam fortemente de grandes instituições ou convenções públicas.
+
+=== SUBTIPO_AP_SOC_1A1 ===
+Esta configuração apresenta o Autopreservação dominante, o Social secundário e o 1 a 1 Reprimido. São indivíduos extremamente metódicos, focados na segurança financeira e na mitigação de riscos práticos no trabalho. Utilizam o instinto social na segunda posição para garantir que estão inseridos em grupos estáveis que lhes ofereçam proteção institucional. Contudo, devido ao 1 a 1 reprimido, revelam grande frieza e reserva na expressão da afetividade profunda.
+
+=== SUBTIPO_1A1_AP_SOC ===
+Com o instinto de 1 a 1 dominante, Autopreservação secundário e Social Reprimido, este perfil fóbico busca afastar a hostilidade do ambiente através do cultivo de uma imagem atraente e esteticamente impecável. Buscam uma fusão absoluta e uma lealdade total de um parceiro idealizado para se sentirem seguros. O social reprimido faz com que evitem ao máximo a exposição em grandes coletivos corporativos, preferindo canalizar toda a sua energia em interações exclusivas de um para um, onde o medo de rejeição gera comportamentos de ciúme silencioso.
+
+=== SUBTIPO_1A1_SOC_AP ===
+Apresenta o 1 a 1 dominante, Social secundário e Autopreservação Reprimida. Procuram segurança estabelecendo fortes conexões pessoais e usando o seu carisma e cuidado estético para desarmar qualquer perigo em potencial nas relações. O social em segunda posição confere a este perfil uma excelente capacidade de transitar e cooperar em equipes, buscando sempre criar ambientes harmoniosos e livres de conflitos. Como possuem a Autopreservação reprimida, tendem a negligenciar severamente o controle das suas finanças pessoais e a prevenção de cuidados de saúde.
+
+=== SUBTIPO_SOC_1A1_AP ===
+Nesta combinação, o instinto Social é dominante, o 1 a 1 é secundário e a Autopreservação é Reprimida. São os verdadeiros defensores das normas e das diretrizes institucionais, buscando segurança através da total identificação com um sistema de crenças, partido ou cultura corporativa rígida. Seguem as regras à risca para não serem criticados ou excluídos. Devido à Autopreservação reprimida, sacrificam o seu próprio bem-estar físico e tempo livre em prol dos deveres do grupo.
+
+=== SUBTIPO_SOC_AP_1A1 ===
+Caracterizado pelo Social dominante, Autopreservação secundário e 1 a 1 Reprimido. Focam a sua energia em construir redes de apoio sólidas e em colaborar de forma exemplar em grupos e organizações corporativas, encarando a cooperação coletiva como a única via segura de sobrevivência. No entanto, por terem o instinto 1 a 1 reprimido, sofrem de uma severa inibição para expressar e iniciar desejos afetivos mais profundos por medo crônico de se exporem e serem rejeitados pelo parceiro.

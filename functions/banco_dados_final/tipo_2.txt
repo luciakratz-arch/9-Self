@@ -1,0 +1,160 @@
+# ARQUIVO DE CONTEÚDO — Traço tipo Prestativo e Acolhedor — Prestativo e Relacional
+# Banco de Dados 9&Self · Dra. Lucia Kratz · CRP 09/20590
+
+=== TIPOLOGIA ===
+As pessoas do tipo "Prestativo e Relacional" possuem uma inteligência emocional extraordinária e uma antena naturalmente sintonizada com as necessidades, emoções e carências das pessoas ao seu redor. São indivíduos generosos, calorosos, acolhedores e autenticamente comprometidos com o bem-estar alheio — capazes de perceber o que os outros precisam antes mesmo que eles próprios o percebam. Em seu estado saudável, são mentores genuínos e inspiradores, construtores de vínculos profundos e duradouros, catalisadores do potencial humano nas equipes onde atuam. Criam climas de confiança psicológica onde todos se sentem vistos, valorizados e apoiados, exercendo uma liderança que humaniza processos e transforma resultados pelo poder das relações.
+
+No entanto, por trás dessa generosidade aparentemente ilimitada habita uma ferida silenciosa e central: o medo profundo de ser descartável, de não ser amado por quem realmente é — mas apenas pelo que faz, oferece e resolve pelos outros. A paixão arquetípica do tipo Prestativo e Acolhedor é o Orgulho — não a arrogância ostentosa e visível, mas o orgulho velado e sofisticado de quem acredita saber o que os outros precisam melhor do que eles mesmos, e de quem nega sistematicamente suas próprias necessidades para se sentir virtualmente indispensável. O tipo Prestativo e Acolhedor perde-se de si mesmo quando transforma o cuidado genuíno em controle disfarçado de afeto, a doação sincera em fatura emocional não declarada e o amor em moeda de troca para garantir que nunca será rejeitado ou abandonado. Essa dinâmica gera um ciclo crônico de superentrega seguida de mágoa profunda quando o retorno não vem na mesma intensidade.
+
+"Eu nunca peço nada para ninguém. Nunca mesmo — e tenho orgulho disso. Mas fico esperando, no fundo do meu coração, que as pessoas percebam o quanto eu faço por elas e se ofereçam de volta com a mesma intensidade e dedicação. Quando isso não acontece — e quase nunca acontece do jeito que eu imagino — fico com uma mágoa enorme que não consigo nem nomear direito. Não é raiva. É uma tristeza funda de me sentir invisível. Justo eu, que passo a vida inteira fazendo o outro se sentir visto e importante." 
+
+=== PADRAO_INFANCIA ===
+Na infância, o indivíduo do tipo Prestativo e Acolhedor aprendeu que para receber afeto, aprovação e atenção, ele precisava ser útil, bonzinho e focado em agradar os outros. Frequentemente, percebeu que suas próprias necessidades eram deixadas de lado ou que expressá-las gerava rejeição ou afastamento dos cuidadores.
+
+Como estratégia de sobrevivência emocional, desenvolveu um mecanismo de antena: aprendeu a ler os sinais sutis de humor dos adultos ao seu redor para antecipar o que eles precisavam, moldando seu comportamento para ser o porto seguro ou o solucionador de problemas da casa, trocando sua autenticidade pela garantia de pertencer e ser amado.
+
+Cresceu acreditando que expressar carências ou pedir ajuda direta é um sinal de egoísmo que afasta as pessoas. Por isso, desenvolveu a máscara da autossuficiência generosa, acreditando que tem muito para dar, mas que não precisa de nada em troca, criando um padrão inconsciente de manipulação afetiva através do favor.
+
+=== INTERACAO_SOCIAL ===
+Nas interações sociais, o tipo Prestativo e Acolhedor é magnético, afetuoso, expansivo e extremamente cativante. Seu comportamento é guiado por uma orientação onde busca construir pontes afetivas de um para um de forma intensa, mantendo o foco em ser aceito e querido por aqueles que considera importantes.
+
+Possui uma facilidade natural para estabelecer rapport e criar vínculos emocionais rápidos. Busca ativamente a proximidade e o contato humano, detestando climas de indiferença, frieza ou distanciamento institucional amplo, onde sente maior previsibilidade e segurança se puder mapear os afetos.
+
+Em uma faixa menos saudável, pode se tornar excessivamente ciumento e projetar altos níveis de cobrança e possessividade nas pessoas mais próximas, usando favores e agrados constantes para reter a atenção e a dependência do outro, controlando o ambiente relacional.
+
+=== PONTOS_FORTES ===
+Altíssima inteligência emocional, empatia aguçada e sensibilidade relacional | Generosidade, altruísmo e disposição natural para apoiar e desenvolver pessoas | Habilidade para construir alianças, engajar equipes e mediar conflitos interpessoais | Postura acolhedora, incentivadora e capacidade de extrair o melhor potencial do outro | Energia realizadora voltada para o cuidado e a facilitação da vida prática das pessoas.
+
+=== PONTOS_FRACOS ===
+Tendência crônica a anular as próprias necessidades básicas e limites de saúde | Orgulho velado de acreditar que sabe o que os outros precisam melhor do que eles mesmos | Dificuldade real de dizer 'não' e impor limites saudáveis nas barreiras profissionais | Manipulação inconsciente através da doação exagerada, gerando dívidas emocionais | Acúmulo de ressentimento, mágoa e cobranças implícitas quando não se sente valorizado.
+
+=== AMBIENTE_TRABALHO ===
+No ambiente de trabalho, o tipo Prestativo e Acolhedor busca criar um clima de harmonia e proximidade, mas sua tendência em centralizar os apoios e se tornar o "padrinho" ou "madrinha" da equipe pode gerar dependência emocional nos liderados. Sua necessidade de agradar faz com que as pessoas percebam sua sensibilidade a críticas, tornando o clima tenso quando feedbacks duros precisam ser dados.
+
+Por focar excessivamente nas relações, pode perder a objetividade técnica e o foco nas metas frias do negócio. Quando se sente desvalorizado ou ignorado pela liderança, sua insatisfação é transmitida imediatamente através de bicos, suspiros e expressões faciais de mágoa, cobrando atenção e gerando um clima de pisar em ovos ao seu redor.
+
+=== ESTRESSE ===
+Situações de estresse ocorrem quando este perfil percebe que seu esforço e dedicação relacional são ignorados ou que as pessoas estão se distanciando, gerando o pensamento: "Tanto que eu faço por todos, e ninguém se importa comigo...".
+
+Quando o acúmulo de mágoa e rejeição atinge o limite, ocorre uma involução drástica para a linha do tipo Desafiador e Controlador. O dócil e prestativo tipo Prestativo e Acolhedor explode em estouros agressivos, cheios de autoritarismo, rispidez e acusações diretas, jogando na cara do outro tudo o que já fez por ele e assumindo uma postura dominadora e centralizadora para recuperar o controle das relações à força.
+
+=== COMUNICACAO ===
+Sua comunicação é envolvente, calorosa e cheia de validações e elogios. No entanto, por medo de quebrar a harmonia ou magoar o interlocutor, tende a ser muito indireto quando precisa dar feedbacks corretivos ou fazer cobranças operacionais, utilizando rodeios e suavizações excessivas para não parecer duro.
+
+=== FALA ===
+Discurso focado em pessoas, sentimentos e bem-estar. Utiliza palavras frequentes como 'ajudar', 'conte comigo', 'estou preocupado', 'carinho', 'reconhecimento' e 'sentimento'. Mostra-se profundamente magoado se for criticado ou ignorado de forma fria.
+
+=== LINGUAGEM_CORPORAL ===
+Expressão facial aberta e sorridente, inclinação do corpo em direção ao interlocutor, gestos abertos, toque físico oportuno e olhar acolhedor. Revela reações de mágoa ou bicos sutis quando contrariado, mantendo uma postura convidativa.
+
+=== PONTOS_CEGOS ===
+Parecer invasivo, controlador ou possessivo perante a equipe sem ter a intenção real | Não perceber que sua ajuda não solicitada pode sufocar a autonomia e o crescimento dos colaboradores.
+
+=== FILTROS_DISTORCOES ===
+Preocupação obsessiva com a aprovação e aceitação das pessoas | Medo constante de ser rejeitado ou considerado descartável | Presunção de que os outros são frios ou ingratos apenas por agirem de forma puramente profissional e objetiva.
+
+=== FEEDBACK_ITENS ===
+Aprenda a dar feedbacks diretos, técnicos e objetivos sem medo de que isso destrua a relação pessoal | Desenvolva a habilidade de recuar e permitir que os colaboradores errem e aprendam sozinhos, sem correr para salvá-los | Controle o uso de linguagem excessivamente emocional em reuniões formais | Lembre-se: por mais que você queira ajudar, as pessoas precisam de espaço para desenvolver sua própria autonomia.
+
+=== LIDERANCA ===
+Líderes deste tipo formam equipes integradas, motivadas e com forte espírito de colaboração. Utilizando sua empatia, atuam como mentores focados no bem-estar e no desenvolvimento humano, criando ambientes acolhedores. No entanto, correm o risco crônico de adotar um estilo paternalista, passando a mão na cabeça de colaboradores de baixa performance pelo medo de gerar conflitos ou romper o vínculo afetivo.
+
+=== TENDENCIAS_LIDERANCA ===
+Liderança acolhedora, estilo mentoria, foco absoluto no clima organizacional, gestão humanizada e engajamento pelo afeto.
+
+=== ASPECTOS_DESENVOLVER ===
+Estabelecer limites claros entre o profissional e o pessoal, aprendendo a dizer 'não' com firmeza técnica | Praticar a auto-observação para identificar quando sua ajuda é uma tentativa oculta de controlar ou se fazer necessário | Focar nas metas e entregas objetivas do negócio com o mesmo zelo que dedica às relações humanas.
+
+=== MOTIVACAO ===
+Conexão, aprovação, afeto, reconhecimento, utilidade, proximidade, pertencimento, valorização relacional e suporte mútuo. Sentem-se altamente motivados quando seus esforços de cuidado são validados publicamente e quando fazem parte de equipes unidas por laços humanos genuínos.
+
+=== AUTODOMINIO ===
+Máximo: Visto como uma pessoa verdadeiramente altruísta e livre da necessidade de aprovação. Doa-se de forma desinteressada, respeita a autonomia alheia e reconhece com maturidade seus próprios limites físicos e emocionais.
+
+Moderado: Visto como o prestativo acolhedor. Flutua entre a doação sincera e a busca por reconhecimento, tornando-se sutilmente invasivo e demonstrando carência ou mágoa indireta quando não recebe a atenção esperada.
+
+Baixo: Atua como um manipulador emocional agressivo e controlador. Utiliza a culpa, o vitimismo e as queixas de saúde para prender as pessoas e explode em rompantes autoritários do tipo Desafiador e Controlador se for contrariado ou ignorado.
+
+=== HABITOS ===
+Praticar o hábito diário de perguntar a si mesmo "O que eu preciso para mim hoje?" antes de correr para atender o outro | Anotar as expectativas de retribuição para conscientizar as faturas emocionais ocultas | Aprender a recuar um passo e observar as situações de forma neutra e racional, sem levar as respostas profissionais para o lado pessoal.
+
+Boas Práticas e Tarefas Concretas:
+
+• Inventário da Fatura Emocional: Ao final de cada semana, liste 3 situações em que você ajudou alguém e registre honestamente: "Eu esperava alguma coisa em troca?" Esse exercício traz à consciência as cobranças ocultas.
+
+• Ritual do Pedido Direto: Uma vez por semana, pratique fazer um pedido direto e explícito a alguém próximo — sem rodeios, sem esperar que a pessoa adivinhe. Comece com algo simples: "Hoje preciso que você me escute por 10 minutos sem me dar conselhos."
+
+• Agenda do Autocuidado Intransferível: Bloqueie na agenda um compromisso semanal só seu — um passeio, um hobby, um silêncio — e trate-o com a mesma seriedade com que trata os compromissos dos outros.
+
+• Diário da Identidade Própria: Reserve 10 minutos diários para anotar: "O que eu quis fazer hoje, mas abri mão para agradar alguém?" Esse registro revela o padrão de autoanulação.
+
+=== FRASES_COMUNS ===
+Deixe comigo, eu resolvo isso para você, não se preocupe. | Eu faço tudo por essa equipe, mas sinto que ninguém reconhece o meu esforço. | Se você precisar de qualquer coisa, a qualquer hora do dia, pode me ligar. | Não preciso de nada, só quero ver você bem. | Sinto de longe quando o clima entre as pessoas não está legal. | Fico profundamente magoado quando me tratam de forma fria ou indiferente. | Sei exatamente o que aquela pessoa precisa para melhorar de vida. | Preciso ser útil e necessário para garantir o meu espaço.
+
+=== NIVEIS_SAUDE ===
+Altruísmo e Liberdade: Neste nível de integração, o indivíduo liberta-se da necessidade de aprovação externa. Torna-se verdadeiramente altruísta, doando um amor incondicional, puro e sem faturas emocionais. Sua presença irradia um acolhimento profundo, aceitando os outros e a si mesmo com total generosidade e desapego humano.
+
+Empatia e Cuidado: Demonstra uma sensibilidade relacional extraordinária, colocando-se no lugar do outro para compreender e apoiar suas dores e necessidades com doçura e equilíbrio.
+
+Auxílio e Incentivo: Atua como um incentivador natural, facilitando o crescimento prático e emocional das pessoas através de suporte constante e mentoria genuína.
+
+Paternalismo e Desejo de Agradar: Começa a focar excessivamente na aprovação alheia, tornando-se o 'agradador' que faz concessões além de seus limites saudáveis para garantir afeto e evitar conflitos.
+
+Invasão e Centralização Relacional: Passa a intervir na vida e no trabalho dos outros sem ser solicitado, microgerenciando relações sob o pretexto de que 'sabe o que é melhor para eles', centralizando os apoios para se tornar indispensável.
+
+Autoengano e Cobrança Indireta: Sente a necessidade constante de se orgulhar de sua generosidade, gerando sentimentos de culpa e faturas emocionais ocultas nos outros, cobrando atenção através de queixas sutis de cansaço ou mágoa.
+
+Vitimismo e Manipulação: Temem ser rejeitados e considerados descartáveis. Para salvar a autoimagem de bonzinhos, tornam-se amargos e manipuladores, utilizando o sofrimento e queixas psicossomáticas para prender as pessoas à força.
+
+Coerção e Desintegração Agressiva: Manifestam os traços agressivos do tipo Desafiador e Controlador por não conseguirem o controle pelo afeto; tornam-se impositivos, dominadores e atracam verbalmente os aliados com duras acusações de ingratidão.
+
+Obsessão e Destruição de Vínculos: Colapso relacional completo, podendo sabotar ativamente a autonomia das pessoas ao seu redor ou adoecer gravemente para forçar o cuidado e a dependência absoluta dos outros.
+
+=== DESENVOLVIMENTO ===
+O caminho de crescimento e evolução do tipo Prestativo e Acolhedor exige que ele faça as pazes com a sua própria vulnerabilidade e carência interna. Ele precisa aprender a integrar a sua linha de evolução em direção ao tipo Autêntico e Profundo, resgatando a sua identidade própria, olhando para dentro e aprendendo a nomear e aceitar seus próprios desejos e sentimentos, sem a máscara da autossuficiência prestativa.
+
+A cura começa quando ele percebe que tem o direito de ser amado por quem ele é, e não pelo que ele faz, doa ou resolve pelos outros. O movimento para que transforme seu comportamento em uma atitude evoluída exige tornar-se mais autêntico, introspectivo e focado em sua própria arte e autocuidado, ganhando a profundidade necessária para entender que a verdadeira doação nasce do transbordo interno e não da barganha por afeto.
+
+=== INFOBOX_DESENVOLVIMENTO ===
+O tipo Prestativo e Acolhedor evolui quando se move em direção às características saudáveis do tipo Autêntico e Profundo, aprendendo a olhar para o seu próprio mundo interno, a validar suas necessidades individuais, a expressar sua autenticidade e a colocar limites claros sem o medo obsessivo de perder o amor das pessoas.
+
+=== FABULA ===
+A Fonte Sedenta: Contam que, no coração de um vale verdejante, existia uma Fonte Sedenta que passava os dias jorrando água cristalina para saciar os pássaros, os viajantes e as plantações da região, orgulhando-se imensamente de ser o sustento e o porto seguro de toda a vida daquele lugar. Ela acreditava que sua única missão era transbordar e que ela mesma era autossuficiente, não precisando de nada para continuar cheia.
+
+Concentrada em olhar apenas para as necessidades do vale, a fonte esqueceu de monitorar os seus próprios lençóis freáticos e ignorou os sinais de rachaduras e cansaço em suas pedras. Gradativamente, o fluxo foi diminuindo até que, em uma manhã ensolarada, ela simplesmente secou. Os animais e viajantes chegaram e, ao verem o leito vazio, perceberam o quanto haviam dependido dela sem nunca oferecer nada em troca.
+
+Foi quando os habitantes do vale se reuniram, trouxeram ferramentas, cavaram mais fundo para desobstruir os canais internos da terra e limparam suas pedras com total zelo que a fonte começou a brotar novamente. Ao ver a água retornar graças ao cuidado dos outros, a fonte finalmente compreendeu que para continuar nutrindo a vida ao seu redor com qualidade, ela precisava primeiro permitir ser cuidada, aceitar sua vulnerabilidade e reconhecer que também tinha o direito de receber.
+
+=== PERGUNTAS_FABULA ===
+A fonte secou porque cuidou de todos sem monitorar seus próprios lençóis freáticos. Quais sinais de esgotamento ou vazio você tem ignorado em si mesmo enquanto continua a abastecer os outros? | Quando os moradores se reuniram para cuidar da fonte, ela se viu obrigada a aceitar ser cuidada. Em que situações da sua vida você recusa o cuidado alheio — e o que esse reflexo revela sobre sua crença no próprio valor? | A fonte acreditava que sua única missão era transbordar. Qual seria a sua missão se você soubesse que tem o direito de ser amado não pelo que oferece, mas simplesmente por existir?
+
+=== PLAYLIST ===
+Link da Playlist: https://youtube.com/playlist?list=PLkqM2ogZH7ixluTtUpfow0Rli0RK2sv5&si=MC9MDB0ScfNrPzRd
+
+=== ASA_1 ===
+Nível saudável: Pessoas que conseguem alinhar o carinho e a afetividade natural com uma dose saudável de seriedade, ética e estrutura. A combinação entre a moralidade do tipo Perfeccionista e Exigente e a empatia da personalidade Prestativo e Relacional desperta uma forte vontade de aliviar a dor da humanidade e minimizar o sofrimento do próximo. Agem como o "bom samaritano", dispondo-se a realizar tarefas difíceis sem buscar reconhecimento ou glamour.
+Nível médio: Tornam-se pessoas ativas, mas que lutam contra uma forte autocrítica interna. Ao oferecer ajuda, passam a carregar expectativas rígidas de como o outro deve agir ou agradecer. Podem se sentir facilmente exploradas ou ressentidas, manifestando dificuldade em expressar seus sentimentos e suas necessidades de forma clara e assertiva.
+Nível baixo: Desenvolvem comportamentos nitidamente manipuladores ou controladores em sua tentativa de se tornarem indispensáveis. Alimentam sentimentos de amargura, cinismo e isolamento em relação à humanidade, tornando-se excessivamente críticas consigo mesmas e com os outros ao perceberem que não recebem a gratidão que julgam merecer.
+
+=== ASA_3 ===
+Nível saudável: Indivíduos carismáticos, altamente comunicativos, envolventes e orientados a resultados. Buscam se conectar genuinamente com as pessoas, valorizando o amor e o reconhecimento que surgem das interações de forma leve. Encontram autoestima em suas próprias qualidades internas e não apenas no que fazem pelos outros, demonstrando entusiasmo, simpatia e excelente capacidade de rede de contatos.
+Nível médio: O desejo genuíno de agradar e apoiar se transforma em uma necessidade latente de aprovação constante e status social. Apesar de manterem uma aparência amigável e bem-humorada, direcionam sua energia mais para a conquista de admiração e validação de sua imagem do que para o vínculo profundo, podendo utilizar uma sutil sedução emocional para prender a atenção das pessoas.
+Nível baixo: A busca por afeto e reconhecimento interfere completamente na naturalidade das relações. Tornam-se frios, calculistas e excessivamente focados em tarefas em detrimento das pessoas, usando a prestatividade como uma moeda de troca explícita e manipuladora para inflar um ego frágil e dependente de aplausos.
+
+=== SUBTIPO_AP_1A1_SOC ===
+Apresenta o Autopreservação dominante, 1 a 1 secundária e Social Reprimido. Focam no cuidado e na proteção prática do ambiente familiar e das pessoas mais próximas, estruturando a rotina e o bem-estar material do núcleo íntimo. A influência do 1 a 1 secundário confere uma intensidade afetiva direcionada, manifestando uma possessividade focada em parcerias individuais onde desejam ser o objeto central de atenção e cuidado. O social reprimido gera uma forte desconfiança em relação a círculos sociais amplos, fazendo com que evitem festas ou eventos corporativos desgastantes, preferindo manter relações estáveis, idealizadas e focadas no provimento e suporte prático de poucos e bons vínculos.
+
+=== SUBTIPO_AP_SOC_1A1 ===
+Caracterizado pelo instinto Autopreservação dominante, Social secundário e 1 a 1 Reprimido. Apresentam um comportamento marcadamente atípico: reprimem suas próprias necessidades básicas de descanso, lazer e alimentação saudável para se dedicarem inteiramente ao cuidado prático do outro. Organizam reuniões, encontros e cozinham para os convidados, mas raramente conseguem desfrutar do momento por estarem 100% focados em servir. Esperam inconscientemente que os outros adivinhem e cuidem de suas necessidades, gerando um sentimento silencioso de martírio quando isso não ocorre. O instinto 1 a 1 reprimido faz com que tenham baixa energia para conexões exclusivas ou românticas profundas, preferindo se relacionar através de uma adulação que torna os grupos e as pessoas dependentes de sua utilidade prática.
+
+=== SUBTIPO_1A1_AP_SOC ===
+Esta configuração apresenta o 1 a 1 dominante, Autopreservação secundária e Social Reprimido. Buscam a conquista e a fusão absoluta em conversas e confidências particulares, agindo com ciúme e possessividade em relação aos indivíduos do seu vínculo direto. A Autopreservação secundária traz um comportamento cuidadoso e acolhedor em termos práticos, manifestado no prazer de receber bem, cozinhar e preparar o ambiente físico para acolher as pessoas íntimas. Contudo, a influência do reprimido social faz com que este perfil sinta um forte desconforto em se expor publicamente ou navegar em grandes grupos institucionais, preferindo interagir de forma intensa, porém reservada, em ambientes altamente controlados e familiares.
+
+=== SUBTIPO_1A1_SOC_AP ===
+Os tipos Prestativo e Relacional com a combinação 1 a 1 dominante, Social secundário e Autopreservação Reprimida gostam de estabelecer relações profundas, agindo com um forte impulso de aproximação emocional e física. Empenham-se intensamente na conquista do outro, sentindo-se altamente motivados por desafios onde o parceiro parece indiferente. Utilizam a adulação estratégica e o aconselhamento a sós para descobrir o que o outro valoriza e se tornar indispensável. O instinto social em segunda posição confere a habilidade de circular e gerenciar múltiplos contatos e agendas cheias. Por possuírem a Autopreservação reprimida, desapegam-se de cuidados materiais e de saúde, canalizando toda a sua energia vital na manutenção de sua presença e possessividade afetiva no núcleo em que confiam.
+
+=== SUBTIPO_SOC_1A1_AP ===
+Configuração marcada pelo Social dominante, 1 a 1 secundário e Autopreservação Reprimida. Direcionam sua prestatividade para causas coletivas, liderança de grupos sociais e engajamento comunitário, buscando visibilidade e o título de grandes motivadores do meio. O instinto 1 a 1 em segunda posição permite que utilizem o magnetismo pessoal e a sedução afetiva para engajar indivíduos específicos em suas causas coletivas. Como possuem a Autopreservação reprimida, negligenciam severamente sua própria saúde, finanças e limites físicos em prol do reconhecimento público. Quando não são correspondidos na mesma intensidade de cuidado e consideração pelo grupo, experimentam episódios agudos de frustração e estresse por exaustão.
+
+=== SUBTIPO_SOC_AP_1A1 ===
+Nesta combinação, o instinto Social é dominante, o Autopreservação é secundário e o 1 a 1 é Reprimido. Possuem um desejo ardente de serem queridos, aceitos e reconhecidos por todos do seu círculo social e profissional, mantendo agendas lotadas e atuando como grandes anfitriões de eventos e grupos. Sentem grande felicidade em ser o centro das atenções do meio, recorrendo frequentemente à menção de nomes de pessoas influentes para reforçar seu grau de importância e afastar o medo da exclusão. A Autopreservação secundária garante o suporte logístico e prático para essas interações. Devido ao 1 a 1 reprimido, embora sejam alegres e convivam harmonicamente com vários grupos, sentem forte bloqueio para se conectar de maneira vulnerável e íntima de pessoa para pessoa.
