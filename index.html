@@ -557,10 +557,15 @@ tr:hover td{background:#FAFAFE;}
               </div>
             </div>
           </div>
-          <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;" onclick="baixarLaudo()">
-            ⬇ Baixar Laudo PDF
-          </button>
-          <div id="pdfStatus" style="margin-top:14px;font-size:13px;color:var(--gray);min-height:20px;"></div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;width:100%;max-width:320px;" onclick="baixarLaudo()">
+              ⬇ Baixar Laudo PDF
+            </button>
+            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
+              🔄 Gerar / Regenerar Laudo
+            </button>
+          </div>
+          <div id="pdfStatus" style="margin-top:10px;font-size:13px;color:var(--gray);min-height:20px;text-align:center;"></div>
           <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #7B1D6B;border-radius:14px;padding:20px 22px;text-align:left;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
               <span style="font-size:20px;">⚠️</span>
@@ -608,6 +613,30 @@ tr:hover td{background:#FAFAFE;}
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modalNovaEmpresa')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarEmpresa()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Código -->
+<div class="modal-overlay" id="modalEditarCodigo">
+  <div class="modal">
+    <h3>Editar Dados do Paciente</h3>
+    <input type="hidden" id="editCodId"/>
+    <div class="form-row">
+      <label>Nome <span style="color:#B00">*</span></label>
+      <input type="text" id="editCodNome" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>WhatsApp <span style="color:#B00">*</span></label>
+      <input type="tel" id="editCodWhatsapp" placeholder="(11) 99999-9999"/>
+    </div>
+    <div class="form-row">
+      <label>E-mail <span style="color:#B00">*</span></label>
+      <input type="email" id="editCodEmail" placeholder="email@exemplo.com"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalEditarCodigo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoCodigo()">Salvar Alterações</button>
     </div>
   </div>
 </div>
@@ -841,7 +870,7 @@ async function loadCodigos() {
       const link  = c.linkTeste || gerarLinkTeste(c.codigo||'');
       const pdf   = c.pdfPath || '';
       const wbtn  = c.whatsapp
-        ? `<a href="${gerarLinkWhatsApp(c.whatsapp,c.nomeDestinatario||'',c.codigo)}" target="_blank" class="btn btn-outline btn-sm" title="WhatsApp">💬</a>`
+        ? `<a href="${gerarLinkWhatsApp(c.whatsapp,c.nomeDestinatario||'',c.codigo)}" target="_blank" class="btn btn-outline btn-sm" title="Reenviar WhatsApp">💬</a>`
         : '';
       return `<tr>
         <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
@@ -851,7 +880,10 @@ async function loadCodigos() {
           <a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
         <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
         <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
-        <td style="display:flex;gap:6px;">${wbtn}
+        <td style="display:flex;gap:6px;align-items:center;">
+          ${wbtn}
+          <button class="btn btn-outline btn-sm" title="Editar"
+            onclick="editarCodigo('${d.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.email||''}','${c.whatsapp||''}')">✏️</button>
           <button class="btn btn-danger btn-sm" title="Excluir"
             onclick="excluirCodigo('${d.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
         </td></tr>`;
@@ -898,10 +930,11 @@ window.validarCodigo = async function() {
           const laudoId = ls.docs[0].id;
           // Preencher tela de resultado com dados do Firestore
           const NOMES = {'1':'Perfeição e Excelência','2':'Prestativo e Relacional','3':'Performance e Imagem','4':'Autêntico e Profundo','5':'Observador e Privacidade','6':'Precavido e Questionador','7':'Visionário e Otimista','8':'Desafiador e Controlador','9':'Harmônico e Diplomático'};
+          const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
           document.getElementById('resultTipoCircle').textContent = laudo.tipo;
           document.getElementById('resultTipoNome').textContent   = laudo.tipoNome || NOMES[laudo.tipo] || '—';
           document.getElementById('resultAsa').textContent        = `Asa ${laudo.asaDominante} (dominante) · Asa ${laudo.asaSecundaria} (secundária)`;
-          document.getElementById('resultSubtipo').textContent    = `${laudo.subtipoDominante} · ${laudo.subtipoIntermediario} · ${laudo.subtipoRemissivo}`;
+          document.getElementById('resultSubtipo').textContent    = `${NS[laudo.subtipoDominante]||laudo.subtipoDominante} · ${NS[laudo.subtipoIntermediario]||laudo.subtipoIntermediario} · ${NS[laudo.subtipoRemissivo]||laudo.subtipoRemissivo}`;
           window._state.laudoDocId = laudoId;
           if(laudo.pdfUrl) window._state.laudoUrl = laudo.pdfUrl;
           // Reconstituir TS mínimo para baixarLaudo()
@@ -1620,7 +1653,11 @@ async function salvarResultadoFinal() {
   } catch(e){ console.warn('Salvar resultado:',e); }
 
   // Mostrar resultado
-  const nomeSub = {'sex':'1 a 1','ap':'Autopreservação','so':'Social','soc':'Social'};
+  const nomeSub = {
+    'sex':'1 a 1','ap':'Autopreservação','so':'Social','soc':'Social',
+    'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social',
+    'SEX':'1 a 1','SO':'Social'
+  };
   document.getElementById('resultTipoCircle').textContent = TS.tipoFinal;
   document.getElementById('resultTipoNome').textContent   = NOMES_TIPO[TS.tipoFinal];
   document.getElementById('resultAsa').textContent        = `Asa ${TS.asaDom} (dominante) · Asa ${TS.asaSec} (secundária)`;
@@ -1629,6 +1666,15 @@ async function salvarResultadoFinal() {
   navigateTo('colab-resultado');
   showToast('Avaliação concluída!','success');
 }
+
+  // ── GERAR LAUDO MANUAL (botão Gerar/Regenerar) ──
+  window.gerarLaudoManual = async function() {
+    window._state.laudoUrl = null; // limpa cache para forçar geração nova
+    const btnG = document.getElementById('btnGerarLaudo');
+    btnG.disabled = true; btnG.textContent = '⏳ Gerando...';
+    await window.baixarLaudo();
+    btnG.disabled = false; btnG.textContent = '🔄 Gerar / Regenerar Laudo';
+  };
 
   // ── GERAR E BAIXAR PDF ──
   const CF_GERAR_PDF = 'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarLaudoPDF';
@@ -1717,7 +1763,8 @@ async function salvarResultadoFinal() {
   };
 const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
 function gerarLinkTeste(codigo) {
-  return `${BASE_URL}/teste?code=${codigo}`;
+  // GitHub Pages SPA: ?code= direto na raiz (evita 404 de sub-rotas)
+  return `${BASE_URL}/?code=${codigo}`;
 }
 function gerarLinkWhatsApp(whatsapp, nome, codigo) {
   const msg = encodeURIComponent(
@@ -1764,6 +1811,32 @@ window.salvarCodigo = async function() {
     showToast(`Código ${codigo} gerado! Abrindo WhatsApp...`,'success');
     if(window._state.profile==='admin') loadCodigos();
   } catch(e) { showToast('Erro ao salvar código.','error'); }
+};
+
+// ── EDITAR CÓDIGO ──
+window.editarCodigo = function(id, nome, email, whatsapp) {
+  // Preencher modal de edição
+  document.getElementById('editCodId').value       = id;
+  document.getElementById('editCodNome').value     = nome;
+  document.getElementById('editCodEmail').value    = email;
+  document.getElementById('editCodWhatsapp').value = whatsapp;
+  openModal('modalEditarCodigo');
+};
+
+window.salvarEdicaoCodigo = async function() {
+  const id       = document.getElementById('editCodId').value;
+  const nome     = document.getElementById('editCodNome').value.trim();
+  const email    = document.getElementById('editCodEmail').value.trim();
+  const whatsapp = document.getElementById('editCodWhatsapp').value.trim();
+  if(!nome || !email || !whatsapp) { showToast('Preencha todos os campos.','error'); return; }
+  try {
+    await updateDoc(doc(db,'nself_codigos',id), {
+      nomeDestinatario: nome, email, whatsapp
+    });
+    closeModal('modalEditarCodigo');
+    showToast('Dados atualizados!','success');
+    loadCodigos();
+  } catch(e) { showToast('Erro ao atualizar.','error'); }
 };
 
 // ── EXCLUIR CÓDIGO ──
@@ -1899,6 +1972,26 @@ window.closeSidebar=function(){
 // ── INIT ──
 window._state.profile = 'admin';
 gerarCodigoPreview();
+
+// Auto-detectar ?code= na URL (colaborador clicou no link)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const code   = params.get('code');
+  if(code) {
+    // Mostrar tela de colaborador com código pré-preenchido
+    window._state.profile = 'colaborador';
+    const el = document.getElementById('colabCode');
+    if(el) {
+      el.value = code.toUpperCase();
+      // Pequeno delay para DOM estar pronto
+      setTimeout(() => {
+        const tabColab = document.querySelector('[onclick*="colaborador"]');
+        if(tabColab) tabColab.click();
+        setTimeout(() => window.doLogin(), 300);
+      }, 400);
+    }
+  }
+})();
 </script>
 </body>
 </html>
