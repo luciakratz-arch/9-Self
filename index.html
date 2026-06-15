@@ -944,35 +944,49 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── CONTEÚDO ──────────────────────────────────────────────────
   const content = [];
 
-  // — CAPA —
+  // — CAPA — (fundo via table fullpage)
+  const _capaCards = [
+    [`Eneatipo ${tipo}:`, nomeTipo],
+    [`Asa ${asaFinal}:`,  nomeAsa],
+    ['Subtipo:',          labelSub],
+  ].map(([lbl,val])=>({
+    table:{ widths:[90,'*'], body:[[
+      { text:lbl, bold:true, color:'#D9C7F5', fontSize:10.5,
+        fillColor:'rgba(255,255,255,0.15)', margin:[14,10,6,10] },
+      { text:val, color:'white', fontSize:10.5,
+        fillColor:'rgba(255,255,255,0.15)', margin:[6,10,14,10] },
+    ]]},
+    layout:{ hLineColor:()=>'rgba(255,255,255,0.2)', vLineColor:(i)=>i===0?'#D9C7F5':'rgba(255,255,255,0.2)',
+             hLineWidth:()=>0.5, vLineWidth:(i)=>i===0?3:0.5 },
+    margin:[0,0,0,8]
+  }));
+
   content.push({
-    stack:[
-      { text:'9&Self', fontSize:50, color:_LAV, alignment:'center', margin:[0,0,0,8] },
-      { text:'Relatório Eneagrama', fontSize:26, bold:true, color:'white', alignment:'center', margin:[0,0,0,16] },
-      { text:nomeCapit, fontSize:16, color:_LAV, alignment:'center', margin:[0,0,0,8] },
-      { canvas:[{ type:'line', x1:198, y1:0, x2:397, y2:0, lineWidth:1.5, lineColor:_LAV }], margin:[0,0,0,10] },
-      { text: cargoTxt ? `Cargo: ${cargoTxt}` : 'Cargo: —', fontSize:12, color:'#E4D9F7', alignment:'center', margin:[0,0,0,4] },
-      { text:mesAno, fontSize:12, color:'#E4D9F7', alignment:'center', margin:[0,0,0,30] },
-      // Cards
-      ...[
-        [`Eneatipo ${tipo}:`, nomeTipo],
-        [`Asa ${asaFinal}:`,  nomeAsa],
-        ['Subtipo:',          labelSub],
-      ].map(([lbl,val])=>({
-        table:{ widths:[80,'*'], body:[[
-          { text:lbl, bold:true, color:'#3A1F5C', fontSize:10.5, margin:[12,9,4,9] },
-          { text:val, color:'#3A1F5C', fontSize:10.5, margin:[4,9,12,9] },
-        ]]},
-        layout:{ fillColor:()=>'white', hLineColor:()=>'white', vLineColor:(i)=>i===0?_MAG:'white',
-                 hLineWidth:()=>0, vLineWidth:(i)=>i===0?3.5:0 },
-        margin:[0,0,0,6]
-      }))
-    ],
-    margin:[0,100,0,0]
+    table:{ widths:['*'], heights:[841.89], body:[[{
+      stack:[
+        { text:'9&Self', fontSize:52, color:'#D9C7F5', alignment:'center', margin:[0,80,0,10] },
+        { text:'Relatório Eneagrama', fontSize:24, bold:true, color:'white', alignment:'center', margin:[0,0,0,20] },
+        { text:nomeCapit, fontSize:18, color:'#D9C7F5', alignment:'center', margin:[0,0,0,10] },
+        { canvas:[{ type:'line', x1:130, y1:0, x2:370, y2:0, lineWidth:1.5, lineColor:'#D9C7F5' }], margin:[0,0,0,10] },
+        cargoTxt
+          ? { text:`Cargo: ${cargoTxt}`, fontSize:12, color:'#E4D9F7', alignment:'center', margin:[0,0,0,6] }
+          : { text:' ', fontSize:12, margin:[0,0,0,6] },
+        { text:mesAno, fontSize:12, color:'#C4B5E8', alignment:'center', margin:[0,0,0,40] },
+        ..._capaCards,
+      ],
+      fillColor:'#26093F',
+      margin:[-56,-72,-56,-50],
+    }]]},
+    layout:{
+      hLineWidth:()=>0, vLineWidth:()=>0,
+      paddingLeft:()=>56, paddingRight:()=>56,
+      paddingTop:()=>0, paddingBottom:()=>0,
+      fillColor:()=>'#26093F',
+    },
+    pageBreak:'after',
   });
 
   // — INTRODUÇÃO —
-  content.push({ text:'', pageBreak:'before' });
   content.push(..._secTitle('Introdução'));
   content.push(_p('O <b>9&Self</b> é um instrumento de identificação de características pessoais e profissionais desenvolvido pelas especialistas <b>Dra. Lúcia Kratz</b> e <b>Ryuza Gonçalves</b>. O teste fundamenta-se nos traços de personalidade do Eneagrama — a partir dos estudos pioneiros de George Ivanovich Gurdjieff, Helen Palmer, David Daniels, Claudio Naranjo, Don Richards Riso e Russ Hudson —, aliados à teoria junguiana dos traços psicológicos e complementados pela Teoria das Necessidades Adquiridas de McClelland e pelo Coaching Executivo.'));
   content.push(_p('Dentro desses estudos, identificam-se 9 tipos básicos de personalidade que se subdividem em 216 padrões diferentes de comportamento. Os nove tipos básicos são: Perfeição e Excelência, Prestativo e Relacional, Performance e Imagem, Autêntico e Profundo, Observador e Privacidade, Precavido e Questionador, Visionário e Otimista, Desafiador e Controlador, Harmônico e Diplomático.'));
@@ -1191,14 +1205,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
     pageMargins:[56,72,56,50],
     header: _header,
     footer: _footer,
-    background: function(page) {
-      if (page !== 1) return null;
-      return [{ canvas:[
-        { type:'rect', x:0, y:0,   w:595.28, h:281, color:'#26093F' },
-        { type:'rect', x:0, y:281, w:595.28, h:280, color:'#4D1D71' },
-        { type:'rect', x:0, y:561, w:595.28, h:281, color:'#7B1D6B' },
-      ]}];
-    },
+
     content: content,
     styles: _estilos(),
     defaultStyle:{ font:'Roboto', fontSize:10.5, lineHeight:1.6 },
