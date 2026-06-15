@@ -682,6 +682,10 @@ tr:hover td{background:#FAFAFE;}
       </select>
     </div>
     <div class="form-row">
+      <label>Cargo / Função</label>
+      <input type="text" id="codCargo" placeholder="Ex: Diretor, Analista, Gerente..."/>
+    </div>
+    <div class="form-row">
       <label>Código gerado</label>
       <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
     </div>
@@ -2250,7 +2254,7 @@ async function salvarResultadoFinal() {
       const blob = await gerarPdfNavegador({
         tipo:TS.tipoFinal, asa:TS.asaDom,
         subDom:TS.subDom, subInt:TS.subInt, subRem:TS.subRem,
-        nome, cargo:cod.cargo||cod.cargoFuncao||cod.funcao||cod.empresa||'',
+        nome, cargo:cod.cargo||'',
       });
       const _url = URL.createObjectURL(blob);
       const _a = document.createElement('a');
@@ -2314,6 +2318,7 @@ window.salvarCodigo = async function() {
   const whatsEl  = document.getElementById('codWhatsapp');
   const whatsapp = whatsEl ? whatsEl.value.trim() : '';
   const emp      = document.getElementById('codEmpresa').value;
+  const cargo    = document.getElementById('codCargo') ? document.getElementById('codCargo').value.trim() : '';
   let codigo     = document.getElementById('codGerado').value.trim();
   if(!codigo) { window.gerarCodigoPreview(); codigo = document.getElementById('codGerado').value; }
   if(!nome)     { showToast('Informe o nome do destinatário.','error'); return; }
@@ -2323,6 +2328,7 @@ window.salvarCodigo = async function() {
     const linkTeste = gerarLinkTeste(codigo);
     await addDoc(collection(db,'nself_codigos'),{
       codigo, nomeDestinatario:nome, email, whatsapp,
+      cargo: cargo||'',
       empresa: emp==='pf' ? null : emp,
       tipo: emp==='pf' ? 'PF' : 'B2B',
       status: 'Pendente',
@@ -2442,12 +2448,13 @@ window.salvarCodigo = async function() {
   const nome  = document.getElementById('codNome').value.trim();
   const email = document.getElementById('codEmail').value.trim();
   const emp   = document.getElementById('codEmpresa').value;
+  const cargo2 = document.getElementById('codCargo') ? document.getElementById('codCargo').value.trim() : '';
   let codigo  = document.getElementById('codGerado').value.trim();
   if(!codigo) { gerarCodigoPreview(); codigo=document.getElementById('codGerado').value; }
   if(!nome){showToast('Informe o nome do destinatário.','error');return;}
   try {
     await addDoc(collection(db,'nself_codigos'),{
-      codigo,nomeDestinatario:nome,email,empresa:emp==='pf'?null:emp,
+      codigo,nomeDestinatario:nome,email,cargo:cargo2||'',empresa:emp==='pf'?null:emp,
       tipo:emp==='pf'?'PF':'B2B',status:'disponivel',criadoEm:serverTimestamp()
     });
     closeModal('modalNovoCodigo');
