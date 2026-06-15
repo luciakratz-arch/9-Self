@@ -912,16 +912,6 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
 
   // ── CAPA (canvas + stack) ─────────────────────────────────────
   const capa = {
-    background: function(page) {
-      if (page===1) return [
-        { canvas:[
-          { type:'rect', x:0, y:0, w:595, h:842, color:'#26093F' },
-          { type:'rect', x:0, y:421, w:595, h:421, color:'#4D2971' },
-          { type:'rect', x:0, y:631, w:595, h:211, color:'#7B1D6B' },
-        ]},
-      ];
-      return null;
-    }
   };
 
   // ── RODAPÉ de todas as páginas ────────────────────────────────
@@ -1201,9 +1191,17 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
     pageMargins:[56,72,56,50],
     header: _header,
     footer: _footer,
+    background: function(page) {
+      if (page !== 1) return null;
+      return [{ canvas:[
+        { type:'rect', x:0, y:0,   w:595.28, h:281, color:'#26093F' },
+        { type:'rect', x:0, y:281, w:595.28, h:280, color:'#4D1D71' },
+        { type:'rect', x:0, y:561, w:595.28, h:281, color:'#7B1D6B' },
+      ]}];
+    },
     content: content,
     styles: _estilos(),
-    defaultStyle:{ font:'Roboto', fontSize:10.5, lineHeight:1.5 },
+    defaultStyle:{ font:'Roboto', fontSize:10.5, lineHeight:1.6 },
   };
 
   return new Promise(resolve=>{
@@ -2221,7 +2219,7 @@ async function salvarResultadoFinal() {
       const blob = await gerarPdfNavegador({
         tipo:TS.tipoFinal, asa:TS.asaDom,
         subDom:TS.subDom, subInt:TS.subInt, subRem:TS.subRem,
-        nome, cargo:cod.cargo||'',
+        nome, cargo:cod.cargo||cod.cargoFuncao||cod.funcao||cod.role||'',
       });
       const _url = URL.createObjectURL(blob);
       const _a = document.createElement('a');
