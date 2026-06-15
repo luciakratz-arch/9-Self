@@ -1718,7 +1718,7 @@ async function salvarResultadoFinal() {
   };
 
   // ── Dimensões A4 (mm) ────────────────────────────────────────────
-  const PW=210, PH=297, ML=12.8, MR=12.8, MT=13.3, MB=9.6;
+  const PW=210, PH=297, ML=14, MR=14, MT=16, MB=9.6;
   const TW_PDF = PW - ML - MR;
 
   // ── Helpers de cor ───────────────────────────────────────────────
@@ -1838,11 +1838,11 @@ async function salvarResultadoFinal() {
     }
 
     function cabecalhoInterno() {
-      pdf.setDrawColor(...C.GLIN); pdf.setLineWidth(0.4);
-      pdf.line(ML, 10, PW-MR, 10);
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5);
+      pdf.setDrawColor(...C.GLIN); pdf.setLineWidth(0.3);
+      pdf.line(ML, 11, PW-MR, 11);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(8);
       pdf.setTextColor(...C.GMID);
-      pdf.text(HDR, ML, 8.5);
+      pdf.text(HDR, ML, 9);
     }
 
     function numeroPagina(n) {
@@ -1877,19 +1877,21 @@ async function salvarResultadoFinal() {
 
     // ── Título de seção ───────────────────────────────────────────
     function secTitle(texto) {
-      novaPageSe(14);
+      y += 4; // espaco antes do titulo de secao
+      novaPageSe(18);
       if(!isCapa()) cabecalhoInterno();
-      escreverTexto(texto, {fs:14, bold:true, cor:C.MAG, leading:7});
+      escreverTexto(texto, {fs:14, bold:true, cor:C.MAG, leading:8});
       secLine();
+      y += 2; // espaco apos linha do titulo
     }
 
     // ── Subtítulo ─────────────────────────────────────────────────
     function subTitle(texto) {
-      y += 5;
-      novaPageSe(10);
+      y += 8; // espaco antes do subtitulo
+      novaPageSe(14);
       if(!isCapa()) cabecalhoInterno();
       escreverTexto(texto, {fs:11, bold:true, cor:C.TEAL, leading:6});
-      y += 1;
+      y += 3; // espaco apos subtitulo
     }
 
     // ── Parágrafo body ────────────────────────────────────────────
@@ -1901,9 +1903,9 @@ async function salvarResultadoFinal() {
         novaPageSe(5.5);
         if(!isCapa()) cabecalhoInterno();
         pdf.text(l, ML+xOff, y);
-        y += 5.2;
+        y += 5.4;
       });
-      y += 3;
+      y += 4; // espaco entre paragrafos
     }
 
     // ── Bullet ────────────────────────────────────────────────────
@@ -1918,8 +1920,9 @@ async function salvarResultadoFinal() {
     // ── QuoteBox (caixa lilás com borda teal, itálico) ────────────
     function quoteBox(texto) {
       if(!texto) return;
-      const linhas = pdf.splitTextToSize(texto, TW_PDF - 22);
-      const h = linhas.length * 5.2 + 16;
+      const linhas = pdf.splitTextToSize(texto, TW_PDF - 24);
+      const h = linhas.length * 5.5 + 20;
+      y += 6; // espaco antes da caixa
       novaPageSe(h);
       if(!isCapa()) cabecalhoInterno();
       pdf.setFillColor(...C.TBOX);
@@ -1927,28 +1930,32 @@ async function salvarResultadoFinal() {
       pdf.setFillColor(...C.TEAL);
       pdf.rect(ML, y, 3, h, 'F');
       pdf.setFont('helvetica','italic'); pdf.setFontSize(10.5); pdf.setTextColor(...C.DARK);
-      linhas.forEach((l,i) => pdf.text(l, ML+12, y+10+(i*5.2)));
-      y += h + 4;
+      linhas.forEach((l,i) => pdf.text(l, ML+12, y+12+(i*5.5)));
+      y += h + 8; // espaco depois da caixa
     }
 
     // ── InfoBox (caixa rosa com borda magenta) ────────────────────
     function infoBox(texto) {
       if(!texto) return;
-      const linhas = pdf.splitTextToSize(texto, TW_PDF - 22);
-      const h = linhas.length * 5.2 + 16;
+      const linhas = pdf.splitTextToSize(texto, TW_PDF - 24);
+      const h = linhas.length * 5.5 + 20;
+      y += 6; // espaco antes da caixa
       novaPageSe(h);
       if(!isCapa()) cabecalhoInterno();
       pdf.setFillColor(...C.MBOX);
       pdf.roundedRect(ML, y, TW_PDF, h, 3, 3, 'F');
       pdf.setFillColor(...C.MAG);
       pdf.rect(ML, y, 3, h, 'F');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(...C.MAG);
+      pdf.text(linhas[0]||'', ML+12, y+12);
       pdf.setFont('helvetica','normal'); pdf.setFontSize(10.5); pdf.setTextColor(...C.DARK);
-      linhas.forEach((l,i) => pdf.text(l, ML+12, y+10+(i*5.2)));
-      y += h + 4;
+      linhas.slice(1).forEach((l,i) => pdf.text(l, ML+12, y+12+5.5+(i*5.5)));
+      y += h + 8; // espaco depois da caixa
     }
 
     // ── DualGrid (tabela 2 colunas com cabeçalho colorido) ────────
     function dualGrid(h1, h2, col1, col2, hcor) {
+      y += 4; // espaco antes da tabela
       hcor = hcor || C.MAG;
       const cw = TW_PDF / 2;
       const n  = Math.max(col1.length, col2.length);
@@ -1978,7 +1985,7 @@ async function salvarResultadoFinal() {
         if(l2[1]) pdf.text(l2[1], ML+cw+5, ry+13);
         ry += RH;
       }
-      y = ry + 4;
+      y = ry + 10; // espaco depois da tabela
     }
 
     // ── FBBox (box teal com itens + último item magenta) ──────────
