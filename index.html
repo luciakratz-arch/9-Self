@@ -686,6 +686,717 @@ tr:hover td{background:#FAFAFE;}
       <input type="text" id="codCargo" placeholder="Ex: Diretor, Analista, Gerente..."/>
     </div>
     <div class="form-row">
+      <label>Cargo / Função</label>
+      <input type="text" id="codCargo" placeholder="Ex: Diretor, Analista, Gerente..."/>
+    </div>
+    <div class="form-row">
+      <label>Código gerado</label>
+      <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
+    </div>
+    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
+      🔗 Link: <span id="previewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="gerarCodigoPreview()">🔄 Novo Código</button>
+      <button class="btn btn-outline" onclick="closeModal('modalNovoCodigo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCodigo()">Liberar e Enviar WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+
+
+<!DOCTYPE html>PE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>9&Self — Conheça sua Personalidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<style>
+:root {
+  --mag:    #7B1D6B;
+  --mag2:   #9B2589;
+  --teal:   #1A9BAF;
+  --teal2:  #13B5CC;
+  --purple: #7B00C4;
+  --purple2:#9B10E4;
+  --dark:   #2C2C2C;
+  --gray:   #6B6B6B;
+  --light:  #F7F4FB;
+  --white:  #FFFFFF;
+  --border: #E2D9EF;
+  --sidebar-w: 240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);min-height:100vh;}
+
+/* ── TELA DE LOGIN ── */
+#loginScreen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  background: linear-gradient(135deg, #1a0a2e 0%, #3d0a5e 40%, #7B1D6B 75%, #1A9BAF 100%);
+  position:relative;overflow:hidden;
+}
+#loginScreen::before{
+  content:'';position:absolute;inset:0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(123,0,196,0.3) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(26,155,175,0.25) 0%, transparent 50%);
+}
+.login-card{
+  background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:24px;padding:48px 40px;width:100%;max-width:420px;
+  position:relative;z-index:1;
+  box-shadow:0 32px 80px rgba(0,0,0,0.4);
+}
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-logo .brand-number{
+  font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;
+  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;letter-spacing:-2px;
+}
+.login-logo .brand-name{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;
+  color:rgba(255,255,255,0.9);letter-spacing:4px;
+}
+.login-logo .brand-tagline{
+  font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:2px;margin-top:6px;
+  text-transform:uppercase;
+}
+.login-tabs{display:flex;gap:8px;margin-bottom:28px;background:rgba(0,0,0,0.2);padding:4px;border-radius:12px;}
+.login-tab{
+  flex:1;padding:8px;border:none;background:transparent;
+  color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;font-size:12px;
+  border-radius:8px;cursor:pointer;transition:all .2s;font-weight:500;
+}
+.login-tab.active{background:rgba(255,255,255,0.15);color:#fff;}
+.login-field{margin-bottom:16px;}
+.login-field label{display:block;font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
+.login-field input{
+  width:100%;padding:12px 16px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;
+  outline:none;transition:border-color .2s;
+}
+.login-field input::placeholder{color:rgba(255,255,255,0.3);}
+.login-field input:focus{border-color:rgba(123,0,196,0.7);}
+.login-btn{
+  width:100%;padding:14px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--mag));
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:0.5px;
+}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,0,196,0.4);}
+.login-error{color:#FF8FA3;font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
+
+/* ── APP SHELL ── */
+#appShell{display:none;min-height:100vh;}
+.app-layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar-w);background:#1a0a2e;
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;
+  z-index:100;border-right:1px solid rgba(255,255,255,0.06);
+  transition:transform .3s;
+}
+.sidebar-logo{
+  padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.sidebar-logo .s-number{
+  font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;
+  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;letter-spacing:-1px;
+}
+.sidebar-logo .s-name{
+  font-family:'Cormorant Garamond',serif;font-size:12px;color:rgba(255,255,255,0.5);
+  letter-spacing:4px;margin-top:2px;
+}
+/* RODAPÉ */
+.app-footer{
+  margin-left:var(--sidebar-w);
+  background:#fff;border-top:1px solid var(--border);
+  padding:10px 28px;display:flex;align-items:center;gap:10px;
+}
+.app-footer span{font-size:11px;color:var(--gray);}
+@media(max-width:768px){.app-footer{margin-left:0;}}
+.sidebar-profile{
+  padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.sidebar-profile .sp-role{
+  font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;font-weight:600;
+}
+.sidebar-profile .sp-name{font-size:13px;color:#fff;margin-top:2px;font-weight:500;}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto;}
+.nav-section{padding:8px 20px 4px;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 20px;
+  color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;
+  transition:all .2s;border-left:3px solid transparent;
+}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.05);}
+.nav-item.active{color:#fff;background:rgba(123,0,196,0.2);border-left-color:var(--purple);}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-footer{
+  padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07);
+}
+.logout-btn{
+  width:100%;padding:10px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;
+  background:transparent;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;
+  font-size:12px;cursor:pointer;transition:all .2s;
+}
+.logout-btn:hover{background:rgba(255,0,80,0.1);color:#ff6b6b;border-color:rgba(255,0,80,0.2);}
+
+/* MAIN CONTENT */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;}
+.topbar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-size:16px;font-weight:600;color:var(--dark);}
+.topbar-actions{display:flex;align-items:center;gap:12px;}
+.badge{
+  display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;letter-spacing:0.5px;
+}
+.badge-admin{background:rgba(123,0,196,0.1);color:var(--purple);}
+.badge-rh{background:rgba(26,155,175,0.1);color:var(--teal);}
+.badge-colab{background:rgba(123,29,107,0.1);color:var(--mag);}
+
+.page{padding:28px;display:none;}
+.page.active{display:block;}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+.stat-card{
+  background:#fff;border-radius:16px;padding:20px;
+  border:1px solid var(--border);position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--purple),var(--mag));
+}
+.stat-card .sc-label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;}
+.stat-card .sc-value{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--dark);line-height:1;}
+.stat-card .sc-sub{font-size:12px;color:var(--teal);margin-top:4px;}
+
+/* TABLE */
+.table-card{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;}
+.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-header h3{font-size:14px;font-weight:600;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--light);padding:10px 16px;text-align:left;font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#FAFAFE;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--mag));color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(123,0,196,0.3);}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-teal:hover{background:var(--teal2);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--dark);}
+.btn-outline:hover{border-color:var(--purple);color:var(--purple);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-danger{background:rgba(220,50,50,0.08);color:#dc3232;border:1px solid rgba(220,50,50,0.15);}
+
+/* STATUS PILLS */
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.pill-green{background:#e6f9f0;color:#1a9460;}
+.pill-yellow{background:#fff8e1;color:#b8860b;}
+.pill-red{background:#ffeaea;color:#c0392b;}
+.pill-blue{background:#e3f2fd;color:#1565c0;}
+.pill-gray{background:#f0f0f0;color:#666;}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:#fff;border-radius:20px;padding:28px;width:100%;max-width:480px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.2);
+}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:20px;}
+.form-row{margin-bottom:14px;}
+.form-row label{display:block;font-size:11px;color:var(--gray);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.form-row input, .form-row select{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:13px;outline:none;
+  transition:border-color .2s;
+}
+.form-row input:focus, .form-row select:focus{border-color:var(--purple);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+
+/* PAINEL COLABORADOR — teste */
+.test-container{max-width:720px;margin:0 auto;}
+.test-progress{background:var(--border);border-radius:4px;height:6px;margin-bottom:28px;}
+.test-progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--teal));transition:width .4s;}
+.question-card{background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border);margin-bottom:16px;}
+.question-card .q-num{font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.question-card .q-text{font-size:15px;font-weight:500;line-height:1.5;}
+.q-options{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.q-option{
+  padding:8px 20px;border:2px solid var(--border);border-radius:20px;
+  background:#fff;cursor:pointer;font-size:13px;transition:all .2s;
+}
+.q-option:hover{border-color:var(--purple);color:var(--purple);}
+.q-option.selected{border-color:var(--purple);background:rgba(123,0,196,0.08);color:var(--purple);font-weight:600;}
+
+/* CÓDIGO DE ACESSO */
+.code-hero{
+  text-align:center;padding:48px 20px;
+  background:linear-gradient(135deg, #1a0a2e, #3d0a5e);
+  border-radius:20px;color:#fff;margin-bottom:24px;
+}
+.code-hero h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;margin-bottom:8px;}
+.code-hero p{color:rgba(255,255,255,0.6);font-size:14px;}
+.code-input-wrap{display:flex;gap:8px;max-width:320px;margin:24px auto 0;}
+.code-input{
+  flex:1;padding:14px 18px;border-radius:12px;border:none;
+  font-size:18px;text-align:center;letter-spacing:4px;font-weight:600;
+  background:rgba(255,255,255,0.12);color:#fff;font-family:'DM Sans',sans-serif;
+  outline:none;
+}
+.code-input::placeholder{color:rgba(255,255,255,0.3);letter-spacing:2px;font-size:14px;}
+.code-input:focus{background:rgba(255,255,255,0.18);}
+.code-submit{
+  padding:14px 20px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--mag));
+  color:#fff;cursor:pointer;font-size:18px;
+}
+
+
+
+
+
+/* SUBTIPO CARDS */
+.subtipo-card{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:2px solid var(--border);border-radius:14px;
+  padding:16px;transition:all .2s;cursor:default;
+}
+.subtipo-card:first-child{border-color:var(--purple);background:rgba(123,0,196,0.04);}
+.subtipo-pos{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
+  color:var(--purple);min-width:32px;line-height:1;
+}
+
+/* SLIDERS */
+.pct-slider{
+  flex:1;-webkit-appearance:none;height:6px;border-radius:4px;
+  background:linear-gradient(90deg,var(--purple) 0%,var(--teal) 100%);
+  outline:none;cursor:pointer;
+}
+.pct-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--purple);cursor:pointer;box-shadow:0 2px 6px rgba(123,0,196,0.3);
+}
+.slider-pct{
+  font-weight:700;font-size:14px;color:var(--purple);min-width:40px;text-align:right;
+}
+.slider-block{background:var(--light);border-radius:12px;padding:16px;}
+
+/* BLOCOS DE PARÁGRAFO */
+.para-block{
+  border:2px solid var(--border);border-radius:12px;padding:16px 18px;
+  margin-bottom:10px;cursor:pointer;transition:all .2s;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.para-block:hover{border-color:var(--purple);background:rgba(123,0,196,0.03);}
+.para-block.para-selected{
+  border-color:var(--purple);
+  background:linear-gradient(135deg,rgba(123,0,196,0.08),rgba(26,155,175,0.05));
+  box-shadow:0 2px 12px rgba(123,0,196,0.15);
+}
+.para-letra{font-weight:800;font-size:16px;min-width:24px;padding-top:2px;}
+.para-texto{font-size:13px;line-height:1.75;color:var(--dark);}
+
+
+/* RESPONSIVO */
+.hamburger{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--dark);}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .hamburger{display:block;}
+  .cards-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* PAGE TITLE */
+.page-title{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  color:var(--dark);margin-bottom:4px;
+}
+.page-subtitle{font-size:13px;color:var(--gray);margin-bottom:24px;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px;color:var(--gray);}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:13px;}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:24px;right:24px;
+  background:#2C2C2C;color:#fff;padding:12px 20px;border-radius:10px;
+  font-size:13px;z-index:999;transform:translateY(60px);opacity:0;
+  transition:all .3s;pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.success{background:#1a9460;}
+#toast.error{background:#c0392b;}
+
+.overlay-mobile{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99;}
+.overlay-mobile.open{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand-number">9&amp;Self</div>
+      <div class="brand-name">SELF</div>
+      <div class="brand-tagline">Descubra sua personalidade</div>
+    </div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="setLoginProfile('admin')">Admin</button>
+      <button class="login-tab" onclick="setLoginProfile('rh')">RH / Empresa</button>
+      <button class="login-tab" onclick="setLoginProfile('colaborador')">Colaborador</button>
+    </div>
+
+    <div id="loginAdmin">
+      <div class="login-field">
+        <label>Senha de Acesso</label>
+        <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+    </div>
+
+    <div id="loginRH" style="display:none;">
+      <div class="login-field">
+        <label>E-mail</label>
+        <input type="email" id="rhEmail" placeholder="empresa@email.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="login-field">
+        <label>Senha</label>
+        <input type="password" id="rhPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+    </div>
+
+    <div id="loginColab" style="display:none;">
+      <div class="code-hero" style="padding:28px 20px;margin-bottom:0;border-radius:12px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:6px;">Acesse com seu código</div>
+        <p style="font-size:12px;opacity:.6;">Você recebeu um código único de acesso</p>
+        <div class="code-input-wrap">
+          <input class="code-input" id="colabCode" placeholder="EX: A1B2C3" maxlength="8"
+            onkeydown="if(event.key==='Enter')doLogin()" style="font-size:15px;letter-spacing:3px;"/>
+        </div>
+      </div>
+    </div>
+
+    <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP SHELL ══════════════════ -->
+<div id="appShell">
+  <div class="overlay-mobile" id="overlayMobile" onclick="closeSidebar()"></div>
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="s-number">9&amp;Self</div>
+        <div class="s-name">SELF</div>
+      </div>
+      <div class="sidebar-profile">
+        <div class="sp-role" id="sideRole">—</div>
+        <div class="sp-name" id="sideName">—</div>
+      </div>
+      <nav class="sidebar-nav" id="sideNav"></nav>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="doLogout()">↩ Sair</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger" onclick="toggleSidebar()">☰</button>
+          <span class="topbar-title" id="topbarTitle">Painel</span>
+        </div>
+        <div class="topbar-actions">
+          <span class="badge" id="topbarBadge">Admin</span>
+        </div>
+      </div>
+
+      <!-- ── PÁGINAS ADMIN ── -->
+      <div class="page active" id="page-dashboard">
+        <div style="padding:28px;">
+          <div class="page-title">Painel Geral</div>
+          <div class="page-subtitle">Visão consolidada do sistema 9&amp;Self</div>
+          <div class="cards-grid" id="dashCards"></div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Últimas Avaliações</h3>
+              <button class="btn btn-outline btn-sm">Ver todas</button>
+            </div>
+            <table>
+              <thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Status</th></tr></thead>
+              <tbody id="dashTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação ainda</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-empresas">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div>
+              <div class="page-title">Empresas / RH</div>
+              <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead><tr><th>Empresa</th><th>Responsável</th><th>E-mail</th><th>Créditos</th><th>Laudos Gerados</th><th>Status</th><th></th></tr></thead>
+              <tbody id="empresasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-codigos">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div>
+              <div class="page-title">Códigos de Acesso</div>
+              <div class="page-subtitle">Gere e gerencie códigos únicos por pessoa</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <tbody id="codigosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-laudos">
+        <div style="padding:28px;">
+          <div class="page-title">Laudos Gerados</div>
+          <div class="page-subtitle">Histórico de todos os laudos do sistema</div>
+          <div class="table-card" style="margin-top:16px;">
+            <table>
+              <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
+              <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PÁGINAS RH ── -->
+      <div class="page" id="page-rh-dashboard">
+        <div style="padding:28px;">
+          <div class="page-title" id="rhDashTitle">Painel RH</div>
+          <div class="page-subtitle">Gerencie seus colaboradores e créditos</div>
+          <div class="cards-grid" id="rhCards"></div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Colaboradores</h3>
+              <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+            </div>
+            <table>
+              <thead><tr><th>Nome</th><th>Código</th><th>Tipo</th><th>Status</th><th>Laudo</th></tr></thead>
+              <tbody id="rhColabTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum colaborador ainda</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PÁGINAS COLABORADOR ── -->
+      <div class="page" id="page-colab-inicio" style="display:none;"></div>
+
+      <div class="page" id="page-colab-teste">
+        <div style="padding:28px;">
+          <div class="page-title">Avaliação de Personalidade</div>
+          <div class="page-subtitle" id="testeSubtitle">Módulo 1 de 3 — Identificação do Tipo</div>
+          <div class="test-container">
+            <div class="test-progress"><div class="test-progress-bar" id="progressBar" style="width:0%"></div></div>
+            <div id="testeContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-colab-resultado">
+        <div style="padding:28px;max-width:720px;margin:0 auto;text-align:center;">
+          <div style="font-size:64px;margin-bottom:16px;">🎉</div>
+          <div class="page-title">Avaliação Concluída!</div>
+          <p style="color:var(--gray);margin-bottom:28px;">Seu laudo personalizado está pronto para download.</p>
+          <div style="background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border);text-align:left;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+              <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--mag));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;" id="resultTipoCircle">—</div>
+              <div>
+                <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;">Seu Tipo</div>
+                <div style="font-size:18px;font-weight:600;" id="resultTipoNome">—</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="background:var(--light);border-radius:10px;padding:12px;">
+                <div style="font-size:11px;color:var(--gray);">Asa Dominante</div>
+                <div style="font-size:15px;font-weight:600;" id="resultAsa">—</div>
+              </div>
+              <div style="background:var(--light);border-radius:10px;padding:12px;">
+                <div style="font-size:11px;color:var(--gray);">Subtipo (Dom · Int · Rem)</div>
+                <div style="font-size:13px;font-weight:600;" id="resultSubtipo">—</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;width:100%;max-width:320px;" onclick="baixarLaudo()">
+              ⬇ Baixar Laudo PDF
+            </button>
+            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
+              🔄 Gerar / Regenerar Laudo
+            </button>
+          </div>
+          <div id="pdfStatus" style="margin-top:10px;font-size:13px;color:var(--gray);min-height:20px;text-align:center;"></div>
+          <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #7B1D6B;border-radius:14px;padding:20px 22px;text-align:left;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:20px;">⚠️</span>
+              <strong style="color:#7B1D6B;font-size:13px;letter-spacing:.5px;text-transform:uppercase;">ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</strong>
+            </div>
+            <p style="color:#2C2C2C;font-size:13px;line-height:1.7;margin:0;">Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu processo e veja o laudo como um companheiro de caminhada.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /app-layout -->
+  <footer class="app-footer">
+    <img src="dra%20luciakratz%20transparente.png" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
+    <span>Desenvolvido por <strong>Dra. Lucia Kratz</strong> · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade 🦋</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ MODAIS ══════════════════ -->
+
+<!-- Modal Nova Empresa -->
+<div class="modal-overlay" id="modalNovaEmpresa">
+  <div class="modal">
+    <h3>Nova Empresa / RH</h3>
+    <div class="form-row">
+      <label>Nome da Empresa</label>
+      <input type="text" id="empNome" placeholder="Ex: Empresa Ltda"/>
+    </div>
+    <div class="form-row">
+      <label>Responsável RH</label>
+      <input type="text" id="empResponsavel" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>E-mail de acesso</label>
+      <input type="email" id="empEmail" placeholder="rh@empresa.com"/>
+    </div>
+    <div class="form-row">
+      <label>Senha de acesso</label>
+      <input type="password" id="empSenha" placeholder="Mínimo 6 caracteres"/>
+    </div>
+    <div class="form-row">
+      <label>Créditos iniciais</label>
+      <input type="number" id="empCreditos" placeholder="0" min="0"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalNovaEmpresa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEmpresa()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Código -->
+<div class="modal-overlay" id="modalEditarCodigo">
+  <div class="modal">
+    <h3>Editar e Reenviar Teste</h3>
+    <input type="hidden" id="editCodId"/>
+    <input type="hidden" id="editCodCodigo"/>
+    <div class="form-row">
+      <label>Nome do destinatário <span style="color:#B00">*</span></label>
+      <input type="text" id="editCodNome" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="tel" id="editCodWhatsapp" placeholder="(11) 99999-9999"/>
+    </div>
+    <div class="form-row">
+      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="email" id="editCodEmail" placeholder="pessoa@email.com"/>
+    </div>
+    <div class="form-row">
+      <label>Empresa</label>
+      <select id="editCodEmpresa">
+        <option value="pf">— Pessoa Física (direto)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Código do paciente</label>
+      <input type="text" id="editCodCodigoDisplay" readonly
+        style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
+    </div>
+    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
+      🔗 Link: <span id="editPreviewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalEditarCodigo')">Cancelar</button>
+      <button class="btn btn-outline" onclick="salvarEdicaoCodigo()">💾 Salvar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoEnviarWhatsApp()">💬 Salvar e Enviar WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo Código -->
+<div class="modal-overlay" id="modalNovoCodigo">
+  <div class="modal">
+    <h3>Liberar Novo Teste</h3>
+    <div class="form-row">
+      <label>Nome do destinatário <span style="color:#B00">*</span></label>
+      <input type="text" id="codNome" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="tel" id="codWhatsapp" placeholder="(11) 99999-9999"/>
+    </div>
+    <div class="form-row">
+      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="email" id="codEmail" placeholder="pessoa@email.com"/>
+    </div>
+    <div class="form-row" id="codEmpresaRow">
+      <label>Empresa</label>
+      <select id="codEmpresa">
+        <option value="pf">— Pessoa Física (direto)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Cargo / Função</label>
+      <input type="text" id="codCargo" placeholder="Ex: Diretor, Analista, Gerente..."/>
+    </div>
+    <div class="form-row">
       <label>Código gerado</label>
       <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
     </div>
@@ -984,14 +1695,12 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
     ['Subtipo:',          labelSub],
   ].map(([lbl,val])=>({
     table:{ widths:[90,'*'], body:[[
-      { text:lbl, bold:true, color:'white', fontSize:10.5,
-        fillColor:'rgba(255,255,255,0.08)', margin:[14,10,6,10], border:[false,false,false,false] },
-      { text:val, color:'white', fontSize:10.5,
-        fillColor:'rgba(255,255,255,0.08)', margin:[6,10,14,10], border:[false,false,false,false] },
+      { text:lbl, bold:true, color:'#5B2D8E', fontSize:10.5, fillColor:'white', margin:[14,10,6,10] },
+      { text:val, color:'#2C2C2C', fontSize:10.5, fillColor:'white', margin:[6,10,14,10] },
     ]]},
     layout:{
-      hLineColor:()=>'rgba(255,255,255,0.15)', vLineColor:(i)=>i===0?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.15)',
-      hLineWidth:()=>0.5, vLineWidth:(i)=>i===0?2:0.5,
+      hLineColor:()=>'white', vLineColor:(i)=>i===0?'#7B00C4':'white',
+      hLineWidth:()=>0, vLineWidth:(i)=>i===0?3.5:0,
       fillColor:()=>'rgba(255,255,255,0.08)',
       paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0,
     },
@@ -1000,8 +1709,8 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
 
   content.push({
     stack:[
-      // Fundo gradiente
-      { canvas: _gradRects, absolutePosition:{x:0, y:0} },
+      // Fundo gradiente cobre página inteira
+      { canvas: _gradRects, absolutePosition:{x:-56, y:-80} },
       // Conteúdo da capa
       { text:'9&Self', fontSize:52, color:'#D9C7F5', alignment:'center', margin:[0,70,0,8] },
       { text:'Relatório Eneagrama', fontSize:24, bold:true, color:'white', alignment:'center', margin:[0,0,0,18] },
@@ -2318,6 +3027,7 @@ window.salvarCodigo = async function() {
   const whatsEl  = document.getElementById('codWhatsapp');
   const whatsapp = whatsEl ? whatsEl.value.trim() : '';
   const emp      = document.getElementById('codEmpresa').value;
+
   const cargo    = document.getElementById('codCargo') ? document.getElementById('codCargo').value.trim() : '';
   let codigo     = document.getElementById('codGerado').value.trim();
   if(!codigo) { window.gerarCodigoPreview(); codigo = document.getElementById('codGerado').value; }
@@ -2328,7 +3038,6 @@ window.salvarCodigo = async function() {
     const linkTeste = gerarLinkTeste(codigo);
     await addDoc(collection(db,'nself_codigos'),{
       codigo, nomeDestinatario:nome, email, whatsapp,
-      cargo: cargo||'',
       empresa: emp==='pf' ? null : emp,
       tipo: emp==='pf' ? 'PF' : 'B2B',
       status: 'Pendente',
