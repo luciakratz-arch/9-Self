@@ -1693,198 +1693,523 @@ async function salvarResultadoFinal() {
     btnG.disabled = false; btnG.textContent = '🔄 Gerar / Regenerar Laudo';
   };
 
-  // ── SUBTIPO DISPLAY (NOMES_TIPO já declarado globalmente) ──
-  const SUBTIPO_DISPLAY = {
+  // ══════════════════════════════════════════════════════════════════
+  // GERADOR DE PDF — 9&Self (navegador, sem Cloud Function)
+  // Layout fiel ao laudo aprovado com ReportLab
+  // ══════════════════════════════════════════════════════════════════
+
+  const SUBTIPO_DISPLAY_PDF = {
     'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social',
-    'ap':'Autopreservação','1a1':'1 a 1','soc':'Social','so':'Social','sex':'1 a 1',
-    'sp':'Autopreservação','sx':'1 a 1'
+    'ap':'Autopreservação','1a1':'1 a 1','soc':'Social',
+    'so':'Social','sex':'1 a 1','sp':'Autopreservação','sx':'1 a 1',
   };
 
-  // ── LER PERFIL DO GITHUB ──
-  async function lerPerfilTipo(tipo) {
-    const BASE = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/functions/banco_dados_final';
-    try {
-      const r = await fetch(`${BASE}/tipo_${tipo}.txt`);
-      if(r.ok) return await r.text();
-    } catch(_) {}
-    return `Perfil do Tipo ${tipo} — conteúdo em carregamento. Por favor, tente novamente em instantes.`;
+  // Monta a chave da seção de subtipo a partir dos três valores
+  function chaveSubtipo(dom, int, rem) {
+    function norm(v) {
+      if(!v) return 'AP';
+      const m = {'ap':'AP','sp':'AP','autopreservação':'AP','autopreservacao':'AP',
+                 '1a1':'1A1','sx':'1A1','sex':'1A1','1 a 1':'1A1',
+                 'soc':'SOC','so':'SOC','social':'SOC'};
+      return m[v.toString().toLowerCase()] || v.toString().toUpperCase();
+    }
+    const d = norm(dom), i = norm(int), r = norm(rem);
+    const map = {'AP':'AP','1A1':'1A1','SOC':'SOC'};
+    return `SUBTIPO_${map[d]||d}_${map[i]||i}_${map[r]||r}`;
   }
 
-  // ── GERAR PDF NO NAVEGADOR (jsPDF) ──
+  // URL base dos arquivos txt no GitHub
+  const RAW_BASE = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/functions/banco_dados_final';
+
+  async function carregarTxt(tipo) {
+    try {
+      const r = await fetch(`${RAW_BASE}/tipo_${tipo}.txt`);
+      if(r.ok) return await r.text();
+    } catch(_) {}
+    return '';
+  }
+
+  // Parseia o txt em um objeto { SECAO: "conteudo", ... }
+  function parsearSecoes(txt) {
+    const secoes = {};
+    const partes = txt.split(/^=== (.+?) ===/m);
+    for(let i = 1; i < partes.length; i += 2) {
+      const chave = partes[i].trim();
+      const valor = (partes[i+1] || '').trim();
+      secoes[chave] = valor;
+    }
+    return secoes;
+  }
+
+  // ── MOTOR DE LAYOUT DO PDF ──────────────────────────────────────────
   async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit:'mm', format:'a4' });
-    const W = 210, H = 297;
-    const ML = 18, MR = 18, MT = 18;
-    let y = MT;
+    const W = 210, PL = 20, PR = 20, PT = 15;
+    const TW = W - PL - PR; // largura útil
+    let y = PT;
 
-    // Cores
-    const COR_PURPLE = [123, 0, 196];
-    const COR_MAG    = [123, 29, 107];
-    const COR_TEAL   = [26, 155, 175];
-    const COR_LIGHT  = [247, 244, 251];
-    const COR_BORDER = [226, 217, 239];
-    const COR_DARK   = [44, 44, 44];
-    const COR_GRAY   = [107, 107, 107];
-    const COR_LILAS  = [237, 217, 255];
+    // Paleta
+    const PURPLE  = [123, 0, 196];
+    const DARK    = [30, 30, 30];
+    const GRAY    = [100, 100, 100];
+    const LIGHT   = [247, 244, 251];
+    const BORDER  = [210, 200, 225];
+    const WHITE   = [255, 255, 255];
+    const LILAS   = [237, 217, 255];
 
-    const largura = W - ML - MR;
+    const hoje = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    const hojeNum = new Date().toLocaleDateString('pt-BR');
 
-    function novaPageSeNecessario(altura) {
-      if (y + altura > H - 15) { pdf.addPage(); y = MT; return true; }
+    // Carregar e parsear txt
+    const txt = await carregarTxt(tipo);
+    const S = parsearSecoes(txt);
+
+    // Nome da asa como texto
+    const asaChave = `ASA_${asa}`;
+    const asaNome = NOMES_TIPO[asa] || `Tipo ${asa}`;
+
+    // Subtipo display
+    function fmtSub(v) { return SUBTIPO_DISPLAY_PDF[v] || SUBTIPO_DISPLAY_PDF[(v||'').toLowerCase()] || v || '—'; }
+    const subDomTxt = fmtSub(subDom);
+    const subIntTxt = fmtSub(subInt);
+    const subRemTxt = fmtSub(subRem);
+
+    // Chave do subtipo para buscar seção correta
+    const subChave = chaveSubtipo(subDom, subInt, subRem);
+
+    // ── HELPERS DE ESCRITA ──────────────────────────────────────────
+    function novaPageSe(altura) {
+      if(y + altura > 282) { pdf.addPage(); y = PT; return true; }
       return false;
     }
 
-    // ── CABEÇALHO ──
-    pdf.setFillColor(...COR_PURPLE);
-    pdf.rect(0, 0, W, 38, 'F');
-    pdf.setTextColor(255,255,255);
-    pdf.setFont('helvetica','bold');
-    pdf.setFontSize(28);
-    pdf.text('9&Self', W/2, 16, {align:'center'});
-    pdf.setFont('helvetica','normal');
-    pdf.setFontSize(11);
-    pdf.text('Avaliação de Personalidade', W/2, 24, {align:'center'});
-    pdf.setFontSize(8);
-    pdf.text('Dra. Lucia Kratz · CRP 09/20590 · A!Equipe Desenvolvimento Humano & Cultural', W/2, 32, {align:'center'});
-    y = 46;
+    function linhaHorizontal(cor, espessura) {
+      pdf.setDrawColor(...(cor||PURPLE));
+      pdf.setLineWidth(espessura||0.5);
+      pdf.line(PL, y, W-PR, y);
+      y += 3;
+    }
 
-    // ── DADOS DO PARTICIPANTE ──
-    pdf.setFillColor(...COR_LIGHT);
-    pdf.roundedRect(ML, y, largura, 30, 3, 3, 'F');
-    pdf.setDrawColor(...COR_BORDER);
-    pdf.roundedRect(ML, y, largura, 30, 3, 3, 'S');
+    function escreverTexto(texto, fontSize, bold, cor, maxW, avancarY) {
+      pdf.setFont('helvetica', bold?'bold':'normal');
+      pdf.setFontSize(fontSize);
+      pdf.setTextColor(...(cor||DARK));
+      const linhas = pdf.splitTextToSize(texto, maxW||TW);
+      linhas.forEach(l => {
+        novaPageSe(fontSize * 0.4);
+        pdf.text(l, PL, y);
+        y += fontSize * 0.38;
+      });
+      if(avancarY !== undefined) y += avancarY;
+      else y += 2;
+    }
 
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(8); pdf.setTextColor(...COR_PURPLE);
-    pdf.text('PARTICIPANTE', ML+4, y+8);
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(11); pdf.setTextColor(...COR_DARK);
-    pdf.text(nome || 'Participante', ML+4, y+16);
+    function tituloSecao(texto) {
+      novaPageSe(14);
+      y += 4;
+      pdf.setFillColor(...LILAS);
+      pdf.rect(PL, y-4, TW, 9, 'F');
+      pdf.setDrawColor(...PURPLE); pdf.setLineWidth(1.2);
+      pdf.line(PL, y-4, PL, y+5);
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(...PURPLE);
+      pdf.text(texto, PL+4, y+2);
+      y += 8;
+    }
 
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(8); pdf.setTextColor(...COR_PURPLE);
-    pdf.text('CARGO / FUNÇÃO', ML+4, y+23);
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...COR_GRAY);
-    pdf.text(cargo || '—', ML+4, y+29);
-
-    // Data
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(8); pdf.setTextColor(...COR_PURPLE);
-    pdf.text('DATA DE EMISSÃO', W-MR-45, y+8);
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(...COR_DARK);
-    pdf.text(hoje, W-MR-45, y+16);
-    y += 38;
-
-    // ── RESULTADO ──
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(...COR_PURPLE);
-    pdf.text('Resultado da Avaliação', ML, y+6);
-    pdf.setDrawColor(...COR_PURPLE); pdf.setLineWidth(0.8);
-    pdf.line(ML, y+9, W-MR, y+9);
-    y += 14;
-
-    // Card do tipo
-    pdf.setFillColor(...COR_LILAS);
-    pdf.roundedRect(ML, y, largura, 24, 3, 3, 'F');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(22); pdf.setTextColor(...COR_PURPLE);
-    pdf.text(`${tipo}`, ML+10, y+16);
-    pdf.setFontSize(13);
-    pdf.text(NOMES_TIPO[tipo]||`Tipo ${tipo}`, ML+22, y+10);
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...COR_MAG);
-    pdf.text(`(Traço Tipo ${tipo})`, ML+22, y+18);
-    y += 30;
-
-    // Tabela asa + subtipos
-    const linhas = [
-      ['Asa Dominante', `Asa ${asa}`],
-      ['Subtipo Dominante', SUBTIPO_DISPLAY[subDom]||subDom||'—'],
-      ['Subtipo Intermediário', SUBTIPO_DISPLAY[subInt]||subInt||'—'],
-      ['Subtipo de Menor Ênfase', SUBTIPO_DISPLAY[subRem]||subRem||'—'],
-    ];
-    linhas.forEach((row, i) => {
-      const bg = i%2===0 ? COR_LIGHT : [255,255,255];
-      pdf.setFillColor(...bg);
-      pdf.rect(ML, y, largura, 9, 'F');
-      pdf.setDrawColor(...COR_BORDER); pdf.setLineWidth(0.3);
-      pdf.rect(ML, y, largura, 9, 'S');
-      pdf.setFont('helvetica','bold'); pdf.setFontSize(8); pdf.setTextColor(...COR_PURPLE);
-      pdf.text(row[0], ML+3, y+6);
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...COR_DARK);
-      pdf.text(row[1], ML+70, y+6);
-      y += 9;
-    });
-    y += 8;
-
-    // ── PERFIL TEXTUAL ──
-    novaPageSeNecessario(20);
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(...COR_PURPLE);
-    pdf.text('Perfil de Personalidade', ML, y+6);
-    pdf.setDrawColor(...COR_PURPLE); pdf.setLineWidth(0.8);
-    pdf.line(ML, y+9, W-MR, y+9);
-    y += 16;
-
-    const perfilTexto = await lerPerfilTipo(tipo);
-    const secoes = perfilTexto.split(/={3,}/).map(s=>s.trim()).filter(Boolean);
-
-    for (const secao of secoes) {
-      const linhasSecao = secao.split('\n');
-      const tituloSecao = linhasSecao[0].replace(/^#+\s*/,'').trim();
-      const corpoSecao  = linhasSecao.slice(1).join(' ').replace(/\s+/g,' ').trim();
-
-      if (tituloSecao) {
-        novaPageSeNecessario(14);
-        pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(...COR_MAG);
-        pdf.text(tituloSecao, ML, y);
-        y += 6;
-      }
-      if (corpoSecao) {
-        pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...COR_DARK);
-        const wrapped = pdf.splitTextToSize(corpoSecao, largura);
-        wrapped.forEach(linha => {
-          novaPageSeNecessario(6);
-          pdf.text(linha, ML, y);
-          y += 5.5;
-        });
-        y += 3;
+    function rodapePaginas() {
+      const total = pdf.internal.getNumberOfPages();
+      for(let p = 1; p <= total; p++) {
+        pdf.setPage(p);
+        // Rodapé esquerdo
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(...GRAY);
+        pdf.text(`| ${nome} | ${cargo||'—'} |`, PL, 291);
+        // Rodapé centro
+        pdf.setFont('helvetica','bold');
+        pdf.text('TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF', W/2, 288, {align:'center'});
+        pdf.setFont('helvetica','normal');
+        pdf.text('DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES', W/2, 292, {align:'center'});
+        // Número página
+        pdf.setTextColor(...PURPLE); pdf.setFont('helvetica','bold'); pdf.setFontSize(9);
+        pdf.text(`${p}`, W-PR, 291, {align:'right'});
       }
     }
 
-    // Se não havia marcadores ===, exibe texto direto
-    if (secoes.length === 0 && perfilTexto.trim()) {
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...COR_DARK);
-      const wrapped = pdf.splitTextToSize(perfilTexto.replace(/\n+/g,' '), largura);
-      wrapped.forEach(linha => {
-        novaPageSeNecessario(6);
-        pdf.text(linha, ML, y);
-        y += 5.5;
+    // ══════════════════════════════════════════════════════════════════
+    // PÁGINA 1 — CAPA
+    // ══════════════════════════════════════════════════════════════════
+    // Fundo degradê simulado com retângulos
+    pdf.setFillColor(20, 0, 50);
+    pdf.rect(0, 0, W, 297, 'F');
+    pdf.setFillColor(...PURPLE);
+    pdf.rect(0, 80, W, 140, 'F');
+    pdf.setFillColor(20, 0, 50);
+    pdf.roundedRect(10, 75, W-20, 150, 8, 8, 'F');
+
+    // Logo / título
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(42); pdf.setTextColor(255,255,255);
+    pdf.text('9&Self', W/2, 50, {align:'center'});
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(13); pdf.setTextColor(200,180,240);
+    pdf.text('Relatório Eneagrama', W/2, 62, {align:'center'});
+
+    // Linha decorativa
+    pdf.setDrawColor(...PURPLE); pdf.setLineWidth(1);
+    pdf.line(W/2-30, 68, W/2+30, 68);
+
+    // Nome e dados
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(20); pdf.setTextColor(255,255,255);
+    pdf.text(nome, W/2, 105, {align:'center'});
+    if(cargo) {
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(11); pdf.setTextColor(200,180,240);
+      pdf.text(`Cargo: ${cargo}`, W/2, 116, {align:'center'});
+    }
+    pdf.setFontSize(10); pdf.setTextColor(180,160,220);
+    pdf.text(hoje.charAt(0).toUpperCase() + hoje.slice(1), W/2, 128, {align:'center'});
+
+    // Tipo
+    pdf.setDrawColor(200,180,240); pdf.setLineWidth(0.5);
+    pdf.line(PL+20, 136, W-PR-20, 136);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(220,200,255);
+    pdf.text(`Eneatipo ${tipo}: ${NOMES_TIPO[tipo]||''}`, W/2, 148, {align:'center'});
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(180,160,210);
+    pdf.text(`Asa ${asa}: ${asaNome}`, W/2, 158, {align:'center'});
+    pdf.text(`Subtipo: ${subDomTxt} (${subIntTxt} e ${subRemTxt} reprimidos)`, W/2, 167, {align:'center'});
+
+    // Rodapé da capa
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(130,110,160);
+    pdf.text('TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF', W/2, 280, {align:'center'});
+    pdf.text('DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES', W/2, 285, {align:'center'});
+
+    // ══════════════════════════════════════════════════════════════════
+    // PÁGINA 2 — INTRODUÇÃO (fixa)
+    // ══════════════════════════════════════════════════════════════════
+    pdf.addPage(); y = PT;
+
+    tituloSecao('Introdução');
+    const intro = `O 9&Self é um instrumento de identificação de características pessoais e profissionais desenvolvido pelas especialistas Dra. Lúcia Kratz e Ryuza Gonçalves. O teste fundamenta-se nos traços de personalidade do Eneagrama — a partir dos estudos pioneiros de George Ivanovich Gurdjieff, Helen Palmer, David Daniels, Claudio Naranjo, Don Richards Riso e Russ Hudson —, aliados à teoria junguiana dos traços psicológicos e complementados pela Teoria das Necessidades Adquiridas de McClelland e pelo Coaching Executivo.\n\nDentro desses estudos, identificam-se 9 tipos básicos de personalidade que se subdividem em 216 padrões diferentes de comportamento. Os nove tipos básicos são: Perfeição e Excelência, Prestativo e Relacional, Performance e Imagem, Autêntico e Profundo, Observador e Privacidade, Precavido e Questionador, Visionário e Otimista, Desafiador e Controlador, Harmônico e Diplomático.\n\nUm dos objetivos do 9&Self é oferecer demonstrações e argumentos que facilitem o caminho para maior respeito e tolerância consigo mesmo e com os outros, auxiliando na apreciação de dons, talentos e competências.\n\nO comportamento das pessoas é bastante variado, mas segue alguns padrões — modelos nos quais os indivíduos preferem observar o mundo e fazer julgamentos. As tipologias de personalidade são profundas e estruturantes no caráter de cada indivíduo. Não podemos alterar a base da nossa personalidade, mas podemos desenvolvê-la e ganhar maturidade.\n\nO 9&Self está organizado da seguinte forma:`;
+    intro.split('\n\n').forEach(p => { escreverTexto(p, 9, false, DARK, TW, 4); });
+
+    // Lista de seções
+    const itens = ['Tipologia da Personalidade','Subtipo da Personalidade','Influência das Personalidades',
+      'Interação Social','Estilo de Trabalho','Ambiente de Trabalho','Estresse da Personalidade',
+      'Comunicação e Feedback','Tendências na Liderança','Motivação',
+      'Desenvolvimento e Evolução da Personalidade','Fábula'];
+    itens.forEach(it => {
+      novaPageSe(6);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...DARK);
+      pdf.text(`• ${it}`, PL+4, y);
+      y += 5;
+    });
+
+    // ══════════════════════════════════════════════════════════════════
+    // PÁGINA 3+ — TIPOLOGIA
+    // ══════════════════════════════════════════════════════════════════
+    pdf.addPage(); y = PT;
+
+    tituloSecao('Tipologia da Personalidade');
+    if(S['TIPOLOGIA']) {
+      S['TIPOLOGIA'].split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+    }
+
+    // Caixa ATENÇÃO
+    y += 4; novaPageSe(30);
+    pdf.setFillColor(...LIGHT);
+    pdf.setDrawColor(...PURPLE); pdf.setLineWidth(0.8);
+    pdf.roundedRect(PL, y, TW, 28, 3, 3, 'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...PURPLE);
+    pdf.text('■ ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO', PL+4, y+6);
+    pdf.setFont('helvetica','italic'); pdf.setFontSize(8); pdf.setTextColor(...DARK);
+    const atencao = 'Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. Acolha o seu processo.';
+    const atLines = pdf.splitTextToSize(atencao, TW-8);
+    atLines.forEach((l,i) => pdf.text(l, PL+4, y+13+(i*4.5)));
+    y += 32;
+
+    // Padrão na Infância
+    tituloSecao('Padrão na Infância');
+    if(S['PADRAO_INFANCIA']) {
+      S['PADRAO_INFANCIA'].split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+    }
+
+    // Pontos Fortes e Fracos
+    tituloSecao('Pontos Fortes e Fracos da Personalidade');
+    y += 2;
+    // Cabeçalho tabela
+    pdf.setFillColor(...PURPLE);
+    pdf.rect(PL, y, TW/2-1, 8, 'F');
+    pdf.rect(PL+TW/2+1, y, TW/2-1, 8, 'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(255,255,255);
+    pdf.text('✓ Pontos Fortes', PL+4, y+5.5);
+    pdf.text('■ Pontos Fracos', PL+TW/2+5, y+5.5);
+    y += 9;
+
+    const fortes = (S['PONTOS_FORTES']||'').split('|').map(s=>s.trim()).filter(Boolean);
+    const fracos = (S['PONTOS_FRACOS']||'').split('|').map(s=>s.trim()).filter(Boolean);
+    const maxLinhas = Math.max(fortes.length, fracos.length);
+    for(let i=0; i<maxLinhas; i++) {
+      novaPageSe(14);
+      const bg = i%2===0 ? LIGHT : WHITE;
+      pdf.setFillColor(...bg);
+      pdf.rect(PL, y, TW/2-1, 13, 'F');
+      pdf.rect(PL+TW/2+1, y, TW/2-1, 13, 'F');
+      pdf.setDrawColor(...BORDER); pdf.setLineWidth(0.3);
+      pdf.rect(PL, y, TW/2-1, 13, 'S');
+      pdf.rect(PL+TW/2+1, y, TW/2-1, 13, 'S');
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(...DARK);
+      if(fortes[i]) {
+        const fl = pdf.splitTextToSize(fortes[i], TW/2-6);
+        fl.forEach((l,j) => pdf.text(l, PL+3, y+4+(j*4)));
+      }
+      if(fracos[i]) {
+        const fl = pdf.splitTextToSize(fracos[i], TW/2-6);
+        fl.forEach((l,j) => pdf.text(l, PL+TW/2+4, y+4+(j*4)));
+      }
+      y += 14;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // SUBTIPO DA PERSONALIDADE (Asa + Interação Social)
+    // ══════════════════════════════════════════════════════════════════
+    pdf.addPage(); y = PT;
+    tituloSecao('Subtipo da Personalidade');
+
+    // Influência das Personalidades (Asa)
+    escreverTexto(`Influência das Personalidades | ${asaNome} |`, 10, true, PURPLE, TW, 2);
+    if(S[asaChave]) {
+      S[asaChave].split('\n').forEach(linha => {
+        linha = linha.trim(); if(!linha) return;
+        if(linha.startsWith('Nível')) {
+          novaPageSe(8); y+=2;
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(...PURPLE);
+          pdf.text(linha.split(':')[0]+':', PL, y);
+          const resto = linha.substring(linha.indexOf(':')+1).trim();
+          if(resto) {
+            pdf.setFont('helvetica','normal'); pdf.setTextColor(...DARK);
+            const rls = pdf.splitTextToSize(resto, TW-2);
+            pdf.text(rls[0], PL+30, y);
+            y += 4.5;
+            rls.slice(1).forEach(l => { pdf.text(l, PL, y); y+=4.5; });
+          } else y += 4.5;
+        } else {
+          escreverTexto(linha, 9, false, DARK, TW, 2);
+        }
       });
     }
 
-    // ── NOTA ÉTICA ──
-    y += 6;
-    novaPageSeNecessario(28);
-    pdf.setFillColor(...COR_LIGHT);
-    pdf.roundedRect(ML, y, largura, 26, 3, 3, 'F');
-    pdf.setDrawColor(...COR_BORDER);
-    pdf.roundedRect(ML, y, largura, 26, 3, 3, 'S');
-    pdf.setFont('helvetica','italic'); pdf.setFontSize(8); pdf.setTextColor(...COR_GRAY);
-    const nota = 'Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o autodesenvolvimento. As respostas refletem a autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. Acolha o seu processo.';
-    const notaWrapped = pdf.splitTextToSize(nota, largura-8);
-    notaWrapped.forEach((l,i) => pdf.text(l, ML+4, y+6+(i*5)));
-    y += 32;
-
-    // ── RODAPÉ PÁGINAS ──
-    const totalPages = pdf.internal.getNumberOfPages();
-    for (let p = 1; p <= totalPages; p++) {
-      pdf.setPage(p);
-      pdf.setFillColor(...COR_PURPLE);
-      pdf.rect(0, H-10, W, 10, 'F');
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(255,255,255);
-      pdf.text(`9&Self · Dra. Lucia Kratz · CRP 09/20590 · ${hoje}`, ML, H-4);
-      pdf.text(`Página ${p} de ${totalPages}`, W-MR, H-4, {align:'right'});
+    y += 4;
+    // Interação Social
+    escreverTexto(`Interação Social | ${subDomTxt} · ${subIntTxt} · ${subRemTxt} Reprimido |`, 10, true, PURPLE, TW, 2);
+    if(S[subChave]) {
+      escreverTexto(S[subChave], 9, false, DARK, TW, 4);
+    } else {
+      // fallback: pegar primeiro subtipo disponível
+      const subKeys = Object.keys(S).filter(k=>k.startsWith('SUBTIPO_'));
+      if(subKeys[0]) escreverTexto(S[subKeys[0]], 9, false, DARK, TW, 4);
     }
+
+    // ══════════════════════════════════════════════════════════════════
+    // ESTILO DE TRABALHO
+    // ══════════════════════════════════════════════════════════════════
+    pdf.addPage(); y = PT;
+    tituloSecao('Estilo de Trabalho');
+
+    escreverTexto('Ambiente de Trabalho:', 10, true, PURPLE, TW, 2);
+    if(S['AMBIENTE_TRABALHO']) {
+      S['AMBIENTE_TRABALHO'].split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+    }
+
+    y += 2;
+    escreverTexto('Estresse da Personalidade:', 10, true, PURPLE, TW, 2);
+    if(S['ESTRESSE']) {
+      S['ESTRESSE'].split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+    }
+
+    y += 2;
+    escreverTexto('Comunicação:', 10, true, PURPLE, TW, 2);
+    if(S['COMUNICACAO']) {
+      S['COMUNICACAO'].split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+    }
+
+    // Tabela Fala / Linguagem Corporal
+    if(S['FALA'] || S['LINGUAGEM_CORPORAL']) {
+      y += 4; novaPageSe(12);
+      pdf.setFillColor(...PURPLE);
+      pdf.rect(PL, y, TW/2-1, 8, 'F');
+      pdf.rect(PL+TW/2+1, y, TW/2-1, 8, 'F');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(255,255,255);
+      pdf.text('■ Estilo ao Falar', PL+4, y+5.5);
+      pdf.text('■ Linguagem Corporal', PL+TW/2+5, y+5.5);
+      y += 9;
+
+      const falaLines = pdf.splitTextToSize(S['FALA']||'', TW/2-6);
+      const corpLines = pdf.splitTextToSize(S['LINGUAGEM_CORPORAL']||'', TW/2-6);
+      const maxL = Math.max(falaLines.length, corpLines.length);
+      const altCelula = maxL * 4.5 + 6;
+      novaPageSe(altCelula);
+      pdf.setFillColor(...LIGHT);
+      pdf.rect(PL, y, TW/2-1, altCelula, 'FD');
+      pdf.rect(PL+TW/2+1, y, TW/2-1, altCelula, 'FD');
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(...DARK);
+      falaLines.forEach((l,i) => pdf.text(l, PL+3, y+5+(i*4.5)));
+      corpLines.forEach((l,i) => pdf.text(l, PL+TW/2+4, y+5+(i*4.5)));
+      y += altCelula + 4;
+    }
+
+    // Feedback / Pontos Cegos
+    escreverTexto('Feedback:', 10, true, PURPLE, TW, 2);
+    if(S['PONTOS_CEGOS'] || S['FILTROS_DISTORCOES']) {
+      y += 2; novaPageSe(12);
+      pdf.setFillColor(...PURPLE);
+      pdf.rect(PL, y, TW/2-1, 8, 'F');
+      pdf.rect(PL+TW/2+1, y, TW/2-1, 8, 'F');
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(255,255,255);
+      pdf.text('■ Pontos Cegos', PL+4, y+5.5);
+      pdf.text('■ Filtros e Distorções', PL+TW/2+5, y+5.5);
+      y += 9;
+      const pcLines = pdf.splitTextToSize(S['PONTOS_CEGOS']||'', TW/2-6);
+      const fdLines = pdf.splitTextToSize(S['FILTROS_DISTORCOES']||'', TW/2-6);
+      const mxL = Math.max(pcLines.length, fdLines.length);
+      const alt2 = mxL * 4.5 + 6;
+      novaPageSe(alt2);
+      pdf.setFillColor(...LIGHT);
+      pdf.rect(PL, y, TW/2-1, alt2, 'FD');
+      pdf.rect(PL+TW/2+1, y, TW/2-1, alt2, 'FD');
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(...DARK);
+      pcLines.forEach((l,i) => pdf.text(l, PL+3, y+5+(i*4.5)));
+      fdLines.forEach((l,i) => pdf.text(l, PL+TW/2+4, y+5+(i*4.5)));
+      y += alt2 + 4;
+    }
+
+    // Diretrizes de feedback
+    if(S['FEEDBACK_ITENS']) {
+      escreverTexto('Diretrizes para o Feedback:', 9, true, PURPLE, TW, 2);
+      S['FEEDBACK_ITENS'].split('|').forEach(it => {
+        it = it.trim(); if(!it) return;
+        novaPageSe(8);
+        const ls = pdf.splitTextToSize(`• ${it}`, TW-4);
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor(...DARK);
+        ls.forEach(l => { pdf.text(l, PL+2, y); y+=4.5; });
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // LIDERANÇA E MOTIVAÇÃO
+    // ══════════════════════════════════════════════════════════════════
+    pdf.addPage(); y = PT;
+    tituloSecao('Liderança e Motivação');
+
+    escreverTexto('Tendências na Liderança:', 10, true, PURPLE, TW, 2);
+    if(S['LIDERANCA']) escreverTexto(S['LIDERANCA'], 9, false, DARK, TW, 4);
+    if(S['TENDENCIAS_LIDERANCA']) escreverTexto(S['TENDENCIAS_LIDERANCA'], 9, false, DARK, TW, 4);
+
+    y += 2;
+    escreverTexto('Principais Aspectos a Desenvolver:', 10, true, PURPLE, TW, 2);
+    if(S['ASPECTOS_DESENVOLVER']) escreverTexto(S['ASPECTOS_DESENVOLVER'], 9, false, DARK, TW, 4);
+
+    y += 2;
+    escreverTexto('Motivação:', 10, true, PURPLE, TW, 2);
+    if(S['MOTIVACAO']) escreverTexto(S['MOTIVACAO'], 9, false, DARK, TW, 4);
+
+    // ── Hábitos
+    pdf.addPage(); y = PT;
+    tituloSecao('Crie Hábitos Positivos para sua Personalidade');
+    if(S['HABITOS']) {
+      S['HABITOS'].split('\n\n').forEach(p => {
+        p = p.trim(); if(!p) return;
+        if(p.startsWith('•') || p.startsWith('Boas') || p.includes('::')) {
+          escreverTexto(p, 9, false, DARK, TW, 3);
+        } else if(p.includes('|')) {
+          p.split('|').forEach(it => {
+            it = it.trim(); if(!it) return;
+            novaPageSe(7);
+            pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...DARK);
+            const ls = pdf.splitTextToSize(`• ${it}`, TW-4);
+            ls.forEach(l => { pdf.text(l, PL+2, y); y+=4.8; });
+          });
+        } else {
+          escreverTexto(p, 9, false, DARK, TW, 3);
+        }
+      });
+    }
+
+    // Frases comuns
+    if(S['FRASES_COMUNS']) {
+      y += 4; tituloSecao('Frases Comuns');
+      S['FRASES_COMUNS'].split('|').forEach(it => {
+        it = it.trim(); if(!it) return;
+        novaPageSe(8);
+        const ls = pdf.splitTextToSize(`• ${it}`, TW-4);
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...DARK);
+        ls.forEach(l => { pdf.text(l, PL+2, y); y+=4.8; });
+      });
+    }
+
+    // Níveis de saúde
+    if(S['NIVEIS_SAUDE'] || S['AUTODOMINIO']) {
+      pdf.addPage(); y = PT;
+      tituloSecao('Níveis de Saúde da Personalidade');
+      escreverTexto('A personalidade é dinâmica e se move ao longo de 9 níveis de desenvolvimento e maturidade individual.', 9, false, DARK, TW, 4);
+      const niveisTexto = S['NIVEIS_SAUDE'] || S['AUTODOMINIO'] || '';
+      niveisTexto.split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // DESENVOLVIMENTO
+    // ══════════════════════════════════════════════════════════════════
+    if(S['DESENVOLVIMENTO'] || S['INFOBOX_DESENVOLVIMENTO']) {
+      pdf.addPage(); y = PT;
+      tituloSecao('O Despertar da Consciência: O Caminho do Autodesenvolvimento');
+      const devTexto = S['DESENVOLVIMENTO'] || S['INFOBOX_DESENVOLVIMENTO'] || '';
+      devTexto.split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // FÁBULA
+    // ══════════════════════════════════════════════════════════════════
+    if(S['FABULA']) {
+      pdf.addPage(); y = PT;
+      tituloSecao('Fábula');
+
+      // Extrair título da fábula (primeira linha antes do ':')
+      const fabulaTexto = S['FABULA'];
+      const primeiraLinha = fabulaTexto.split('\n')[0];
+      const tituloFabula = primeiraLinha.includes(':') ? primeiraLinha.split(':')[0].trim() : 'Fábula';
+      const corpusFabula = fabulaTexto.includes(':') ? fabulaTexto.substring(fabulaTexto.indexOf(':')+1).trim() : fabulaTexto;
+
+      escreverTexto(tituloFabula, 11, true, PURPLE, TW, 4);
+      corpusFabula.split('\n\n').forEach(p => { if(p.trim()) escreverTexto(p.trim(), 9, false, DARK, TW, 4); });
+      y += 2;
+      escreverTexto('Autor Desconhecido', 8, true, GRAY, TW, 6);
+    }
+
+    // Perguntas da fábula
+    if(S['PERGUNTAS_FABULA']) {
+      novaPageSe(20);
+      escreverTexto('Reflexões sobre a Fábula', 10, true, PURPLE, TW, 4);
+      S['PERGUNTAS_FABULA'].split('|').forEach((q, i) => {
+        q = q.trim(); if(!q) return;
+        novaPageSe(12);
+        const ls = pdf.splitTextToSize(`${i+1}. ${q}`, TW-4);
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(...DARK);
+        ls.forEach(l => { pdf.text(l, PL, y); y+=4.8; });
+        y += 2;
+      });
+    }
+
+    // ── PLAYLIST
+    if(S['PLAYLIST']) {
+      y += 4; novaPageSe(20);
+      tituloSecao('Playlist da Personalidade');
+      escreverTexto('Se desejar assistir a vídeos detalhados sobre o seu perfil, acesse o endereço abaixo. Recomenda-se iniciar a partir do vídeo 3 desta lista de reprodução.', 9, false, DARK, TW, 4);
+      escreverTexto(S['PLAYLIST'].trim(), 9, false, PURPLE, TW, 4);
+    }
+
+    // Aplicar rodapé em todas as páginas
+    rodapePaginas();
 
     return pdf;
   }
 
-  // ── GERAR E BAIXAR PDF ──
+  // ── GERAR E BAIXAR PDF (paciente) ──
   window.baixarLaudo = async function() {
     const btn    = document.getElementById('btnDownloadPdf');
     const status = document.getElementById('pdfStatus');
@@ -1895,31 +2220,21 @@ async function salvarResultadoFinal() {
       showToast('Dados do teste não encontrados. Refaça o teste.','error');
       return;
     }
-
-    btn.disabled    = true;
-    btn.textContent = '⏳ Gerando laudo...';
-    status.textContent = 'Preparando seu laudo personalizado...';
-
+    btn.disabled = true; btn.textContent = '⏳ Gerando laudo...';
+    status.textContent = 'Montando seu laudo personalizado...';
     try {
       const pdf = await gerarPdfNavegador({
-        tipo:   TS.tipoFinal,
-        asa:    TS.asaDom,
-        subDom: TS.subDom,
-        subInt: TS.subInt,
-        subRem: TS.subRem,
-        nome:   nome,
-        cargo:  cod.cargo || '',
+        tipo: TS.tipoFinal, asa: TS.asaDom,
+        subDom: TS.subDom, subInt: TS.subInt, subRem: TS.subRem,
+        nome, cargo: cod.cargo||'',
       });
       pdf.save(`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`);
       status.textContent = '✅ Laudo baixado com sucesso!';
-      btn.textContent    = '⬇ Baixar Laudo PDF';
-      btn.disabled       = false;
     } catch(e) {
-      btn.disabled    = false;
-      btn.textContent = '⬇ Baixar Laudo PDF';
-      status.innerHTML = `<span style="color:#c00;">⚠ Não foi possível gerar. Tente novamente.</span>`;
+      status.innerHTML = `<span style="color:#c00;">⚠ Erro ao gerar. Tente novamente.</span>`;
       console.error('Erro PDF:', e);
     }
+    btn.disabled = false; btn.textContent = '⬇ Baixar Laudo PDF';
   };
 const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
 function gerarLinkTeste(codigo) {
@@ -2149,17 +2464,12 @@ function normalizeSubtipo(raw) {
 window.gerarPdfLaudo = async function(laudoId) {
   const cell = document.getElementById(`pdfcell_${laudoId}`);
   const setCell = (html) => { if(cell) cell.innerHTML = html; };
-
   setCell(`<span style="font-size:12px;color:#888;">⏳ Gerando...</span>`);
-
   try {
-    // 1. Buscar dados do laudo no Firestore
     const { getDoc: _getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await _getDoc(doc(db,'nself_laudos', laudoId));
-    if(!snap.exists()) throw new Error('Registro não encontrado no banco');
+    if(!snap.exists()) throw new Error('Registro não encontrado');
     const l = snap.data();
-
-    // 2. Sanitizar dados (blinda contra nulos de registros legados)
     const tipo   = parseInt(l.tipo) || 1;
     const asa    = parseInt(l.asaDominante || l.asa || l.asaDom) || (tipo===1?9:tipo-1);
     const subDom = normalizeSubtipo(l.subtipoDominante    || l.subDom);
@@ -2167,25 +2477,16 @@ window.gerarPdfLaudo = async function(laudoId) {
     const subRem = normalizeSubtipo(l.subtipoRemissivo    || l.subRem);
     const nome   = (l.nome  || 'Participante').trim();
     const cargo  = (l.cargo || '').trim();
-
     const ASAS_VALIDAS = {1:[2,9],2:[1,3],3:[2,4],4:[3,5],5:[4,6],6:[5,7],7:[6,8],8:[7,9],9:[8,1]};
     const asaFinal = ASAS_VALIDAS[tipo]?.includes(asa) ? asa : ASAS_VALIDAS[tipo][0];
-
-    // 3. Gerar PDF no navegador
     const pdf = await gerarPdfNavegador({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo });
     pdf.save(`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`);
-
-    // 4. Atualizar célula com botão de re-download
     setCell(`<button class="btn btn-teal btn-sm" onclick="gerarPdfLaudo('${laudoId}')">⬇ Re-gerar PDF</button>`);
-
   } catch(e) {
     console.error('[gerarPdfLaudo]', e.message);
-    setCell(`
-      <div style="font-size:11px;">
-        <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}')"
-          style="color:#c00;margin-bottom:4px;">⚠ Tentar novamente</button><br>
-        <span style="color:#999;">${e.message.slice(0,80)}</span>
-      </div>`);
+    setCell(`<div style="font-size:11px;">
+      <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}')" style="color:#c00;margin-bottom:4px;">⚠ Tentar novamente</button><br>
+      <span style="color:#999;">${e.message.slice(0,80)}</span></div>`);
   }
 };
 
