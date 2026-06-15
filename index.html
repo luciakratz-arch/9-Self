@@ -1736,11 +1736,13 @@ async function salvarResultadoFinal() {
   }
 
   function parsearSecoes(txt) {
+    // Normalizar line endings (GitHub entrega \r\n)
+    txt = txt.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const sec = {};
-    const re = /^=== (\w+) ===\s*$([\s\S]*?)(?=^=== \w+ ===$|$)/gm;
-    let m;
-    while((m = re.exec(txt)) !== null) {
-      sec[m[1].trim()] = m[2].trim();
+    // split pelo marcador === CHAVE ===
+    const partes = txt.split(/^=== (\w+) ===[ \t]*$/m);
+    for(let i = 1; i < partes.length - 1; i += 2) {
+      sec[partes[i].trim()] = partes[i+1] ? partes[i+1].trim() : '';
     }
     return sec;
   }
@@ -1905,7 +1907,7 @@ async function salvarResultadoFinal() {
     }
 
     // ── Bullet ────────────────────────────────────────────────────
-    function bullet(texto) { paragrafo(`• ${texto}`, 4); }
+    function bullet(texto) { paragrafo('- ' + texto, 4); }
 
     // ── Múltiplos parágrafos por \n\n ─────────────────────────────
     function paraMulti(texto) {
@@ -1985,7 +1987,7 @@ async function salvarResultadoFinal() {
       const linhasTit = pdf.splitTextToSize(titulo, TW_PDF-20);
       let h = linhasTit.length*5.5 + 18;
       itens.forEach(it => {
-        const ls = pdf.splitTextToSize(`• ${it}`, TW_PDF-28);
+        const ls = pdf.splitTextToSize(`- ${it}`, TW_PDF-28);
         h += ls.length * 5.2 + 5;
       });
       novaPageSe(h);
@@ -2002,7 +2004,7 @@ async function salvarResultadoFinal() {
         const isFim = idx === itens.length-1;
         pdf.setFont('helvetica', isFim?'bold':'normal');
         pdf.setTextColor(...(isFim ? C.MAG : C.DARK));
-        const ls = pdf.splitTextToSize(`• ${it}`, TW_PDF-28);
+        const ls = pdf.splitTextToSize(`- ${it}`, TW_PDF-28);
         ls.forEach(l => { pdf.text(l, ML+16, iy); iy += 5.2; });
         iy += 4;
       });
@@ -2142,7 +2144,7 @@ async function salvarResultadoFinal() {
       });
     }
     y += 2;
-    infoBox('⚠ ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO\n\nNa filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Acolha o seu processo e veja o laudo como um companheiro de caminhada.');
+    infoBox('ATENCAO: A JORNADA DO AUTOCONHECIMENTO\n\nNa filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Acolha o seu processo e veja o laudo como um companheiro de caminhada.');
     subTitle('Padrão na Infância');
     paraMulti(S['PADRAO_INFANCIA']||'');
     rodapeInterno(); numeroPagina(pagina);
@@ -2154,7 +2156,7 @@ async function salvarResultadoFinal() {
     secTitle('Pontos Fortes e Fracos da Personalidade');
     paragrafo(`Todo perfil de personalidade carrega consigo um conjunto de atributos que, quando bem canalizados, se tornam diferenciais competitivos genuínos. Da mesma forma, existem tendências comportamentais que, sem a devida consciência, podem limitar o desempenho e gerar atritos nos relacionamentos pessoais e profissionais. O mapeamento abaixo sintetiza os principais pontos de força e os pontos de atenção do perfil ${nomeTipo}.`);
     y += 3;
-    dualGrid('✓  Pontos Fortes','⚠  Pontos Fracos',
+    dualGrid('+ Pontos Fortes','- Pontos Fracos',
       splitPipes(S['PONTOS_FORTES']||''), splitPipes(S['PONTOS_FRACOS']||''), C.MAG);
     rodapeInterno(); numeroPagina(pagina);
 
@@ -2201,7 +2203,7 @@ async function salvarResultadoFinal() {
       y += 3;
       escreverTexto('Estilo de Comunicação:', {fs:10.5, bold:true, cor:C.TEAL, leading:6});
       y += 1;
-      dualGrid('🗣 Estilo ao Falar','🤝 Linguagem Corporal', falaItens, corpItens, C.TEAL);
+      dualGrid('Estilo ao Falar','Linguagem Corporal', falaItens, corpItens, C.TEAL);
     }
 
     subTitle('Feedback:');
@@ -2209,7 +2211,7 @@ async function salvarResultadoFinal() {
     y += 2;
     escreverTexto('Pontos Cegos e Filtros:', {fs:10.5, bold:true, cor:C.TEAL, leading:6});
     y += 1;
-    dualGrid('🎯 Pontos Cegos','🔍 Filtros e Distorções',
+    dualGrid('Pontos Cegos','Filtros e Distorcoes',
       splitPipes(S['PONTOS_CEGOS']||''), splitPipes(S['FILTROS_DISTORCOES']||''), C.TEAL);
     const feedbackItens = splitPipes(S['FEEDBACK_ITENS']||'');
     if(feedbackItens.length) { y+=2; fbBox('Diretrizes para o Feedback:', feedbackItens); }
