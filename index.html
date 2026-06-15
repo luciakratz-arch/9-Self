@@ -757,18 +757,18 @@ const _FABULA= '#F3EEFB';
 // ── Estilos base ──────────────────────────────────────────────────
 function _estilos() {
   return {
-    body:    { font:'Roboto', fontSize:10.5, lineHeight:1.5, color:_DARK, alignment:'justify' },
-    secT:    { font:'Roboto', fontSize:14,   bold:true,  color:_MAG,  margin:[0,8,0,2] },
-    subT:    { font:'Roboto', fontSize:11,   bold:true,  color:_TEAL, margin:[0,12,0,4] },
-    bul:     { font:'Roboto', fontSize:10.5, color:_DARK, margin:[10,0,0,3] },
-    hdr:     { font:'Roboto', fontSize:8.5,  color:_GMID },
-    lvlG:    { font:'Roboto', fontSize:11,   bold:true,  color:_MAG,  margin:[0,8,0,2] },
-    lvlS:    { font:'Roboto', fontSize:10.5, bold:true,  color:_TEAL, margin:[0,4,0,1] },
-    lvlB:    { font:'Roboto', fontSize:10.5, color:_DARK, margin:[8,0,0,4] },
-    fable:   { font:'Roboto', fontSize:10.5, italics:true, color:_DARK, alignment:'justify' },
-    carimbo0:{ font:'Roboto', fontSize:11,   bold:true,  color:_MAG,  alignment:'center' },
-    carimbo1:{ font:'Roboto', fontSize:9,    bold:true,  color:_MAG,  alignment:'center' },
-    carimbo2:{ font:'Roboto', fontSize:9,    color:_GMID, alignment:'center' },
+    body:    { font:'Roboto', fontSize:10.5, lineHeight:1.6, color:'#333333', alignment:'justify' },
+    secT:    { font:'Roboto', fontSize:14,   bold:true,  color:'#7B00C4', margin:[0,14,0,4] },
+    subT:    { font:'Roboto', fontSize:11,   bold:true,  color:'#403071', margin:[0,14,0,6] },
+    bul:     { font:'Roboto', fontSize:10.5, color:'#333333', margin:[12,0,0,4], alignment:'justify' },
+    hdr:     { font:'Roboto', fontSize:8,    color:'#888888', bold:false },
+    lvlG:    { font:'Roboto', fontSize:11,   bold:true,  color:'#7B00C4', margin:[0,10,0,4] },
+    lvlS:    { font:'Roboto', fontSize:10.5, bold:true,  color:'#403071', margin:[0,6,0,2] },
+    lvlB:    { font:'Roboto', fontSize:10.5, color:'#333333', margin:[10,0,0,6], alignment:'justify' },
+    fable:   { font:'Roboto', fontSize:10.5, italics:true, color:'#333333', alignment:'justify', lineHeight:1.7 },
+    carimbo0:{ font:'Roboto', fontSize:12,   bold:true,  color:'#7B00C4', alignment:'center', margin:[0,0,0,4] },
+    carimbo1:{ font:'Roboto', fontSize:10,   bold:true,  color:'#7B00C4', alignment:'center', margin:[0,0,0,4] },
+    carimbo2:{ font:'Roboto', fontSize:9.5,  color:'#666666', alignment:'center', margin:[0,0,0,3] },
   };
 }
 
@@ -801,26 +801,26 @@ function _paraMulti(txt) {
 }
 
 function _quoteBox(txt) {
+  const clean = (txt||'').replace(/^["\u201c]+/,'').replace(/["\u201d]+$/,'').trim();
   return {
-    table:{ widths:['*'], body:[[ { text:(txt||'').replace(/^["""]/,'').replace(/["""]$/,''), style:'fable', margin:[12,10,12,10] } ]] },
-    layout:{ fillColor:()=>_TBOX, hLineColor:()=>_TBOX, vLineColor:(i)=>i===0?_TEAL:_TBOX,
-             hLineWidth:()=>0, vLineWidth:(i)=>i===0?4:0 },
-    margin:[0,6,0,10]
+    table:{ widths:['*'], body:[[ { text:clean, font:'Roboto', fontSize:10.5, italics:true, color:'#333333', alignment:'justify', lineHeight:1.7, margin:[16,14,16,14] } ]] },
+    layout:{ fillColor:()=>'#EFE6F9', hLineColor:()=>'#EFE6F9', vLineColor:(i)=>i===0?'#403071':'#EFE6F9', hLineWidth:()=>0, vLineWidth:(i)=>i===0?4:0, paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0 },
+    margin:[0,8,0,12]
   };
 }
 
 function _infoBox(txt) {
   const clean = (txt||'').replace(/<[^>]+>/g,'');
   const partes = clean.split(/\n\n+/);
-  const titulo = partes[0];
-  const corpo  = partes.slice(1).join('\n\n');
-  const body_arr = [{ text: titulo, bold:true, color:_MAG, fontSize:10.5, margin:[0,0,0,4] }];
-  if (corpo) body_arr.push({ text: corpo, fontSize:10.5, color:_DARK });
+  const titulo = partes[0].replace(/^[*_\u26a0]+\s*/,'').trim();
+  const corpo  = partes.slice(1).join(' ').trim();
+  const body_arr = [];
+  if (titulo) body_arr.push({ text:titulo, bold:true, color:'#7B00C4', fontSize:10.5, margin:[0,0,0,6] });
+  if (corpo)  body_arr.push({ text:corpo, font:'Roboto', fontSize:10.5, color:'#333333', alignment:'justify', lineHeight:1.6 });
   return {
-    table:{ widths:['*'], body:[[ { stack: body_arr, margin:[12,10,12,10] } ]] },
-    layout:{ fillColor:()=>_MBOX, hLineColor:()=>_MBOX, vLineColor:(i)=>i===0?_MAG:_MBOX,
-             hLineWidth:()=>0, vLineWidth:(i)=>i===0?4:0 },
-    margin:[0,6,0,10]
+    table:{ widths:['*'], body:[[ { stack:body_arr, margin:[16,14,16,14] } ]] },
+    layout:{ fillColor:()=>'#F7EFF5', hLineColor:()=>'#F7EFF5', vLineColor:(i)=>i===0?'#7B00C4':'#F7EFF5', hLineWidth:()=>0, vLineWidth:(i)=>i===0?4:0, paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0 },
+    margin:[0,8,0,12]
   };
 }
 
@@ -927,17 +927,16 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── RODAPÉ de todas as páginas ────────────────────────────────
   function _footer(page, pages) {
     return {
-      stack:[{
-        canvas:[{ type:'rect', x:0, y:0, w:595, h:28, color:_FOOT }],
-        margin:[0,0,0,0]
-      },{
-        columns:[
-          { text:'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF\nDESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES',
-            fontSize:6.5, bold:true, color:'white', alignment:'center', width:'*', margin:[30,2,30,0] },
-          { text:String(page), fontSize:8, color:'white', alignment:'right', width:30, margin:[0,4,10,0] }
-        ],
-        margin:[0,-26,0,0]
-      }]
+      margin:[0,0,0,0],
+      stack:[
+        { canvas:[{ type:'rect', x:0, y:4, w:595.28, h:30, color:'#7B1D6B' }] },
+        { columns:[
+            { text:'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF\nDESENVOLVIDO POR LÚCÍA KRATZ E RYUZA GONÇALVES',
+              font:'Roboto', fontSize:6.5, bold:true, color:'white', alignment:'center', width:'*', margin:[20,0,20,0] },
+            { text:page.toString(), font:'Roboto', fontSize:8, color:'white', alignment:'right', width:25, margin:[0,4,8,0] }
+          ], margin:[0,-22,0,0]
+        }
+      ]
     };
   }
 
@@ -946,8 +945,8 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
     if (page===1) return null;
     return {
       stack:[
-        { text: HDR, style:'hdr', margin:[40,14,40,0] },
-        { canvas:[{ type:'line', x1:40, y1:0, x2:555, y2:0, lineWidth:0.4, lineColor:_GLIN }], margin:[0,2,0,0] }
+        { text:`| ${nomeCapit}  |  ${cargoTxt||'\u2014'} |`, font:'Roboto', fontSize:8, color:'#888888', bold:false, margin:[40,12,40,0] },
+        { canvas:[{ type:'line', x1:40, y1:0, x2:555, y2:0, lineWidth:0.3, lineColor:'#DDDDDD' }], margin:[0,3,0,0] }
       ]
     };
   }
@@ -962,7 +961,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
       { text:'Relatório Eneagrama', fontSize:26, bold:true, color:'white', alignment:'center', margin:[0,0,0,16] },
       { text:nomeCapit, fontSize:16, color:_LAV, alignment:'center', margin:[0,0,0,8] },
       { canvas:[{ type:'line', x1:198, y1:0, x2:397, y2:0, lineWidth:1.5, lineColor:_LAV }], margin:[0,0,0,10] },
-      cargoTxt ? { text:`Cargo: ${cargoTxt}`, fontSize:12, color:'#E4D9F7', alignment:'center', margin:[0,0,0,4] } : {},
+      { text: cargoTxt ? `Cargo: ${cargoTxt}` : 'Cargo: —', fontSize:12, color:'#E4D9F7', alignment:'center', margin:[0,0,0,4] },
       { text:mesAno, fontSize:12, color:'#E4D9F7', alignment:'center', margin:[0,0,0,30] },
       // Cards
       ...[
@@ -1199,7 +1198,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── MONTAR DOCUMENTO ─────────────────────────────────────────
   const docDef = {
     pageSize:'A4',
-    pageMargins:[40,60,40,40],
+    pageMargins:[56,72,56,50],
     header: _header,
     footer: _footer,
     content: content,
@@ -2590,4 +2589,25 @@ gerarCodigoPreview();
 })();
 </script>
 </body>
-</html>
+</html>    // — ASSINATURA / CARIMBO —
+    content.push({ text:'', pageBreak:'before' });
+    const _imgUrl2 = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/dra%20luciakratz%20transparente.png';
+    let _imgB64 = null;
+    try {
+      const _r2 = await fetch(_imgUrl2);
+      if (_r2.ok) {
+        const _blob2 = await _r2.blob();
+        _imgB64 = await new Promise(res => { const rd=new FileReader(); rd.onload=()=>res(rd.result); rd.readAsDataURL(_blob2); });
+      }
+    } catch(_e2) {}
+    const _carimboItems = [{ text:'\n\n', fontSize:10 }];
+    if (_imgB64) _carimboItems.push({ image:_imgB64, width:170, alignment:'center', margin:[0,0,0,12] });
+    _carimboItems.push(
+      { canvas:[{ type:'line', x1:148, y1:0, x2:408, y2:0, lineWidth:0.8, lineColor:'#7B00C4' }], margin:[0,0,0,10] },
+      { text:'Dra. Lucia Kratz', style:'carimbo0' },
+      { text:'Psicóloga Clínica e Organizacional', style:'carimbo2', margin:[0,2,0,2] },
+      { text:'CRP 09/20590', style:'carimbo1' },
+      { text:'Especialista TCC, Neuromodulação e Musicoterapia', style:'carimbo2', margin:[0,2,0,2] },
+      { text:'Goiânia, GO', style:'carimbo2', margin:[0,0,0,4] }
+    );
+    content.push({ stack:_carimboItems });
