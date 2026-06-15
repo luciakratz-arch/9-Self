@@ -112,21 +112,10 @@ def chave_subtipo(dom, intermed, rem):
 # PARSER DO BANCO DE DADOS
 # ══════════════════════════════════════════════════════════════════════════
 def carregar_secoes(tipo):
-    """Lê tipo_N.txt e retorna dict {NOME_SECAO: texto}.
-    Tenta BANCO_DIR primeiro; se não encontrar, sobe um nível (repo raiz)."""
+    """Lê tipo_N.txt e retorna dict {NOME_SECAO: texto}."""
     path = os.path.join(BANCO_DIR, f"tipo_{tipo}.txt")
-    txt = None
-    for tentativa in [path, os.path.join(os.path.dirname(BANCO_DIR), 'banco_dados_final', f"tipo_{tipo}.txt")]:
-        if os.path.exists(tentativa):
-            with open(tentativa, encoding='utf-8') as f:
-                txt = f.read()
-            break
-    if txt is None:
-        raise FileNotFoundError(
-            f"Banco de dados nao encontrado para tipo {tipo}.\n"
-            f"Caminho principal: {path}\n"
-            f"Certifique-se de que banco_dados_final/ esta dentro de functions/."
-        )
+    with open(path, encoding='utf-8') as f:
+        txt = f.read()
     secs = dict(re.findall(r'=== (\w+) ===\n(.*?)(?=\n=== |\Z)', txt, re.S))
     return {k: v.strip() for k, v in secs.items()}
 
@@ -406,27 +395,15 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     nome_tipo = NOMES_TIPO[tipo]
 
     asa_ant, asa_seg = asas_do_tipo(tipo)
-    # Blindagem: se asa invalida, usa a primeira asa adjacente como fallback
     if asa_dominante not in (asa_ant, asa_seg):
-        asa_dominante = asa_ant
+        raise ValueError(f"Asa {asa_dominante} não é adjacente ao Tipo {tipo} (esperado {asa_ant} ou {asa_seg}).")
     nome_asa = NOMES_TIPO[asa_dominante]
     texto_asa = sec.get(f'ASA_{asa_dominante}', '')
 
     chave_sub = chave_subtipo(subtipo_dom, subtipo_int, subtipo_rem)
     texto_subtipo = sec.get(chave_sub, '')
-    # Blindagem: se subtipo não encontrado, tenta permutações ou usa texto vazio
-    if not texto_subtipo:
-        for fallback_key in [k for k in sec if k.startswith('SUBTIPO_')]:
-            texto_subtipo = sec.get(fallback_key, '')
-            if texto_subtipo:
-                break
-    # Blindagem: normalizar subtipos para valores válidos
-    _SUBS_VALIDOS = {'AP', '1A1', 'SOC'}
-    subtipo_dom = subtipo_dom if subtipo_dom in _SUBS_VALIDOS else 'AP'
-    subtipo_int = subtipo_int if subtipo_int in _SUBS_VALIDOS else '1A1'
-    subtipo_rem = subtipo_rem if subtipo_rem in _SUBS_VALIDOS else 'SOC'
-    label_subtipo = (f"{NOMES_SUBTIPO.get(subtipo_dom, subtipo_dom)} "
-                     f"({LABELS_SUBTIPO_LONGO.get(subtipo_int, subtipo_int)} e {LABELS_SUBTIPO_LONGO.get(subtipo_rem, subtipo_rem)} reprimidos)")
+    label_subtipo = (f"{NOMES_SUBTIPO[subtipo_dom]} "
+                     f"({LABELS_SUBTIPO_LONGO[subtipo_int]} e {LABELS_SUBTIPO_LONGO[subtipo_rem]} reprimidos)")
 
     HDR = f'| {nome}  |  {cargo} |'
 
