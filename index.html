@@ -1650,7 +1650,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
     if (page===1) return null;
     return {
       stack:[
-        { text:`| ${nomeCapit}  |  ${(cargoTxt&&cargoTxt!=='PF'&&cargoTxt!=='B2B')?cargoTxt:'\u2014'} |`, font:'Roboto', fontSize:8, color:'#888888', bold:false, margin:[40,12,40,0] },
+        { text: (cargoTxt&&cargoTxt!=='PF'&&cargoTxt!=='B2B') ? `| ${nomeCapit}  |  ${cargoTxt} |` : `| ${nomeCapit} |`, font:'Roboto', fontSize:8, color:'#888888', bold:false, margin:[40,12,40,0] },
         { canvas:[{ type:'line', x1:40, y1:0, x2:555, y2:0, lineWidth:0.3, lineColor:'#DDDDDD' }], margin:[0,3,0,0] }
       ]
     };
@@ -1675,6 +1675,13 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // Conteúdo da capa (sobre o fundo)
   content.push({
     stack:[
+      // Canvas de fundo — cobre página inteira
+      { canvas:[
+          { type:'rect', x:-56, y:-64, w:596, h:843, color:'#26093F' },
+          { type:'rect', x:-56, y:216, w:596, h:281, color:'#4A1870' },
+          { type:'rect', x:-56, y:497, w:596, h:346, color:'#7B1D6B' },
+        ], absolutePosition:{x:0, y:0}
+      },
       { text:'9&Self', fontSize:52, color:'#D9C7F5', alignment:'center', margin:[0,80,0,10] },
       { text:'Relatório Eneagrama', fontSize:24, bold:true, color:'white', alignment:'center', margin:[0,0,0,20] },
       { text:nomeCapit, fontSize:18, color:'#D9C7F5', alignment:'center', margin:[0,0,0,10] },
@@ -1916,7 +1923,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── MONTAR DOCUMENTO ─────────────────────────────────────────
   const docDef = {
     pageSize:'A4',
-    pageMargins:[56,64,56,65],
+    pageMargins:[56,64,56,80],
     header: _header,
     footer: _footer,
     background: _bgCapa,
@@ -2940,7 +2947,7 @@ async function salvarResultadoFinal() {
       const blob = await gerarPdfNavegador({
         tipo:TS.tipoFinal, asa:TS.asaDom,
         subDom:TS.subDom, subInt:TS.subInt, subRem:TS.subRem,
-        nome, cargo:cod.cargo||'',
+        nome, cargo:cod.cargo||(cod.empresa&&cod.empresa!=='PF'?cod.empresa:'')||'',
       });
       const _url = URL.createObjectURL(blob);
       const _a = document.createElement('a');
