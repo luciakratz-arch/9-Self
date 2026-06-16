@@ -1598,6 +1598,8 @@ function _nivel(titulo, texto) {
 // MOTOR PRINCIPAL
 // ══════════════════════════════════════════════════════════════════
 async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
+  // Carregar Cormorant Garamond
+  await _carregarFontesCormorant();
   const _NT = {1:'Perfeição e Excelência',2:'Prestativo e Relacional',3:'Performance e Imagem',
                4:'Autêntico e Profundo',5:'Observador e Privacidade',6:'Precavido e Questionador',
                7:'Visionário e Otimista',8:'Desafiador e Controlador',9:'Harmônico e Diplomático'};
@@ -1632,16 +1634,17 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── RODAPÉ de todas as páginas ────────────────────────────────
   function _footer(page, pages) {
     return {
-      margin:[0,0,0,0],
-      stack:[
-        { canvas:[{ type:'rect', x:0, y:4, w:595.28, h:30, color:'#7B1D6B' }] },
-        { columns:[
-            { text:'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF\nDESENVOLVIDO POR LÚCÍA KRATZ E RYUZA GONÇALVES',
-              font:'Roboto', fontSize:6.5, bold:true, color:'white', alignment:'center', width:'*', margin:[20,0,20,0] },
-            { text:page.toString(), font:'Roboto', fontSize:8, color:'white', alignment:'right', width:25, margin:[0,4,8,0] }
-          ], margin:[0,-22,0,0]
-        }
-      ]
+      margin:[0,2,0,0],
+      table:{ widths:['*',25], body:[[
+        { text:'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF\nDESENVOLVIDO POR LÚ CIA KRATZ E RYUZA GONÇALVES',
+          font:'Roboto', fontSize:6.5, bold:true, color:'white',
+          alignment:'center', fillColor:'#7B1D6B', margin:[20,8,20,8] },
+        { text:page.toString(), font:'Roboto', fontSize:8, color:'white',
+          alignment:'right', fillColor:'#7B1D6B', margin:[0,8,8,8] },
+      ]]},
+      layout:{ hLineWidth:()=>0, vLineWidth:()=>0,
+               paddingLeft:()=>0, paddingRight:()=>0,
+               paddingTop:()=>0, paddingBottom:()=>0 },
     };
   }
 
@@ -1659,51 +1662,82 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── CONTEÚDO ──────────────────────────────────────────────────
   const content = [];
 
-  // — CAPA — fundo branco com caixa roxa central
+  // — CAPA — estilo glassmorphism igual ao login
   content.push({
     stack:[
+      // Fundo degradê via canvas cobrindo página inteira
+      { canvas:[
+          { type:'rect', x:-56, y:-64, w:708, h:300, color:'#1A0A2E' },
+          { type:'rect', x:-56, y:236, w:708, h:300, color:'#3D0A5E' },
+          { type:'rect', x:-56, y:536, w:708, h:307, color:'#7B1D6B' },
+        ]
+      },
 
-      // Logo 9&Self em roxo no topo
-      { text:'9&Self', fontSize:48, color:'#7B00C4',
-        font:'Roboto', alignment:'center', margin:[0,80,0,4] },
-      { text:'SELF', fontSize:14, color:'#7B00C4', bold:true,
-        alignment:'center', margin:[0,0,0,6], characterSpacing:6 },
-      { text:'DESCUBRA SUA PERSONALIDADE', fontSize:9, color:'#7B00C4',
-        alignment:'center', characterSpacing:3, margin:[0,0,0,40] },
+      // Espaço topo
+      { text:' ', fontSize:6, margin:[0,60,0,0] },
 
-      // Caixa roxa com nome e resultados
+      // Caixa glassmorphism centralizada
       { table:{ widths:['*'], body:[[
           { stack:[
-              { text:nomeCapit, fontSize:18, color:'white', bold:false,
-                alignment:'center', margin:[0,30,0,6] },
+              // Logo
+              { text:'9&Self', fontSize:46, color:'#A8E6F0', font:'CormorantGaramond',
+                alignment:'center', margin:[0,20,0,4] },
+              { text:'SELF', fontSize:12, bold:true, color:'white', font:'Roboto',
+                alignment:'center', characterSpacing:5, margin:[0,0,0,4] },
+              { text:'DESCUBRA SUA PERSONALIDADE', fontSize:8, color:'#C8D8E8',
+                alignment:'center', characterSpacing:2, margin:[0,0,0,24] },
+
+              // Nome
+              { text:nomeCapit, fontSize:16, color:'white',
+                alignment:'center', margin:[0,0,0,6] },
               (cargoTxt && cargoTxt!=='PF' && cargoTxt!=='B2B')
-                ? { text:cargoTxt, fontSize:11, color:'#D9C7F5',
-                    alignment:'center', margin:[0,0,0,20] }
-                : { text:' ', fontSize:6, margin:[0,0,0,20] },
-              { canvas:[{ type:'line', x1:40, y1:0, x2:360, y2:0,
-                  lineWidth:0.8, lineColor:'rgba(255,255,255,0.4)' }],
-                margin:[0,0,0,20] },
-              { text:`Eneatipo ${tipo}:  ${nomeTipo} (Traço Tipo ${tipo})`,
-                fontSize:11, color:'white', alignment:'center', margin:[0,0,0,8] },
-              { text:`Asa ${asaFinal}:  ${nomeAsa} (Traço Tipo ${asaFinal})`,
-                fontSize:11, color:'white', alignment:'center', margin:[0,0,0,8] },
-              { text:`Subtipo:  ${labelSub}`,
-                fontSize:11, color:'white', alignment:'center', margin:[0,0,0,30] },
+                ? { text:cargoTxt, fontSize:10, color:'#C8D8E8',
+                    alignment:'center', margin:[0,0,0,16] }
+                : { text:' ', fontSize:4, margin:[0,0,0,16] },
+
+              // Linha divisória
+              { canvas:[{ type:'line', x1:30, y1:0, x2:330, y2:0,
+                  lineWidth:0.5, lineColor:'rgba(255,255,255,0.3)' }],
+                margin:[0,0,0,16] },
+
+              // Resultados como badges
+              { table:{ widths:['*'], body:[
+                  [{ text:`Eneatipo ${tipo}:   ${nomeTipo}`,
+                    fontSize:10, color:'white', alignment:'center',
+                    fillColor:'rgba(255,255,255,0.12)',
+                    margin:[10,8,10,8] }],
+                  [{ text:`Asa ${asaFinal}:   ${nomeAsa}`,
+                    fontSize:10, color:'white', alignment:'center',
+                    fillColor:'rgba(255,255,255,0.08)',
+                    margin:[10,8,10,8] }],
+                  [{ text:`Subtipo:   ${labelSub}`,
+                    fontSize:10, color:'white', alignment:'center',
+                    fillColor:'rgba(255,255,255,0.12)',
+                    margin:[10,8,10,8] }],
+                ]},
+                layout:{ hLineColor:()=>'rgba(255,255,255,0.15)',
+                         vLineColor:()=>'transparent',
+                         hLineWidth:()=>0.5, vLineWidth:()=>0 },
+                margin:[0,0,0,20]
+              },
+
+              // Mês/ano
+              { text:mesAno, fontSize:10, color:'#C8D8E8',
+                alignment:'center', margin:[0,0,0,20] },
             ],
-            fillColor:'#7B00C4',
+            fillColor:'rgba(255,255,255,0.08)',
             margin:[0,0,0,0],
           }
         ]]},
-        layout:{ hLineWidth:()=>0, vLineWidth:()=>0,
-                 paddingLeft:()=>20, paddingRight:()=>20,
-                 paddingTop:()=>0, paddingBottom:()=>0 },
-        margin:[0,0,0,40]
+        layout:{
+          hLineWidth:()=>0.5, vLineWidth:()=>0.5,
+          hLineColor:()=>'rgba(255,255,255,0.2)',
+          vLineColor:()=>'rgba(255,255,255,0.2)',
+          paddingLeft:()=>20, paddingRight:()=>20,
+          paddingTop:()=>0, paddingBottom:()=>0,
+        },
+        margin:[40,0,40,0]
       },
-
-      // Data e mês centralizado
-      { text:mesAno, fontSize:11, color:'#888888',
-        alignment:'center', margin:[0,0,0,0] },
-
     ],
     pageBreak:'after',
   });
@@ -1921,7 +1955,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── MONTAR DOCUMENTO ─────────────────────────────────────────
   const docDef = {
     pageSize:'A4',
-    pageMargins:[56,64,56,80],
+    pageMargins:[56,64,56,45],
     header: _header,
     footer: _footer,
     content: content,
