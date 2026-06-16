@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>9&Self — Conheça sua Personalidade</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
 <style>
 :root {
   --mag:    #7B1D6B;
@@ -1597,6 +1596,27 @@ function _nivel(titulo, texto) {
 // ══════════════════════════════════════════════════════════════════
 // MOTOR PRINCIPAL
 // ══════════════════════════════════════════════════════════════════
+async function _carregarFontesCormorant() {
+  const BASE = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/functions/fonts';
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch(`${BASE}/CormorantGaramond.ttf`),
+      fetch(`${BASE}/CormorantGaramond-Italic.ttf`),
+    ]);
+    if (!r1.ok || !r2.ok) return;
+    const [b1, b2] = await Promise.all([r1.arrayBuffer(), r2.arrayBuffer()]);
+    const toB64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+    const n = toB64(b1), i = toB64(b2);
+    window.pdfMake.fonts = window.pdfMake.fonts || {};
+    window.pdfMake.fonts['CormorantGaramond'] = {
+      normal: `data:font/truetype;base64,${n}`,
+      bold: `data:font/truetype;base64,${n}`,
+      italics: `data:font/truetype;base64,${i}`,
+      bolditalics: `data:font/truetype;base64,${i}`,
+    };
+  } catch(e) { console.warn('Cormorant:', e); }
+}
+
 async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
   // Carregar Cormorant Garamond
   await _carregarFontesCormorant();
