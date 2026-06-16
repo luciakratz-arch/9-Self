@@ -1659,53 +1659,51 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── CONTEÚDO ──────────────────────────────────────────────────
   const content = [];
 
-  // — CAPA — usando background function do pdfmake
-  // Registrar background para página 1 via docDef.background
-  const _bgCapa = function(page) {
-    if (page !== 1) return null;
-    return {
-      canvas:[
-        { type:'rect', x:0,   y:0,   w:595.28, h:280, color:'#26093F' },
-        { type:'rect', x:0,   y:280, w:595.28, h:280, color:'#4A1870' },
-        { type:'rect', x:0,   y:560, w:595.28, h:282, color:'#7B1D6B' },
-      ]
-    };
-  };
-
-  // Conteúdo da capa (sobre o fundo)
+  // — CAPA — fundo branco com caixa roxa central
   content.push({
     stack:[
-      // Canvas de fundo — cobre página inteira
-      { canvas:[
-          { type:'rect', x:-56, y:-64, w:596, h:843, color:'#26093F' },
-          { type:'rect', x:-56, y:216, w:596, h:281, color:'#4A1870' },
-          { type:'rect', x:-56, y:497, w:596, h:346, color:'#7B1D6B' },
-        ], absolutePosition:{x:0, y:0}
-      },
-      { text:'9&Self', fontSize:52, color:'#D9C7F5', alignment:'center', margin:[0,80,0,10] },
-      { text:'Relatório Eneagrama', fontSize:24, bold:true, color:'white', alignment:'center', margin:[0,0,0,20] },
-      { text:nomeCapit, fontSize:18, color:'#D9C7F5', alignment:'center', margin:[0,0,0,10] },
-      { canvas:[{ type:'line', x1:80, y1:0, x2:400, y2:0, lineWidth:1.5, lineColor:'#D9C7F5' }], margin:[0,0,0,10] },
-      (cargoTxt && cargoTxt !== 'PF' && cargoTxt !== 'B2B')
-        ? { text:`Cargo: ${cargoTxt}`, fontSize:12, bold:true, color:'#E4D9F7', alignment:'center', margin:[0,0,0,6] }
-        : { text:' ', fontSize:6, margin:[0,0,0,6] },
-      { text:mesAno, fontSize:11, color:'#C4B5E8', alignment:'center', margin:[0,0,0,50] },
-      ...[
-        [`Eneatipo ${tipo}:`, `${nomeTipo} (Traço Tipo ${tipo})`],
-        [`Asa ${asaFinal}:`,  `${nomeAsa} (Traço Tipo ${asaFinal})`],
-        ['Subtipo:',          labelSub],
-      ].map(([lbl,val])=>({
-        table:{ widths:[90,'*'], body:[[
-          { text:lbl, bold:true, color:'#5B2D8E', fontSize:10.5, fillColor:'#FFFFFF', margin:[14,10,6,10] },
-          { text:val, color:'#2C2C2C', fontSize:10.5, fillColor:'#FFFFFF', margin:[6,10,14,10] },
+
+      // Logo 9&Self em roxo no topo
+      { text:'9&Self', fontSize:48, color:'#7B00C4',
+        font:'Roboto', alignment:'center', margin:[0,80,0,4] },
+      { text:'SELF', fontSize:14, color:'#7B00C4', bold:true,
+        alignment:'center', margin:[0,0,0,6], characterSpacing:6 },
+      { text:'DESCUBRA SUA PERSONALIDADE', fontSize:9, color:'#7B00C4',
+        alignment:'center', characterSpacing:3, margin:[0,0,0,40] },
+
+      // Caixa roxa com nome e resultados
+      { table:{ widths:['*'], body:[[
+          { stack:[
+              { text:nomeCapit, fontSize:18, color:'white', bold:false,
+                alignment:'center', margin:[0,30,0,6] },
+              (cargoTxt && cargoTxt!=='PF' && cargoTxt!=='B2B')
+                ? { text:cargoTxt, fontSize:11, color:'#D9C7F5',
+                    alignment:'center', margin:[0,0,0,20] }
+                : { text:' ', fontSize:6, margin:[0,0,0,20] },
+              { canvas:[{ type:'line', x1:40, y1:0, x2:360, y2:0,
+                  lineWidth:0.8, lineColor:'rgba(255,255,255,0.4)' }],
+                margin:[0,0,0,20] },
+              { text:`Eneatipo ${tipo}:  ${nomeTipo} (Traço Tipo ${tipo})`,
+                fontSize:11, color:'white', alignment:'center', margin:[0,0,0,8] },
+              { text:`Asa ${asaFinal}:  ${nomeAsa} (Traço Tipo ${asaFinal})`,
+                fontSize:11, color:'white', alignment:'center', margin:[0,0,0,8] },
+              { text:`Subtipo:  ${labelSub}`,
+                fontSize:11, color:'white', alignment:'center', margin:[0,0,0,30] },
+            ],
+            fillColor:'#7B00C4',
+            margin:[0,0,0,0],
+          }
         ]]},
-        layout:{
-          hLineColor:()=>'#FFFFFF', vLineColor:(i)=>i===0?'#7B00C4':'#FFFFFF',
-          hLineWidth:()=>0, vLineWidth:(i)=>i===0?3.5:0,
-          paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0,
-        },
-        margin:[0,0,0,6]
-      })),
+        layout:{ hLineWidth:()=>0, vLineWidth:()=>0,
+                 paddingLeft:()=>20, paddingRight:()=>20,
+                 paddingTop:()=>0, paddingBottom:()=>0 },
+        margin:[0,0,0,40]
+      },
+
+      // Data e mês centralizado
+      { text:mesAno, fontSize:11, color:'#888888',
+        alignment:'center', margin:[0,0,0,0] },
+
     ],
     pageBreak:'after',
   });
@@ -1926,7 +1924,6 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
     pageMargins:[56,64,56,80],
     header: _header,
     footer: _footer,
-    background: _bgCapa,
     content: content,
     styles: _estilos(),
     defaultStyle:{ font:'Roboto', fontSize:10.5, lineHeight:1.6 },
