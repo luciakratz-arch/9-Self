@@ -706,8 +706,6 @@ tr:hover td{background:#FAFAFE;}
 <!-- TOAST -->
 <div id="toast"></div>
 
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
@@ -951,7 +949,7 @@ window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, no
   // ── RODAPÉ de todas as páginas ────────────────────────────────
   function _footer(page, pages) {
     return {
-      margin:[0,10,0,0],
+      margin:[0,8,0,0],
       table:{ widths:['*',25], body:[[
         { text:'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF\nDESENVOLVIDO POR LÚ CIA KRATZ E RYUZA GONÇALVES',
           font:'Roboto', fontSize:6.5, bold:true, color:'white',
@@ -979,67 +977,47 @@ window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, no
   // ── CONTEÚDO ──────────────────────────────────────────────────
   const content = [];
 
-  // — CAPA — degradê full-page + caixa glassmorphism
-  // A4 = 595x842 pts. pageMargins [56,64,56,55]. Canvas relativo à área útil (x=-56,y=-64 = canto superior esquerdo da folha)
+  // — CAPA — estilo simples que funciona de forma estável no pdfmake
   content.push({
     stack:[
-      // Fundo: 3 faixas cobrindo A4 inteiro
-      { canvas:[
-          { type:'rect', x:-56, y:-64, w:595, h:281, color:'#1A0A2E' },
-          { type:'rect', x:-56, y:217, w:595, h:281, color:'#3D0A5E' },
-          { type:'rect', x:-56, y:498, w:595, h:344, color:'#7B1D6B' },
-        ]
-      },
-      // Espaço empurrando a caixa para o centro vertical
-      { text:' ', fontSize:1, margin:[0,110,0,0] },
-      // Caixa glassmorphism
-      { table:{ widths:['*'], body:[[
-          { stack:[
-              { text:'9&Self', fontSize:52, color:'#A8E6F0', font:'CormorantGaramond',
-                alignment:'center', margin:[0,24,0,2] },
-              { text:'S E L F', fontSize:11, bold:true, color:'rgba(255,255,255,0.9)',
-                alignment:'center', characterSpacing:6, margin:[0,0,0,4] },
-              { text:'D E S C U B R A   S U A   P E R S O N A L I D A D E',
-                fontSize:7, color:'rgba(200,216,232,0.7)',
-                alignment:'center', margin:[0,0,0,28] },
-              { canvas:[{ type:'line', x1:60, y1:0, x2:290, y2:0,
-                  lineWidth:0.4, lineColor:'rgba(255,255,255,0.5)' }], margin:[0,0,0,20] },
-              { text:nomeCapit, fontSize:18, bold:true, color:'#ffffff',
-                alignment:'center', margin:[0,0,0,6] },
-              (cargoTxt && cargoTxt!=='PF' && cargoTxt!=='B2B')
-                ? { text:cargoTxt, fontSize:10, color:'rgba(200,216,232,0.85)',
-                    alignment:'center', margin:[0,0,0,20] }
-                : { text:' ', fontSize:4, margin:[0,0,0,20] },
-              { table:{ widths:['*'], body:[
-                  [{ text:`Eneatipo ${tipo}:  ${nomeTipo} (Traço Tipo ${tipo})`,
-                    fontSize:10, color:'#ffffff', alignment:'center',
-                    fillColor:'rgba(255,255,255,0.13)', margin:[12,9,12,9] }],
-                  [{ text:`Asa ${asaFinal}:  ${nomeAsa} (Traço Tipo ${asaFinal})`,
-                    fontSize:10, color:'#ffffff', alignment:'center',
-                    fillColor:'rgba(255,255,255,0.07)', margin:[12,9,12,9] }],
-                  [{ text:`Subtipo:  ${labelSub}`,
-                    fontSize:10, color:'#ffffff', alignment:'center',
-                    fillColor:'rgba(255,255,255,0.13)', margin:[12,9,12,9] }],
-                ]},
-                layout:{ hLineColor:()=>'rgba(255,255,255,0.18)',
-                         vLineColor:()=>'transparent',
-                         hLineWidth:()=>0.5, vLineWidth:()=>0 },
-                margin:[0,0,0,22]
-              },
-              { text:mesAno, fontSize:10, color:'rgba(200,216,232,0.75)',
-                alignment:'center', margin:[0,0,0,24] },
-            ],
-            fillColor:'rgba(255,255,255,0.09)',
-          }
-        ]]},
-        layout:{
-          hLineWidth:()=>0.6, vLineWidth:()=>0.6,
-          hLineColor:()=>'rgba(255,255,255,0.22)',
-          vLineColor:()=>'rgba(255,255,255,0.22)',
-          paddingLeft:()=>24, paddingRight:()=>24,
-          paddingTop:()=>0, paddingBottom:()=>0,
-        },
+      { text:' ', fontSize:40 },
+      { text:'9&Self', font:'CormorantGaramond', fontSize:48, color:'#A8E6F0',
+        alignment:'center', margin:[0,0,0,8] },
+      { text:'Relatório Eneagrama', font:'Roboto', fontSize:18, bold:true, color:'white',
+        alignment:'center', margin:[0,0,0,16] },
+      { text:nomeCapit, font:'Roboto', fontSize:14, color:'white',
+        alignment:'center', margin:[0,0,0,6] },
+      { canvas:[{ type:'line', x1:150, y1:0, x2:365, y2:0,
+          lineWidth:0.5, lineColor:'rgba(255,255,255,0.4)' }], margin:[0,8,0,16] },
+      (cargoTxt && cargoTxt!=='PF' && cargoTxt!=='B2B')
+        ? { text:'Cargo: ' + cargoTxt, font:'Roboto', fontSize:11, bold:true, color:'white',
+            alignment:'center', margin:[0,0,0,4] }
+        : { text:' ', fontSize:4 },
+      { text:mesAno, font:'Roboto', fontSize:10, color:'rgba(200,216,232,0.7)',
+        alignment:'center', margin:[0,0,0,40] },
+      { table:{ widths:[80,'*'], body:[
+          [{ text:'Eneatipo ' + tipo + ':', bold:true, color:'#7B00C4', fontSize:10,
+             fillColor:'white', margin:[10,8,6,8] },
+           { text:nomeTipo, color:'#333', fontSize:10,
+             fillColor:'white', margin:[0,8,10,8] }],
+          [{ text:'Asa ' + asaFinal + ':', bold:true, color:'#7B00C4', fontSize:10,
+             fillColor:'#F7F4FB', margin:[10,8,6,8] },
+           { text:nomeAsa, color:'#333', fontSize:10,
+             fillColor:'#F7F4FB', margin:[0,8,10,8] }],
+          [{ text:'Subtipo:', bold:true, color:'#7B00C4', fontSize:10,
+             fillColor:'white', margin:[10,8,6,8] },
+           { text:labelSub, color:'#333', fontSize:10,
+             fillColor:'white', margin:[0,8,10,8] }],
+        ]},
+        layout:{ hLineColor:()=>'#E2D9EF', vLineColor:()=>'#E2D9EF',
+                 hLineWidth:()=>0.5, vLineWidth:()=>0.5 },
         margin:[30,0,30,0]
+      },
+    ],
+    background: [
+      { canvas:[
+          { type:'rect', x:0, y:0, w:595, h:842, color:'#3D0A5E' },
+        ]
       },
     ],
     pageBreak:'after',
@@ -1258,7 +1236,7 @@ window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, no
   // ── MONTAR DOCUMENTO ─────────────────────────────────────────
   const docDef = {
     pageSize:'A4',
-    pageMargins:[56,64,56,55],
+    pageMargins:[56,64,56,52],
     header: _header,
     footer: _footer,
     content: content,
@@ -2278,7 +2256,7 @@ async function salvarResultadoFinal() {
     btn.disabled = true; btn.textContent = '⏳ Gerando laudo...';
     status.textContent = 'Montando seu laudo personalizado...';
     try {
-      const blob = await gerarPdfNavegador({
+      const blob = await window.gerarPdfNavegador({
         tipo:TS.tipoFinal, asa:TS.asaDom,
         subDom:TS.subDom, subInt:TS.subInt, subRem:TS.subRem,
         nome, cargo:cod.cargo||(cod.empresa&&cod.empresa!=='PF'?cod.empresa:'')||'',
@@ -2568,7 +2546,7 @@ window.gerarPdfLaudo = async function(laudoId) {
     const asaFinal = ASAS_VALIDAS[tipo]?.includes(asa) ? asa : ASAS_VALIDAS[tipo][0];
 
     // 3. Gerar PDF no navegador (mesmo motor do paciente)
-    const blob = await gerarPdfNavegador({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo });
+    const blob = await window.gerarPdfNavegador({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo });
     const _url = URL.createObjectURL(blob);
     const _a = document.createElement('a');
     _a.href=_url; _a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
@@ -2651,6 +2629,5 @@ gerarCodigoPreview();
   }
 })();
 </script>
-
 </body>
 </html>
