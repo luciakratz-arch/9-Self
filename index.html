@@ -1659,49 +1659,47 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── CONTEÚDO ──────────────────────────────────────────────────
   const content = [];
 
-  // — CAPA — tabela página inteira com gradiente via múltiplos rows
-  const _capaContent = [
-    { text:'9&Self', fontSize:52, color:'#D9C7F5', alignment:'center', margin:[0,60,0,10] },
-    { text:'Relatório Eneagrama', fontSize:24, bold:true, color:'white', alignment:'center', margin:[0,0,0,20] },
-    { text:nomeCapit, fontSize:18, color:'#D9C7F5', alignment:'center', margin:[0,0,0,10] },
-    { canvas:[{ type:'line', x1:80, y1:0, x2:350, y2:0, lineWidth:1.5, lineColor:'#D9C7F5' }], margin:[0,0,0,10] },
-    (cargoTxt && cargoTxt !== 'PF' && cargoTxt !== 'B2B')
-      ? { text:`Cargo: ${cargoTxt}`, fontSize:12, bold:true, color:'#E4D9F7', alignment:'center', margin:[0,0,0,6] }
-      : { text:' ', fontSize:6, margin:[0,0,0,6] },
-    { text:mesAno, fontSize:11, color:'#C4B5E8', alignment:'center', margin:[0,0,0,40] },
-    // Cards com fundo branco
-    ...[
-      [`Eneatipo ${tipo}:`, `${nomeTipo} (Traço Tipo ${tipo})`],
-      [`Asa ${asaFinal}:`,  `${nomeAsa} (Traço Tipo ${asaFinal})`],
-      ['Subtipo:',          labelSub],
-    ].map(([lbl,val])=>({
-      table:{ widths:[90,'*'], body:[[
-        { text:lbl, bold:true, color:'#5B2D8E', fontSize:10.5, fillColor:'#FFFFFF', margin:[14,10,6,10] },
-        { text:val, color:'#2C2C2C', fontSize:10.5, fillColor:'#FFFFFF', margin:[6,10,14,10] },
-      ]]},
-      layout:{
-        hLineColor:()=>'#FFFFFF', vLineColor:(i)=>i===0?'#7B00C4':'#FFFFFF',
-        hLineWidth:()=>0, vLineWidth:(i)=>i===0?3.5:0,
-        paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0,
-      },
-      margin:[0,0,0,6]
-    })),
-  ];
+  // — CAPA — usando background function do pdfmake
+  // Registrar background para página 1 via docDef.background
+  const _bgCapa = function(page) {
+    if (page !== 1) return null;
+    return {
+      canvas:[
+        { type:'rect', x:0,   y:0,   w:595.28, h:280, color:'#26093F' },
+        { type:'rect', x:0,   y:280, w:595.28, h:280, color:'#4A1870' },
+        { type:'rect', x:0,   y:560, w:595.28, h:282, color:'#7B1D6B' },
+      ]
+    };
+  };
 
+  // Conteúdo da capa (sobre o fundo)
   content.push({
-    table:{
-      widths:['*'],
-      heights:[719],
-      body:[[{
-        stack: _capaContent,
-        fillColor:'#3A0A5E',
-      }]]
-    },
-    layout:{
-      hLineWidth:()=>0, vLineWidth:()=>0,
-      paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0,
-      fillColor:()=>'#3A0A5E',
-    },
+    stack:[
+      { text:'9&Self', fontSize:52, color:'#D9C7F5', alignment:'center', margin:[0,80,0,10] },
+      { text:'Relatório Eneagrama', fontSize:24, bold:true, color:'white', alignment:'center', margin:[0,0,0,20] },
+      { text:nomeCapit, fontSize:18, color:'#D9C7F5', alignment:'center', margin:[0,0,0,10] },
+      { canvas:[{ type:'line', x1:80, y1:0, x2:400, y2:0, lineWidth:1.5, lineColor:'#D9C7F5' }], margin:[0,0,0,10] },
+      (cargoTxt && cargoTxt !== 'PF' && cargoTxt !== 'B2B')
+        ? { text:`Cargo: ${cargoTxt}`, fontSize:12, bold:true, color:'#E4D9F7', alignment:'center', margin:[0,0,0,6] }
+        : { text:' ', fontSize:6, margin:[0,0,0,6] },
+      { text:mesAno, fontSize:11, color:'#C4B5E8', alignment:'center', margin:[0,0,0,50] },
+      ...[
+        [`Eneatipo ${tipo}:`, `${nomeTipo} (Traço Tipo ${tipo})`],
+        [`Asa ${asaFinal}:`,  `${nomeAsa} (Traço Tipo ${asaFinal})`],
+        ['Subtipo:',          labelSub],
+      ].map(([lbl,val])=>({
+        table:{ widths:[90,'*'], body:[[
+          { text:lbl, bold:true, color:'#5B2D8E', fontSize:10.5, fillColor:'#FFFFFF', margin:[14,10,6,10] },
+          { text:val, color:'#2C2C2C', fontSize:10.5, fillColor:'#FFFFFF', margin:[6,10,14,10] },
+        ]]},
+        layout:{
+          hLineColor:()=>'#FFFFFF', vLineColor:(i)=>i===0?'#7B00C4':'#FFFFFF',
+          hLineWidth:()=>0, vLineWidth:(i)=>i===0?3.5:0,
+          paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0,
+        },
+        margin:[0,0,0,6]
+      })),
+    ],
     pageBreak:'after',
   });
   content.push(..._secTitle('Introdução'));
@@ -1895,8 +1893,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   }
 
   // — ASSINATURA / CARIMBO —
-  content.push({ text:'', pageBreak:'before' });
-  content.push({ text:'\n\n\n', fontSize:10 });
+  content.push({ text:'', margin:[0,30,0,0] });
   // Tentar carregar imagem da assinatura
   const _imgUrl='https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/dra%20luciakratz%20transparente.png';
   let imgNode = null;
@@ -1919,10 +1916,10 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   // ── MONTAR DOCUMENTO ─────────────────────────────────────────
   const docDef = {
     pageSize:'A4',
-    pageMargins:[56,64,56,50],
+    pageMargins:[56,64,56,65],
     header: _header,
     footer: _footer,
-
+    background: _bgCapa,
     content: content,
     styles: _estilos(),
     defaultStyle:{ font:'Roboto', fontSize:10.5, lineHeight:1.6 },
