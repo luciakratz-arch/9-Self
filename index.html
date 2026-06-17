@@ -347,27 +347,6 @@ tr:hover td{background:#FAFAFE;}
 
 .overlay-mobile{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99;}
 .overlay-mobile.open{display:block;}
-
-/* ── ACCORDION ── */
-.accordion-mes{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:0;}
-.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
-  background:var(--light);cursor:pointer;font-weight:600;font-size:13px;color:var(--purple);user-select:none;}
-.accordion-header:hover{background:#ede6f7;}
-.accordion-header .acc-arrow{transition:transform .25s;font-size:11px;}
-.accordion-header.open .acc-arrow{transform:rotate(90deg);}
-.accordion-body{display:none;}
-.accordion-body.open{display:block;}
-.accordion-body table{width:100%;border-collapse:collapse;}
-.accordion-body td,.accordion-body th{padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--border);text-align:left;}
-.accordion-body th{background:#faf7ff;color:#555;font-weight:600;font-size:11px;}
-/* ── EMP CARD ── */
-.emp-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:box-shadow .2s,border-color .2s;}
-.emp-card:hover{box-shadow:0 4px 18px rgba(123,0,196,.12);border-color:var(--purple);}
-.emp-card-nome{font-size:15px;font-weight:700;color:#1a0a2e;margin-bottom:4px;}
-.emp-card-sub{font-size:12px;color:var(--gray);}
-.emp-card-badges{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
-.emp-card-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:#f0eaf7;color:var(--purple);font-weight:600;}
-
 </style>
 </head>
 <body>
@@ -413,16 +392,144 @@ tr:hover td{background:#FAFAFE;}
           <input class="code-input" id="colabCode" placeholder="EX: A1B2C3" maxlength="8"
             onkeydown="if(event.key==='Enter')doLogin()" style="font-size:15px;letter-spacing:3px;"/>
         </div>
+        <button style="width:100%;margin-top:16px;padding:12px;border:2px solid var(--teal,#1A9BAF);
+          color:var(--teal,#1A9BAF);background:transparent;border-radius:10px;cursor:pointer;
+          font-size:14px;font-weight:600;"
+          onclick="
+            document.getElementById('loginScreen').style.display='none';
+            document.getElementById('appShell').style.display='none';
+            var ck=document.getElementById('checkout-publico');
+            if(ck){ck.style.display='flex';}
+          ">🛒 Não tenho um código — Quero Comprar o Teste</button>
       </div>
     </div>
 
     <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
-  <button class="btn btn-outline" style="width:100%;margin-top:12px;border-color:var(--teal);color:var(--teal);" onclick="document.getElementById('loginScreen').style.display='none';const ck=document.getElementById('page-checkout');if(ck){ck.style.display='block';ck.classList.add('active');}">🛒 Não tenho um código — Quero Comprar o Teste</button>
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
 
 <!-- ══════════════════ APP SHELL ══════════════════ -->
+
+<!-- ══ CHECKOUT PÚBLICO (exibido quando ?comprar=true) ══ -->
+<div id="checkout-publico" style="display:none;min-height:100vh;
+  background:linear-gradient(135deg,#1a0a2e 0%,#3d0a5e 40%,#7B1D6B 75%,#1A9BAF 100%);
+  align-items:center;justify-content:center;padding:24px;">
+  <div style="background:rgba(255,255,255,0.97);border-radius:24px;padding:36px;
+              max-width:480px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.35);
+              margin:0 auto;">
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:42px;font-family:'Cormorant Garamond',serif;font-weight:300;color:#1a0a2e;">9&Self</div>
+      <div style="font-size:9px;letter-spacing:6px;color:#888;margin-top:2px;">S E L F</div>
+      <div style="font-size:11px;color:#aaa;margin-top:4px;letter-spacing:1px;">DESCUBRA SUA PERSONALIDADE</div>
+    </div>
+
+    <!-- Etapa 1: Escolha do plano + dados -->
+    <div id="ckEtapa1">
+      <div style="font-size:13px;font-weight:700;color:#3d0a5e;margin-bottom:12px;text-align:center;">Escolha seu plano:</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <!-- PF -->
+        <div id="ckOpcaoPF" onclick="ckSelecionarPlano('pf')"
+          style="border:2px solid #e0d0f5;border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:24px;">👤</span>
+            <div style="flex:1;">
+              <div style="font-weight:700;color:#1a0a2e;font-size:14px;">Teste Individual</div>
+              <div style="font-size:12px;color:#666;margin-top:2px;">1 acesso completo ao 9&Self</div>
+            </div>
+            <div style="text-align:right;">
+              <div id="ckValorPF" style="font-size:20px;font-weight:800;color:#7B00C4;">R$ 297</div>
+              <div style="font-size:10px;color:#aaa;">Pessoa Física</div>
+            </div>
+          </div>
+        </div>
+        <!-- PJ -->
+        <div id="ckOpcaoPJ" onclick="ckSelecionarPlano('pj')"
+          style="border:2px solid #e0d0f5;border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:24px;">🏢</span>
+            <div style="flex:1;">
+              <div style="font-weight:700;color:#1a0a2e;font-size:14px;">Pacote Empresa / RH</div>
+              <div style="font-size:12px;color:#666;margin-top:2px;">Múltiplos acessos para equipe</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:13px;font-weight:700;color:#7B00C4;">R$ 247/lic.</div>
+              <div style="font-size:10px;color:#aaa;">mín. 5 licenças</div>
+            </div>
+          </div>
+          <div id="ckQtdPJRow" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #eee;">
+            <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Quantidade de licenças</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" id="ckQtdPJ" value="5" min="5"
+                style="width:80px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:15px;font-weight:700;text-align:center;"
+                oninput="ckAtualizarTotalPJ()"/>
+              <span style="font-size:13px;color:#666;">× R$ 247 =</span>
+              <span id="ckTotalPJ" style="font-size:16px;font-weight:800;color:#7B00C4;">R$ 1.235</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Dados do comprador -->
+      <div id="ckDadosComprador" style="display:none;">
+        <div style="height:1px;background:#eee;margin-bottom:20px;"></div>
+        <div style="font-size:13px;font-weight:700;color:#3d0a5e;margin-bottom:12px;">Seus dados:</div>
+        <input type="text"  id="ckNome"     placeholder="Nome completo *"
+          style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
+        <input type="email" id="ckEmail"    placeholder="E-mail *"
+          style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
+        <input type="tel"   id="ckWhatsapp" placeholder="WhatsApp *"
+          style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
+        <input type="text"  id="ckDoc"      placeholder="CPF / CNPJ"
+          style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:16px;"/>
+        <button style="width:100%;padding:14px;font-size:15px;background:#7B00C4;color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:700;"
+          onclick="ckIrParaPix()">⚡ Ver QR Code Pix para Pagar</button>
+      </div>
+    </div>
+
+    <!-- Etapa 2: QR Code Pix -->
+    <div id="ckEtapa2" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;color:#3d0a5e;" id="ckResumoCompra"></div>
+      </div>
+      <div style="background:#f0fff4;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;">
+        <div style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:12px;">⚡ Pague via Pix</div>
+        <div id="ckQrCode" style="margin:0 auto 14px;"></div>
+        <div style="font-size:11px;color:#555;margin-bottom:6px;">ou copie a chave Pix:</div>
+        <div style="display:flex;gap:6px;">
+          <input id="ckChavePix" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ccc;border-radius:6px;background:#fff;font-family:monospace;color:#333;"/>
+          <button onclick="navigator.clipboard.writeText(document.getElementById('ckChavePix').value);document.getElementById('ckCopiado').style.display='block';setTimeout(()=>document.getElementById('ckCopiado').style.display='none',2000);"
+            style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;">📋</button>
+        </div>
+        <div id="ckCopiado" style="display:none;font-size:11px;color:#2e7d32;margin-top:4px;">✅ Copiado!</div>
+        <div style="font-size:11px;color:#e65100;margin-top:10px;font-weight:600;" id="ckValorDestaque"></div>
+      </div>
+      <div style="background:#fff8e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#5d4037;line-height:1.6;">
+        <strong>Como funciona:</strong><br>
+        1. Pague o Pix pelo valor exato acima<br>
+        2. Clique em "Já Paguei" — o sistema libera seu acesso imediatamente
+      </div>
+      <button style="width:100%;padding:14px;font-size:15px;font-weight:700;background:#7B00C4;color:#fff;border:none;border-radius:12px;cursor:pointer;"
+        onclick="ckConfirmarPagamento()">✅ Já Paguei — Iniciar Agora!</button>
+      <button onclick="document.getElementById('ckEtapa2').style.display='none';document.getElementById('ckEtapa1').style.display='';"
+        style="width:100%;margin-top:8px;padding:10px;border:none;background:none;color:#888;cursor:pointer;font-size:13px;">← Voltar</button>
+      <div id="ckStatus" style="text-align:center;margin-top:12px;font-size:13px;min-height:20px;"></div>
+    </div>
+
+    <!-- Etapa 3: Sucesso PJ -->
+    <div id="ckEtapa3PJ" style="display:none;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <div style="font-size:18px;font-weight:700;color:#2e7d32;margin-bottom:8px;">Acesso liberado!</div>
+      <div style="font-size:13px;color:#555;margin-bottom:20px;">Seus códigos de acesso:</div>
+      <div id="ckCodigosGerados" style="background:#f0eaf7;border-radius:12px;padding:16px;text-align:left;margin-bottom:16px;font-family:monospace;font-size:13px;line-height:2;color:#3d0a5e;"></div>
+      <button style="width:100%;margin-bottom:10px;padding:13px;background:#7B00C4;color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:700;"
+        onclick="ckCopiarCodigosWhatsApp()">📲 Copiar para WhatsApp</button>
+      <div style="font-size:12px;color:#888;">Cópia enviada para seu e-mail.</div>
+    </div>
+  </div>
+</div>
+<!-- /CHECKOUT PÚBLICO -->
+
 <div id="appShell">
   <div class="overlay-mobile" id="overlayMobile" onclick="closeSidebar()"></div>
   <div class="app-layout">
@@ -519,194 +626,6 @@ tr:hover td{background:#FAFAFE;}
               <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
               <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
             </table>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ══ PAGE PF ══ -->
-      <div class="page" id="page-pf">
-        <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-            <div><div class="page-title">Pessoa Física</div><div class="page-subtitle">Códigos e laudos de clientes diretos (PF)</div></div>
-            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código PF</button>
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0;">
-            <button id="pfTabCod" onclick="pfShowTab('codigos')" style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--purple);border-bottom:2px solid var(--purple);margin-bottom:-2px;">🔑 Códigos</button>
-            <button id="pfTabLau" onclick="pfShowTab('laudos')"  style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;">📄 Laudos</button>
-          </div>
-          <div id="pfSecCodigos"><div id="pfAccordionCodigos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
-          <div id="pfSecLaudos" style="display:none;"><div id="pfAccordionLaudos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
-        </div>
-      </div>
-
-      <!-- ══ PAGE VENDAS (relatório admin limpo) ══ -->
-      <div class="page" id="page-vendas">
-        <div style="padding:28px;max-width:1100px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-            <div><div class="page-title">Controle de Vendas</div><div class="page-subtitle">Faturamento, histórico e comissões</div></div>
-            <button class="btn btn-primary" onclick="openModal('modalLinkDesconto')">🔗 Gerar Link com Desconto / Afiliado</button>
-          </div>
-          <!-- Link público -->
-          <div class="table-card" style="padding:18px;margin-bottom:24px;background:linear-gradient(135deg,#f0eaf7,#e8f5ff);">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-              <div><div style="font-weight:700;color:#3d0a5e;font-size:14px;">🌐 Link Público de Vendas</div>
-                <div style="font-size:12px;color:#666;margin-top:2px;">Compartilhe para clientes comprarem diretamente</div></div>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input id="linkPublicoPadrao" readonly value="https://luciakratz-arch.github.io/9-Self/?comprar=true"
-                  style="font-size:12px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;width:300px;font-family:monospace;color:#3d0a5e;background:#fff;"/>
-                <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('linkPublicoPadrao').value);showToast('✅ Link copiado!')">📋 Copiar</button>
-              </div>
-            </div>
-          </div>
-          <!-- Cards e listas -->
-          <div class="cards-grid" id="vendasCards" style="margin-bottom:24px;"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-            <div class="table-card" style="padding:20px;">
-              <h3 style="margin:0 0 14px;font-size:14px;color:#1a0a2e;">📋 Vendas Aprovadas</h3>
-              <div id="vendasLista" style="display:flex;flex-direction:column;gap:8px;"><div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Carregando...</div></div>
-            </div>
-            <div class="table-card" style="padding:20px;">
-              <h3 style="margin:0 0 14px;font-size:14px;color:#1a0a2e;">💸 Comissões de Afiliados</h3>
-              <table style="width:100%;border-collapse:collapse;">
-                <thead><tr style="background:#faf7ff;">
-                  <th style="padding:8px 10px;text-align:left;font-size:11px;color:#555;border-bottom:1px solid #eee;">Afiliado</th>
-                  <th style="padding:8px 10px;text-align:left;font-size:11px;color:#555;border-bottom:1px solid #eee;">Valor</th>
-                  <th style="padding:8px 10px;text-align:left;font-size:11px;color:#555;border-bottom:1px solid #eee;">Status</th>
-                </tr></thead>
-                <tbody id="comissoesTable"><tr><td colspan="3" style="text-align:center;color:#aaa;padding:16px;font-size:13px;">Nenhuma comissão</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ PAGE CHECKOUT PÚBLICO ══ -->
-      <div class="page" id="page-checkout" style="display:none;">
-        <div style="min-height:100vh;background:linear-gradient(135deg,#1a0a2e 0%,#3d0a5e 40%,#7B1D6B 75%,#1A9BAF 100%);
-                    display:flex;align-items:center;justify-content:center;padding:24px;">
-          <div style="background:rgba(255,255,255,0.97);border-radius:24px;padding:36px;
-                      max-width:480px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.35);">
-            <!-- Logo -->
-            <div style="text-align:center;margin-bottom:28px;">
-              <div style="font-size:42px;font-family:'Cormorant Garamond',serif;font-weight:300;color:#1a0a2e;">9&Self</div>
-              <div style="font-size:9px;letter-spacing:6px;color:#888;margin-top:2px;">S E L F</div>
-              <div style="font-size:11px;color:#aaa;margin-top:4px;letter-spacing:1px;">DESCUBRA SUA PERSONALIDADE</div>
-            </div>
-
-            <!-- Etapa 1: Escolha do plano + dados -->
-            <div id="ckEtapa1">
-              <div style="font-size:13px;font-weight:700;color:#3d0a5e;margin-bottom:12px;text-align:center;">Escolha seu plano:</div>
-              <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
-                <!-- PF -->
-                <div id="ckOpcaoPF" onclick="ckSelecionarPlano('pf')"
-                  style="border:2px solid #e0d0f5;border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;">
-                  <div style="display:flex;align-items:center;gap:12px;">
-                    <span style="font-size:24px;">👤</span>
-                    <div style="flex:1;"><div style="font-weight:700;color:#1a0a2e;font-size:14px;">Teste Individual</div>
-                      <div style="font-size:12px;color:#666;margin-top:2px;">1 acesso completo ao 9&Self</div></div>
-                    <div style="text-align:right;">
-                      <div id="ckValorPF" style="font-size:20px;font-weight:800;color:#7B00C4;">R$ 297</div>
-                      <div style="font-size:10px;color:#aaa;">Pessoa Física</div></div>
-                  </div>
-                </div>
-                <!-- PJ -->
-                <div id="ckOpcaoPJ" onclick="ckSelecionarPlano('pj')"
-                  style="border:2px solid #e0d0f5;border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;">
-                  <div style="display:flex;align-items:center;gap:12px;">
-                    <span style="font-size:24px;">🏢</span>
-                    <div style="flex:1;"><div style="font-weight:700;color:#1a0a2e;font-size:14px;">Pacote Empresa / RH</div>
-                      <div style="font-size:12px;color:#666;margin-top:2px;">Múltiplos acessos para sua equipe</div></div>
-                    <div style="text-align:right;">
-                      <div style="font-size:13px;font-weight:700;color:#7B00C4;">R$ 247/lic.</div>
-                      <div style="font-size:10px;color:#aaa;">mín. 5 licenças</div></div>
-                  </div>
-                  <div id="ckQtdPJRow" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #eee;">
-                    <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Quantidade de licenças</label>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                      <input type="number" id="ckQtdPJ" value="5" min="5"
-                        style="width:80px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:15px;font-weight:700;text-align:center;"
-                        oninput="ckAtualizarTotalPJ()"/>
-                      <span style="font-size:13px;color:#666;">× R$ 247 =</span>
-                      <span id="ckTotalPJ" style="font-size:16px;font-weight:800;color:#7B00C4;">R$ 1.235</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Dados do comprador -->
-              <div id="ckDadosComprador" style="display:none;">
-                <div style="height:1px;background:#eee;margin-bottom:20px;"></div>
-                <div style="font-size:13px;font-weight:700;color:#3d0a5e;margin-bottom:12px;">Seus dados:</div>
-                <input type="text"  id="ckNome"     placeholder="Nome completo *"  style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
-                <input type="email" id="ckEmail"    placeholder="E-mail *"         style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
-                <input type="tel"   id="ckWhatsapp" placeholder="WhatsApp *"       style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
-                <input type="text"  id="ckDoc"      placeholder="CPF / CNPJ"       style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:16px;"/>
-                <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;" onclick="ckIrParaPix()">
-                  ⚡ Ver QR Code Pix para Pagar
-                </button>
-              </div>
-            </div><!-- /ckEtapa1 -->
-
-            <!-- Etapa 2: QR Code Pix -->
-            <div id="ckEtapa2" style="display:none;">
-              <div style="text-align:center;margin-bottom:16px;">
-                <div style="font-size:14px;font-weight:700;color:#3d0a5e;" id="ckResumoCompra"></div>
-              </div>
-              <div style="background:#f0fff4;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;">
-                <div style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:12px;">⚡ Pague via Pix</div>
-                <div id="ckQrCode" style="margin:0 auto 14px;"></div>
-                <div style="font-size:11px;color:#555;margin-bottom:6px;">ou copie a chave Pix:</div>
-                <div style="display:flex;gap:6px;">
-                  <input id="ckChavePix" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ccc;border-radius:6px;background:#fff;font-family:monospace;color:#333;"/>
-                  <button onclick="navigator.clipboard.writeText(document.getElementById('ckChavePix').value);document.getElementById('ckCopiado').style.display='block';setTimeout(()=>document.getElementById('ckCopiado').style.display='none',2000);"
-                    style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;">📋</button>
-                </div>
-                <div id="ckCopiado" style="display:none;font-size:11px;color:#2e7d32;margin-top:4px;">✅ Copiado!</div>
-                <div style="font-size:11px;color:#e65100;margin-top:10px;font-weight:600;" id="ckValorDestaque"></div>
-              </div>
-              <div style="background:#fff8e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#5d4037;line-height:1.6;">
-                <strong>Como funciona:</strong><br>
-                1. Pague o Pix pelo valor exato acima<br>
-                2. Clique em "Já Paguei" — o sistema libera seu acesso imediatamente
-              </div>
-              <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;font-weight:700;" onclick="ckConfirmarPagamento()">
-                ✅ Já Paguei — Iniciar Agora!
-              </button>
-              <button onclick="document.getElementById('ckEtapa2').style.display='none';document.getElementById('ckEtapa1').style.display='';"
-                style="width:100%;margin-top:8px;padding:10px;border:none;background:none;color:#888;cursor:pointer;font-size:13px;">← Voltar</button>
-              <div id="ckStatus" style="text-align:center;margin-top:12px;font-size:13px;min-height:20px;"></div>
-            </div><!-- /ckEtapa2 -->
-
-            <!-- Etapa 3: Sucesso PJ -->
-            <div id="ckEtapa3PJ" style="display:none;text-align:center;">
-              <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-              <div style="font-size:18px;font-weight:700;color:#2e7d32;margin-bottom:8px;">Acesso liberado!</div>
-              <div style="font-size:13px;color:#555;margin-bottom:20px;">Seus códigos de acesso:</div>
-              <div id="ckCodigosGerados" style="background:#f0eaf7;border-radius:12px;padding:16px;text-align:left;margin-bottom:16px;font-family:monospace;font-size:13px;line-height:2;color:#3d0a5e;"></div>
-              <button class="btn btn-primary" style="width:100%;margin-bottom:10px;" onclick="ckCopiarCodigosWhatsApp()">📲 Copiar para WhatsApp</button>
-              <div style="font-size:12px;color:#888;">Cópia enviada para seu e-mail.</div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /page-checkout -->
-
-      <!-- Modal Link Desconto/Afiliado -->
-      <div class="modal-overlay" id="modalLinkDesconto">
-        <div class="modal">
-          <h3>🔗 Link com Desconto ou Afiliado</h3>
-          <div class="form-row"><label>Desconto (%)</label><input type="number" id="ldDesconto" value="0" min="0" max="100"/></div>
-          <div class="form-row"><label>Nome do Afiliado</label><input type="text" id="ldAfiliado" placeholder="Ex: João Silva"/></div>
-          <div class="form-row"><label>% Comissão do Afiliado</label><input type="number" id="ldComissao" value="0" min="0" max="100"/></div>
-          <div id="ldResultado" style="display:none;margin-top:12px;background:#f0eaf7;border-radius:8px;padding:12px;">
-            <div style="font-size:11px;color:#888;margin-bottom:6px;">Link gerado:</div>
-            <div style="display:flex;gap:6px;">
-              <input id="ldLinkUrl" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ddd;border-radius:6px;background:#fff;font-family:monospace;"/>
-              <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('ldLinkUrl').value);showToast('Copiado!')">📋</button>
-            </div>
-          </div>
-          <div class="modal-actions">
-            <button class="btn btn-outline" onclick="closeModal('modalLinkDesconto')">Fechar</button>
-            <button class="btn btn-primary" onclick="gerarLinkDesconto()">⚡ Gerar</button>
           </div>
         </div>
       </div>
@@ -1101,7 +1020,7 @@ function _nivel(titulo, texto) {
 // ══════════════════════════════════════════════════════════════════
 // MOTOR PRINCIPAL
 // ══════════════════════════════════════════════════════════════════
-window._carregarFontesCormorant = async function() {
+async function _carregarFontesCormorant() {
   const BASE = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/functions/fonts';
   try {
     const [r1, r2] = await Promise.all([
@@ -1122,9 +1041,9 @@ window._carregarFontesCormorant = async function() {
   } catch(e) { console.warn('Cormorant:', e); }
 }
 
-window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
+async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
   // Carregar Cormorant Garamond
-  await window._carregarFontesCormorant();
+  await _carregarFontesCormorant();
   const _NT = {1:'Perfeição e Excelência',2:'Prestativo e Relacional',3:'Performance e Imagem',
                4:'Autêntico e Profundo',5:'Observador e Privacidade',6:'Precavido e Questionador',
                7:'Visionário e Otimista',8:'Desafiador e Controlador',9:'Harmônico e Diplomático'};
@@ -1589,10 +1508,10 @@ function enterApp(profile, name, role) {
 // ── SIDEBAR ──
 const NAVS = {
   admin: [
-    {icon:'📊', label:'Painel Geral',       page:'dashboard'},
-    {icon:'👤', label:'Pessoa Física (PF)', page:'pf'},
-    {icon:'🏢', label:'Empresas / RH (PJ)', page:'empresas'},
-    {icon:'💰', label:'Controle de Vendas', page:'vendas'},
+    {icon:'📊', label:'Painel', page:'dashboard'},
+    {icon:'🏢', label:'Empresas / RH', page:'empresas'},
+    {icon:'🔑', label:'Códigos de Acesso', page:'codigos'},
+    {icon:'📄', label:'Laudos', page:'laudos'},
   ],
   rh: [
     {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
@@ -1630,9 +1549,6 @@ window.navigateTo = function(page) {
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
-  if(page==='pf')      loadPF();
-  if(page==='empresas') loadEmpresas();
-  if(page==='vendas')   loadVendas();
 };
 
 // ── DASHBOARD ADMIN ──
@@ -2856,47 +2772,52 @@ window.closeSidebar=function(){
 window._state.profile = 'admin';
 gerarCodigoPreview();
 
-// ── DETECÇÃO DE URL: ?comprar=true | ?code=XXX ──────────────────────
+// ── Detecção de parâmetros da URL ──
 (function() {
   const params = new URLSearchParams(window.location.search);
 
-  // 1. CHECKOUT PÚBLICO — esconde login, isola no checkout
+  // 1. ?comprar=true → esconder login/app, exibir checkout público
   if(params.get('comprar') === 'true') {
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('loginScreen').style.display = 'none';
-      const appEl = document.getElementById('appShell');
-      if(appEl) appEl.style.display = 'none';
-      const ck = document.getElementById('page-checkout');
-      if(ck) { ck.style.display = 'block'; ck.classList.add('active'); }
-      // Desconto via parâmetro ?desc=XX&af=AFID
-      const desc  = parseFloat(params.get('desc')||0);
-      const afId  = params.get('af')||null;
+    // Executar imediatamente (script roda antes do DOMContentLoaded)
+    // e também após o DOM estar pronto (garantia dupla)
+    function _mostrarCheckout() {
+      var ls = document.getElementById('loginScreen');
+      var ap = document.getElementById('appShell');
+      var ck = document.getElementById('checkout-publico');
+      if(ls) ls.style.display = 'none';
+      if(ap) ap.style.display = 'none';
+      if(ck) { ck.style.display = 'flex'; }
+      // Aplicar desconto se ?desc=XX
+      var desc  = parseFloat(params.get('desc')||0);
       if(desc > 0) {
-        window._ckDesconto = {pct:desc, afId};
-        const novoValor = Math.round(297*(1-desc/100));
-        const el = document.getElementById('ckValorPF');
-        if(el) el.textContent = `R$ ${novoValor}`;
+        var elPF = document.getElementById('ckValorPF');
+        if(elPF) elPF.textContent = 'R$ ' + Math.round(297*(1-desc/100));
+        window._ckDesconto = { pct: desc, afId: params.get('af')||null };
       }
-    });
+    }
+    if(document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _mostrarCheckout);
+    } else {
+      _mostrarCheckout();
+    }
     return; // não processar outros parâmetros
   }
 
-  // 2. LINK DE CÓDIGO — pula login, entra direto como colaborador
-  const code = params.get('code') || params.get('c');
+  // 2. ?code=XXX ou ?c=XXX → pular login, entrar como colaborador
+  var code = params.get('code') || params.get('c');
   if(code) {
     window._state.profile = 'colaborador';
-    document.addEventListener('DOMContentLoaded', () => {
-      const el = document.getElementById('colabCode');
-      if(el) el.value = code.toUpperCase();
-      setTimeout(() => {
-        const tabColab = document.querySelector('[onclick*="colaborador"]');
+    var el = document.getElementById('colabCode');
+    if(el) {
+      el.value = code.toUpperCase();
+      setTimeout(function() {
+        var tabColab = document.querySelector('[onclick*="colaborador"]');
         if(tabColab) tabColab.click();
-        setTimeout(() => window.doLogin && window.doLogin(), 400);
+        setTimeout(function() { if(window.doLogin) window.doLogin(); }, 400);
       }, 500);
-    });
+    }
   }
 })();
-
 
 // ════════════════════════════════════════════════════════════════════
 // ── CHECKOUT PÚBLICO ─────────────────────────────────────────────────
@@ -2904,8 +2825,8 @@ gerarCodigoPreview();
 window._ckPlano   = null;
 window._ckVendaId = null;
 window._ckCodigos = [];
-const _CK_VALOR_PF  = 297;
-const _CK_VALOR_PJ  = 247;
+const _CK_VALOR_PF = 297;
+const _CK_VALOR_PJ = 247;
 // ⬇ Substitua pela sua chave Pix real
 const _PIX_CHAVE = 'luciakratz@gmail.com';
 const _PIX_NOME  = 'Lucia Kratz';
@@ -2914,17 +2835,17 @@ const _PIX_CIDADE= 'Goiania';
 window.ckSelecionarPlano = function(plano) {
   window._ckPlano = plano;
   const isPF = plano==='pf';
-  document.getElementById('ckOpcaoPF').style.border      = isPF?'2px solid #7B00C4':'2px solid #e0d0f5';
-  document.getElementById('ckOpcaoPF').style.background  = isPF?'#faf5ff':'';
-  document.getElementById('ckOpcaoPJ').style.border      = !isPF?'2px solid #7B00C4':'2px solid #e0d0f5';
-  document.getElementById('ckOpcaoPJ').style.background  = !isPF?'#faf5ff':'';
-  document.getElementById('ckQtdPJRow').style.display    = !isPF?'':'none';
+  document.getElementById('ckOpcaoPF').style.border     = isPF?'2px solid #7B00C4':'2px solid #e0d0f5';
+  document.getElementById('ckOpcaoPF').style.background = isPF?'#faf5ff':'';
+  document.getElementById('ckOpcaoPJ').style.border     = !isPF?'2px solid #7B00C4':'2px solid #e0d0f5';
+  document.getElementById('ckOpcaoPJ').style.background = !isPF?'#faf5ff':'';
+  document.getElementById('ckQtdPJRow').style.display   = !isPF?'':'none';
   document.getElementById('ckDadosComprador').style.display = '';
 };
 
 window.ckAtualizarTotalPJ = function() {
   const qtd = parseInt(document.getElementById('ckQtdPJ').value)||5;
-  document.getElementById('ckTotalPJ').textContent = 'R$ '+( qtd*_CK_VALOR_PJ ).toLocaleString('pt-BR');
+  document.getElementById('ckTotalPJ').textContent = 'R$ '+(qtd*_CK_VALOR_PJ).toLocaleString('pt-BR');
 };
 
 window.ckIrParaPix = function() {
@@ -2935,15 +2856,14 @@ window.ckIrParaPix = function() {
   const isPF  = window._ckPlano==='pf';
   const qtd   = isPF?1:(parseInt(document.getElementById('ckQtdPJ').value)||5);
   const desc  = window._ckDesconto?.pct||0;
-  const valorBase = isPF?_CK_VALOR_PF:(qtd*_CK_VALOR_PJ);
-  const valor = desc>0 ? Math.round(valorBase*(1-desc/100)) : valorBase;
+  const base  = isPF?_CK_VALOR_PF:(qtd*_CK_VALOR_PJ);
+  const valor = desc>0?Math.round(base*(1-desc/100)):base;
 
   document.getElementById('ckResumoCompra').textContent =
     isPF?`Teste Individual — R$ ${valor}`:`${qtd} licenças × R$ ${_CK_VALOR_PJ} = R$ ${valor.toLocaleString('pt-BR')}`;
   document.getElementById('ckValorDestaque').textContent =
     `⚠️ Pague exatamente R$ ${valor.toFixed(2).replace('.',',')}`;
 
-  // Gerar QR Code Pix
   const txid = 'NS'+Math.random().toString(36).substr(2,5).toUpperCase();
   const pixPayload = _gerarPixPayload({chave:_PIX_CHAVE,nome:_PIX_NOME,valor,cidade:_PIX_CIDADE,txid});
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixPayload)}`;
@@ -2951,342 +2871,98 @@ window.ckIrParaPix = function() {
     `<img src="${qrUrl}" alt="QR Pix" style="border-radius:8px;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.1);"/>`;
   document.getElementById('ckChavePix').value = _PIX_CHAVE;
 
-  // Salvar venda pendente no Firestore
-  const doc_ = document.getElementById('ckDoc').value.trim();
+  // Salvar venda pendente
+  const doc_ = (document.getElementById('ckDoc')||{value:''}).value.trim();
   addDoc(collection(db,'nself_vendas'),{
     plano:window._ckPlano, qtd, valor, comprador:nome,
     compradorEmail:email, compradorWhatsapp:whatsapp, compradorDoc:doc_||'',
     pixTxid:txid, status:'aguardando_pix',
-    afiliado:window._ckDesconto?.afId||null,
-    criadoEm:serverTimestamp(),
-  }).then(ref=>{ window._ckVendaId=ref.id; });
+    afiliado:window._ckDesconto?.afId||null, criadoEm:serverTimestamp(),
+  }).then(ref=>{ window._ckVendaId=ref.id; }).catch(()=>{});
 
   document.getElementById('ckEtapa1').style.display='none';
   document.getElementById('ckEtapa2').style.display='';
 };
 
-// ── CONFIRMAR PAGAMENTO: esteira automática ──────────────────────────
 window.ckConfirmarPagamento = async function() {
-  const st    = document.getElementById('ckStatus');
-  const nome  = document.getElementById('ckNome').value.trim();
-  const email = document.getElementById('ckEmail').value.trim();
-  const isPF  = window._ckPlano==='pf';
-  const qtd   = isPF?1:(parseInt(document.getElementById('ckQtdPJ').value)||5);
-  const desc  = window._ckDesconto?.pct||0;
-  const valorBase = isPF?_CK_VALOR_PF:(qtd*_CK_VALOR_PJ);
-  const valor = desc>0?Math.round(valorBase*(1-desc/100)):valorBase;
-
-  st.innerHTML='<span style="color:#888;">⏳ Liberando seu acesso...</span>';
-  document.querySelector('#ckEtapa2 button.btn-primary').disabled=true;
-
+  const st   = document.getElementById('ckStatus');
+  const nome = document.getElementById('ckNome').value.trim();
+  const email= document.getElementById('ckEmail').value.trim();
+  const isPF = window._ckPlano==='pf';
+  const qtd  = isPF?1:(parseInt(document.getElementById('ckQtdPJ').value)||5);
+  const desc = window._ckDesconto?.pct||0;
+  const base = isPF?_CK_VALOR_PF:(qtd*_CK_VALOR_PJ);
+  const valor= desc>0?Math.round(base*(1-desc/100)):base;
+  const btn  = document.querySelector('#ckEtapa2 button');
+  if(btn) btn.disabled=true;
+  st.innerHTML='<span style="color:#888;">⏳ Liberando acesso...</span>';
   try {
-    const BASE = 'https://luciakratz-arch.github.io/9-Self/index.html?code=';
-    window._ckCodigos = [];
-
-    // 1. Gerar códigos no Firestore
+    const BASE='https://luciakratz-arch.github.io/9-Self/index.html?code=';
+    window._ckCodigos=[];
+    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     for(let i=0;i<qtd;i++){
-      const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let cod=''; for(let j=0;j<6;j++) cod+=chars[Math.floor(Math.random()*chars.length)];
       await addDoc(collection(db,'nself_codigos'),{
         codigo:cod, nomeDestinatario:nome, email,
-        empresa:isPF?'PF':'PJ_COMPRA',
-        status:'disponivel', origem:'compra_direta',
-        vendaId:window._ckVendaId||'',
+        empresa:isPF?'PF':'PJ_COMPRA', status:'disponivel',
+        origem:'compra_direta', vendaId:window._ckVendaId||'',
         linkAcesso:BASE+cod, criadoEm:serverTimestamp(),
       });
       window._ckCodigos.push(cod);
     }
-
-    // 2. Marcar venda como PAGA
-    if(window._ckVendaId) {
+    if(window._ckVendaId){
       await updateDoc(doc(db,'nself_vendas',window._ckVendaId),{
         status:'pago', pagoEm:serverTimestamp(), codigos:window._ckCodigos
       });
     }
-
-    // 3. Registrar comissão de afiliado se houver
-    if(window._ckDesconto?.afId && desc>0) {
-      await addDoc(collection(db,'nself_comissoes'),{
-        vendaId:window._ckVendaId, afiliado:window._ckDesconto.afId,
-        pct:desc, valor:Math.round(valor*desc/100),
-        pago:false, criadoEm:serverTimestamp(),
-      });
-    }
-
-    // 4. PF → login automático e DIRETO para o teste
-    if(isPF) {
-      st.innerHTML='<span style="color:#2e7d32;font-weight:700;">✅ Acesso liberado! Iniciando seu teste...</span>';
-      // Esconder checkout, mostrar app, entrar como colaborador
-      document.getElementById('page-checkout').style.display='none';
-      const appShell = document.getElementById('appShell');
-      if(appShell) appShell.style.display='block';
-      // Simular login de colaborador com o código gerado
-      const cod = window._ckCodigos[0];
-      window._state.codigoAtivo = {
-        codigo:cod, nomeDestinatario:nome, email,
-        empresa:'PF', status:'disponivel',
-      };
-      enterApp('colaborador', nome, 'Colaborador');
-      // Ir direto para o teste sem passar por colab-inicio
+    if(isPF){
+      st.innerHTML='<span style="color:#2e7d32;font-weight:700;">✅ Acesso liberado! Iniciando teste...</span>';
+      const cod=window._ckCodigos[0];
+      window._state = window._state||{};
+      window._state.codigoAtivo={codigo:cod,nomeDestinatario:nome,email,empresa:'PF',status:'disponivel'};
+      // Esconder checkout, mostrar app
+      document.getElementById('checkout-publico').style.display='none';
+      document.getElementById('appShell').style.display='block';
+      enterApp('colaborador',nome,'Colaborador');
       setTimeout(()=>{
         navigateTo('colab-teste');
         if(window.iniciarTeste) iniciarTeste();
-      }, 200);
+      },200);
       return;
     }
-
-    // 5. PJ → mostrar códigos
+    // PJ
     document.getElementById('ckEtapa2').style.display='none';
     document.getElementById('ckEtapa3PJ').style.display='';
-    document.getElementById('ckCodigosGerados').innerHTML =
-      window._ckCodigos.map((c,i)=>`<div>Código ${i+1}: <strong>${c}</strong> — ${BASE}${c}</div>`).join('');
-
-    // Enviar e-mail se EmailJS configurado
-    if(window._emailjsReady && email) {
-      const codigosTexto = window._ckCodigos.map((c,i)=>`Código ${i+1}: ${c}\nLink: ${BASE}${c}`).join('\n\n');
-      emailjs.send(_EMAILJS_SERVICE,_EMAILJS_TEMPLATE,{
-        to_name:nome, to_email:email,
-        produto:'9&Self — Pacote Empresa',
-        qtd, codigos:codigosTexto,
-        valor:`R$ ${valor.toFixed(2).replace('.',',')}`,
-      }).catch(()=>{});
-    }
-
-  } catch(e) {
+    const BASE2='https://luciakratz-arch.github.io/9-Self/index.html?code=';
+    document.getElementById('ckCodigosGerados').innerHTML=
+      window._ckCodigos.map((c,i)=>`<div>Código ${i+1}: <strong>${c}</strong><br><small>${BASE2}${c}</small></div>`).join('');
+  } catch(e){
     st.innerHTML=`<span style="color:#c62828;">Erro: ${e.message}</span>`;
-    document.querySelector('#ckEtapa2 button.btn-primary').disabled=false;
+    if(btn) btn.disabled=false;
   }
 };
 
 window.ckCopiarCodigosWhatsApp = function() {
-  const BASE='https://luciakratz-arch.github.io/9-Self/index.html?code=';
+  const B='https://luciakratz-arch.github.io/9-Self/index.html?code=';
   const txt='*9&Self — Seus Códigos de Acesso*\n\n'+
-    window._ckCodigos.map((c,i)=>`Código ${i+1}: *${c}*\nLink: ${BASE}${c}`).join('\n\n')+
-    '\n\nAcesse seu link para iniciar o teste.';
-  navigator.clipboard.writeText(txt).then(()=>showToast('✅ Copiado para colar no WhatsApp!'));
+    window._ckCodigos.map((c,i)=>`Código ${i+1}: *${c}*\nLink: ${B}${c}`).join('\n\n')+
+    '\n\nAcesse o link para iniciar seu teste.';
+  navigator.clipboard.writeText(txt).then(()=>alert('✅ Copiado! Cole no WhatsApp.'));
 };
 
-// ── GERADOR PAYLOAD PIX EMV (QR Code estático) ──────────────────────
 function _gerarPixPayload({chave,nome,valor,cidade,txid}){
-  const _tlv=(id,val)=>{const v=String(val);return `${id}${String(v.length).padStart(2,'0')}${v}`;};
-  const gui  =_tlv('00','BR.GOV.BCB.PIX')+_tlv('01',chave);
-  const mai  =_tlv('26',gui);
-  const nome_=(nome||'9SELF').replace(/[^A-Za-z0-9 ]/g,'').substr(0,25).toUpperCase();
-  const city_=(cidade||'GOIANIA').replace(/[^A-Za-z0-9 ]/g,'').substr(0,15).toUpperCase();
-  const txid_=(txid||'9SELF').replace(/[^A-Za-z0-9]/g,'').substr(0,25).toUpperCase()||'***';
-  const val_ =valor>0?_tlv('54',valor.toFixed(2)):'';
-  const base =_tlv('00','01')+mai+_tlv('52','0000')+_tlv('53','986')+
-               val_+_tlv('58','BR')+_tlv('59',nome_)+_tlv('60',city_)+
-               _tlv('62',_tlv('05',txid_))+'6304';
+  const _t=(id,v)=>{const s=String(v);return `${id}${String(s.length).padStart(2,'0')}${s}`;};
+  const gui=_t('00','BR.GOV.BCB.PIX')+_t('01',chave);
+  const mai=_t('26',gui);
+  const n_=(nome||'9SELF').replace(/[^A-Za-z0-9 ]/g,'').substr(0,25).toUpperCase();
+  const c_=(cidade||'GOIANIA').replace(/[^A-Za-z0-9 ]/g,'').substr(0,15).toUpperCase();
+  const tx=(txid||'9SELF').replace(/[^A-Za-z0-9]/g,'').substr(0,25).toUpperCase()||'***';
+  const v_=valor>0?_t('54',valor.toFixed(2)):'';
+  const base=_t('00','01')+mai+_t('52','0000')+_t('53','986')+v_+_t('58','BR')+_t('59',n_)+_t('60',c_)+_t('62',_t('05',tx))+'6304';
   let crc=0xFFFF;
   for(const ch of base){crc^=ch.charCodeAt(0)<<8;for(let i=0;i<8;i++)crc=(crc&0x8000)?(crc<<1)^0x1021:(crc<<1);}
   return base+(crc&0xFFFF).toString(16).toUpperCase().padStart(4,'0');
 }
-
-// ════════════════════════════════════════════════════════════════════
-// ── CONTROLE DE VENDAS (admin — somente relatório) ───────────────────
-// ════════════════════════════════════════════════════════════════════
-async function loadVendas(){
-  await Promise.all([_loadVendasCards(),_loadVendasLista(),_loadComissoes()]);
-}
-async function _loadVendasCards(){
-  const el=document.getElementById('vendasCards');
-  if(!el)return;
-  try{
-    const now=new Date(),ini=new Date(now.getFullYear(),now.getMonth(),1);
-    const snap=await getDocs(collection(db,'nself_vendas'));
-    let total=0,codigos=0,pendentes=0;
-    snap.forEach(d=>{const v=d.data(),dt=v.criadoEm?.toDate?.();
-      if(dt&&dt>=ini){
-        if(v.status==='pago'){total+=v.valor||0;codigos+=v.qtd||1;}
-        if(v.status==='aguardando_pix')pendentes++;
-      }
-    });
-    el.innerHTML=`
-      <div class="stat-card"><div class="sc-label">Total Faturado no Mês</div>
-        <div class="sc-value" style="color:#2e7d32;">R$ ${total.toFixed(2).replace('.',',')}</div>
-        <div class="sc-sub">vendas aprovadas</div></div>
-      <div class="stat-card"><div class="sc-label">Acessos Liberados</div>
-        <div class="sc-value">${codigos}</div><div class="sc-sub">automaticamente</div></div>
-      <div class="stat-card"><div class="sc-label">Pagamentos Pendentes</div>
-        <div class="sc-value" style="color:#e65100;">${pendentes}</div>
-        <div class="sc-sub">Pix aguardando</div></div>`;
-  }catch(e){console.warn(e);}
-}
-async function _loadVendasLista(){
-  const el=document.getElementById('vendasLista');
-  if(!el)return;
-  try{
-    const snap=await getDocs(collection(db,'nself_vendas'));
-    const itens=snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(v=>v.status==='pago')
-      .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0))
-      .slice(0,20);
-    if(!itens.length){el.innerHTML='<div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Nenhuma venda aprovada ainda</div>';return;}
-    el.innerHTML=itens.map(v=>`
-      <div style="border:1px solid #eee;border-radius:10px;padding:12px 14px;background:#fafafa;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-          <div>
-            <div style="font-weight:600;font-size:13px;color:#1a0a2e;">${v.comprador||'—'}</div>
-            <div style="font-size:11px;color:#888;margin-top:2px;">
-              ${v.compradorEmail||''} · ${v.plano==='pf'?'PF':'PJ'} · ${v.qtd||1} lic.
-              · ${v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}
-            </div>
-          </div>
-          <div style="font-weight:700;color:#7B00C4;font-size:15px;white-space:nowrap;">
-            R$ ${(v.valor||0).toFixed(2).replace('.',',')}
-            <span style="display:block;font-size:11px;font-weight:400;color:#2e7d32;">✔ Pago</span>
-          </div>
-        </div>
-      </div>`).join('');
-  }catch(e){console.warn(e);}
-}
-async function _loadComissoes(){
-  const tbody=document.getElementById('comissoesTable');
-  if(!tbody)return;
-  try{
-    const snap=await getDocs(collection(db,'nself_comissoes'));
-    if(!snap.empty){
-      tbody.innerHTML=snap.docs.map(d=>{const c=d.data();return`<tr>
-        <td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #eee;">${c.afiliado||'—'}</td>
-        <td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #eee;font-weight:600;color:#7B00C4;">R$ ${(c.valor||0).toFixed(2).replace('.',',')}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid #eee;">
-          <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${c.pago?'#e8f5e9':'#fff3e0'};color:${c.pago?'#2e7d32':'#e65100'};">
-            ${c.pago?'✔ Paga':'⏳ Pendente'}</span></td>
-      </tr>`;}).join('');
-    }
-  }catch(e){console.warn(e);}
-}
-
-// Gerar link com desconto/afiliado
-window.gerarLinkDesconto = async function(){
-  const desc     =parseFloat(document.getElementById('ldDesconto').value)||0;
-  const afiliado =document.getElementById('ldAfiliado').value.trim();
-  const comissao =parseFloat(document.getElementById('ldComissao').value)||0;
-  const afId     =Math.random().toString(36).substr(2,6).toUpperCase();
-  const url      =`https://luciakratz-arch.github.io/9-Self/?comprar=true${desc>0?'&desc='+desc:''}${afiliado?'&af='+afId:''}`;
-  try{
-    if(afiliado){
-      await addDoc(collection(db,'nself_afiliados'),{
-        afId,afiliado,desconto:desc,comissao,criadoEm:serverTimestamp(),ativo:true
-      });
-    }
-  }catch(e){}
-  document.getElementById('ldLinkUrl').value=url;
-  document.getElementById('ldResultado').style.display='';
-  showToast('✅ Link gerado!');
-};
-
-// EmailJS (configurar para ativar e-mails automáticos)
-const _EMAILJS_SERVICE  = 'SEU_SERVICE_ID';
-const _EMAILJS_TEMPLATE = 'SEU_TEMPLATE_ID';
-window._emailjsReady    = false;
-(function(){
-  const s=document.createElement('script');
-  s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-  s.onload=()=>{
-    if(_EMAILJS_SERVICE!=='SEU_SERVICE_ID'){
-      emailjs.init({publicKey:'SUA_PUBLIC_KEY'});
-      window._emailjsReady=true;
-    }
-  };
-  document.head.appendChild(s);
-})();
-
-// ════════════════════════════════════════════════════════════════════
-// ── ACCORDION (PF + Empresas) ────────────────────────────────────────
-// ════════════════════════════════════════════════════════════════════
-window.pfShowTab=function(tab){
-  const isCod=tab==='codigos';
-  document.getElementById('pfSecCodigos').style.display=isCod?'':'none';
-  document.getElementById('pfSecLaudos').style.display=isCod?'none':'';
-  document.getElementById('pfTabCod').style.color=isCod?'var(--purple)':'var(--gray)';
-  document.getElementById('pfTabCod').style.borderBottomColor=isCod?'var(--purple)':'transparent';
-  document.getElementById('pfTabLau').style.color=!isCod?'var(--purple)':'var(--gray)';
-  document.getElementById('pfTabLau').style.borderBottomColor=!isCod?'var(--purple)':'transparent';
-};
-async function loadPF(){
-  await Promise.all([_loadPFCodigos(),_loadPFLaudos()]);
-}
-async function _loadPFCodigos(){
-  const c=document.getElementById('pfAccordionCodigos');if(!c)return;
-  c.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
-  try{
-    const snap=await getDocs(collection(db,'nself_codigos'));
-    const todos=snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(x=>!x.empresa||x.empresa==='PF'||x.empresa==='pf');
-    c.innerHTML=todos.length?_renderAccordionCodigos(todos):'<div style="color:#aaa;padding:16px;text-align:center;">Nenhum código PF</div>';
-    _initAccordion(c);
-  }catch(e){console.warn(e);}
-}
-async function _loadPFLaudos(){
-  const c=document.getElementById('pfAccordionLaudos');if(!c)return;
-  c.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
-  try{
-    const snap=await getDocs(collection(db,'nself_laudos'));
-    const todos=snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(l=>!l.empresa||l.empresa==='PF');
-    c.innerHTML=todos.length?_renderAccordionLaudos(todos):'<div style="color:#aaa;padding:16px;text-align:center;">Nenhum laudo PF</div>';
-    _initAccordion(c);
-  }catch(e){console.warn(e);}
-}
-function _getMesAnoKey(item){
-  const d=item.criadoEm?.toDate?.();
-  if(!d)return '9999-99::Data desconhecida';
-  const key=`${String(9999-d.getFullYear()).padStart(4,'0')}-${String(99-d.getMonth()).padStart(2,'0')}`;
-  const label=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
-  return `${key}::${label}`;
-}
-function _agruparPorMes(lista){
-  const g={};
-  lista.forEach(item=>{const k=_getMesAnoKey(item);if(!g[k])g[k]=[];g[k].push(item);});
-  Object.values(g).forEach(arr=>arr.sort((a,b)=>(a.nome||a.nomeDestinatario||'').localeCompare(b.nome||b.nomeDestinatario||'','pt-BR',{sensitivity:'base'})));
-  return Object.keys(g).sort().map(k=>({label:k.split('::')[1],itens:g[k]}));
-}
-function _renderAccordionCodigos(lista){
-  return _agruparPorMes(lista).map(g=>`
-    <div class="accordion-mes">
-      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
-        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length})</span></span>
-        <span class="acc-arrow">▶</span>
-      </div>
-      <div class="accordion-body">
-        <table><thead><tr><th>Nome</th><th>Código</th><th>Status</th><th>Data</th></tr></thead>
-        <tbody>${g.itens.map(c=>`<tr>
-          <td>${c.nomeDestinatario||'—'}</td>
-          <td style="font-family:monospace;">${c.codigo||'—'}</td>
-          <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${c.status==='usado'?'#e8f5e9':'#fff3e0'};color:${c.status==='usado'?'#2e7d32':'#e65100'};">${c.status==='usado'?'✔ Usado':'⏳ Pendente'}</span></td>
-          <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-        </tr>`).join('')}</tbody></table>
-      </div>
-    </div>`).join('');
-}
-const _NS={'ap':'Autopreservação','sex':'1 a 1','so':'Social','AP':'Autopreservação','1A1':'1 a 1','SOC':'Social'};
-function _renderAccordionLaudos(lista){
-  return _agruparPorMes(lista).map(g=>`
-    <div class="accordion-mes">
-      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
-        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length})</span></span>
-        <span class="acc-arrow">▶</span>
-      </div>
-      <div class="accordion-body">
-        <table><thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>PDF</th></tr></thead>
-        <tbody>${g.itens.map(l=>{
-          const lid=l.id,sub=[l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo].map(s=>_NS[s]||s||'—').join(' · ');
-          const btn=l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:
-            `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')">🔄</button>`;
-          return `<tr><td>${l.nome||'—'}</td><td style="font-size:12px;">${l.tipoNome||l.tipo||'—'}</td>
-            <td>Asa ${l.asaDominante||'—'}</td><td style="font-size:11px;">${sub}</td>
-            <td id="pdfcell_${lid}">${btn}</td></tr>`;
-        }).join('')}</tbody></table>
-      </div>
-    </div>`).join('');
-}
-function _initAccordion(container){
-  const first=container.querySelector('.accordion-header');
-  if(first){first.classList.add('open');first.nextElementSibling.classList.add('open');}
-}
-
 </script>
 </body>
 </html>
