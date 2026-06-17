@@ -708,6 +708,26 @@ tr:hover td{background:#FAFAFE;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script>
+// Declarar fontes padrão imediatamente após CDN carregar
+(function() {
+  function _initFonts() {
+    if (!window.pdfMake) return;
+    window.pdfMake.fonts = window.pdfMake.fonts || {};
+    window.pdfMake.fonts['Roboto'] = {
+      normal:      'Roboto-Regular.ttf',
+      bold:        'Roboto-Medium.ttf',
+      italics:     'Roboto-Italic.ttf',
+      bolditalics: 'Roboto-MediumItalic.ttf',
+    };
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _initFonts);
+  } else {
+    _initFonts();
+  }
+})();
+</script>
 
 <!-- ══ GERADOR PDF (pdfmake — script global, não module) ══ -->
 <script>
@@ -938,6 +958,14 @@ window._carregarFontesCormorant = async function() {
 window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
   // Carregar Cormorant Garamond
   await window._carregarFontesCormorant();
+  // Garantia extra: Roboto sempre declarado antes de gerar PDF
+  window.pdfMake.fonts = window.pdfMake.fonts || {};
+  window.pdfMake.fonts['Roboto'] = {
+    normal:      'Roboto-Regular.ttf',
+    bold:        'Roboto-Medium.ttf',
+    italics:     'Roboto-Italic.ttf',
+    bolditalics: 'Roboto-MediumItalic.ttf',
+  };
   const _NT = {1:'Perfeição e Excelência',2:'Prestativo e Relacional',3:'Performance e Imagem',
                4:'Autêntico e Profundo',5:'Observador e Privacidade',6:'Precavido e Questionador',
                7:'Visionário e Otimista',8:'Desafiador e Controlador',9:'Harmônico e Diplomático'};
