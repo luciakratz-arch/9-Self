@@ -940,9 +940,7 @@ window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, no
   if (!textoSub) { const k=Object.keys(S).find(x=>x.startsWith('SUBTIPO_')); if(k) textoSub=S[k]; }
   const textoAsa = S[`ASA_${asaFinal}`]||'';
 
-  // ── CAPA (canvas + stack) ─────────────────────────────────────
-  const capa = {
-  };
+  // ── CAPA ─────────────────────────────────────────────────────
 
   // ── RODAPÉ de todas as páginas ────────────────────────────────
   function _footer(page, pages) {
