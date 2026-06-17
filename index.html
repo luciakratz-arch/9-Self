@@ -2523,7 +2523,9 @@ async function loadLaudos(){
       // Estado do botão PDF
       const btnPdf = l.pdfUrl
         ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
-        : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
+        : l.pdfStatus === 'gerando'
+          ? `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Clique para tentar novamente">🔄 Gerar PDF</button>`
+          : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
       return `<tr>
         <td>${l.nome||'—'}</td>
         <td>${l.empresa||'PF'}</td>
@@ -2673,22 +2675,35 @@ window.gerarPdfLaudo = async function(laudoId) {
     const asaFinal = ASAS_VALIDAS[tipo]?.includes(asa) ? asa : ASAS_VALIDAS[tipo][0];
 
     // 3. Gerar PDF no navegador (mesmo motor do paciente)
-    // Gerar PDF + subir Storage
-    const { getStorage, ref: sRef, uploadBytes, getDownloadURL } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
-
+    // Gerar PDF
+    setCell(`<span style="font-size:12px;color:#888;">⏳ Gerando PDF...</span>`);
     const blob = await window.gerarPdfNavegador({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo });
 
-    const nomeArq = `laudos_9self/${laudoId}_${Date.now()}.pdf`;
-    const storageRef = sRef(getStorage(), nomeArq);
-    const uploadSnap = await uploadBytes(storageRef, blob, { contentType:'application/pdf' });
-    const pdfUrl = await getDownloadURL(uploadSnap.ref);
-
-    await updateDoc(doc(db,'nself_laudos', laudoId), {
-      pdfUrl, pdfStatus:'pronto', pdfGeradoEm: serverTimestamp()
-    });
-
-    setCell(`<a href="${pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
+    // Tentar subir no Storage
+    let pdfUrl = null;
+    try {
+      setCell(`<span style="font-size:12px;color:#888;">⬆ Enviando...</span>`);
+      const { getStorage, ref: sRef, uploadBytes, getDownloadURL } =
+        await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
+      const nomeArq = `laudos_9self/${laudoId}_${Date.now()}.pdf`;
+      const storageRef = sRef(getStorage(), nomeArq);
+      const uploadSnap = await uploadBytes(storageRef, blob, { contentType:'application/pdf' });
+      pdfUrl = await getDownloadURL(uploadSnap.ref);
+      await updateDoc(doc(db,'nself_laudos', laudoId), {
+        pdfUrl, pdfStatus:'pronto', pdfGeradoEm: serverTimestamp()
+      });
+      setCell(`<a href="${pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
+    } catch(eStorage) {
+      // Storage falhou (não habilitado?) — baixar localmente mesmo assim
+      console.warn('[Storage]', eStorage.message);
+      await updateDoc(doc(db,'nself_laudos', laudoId), { pdfStatus:'erro_storage', pdfErro: eStorage.message });
+      const _url = URL.createObjectURL(blob);
+      const _a = document.createElement('a');
+      _a.href=_url; _a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+      document.body.appendChild(_a); _a.click();
+      document.body.removeChild(_a); URL.revokeObjectURL(_url);
+      setCell(`<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}')">🔄 Re-gerar</button>`);
+    }
 
   } catch(e) {
     console.error('[gerarPdfLaudo]', e.message);
