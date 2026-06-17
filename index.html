@@ -1544,6 +1544,39 @@ async function loadDashboard() {
       <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${laudoSnap.size}</div><div class="sc-sub">gerados</div></div>
       <div class="stat-card"><div class="sc-label">Códigos Usados</div><div class="sc-value">${codSnap.docs.filter(d=>d.data().status==='usado').length}</div><div class="sc-sub">avaliações realizadas</div></div>
     `;
+
+    // ── Preencher tabela Últimas Avaliações ──
+    const NS = {'ap':'Autopreservação','sex':'1 a 1','so':'Social','AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','soc':'Social'};
+    const dashTable = document.getElementById('dashTable');
+    const laudos = laudoSnap.docs
+      .map(d=>({...d.data(), _id:d.id}))
+      .sort((a,b)=>{ // mais recente primeiro
+        const ta = a.criadoEm?.toDate?.()?.getTime()||0;
+        const tb = b.criadoEm?.toDate?.()?.getTime()||0;
+        return tb - ta;
+      })
+      .slice(0,10); // últimas 10
+
+    if(!laudos.length) {
+      dashTable.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação ainda</td></tr>';
+    } else {
+      dashTable.innerHTML = laudos.map(l=>{
+        const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
+                    .map(s=>NS[s]||s||'—').join(' · ');
+        const data = l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—';
+        const status = l.pdfUrl
+          ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:#2e7d32;">✔ PDF pronto</span>`
+          : `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#fff3e0;color:#e65100;">⏳ Pendente</span>`;
+        return `<tr>
+          <td>${l.nome||'—'}</td>
+          <td style="font-size:12px;">${l.tipoNome||l.tipo||'—'}</td>
+          <td>Asa ${l.asaDominante||'—'}</td>
+          <td style="font-size:11px;">${sub}</td>
+          <td>${data}</td>
+          <td>${status}</td>
+        </tr>`;
+      }).join('');
+    }
   } catch(e){console.warn('Dashboard:',e);}
 }
 
