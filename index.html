@@ -581,6 +581,170 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+
+      <!-- ══ PAGE VENDAS ══ -->
+      <div class="page" id="page-vendas">
+        <div style="padding:28px;max-width:1100px;">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div>
+              <div class="page-title">Controle de Vendas</div>
+              <div class="page-subtitle">Links de venda, comissões e liberação automática de códigos</div>
+            </div>
+          </div>
+
+          <!-- Cards resumo -->
+          <div class="cards-grid" id="vendasCards" style="margin-bottom:28px;"></div>
+
+          <!-- Layout 2 colunas -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+            <!-- Gerador de links -->
+            <div class="table-card" style="padding:24px;">
+              <h3 style="margin:0 0 18px;font-size:15px;color:#1a0a2e;">🔗 Gerar Novo Link de Venda</h3>
+
+              <div class="form-row">
+                <label>Destino</label>
+                <select id="vDestino">
+                  <option value="pf">👤 Pessoa Física (direto)</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label>Quantidade de Licenças</label>
+                <input type="number" id="vQtd" value="1" min="1" placeholder="Ex: 5"/>
+              </div>
+              <div class="form-row">
+                <label>Valor do Pacote (R$)</label>
+                <input type="number" id="vValor" placeholder="Ex: 297.00" step="0.01"/>
+              </div>
+              <div class="form-row">
+                <label>% de Comissão (parceiro)</label>
+                <input type="number" id="vComissao" value="0" min="0" max="100" placeholder="0"/>
+              </div>
+              <div class="form-row">
+                <label>Nome do Parceiro (opcional)</label>
+                <input type="text" id="vParceiro" placeholder="Ex: João Silva"/>
+              </div>
+
+              <div class="form-row">
+                <label>Sua Chave Pix <span style="color:#B00">*</span></label>
+                <input type="text" id="vChavePix" placeholder="CPF, e-mail, telefone ou chave aleatória"
+                  style="font-family:monospace;"/>
+              </div>
+              <div class="form-row">
+                <label>Seu nome (como aparece no Pix)</label>
+                <input type="text" id="vNomePix" placeholder="Ex: Lucia Kratz"/>
+              </div>
+              <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="gerarLinkVenda()">
+                ⚡ Gerar Link de Venda
+              </button>
+
+              <!-- Resultado do link gerado -->
+              <div id="vLinkResult" style="display:none;margin-top:16px;background:#f0eaf7;border-radius:10px;padding:14px;">
+                <div style="font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Link gerado</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <input id="vLinkUrl" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#333;"/>
+                  <button class="btn btn-outline btn-sm" onclick="copiarLink()">📋 Copiar</button>
+                </div>
+                <div id="vLinkInfo" style="font-size:12px;color:#666;margin-top:8px;"></div>
+              </div>
+            </div>
+
+            <!-- Lista de vendas -->
+            <div class="table-card" style="padding:24px;">
+              <h3 style="margin:0 0 18px;font-size:15px;color:#1a0a2e;">📋 Vendas Recentes</h3>
+              <div id="vendasLista" style="display:flex;flex-direction:column;gap:10px;">
+                <div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Carregando...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comissões -->
+          <div class="table-card" style="margin-top:24px;padding:24px;">
+            <h3 style="margin:0 0 18px;font-size:15px;color:#1a0a2e;">💸 Relatório de Comissões</h3>
+            <table style="width:100%;border-collapse:collapse;">
+              <thead>
+                <tr style="background:#faf7ff;">
+                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Parceiro</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Venda</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">% Comissão</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Valor</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Status</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Data</th>
+                </tr>
+              </thead>
+              <tbody id="comissoesTable">
+                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Nenhuma comissão registrada</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div><!-- /page-vendas -->
+
+      <!-- ══ CHECKOUT (página pública de pagamento) ══ -->
+      <div class="page" id="page-checkout">
+        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;
+                    background:linear-gradient(135deg,#1a0a2e 0%,#3d0a5e 40%,#7B1D6B 75%,#1A9BAF 100%);
+                    padding:28px;">
+          <div style="background:rgba(255,255,255,0.96);border-radius:20px;padding:36px;
+                      max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align:center;margin-bottom:24px;">
+              <div style="font-size:32px;font-weight:700;color:#1a0a2e;font-family:'Cormorant Garamond',serif;">9&Self</div>
+              <div style="font-size:13px;color:#888;margin-top:4px;">Teste de Perfil Comportamental</div>
+            </div>
+
+            <div style="background:#f0eaf7;border-radius:12px;padding:16px;margin-bottom:20px;text-align:center;">
+              <div id="ckProduto" style="font-size:15px;font-weight:700;color:#3d0a5e;"></div>
+              <div id="ckLicencas" style="font-size:13px;color:#666;margin-top:4px;"></div>
+              <div id="ckValor" style="font-size:28px;font-weight:700;color:#7B00C4;margin-top:8px;"></div>
+            </div>
+
+            <div class="form-row" style="margin-bottom:12px;">
+              <label style="font-size:12px;color:#555;margin-bottom:4px;display:block;">Nome completo</label>
+              <input type="text" id="ckNome" placeholder="Seu nome completo" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;"/>
+            </div>
+            <div class="form-row" style="margin-bottom:12px;">
+              <label style="font-size:12px;color:#555;margin-bottom:4px;display:block;">E-mail</label>
+              <input type="email" id="ckEmail" placeholder="seu@email.com" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;"/>
+            </div>
+            <div class="form-row" style="margin-bottom:12px;">
+              <label style="font-size:12px;color:#555;margin-bottom:4px;display:block;">CPF / CNPJ</label>
+              <input type="text" id="ckDoc" placeholder="000.000.000-00" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;"/>
+            </div>
+
+            <!-- QR Code Pix -->
+            <div style="text-align:center;background:#f0fff4;border-radius:12px;padding:20px;margin-bottom:16px;">
+              <div style="font-size:13px;color:#2e7d32;font-weight:600;margin-bottom:12px;">
+                ⚡ Pague via Pix
+              </div>
+              <div id="ckQrCode" style="margin:0 auto 12px;"></div>
+              <div style="font-size:11px;color:#555;margin-bottom:8px;">ou copie a chave:</div>
+              <div style="display:flex;gap:6px;">
+                <input id="ckChavePix" readonly
+                  style="flex:1;font-size:12px;padding:8px;border:1px solid #ccc;border-radius:6px;background:#fff;font-family:monospace;color:#333;"/>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('ckChavePix').value);document.getElementById('ckCopiadoMsg').style.display='block';setTimeout(()=>document.getElementById('ckCopiadoMsg').style.display='none',2000);"
+                  style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;">📋</button>
+              </div>
+              <div id="ckCopiadoMsg" style="display:none;font-size:11px;color:#2e7d32;margin-top:4px;">✅ Copiado!</div>
+            </div>
+
+            <div style="background:#fff8e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#5d4037;">
+              <strong>⚠️ Como funciona:</strong><br>
+              1. Copie a chave Pix acima e pague pelo seu banco<br>
+              2. Clique em "Já Paguei" abaixo<br>
+              3. Seus códigos de acesso serão enviados por e-mail em até 1h após confirmação
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;"
+              onclick="confirmarPagamento()">
+              ✅ Já Paguei — Enviar Comprovante
+            </button>
+            <div id="ckStatus" style="text-align:center;margin-top:12px;font-size:13px;min-height:20px;"></div>
+          </div>
+        </div>
+      </div><!-- /page-checkout -->
+
       <!-- PAGE LAUDOS (oculta, mantida para compatibilidade) -->
       <div class="page" id="page-laudos" style="display:none;">
         <div style="padding:28px;">
@@ -1487,6 +1651,7 @@ const NAVS = {
     {icon:'📊', label:'Painel Geral',       page:'dashboard'},
     {icon:'👤', label:'Pessoa Física (PF)', page:'pf'},
     {icon:'🏢', label:'Empresas / RH (PJ)', page:'empresas'},
+    {icon:'💰', label:'Controle de Vendas', page:'vendas'},
   ],
   rh: [
     {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
@@ -1518,7 +1683,7 @@ window.navigateTo = function(page) {
   if(el) el.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   const labels = {
-    'dashboard':'Painel Geral','pf':'Pessoa Física','empresas':'Empresas / RH','codigos':'Códigos',
+    'dashboard':'Painel Geral','pf':'Pessoa Física','empresas':'Empresas / RH','vendas':'Controle de Vendas','codigos':'Códigos',
     'laudos':'Laudos','rh-dashboard':'Painel RH',
     'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo'
   };
@@ -1526,7 +1691,8 @@ window.navigateTo = function(page) {
   closeSidebar();
   if(page==='pf')       { loadPF(); }
   if(page==='empresas') { loadEmpresas(); }
-  if(page==='laudos')   {} // mantido para compatibilidade
+  if(page==='laudos')   {}
+  if(page==='vendas')   { loadVendas(); }
 };
 
 // ── DASHBOARD ADMIN ──
@@ -3226,6 +3392,268 @@ gerarCodigoPreview();
     }
   }
 })();
+
+// ════════════════════════════════════════════════════════════════════
+// ── CONTROLE DE VENDAS ──────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════
+
+// Popular select de destino com empresas
+async function _popularDestinoVendas() {
+  const sel = document.getElementById('vDestino');
+  if(!sel) return;
+  sel.innerHTML = '<option value="pf">👤 Pessoa Física (direto)</option>';
+  try {
+    const snap = await getDocs(collection(db,'nself_empresas'));
+    snap.forEach(d => {
+      const e = d.data();
+      const opt = document.createElement('option');
+      opt.value = d.id;
+      opt.textContent = '🏢 ' + (e.nome||'Empresa');
+      sel.appendChild(opt);
+    });
+  } catch(e) { console.warn(e); }
+}
+
+async function loadVendas() {
+  await _popularDestinoVendas();
+  await Promise.all([_loadVendasCards(), _loadVendasLista(), _loadComissoes()]);
+}
+
+async function _loadVendasCards() {
+  const el = document.getElementById('vendasCards');
+  if(!el) return;
+  try {
+    const now = new Date();
+    const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+    const snap = await getDocs(collection(db,'nself_vendas'));
+    let totalMes=0, codigosLiberados=0, comissaoTotal=0;
+    snap.forEach(d => {
+      const v = d.data();
+      const dt = v.criadoEm?.toDate?.();
+      if(dt && dt >= inicioMes) {
+        if(v.status==='pago') { totalMes += v.valor||0; codigosLiberados += v.qtd||0; }
+        comissaoTotal += v.comissaoValor||0;
+      }
+    });
+    el.innerHTML = `
+      <div class="stat-card">
+        <div class="sc-label">Total Vendido no Mês</div>
+        <div class="sc-value" style="color:#2e7d32;">R$ ${totalMes.toFixed(2).replace('.',',')}</div>
+        <div class="sc-sub">vendas aprovadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Códigos Liberados</div>
+        <div class="sc-value">${codigosLiberados}</div>
+        <div class="sc-sub">automaticamente este mês</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-label">Comissões a Pagar</div>
+        <div class="sc-value" style="color:#e65100;">R$ ${comissaoTotal.toFixed(2).replace('.',',')}</div>
+        <div class="sc-sub">parceiros este mês</div>
+      </div>
+    `;
+  } catch(e){ console.warn(e); }
+}
+
+async function _loadVendasLista() {
+  const el = document.getElementById('vendasLista');
+  if(!el) return;
+  try {
+    const snap = await getDocs(collection(db,'nself_vendas'));
+    const itens = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0))
+      .slice(0,20);
+    if(!itens.length){ el.innerHTML='<div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Nenhuma venda ainda</div>';return;}
+    el.innerHTML = itens.map(v=>`
+      <div style="border:1px solid #eee;border-radius:10px;padding:12px 16px;background:#fafafa;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:600;font-size:13px;color:#1a0a2e;">${v.destinoLabel||'PF'} · ${v.qtd||1} licença${(v.qtd||1)!==1?'s':''}</div>
+            <div style="font-size:11px;color:#888;margin-top:2px;">${v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'} · ${v.parceiro?'Parceiro: '+v.parceiro:''}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700;color:#7B00C4;font-size:15px;">R$ ${(v.valor||0).toFixed(2).replace('.',',')}</div>
+            <span style="font-size:11px;padding:2px 8px;border-radius:10px;
+              background:${v.status==='pago'?'#e8f5e9':'#fff3e0'};
+              color:${v.status==='pago'?'#2e7d32':'#e65100'};">
+              ${v.status==='pago'?'✔ Pago':'⏳ Aguardando'}
+            </span>
+          </div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px;align-items:center;">
+          <input value="${v.linkUrl||''}" readonly style="flex:1;font-size:11px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;color:#555;background:#fff;"/>
+          <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('${v.linkUrl||''}');showToast('Link copiado!')">📋</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e){ console.warn(e); }
+}
+
+async function _loadComissoes() {
+  const tbody = document.getElementById('comissoesTable');
+  if(!tbody) return;
+  try {
+    const snap = await getDocs(collection(db,'nself_vendas'));
+    const comissoes = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(v => v.comissaoPct > 0)
+      .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0));
+    if(!comissoes.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Nenhuma comissão registrada</td></tr>';return;}
+    tbody.innerHTML = comissoes.map(v=>`<tr>
+      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;">${v.parceiro||'—'}</td>
+      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;">${v.destinoLabel||'PF'} · ${v.qtd} lic.</td>
+      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;">${v.comissaoPct||0}%</td>
+      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;font-weight:600;color:#7B00C4;">R$ ${(v.comissaoValor||0).toFixed(2).replace('.',',')}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #eee;">
+        <span style="font-size:11px;padding:2px 8px;border-radius:10px;
+          background:${v.comissaoPaga?'#e8f5e9':'#fff3e0'};
+          color:${v.comissaoPaga?'#2e7d32':'#e65100'};">
+          ${v.comissaoPaga?'✔ Paga':'⏳ Pendente'}
+        </span>
+      </td>
+      <td style="padding:9px 14px;font-size:12px;color:#888;border-bottom:1px solid #eee;">${v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+    </tr>`).join('');
+  } catch(e){ console.warn(e); }
+}
+
+window.gerarLinkVenda = async function() {
+  const destino  = document.getElementById('vDestino').value;
+  const destinoLabel = document.getElementById('vDestino').selectedOptions[0].text;
+  const qtd      = parseInt(document.getElementById('vQtd').value)||1;
+  const valor    = parseFloat(document.getElementById('vValor').value)||0;
+  const comPct   = parseFloat(document.getElementById('vComissao').value)||0;
+  const parceiro = document.getElementById('vParceiro').value.trim();
+
+  if(!valor){ showToast('Informe o valor do pacote'); return; }
+
+  const comissaoValor = valor * comPct / 100;
+  // Gerar ID único para o link
+  const linkId = Math.random().toString(36).substr(2,8).toUpperCase();
+  const linkUrl = `https://luciakratz-arch.github.io/9-Self/?checkout=${linkId}`;
+
+  try {
+    await addDoc(collection(db,'nself_vendas'),{
+      linkId, linkUrl,
+      destino, destinoLabel: destinoLabel.replace(/^[👤🏢] /,''),
+      qtd, valor, comissaoPct: comPct, comissaoValor,
+      parceiro: parceiro||null,
+      status: 'aguardando',
+      comissaoPaga: false,
+      criadoEm: serverTimestamp(),
+    });
+
+    document.getElementById('vLinkUrl').value = linkUrl;
+    document.getElementById('vLinkInfo').textContent =
+      `${qtd} licença${qtd!==1?'s':''} · R$ ${valor.toFixed(2).replace('.',',')} · ${comPct>0?comPct+'% comissão para '+parceiro:'sem comissão'}`;
+    document.getElementById('vLinkResult').style.display = '';
+    showToast('Link gerado com sucesso!');
+    _loadVendasLista();
+  } catch(e){ showToast('Erro: '+e.message); }
+};
+
+window.copiarLink = function() {
+  const url = document.getElementById('vLinkUrl').value;
+  navigator.clipboard.writeText(url).then(()=>showToast('Link copiado!'));
+};
+
+// ── CHECKOUT ──────────────────────────────────────────────────────────
+window._checkoutData = null;
+
+window.ckTab = function(tab) {
+  const isCartao = tab==='cartao';
+  document.getElementById('ckCartaoFields').style.display = isCartao?'':'none';
+  document.getElementById('ckPixFields').style.display    = isCartao?'none':'';
+  document.getElementById('ckTabCartao').style.background = isCartao?'#7B00C4':'#fff';
+  document.getElementById('ckTabCartao').style.color      = isCartao?'#fff':'#555';
+  document.getElementById('ckTabCartao').style.borderColor= isCartao?'#7B00C4':'#ddd';
+  document.getElementById('ckTabPix').style.background    = !isCartao?'#7B00C4':'#fff';
+  document.getElementById('ckTabPix').style.color         = !isCartao?'#fff':'#555';
+  document.getElementById('ckTabPix').style.borderColor   = !isCartao?'#7B00C4':'#ddd';
+};
+
+// Verificar parâmetro ?checkout=ID na URL e abrir checkout
+async function _checkCheckoutParam() {
+  const params = new URLSearchParams(window.location.search);
+  const cid = params.get('checkout');
+  if(!cid) return;
+  try {
+    const snap = await getDocs(collection(db,'nself_vendas'));
+    let venda = null;
+    snap.forEach(d=>{ if(d.data().linkId===cid) venda={id:d.id,...d.data()}; });
+    if(!venda){ return; }
+    window._checkoutData = venda;
+    // Preencher checkout
+    document.getElementById('ckProduto').textContent  = '9&Self — Teste de Perfil Comportamental';
+    document.getElementById('ckLicencas').textContent = `${venda.qtd} acesso${venda.qtd!==1?'s':''} incluído${venda.qtd!==1?'s':''}`;
+    document.getElementById('ckValor').textContent    = `R$ ${(venda.valor||0).toFixed(2).replace('.',',')}`;
+    // Esconder app e mostrar checkout
+    document.getElementById('appContainer').style.display='none';
+    document.getElementById('page-checkout').style.display='flex';
+    document.getElementById('page-checkout').classList.add('active');
+  } catch(e){ console.warn('[checkout]',e); }
+}
+
+window.confirmarPagamento = async function() {
+  const nome  = document.getElementById('ckNome').value.trim();
+  const email = document.getElementById('ckEmail').value.trim();
+  const doc_  = document.getElementById('ckDoc').value.trim();
+  const st    = document.getElementById('ckStatus');
+
+  if(!nome||!email){ st.innerHTML='<span style="color:#c62828;">Preencha nome e e-mail</span>'; return; }
+
+  const venda = window._checkoutData;
+  if(!venda){ st.innerHTML='<span style="color:#c62828;">Link inválido</span>'; return; }
+
+  st.innerHTML = '<span style="color:#888;">⏳ Processando pagamento...</span>';
+
+  try {
+    // Simular aprovação (em produção: integrar Stripe/Pagar.me aqui)
+    await new Promise(r=>setTimeout(r,1800));
+
+    // 1. Atualizar venda como paga
+    const vendaRef = doc(db,'nself_vendas', venda.id);
+    await updateDoc(vendaRef,{
+      status:'pago', comprador:nome, compradorEmail:email, compradorDoc:doc_,
+      pagoEm: serverTimestamp(),
+    });
+
+    // 2. Liberar códigos automaticamente
+    const BASE_URL = 'https://luciakratz-arch.github.io/9-Self/?c=';
+    for(let i=0; i<(venda.qtd||1); i++){
+      const cod = Math.random().toString(36).substr(2,6).toUpperCase();
+      await addDoc(collection(db,'nself_codigos'),{
+        codigo: cod,
+        nomeDestinatario: nome,
+        email: email,
+        empresa: venda.destino==='pf' ? 'PF' : venda.destino,
+        status: 'pendente',
+        origem: 'venda_automatica',
+        vendaId: venda.id,
+        linkAcesso: BASE_URL+cod,
+        criadoEm: serverTimestamp(),
+      });
+    }
+
+    // 3. Registrar comissão se houver
+    if((venda.comissaoPct||0) > 0) {
+      await addDoc(collection(db,'nself_comissoes'),{
+        vendaId: venda.id, parceiro: venda.parceiro,
+        pct: venda.comissaoPct, valor: venda.comissaoValor,
+        pago: false, criadoEm: serverTimestamp(),
+      });
+    }
+
+    st.innerHTML = '<span style="color:#2e7d32;font-size:15px;font-weight:600;">✅ Pagamento aprovado! Seus códigos foram enviados por e-mail.</span>';
+    document.querySelector('#page-checkout button.btn-primary').disabled = true;
+
+  } catch(e){
+    st.innerHTML = `<span style="color:#c62828;">Erro: ${e.message}</span>`;
+  }
+};
+
+// Verificar checkout ao carregar
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(_checkCheckoutParam, 800); });
+
+
 </script>
 </body>
 </html>
