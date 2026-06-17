@@ -322,6 +322,38 @@ tr:hover td{background:#FAFAFE;}
   .cards-grid{grid-template-columns:1fr 1fr;}
 }
 
+/* ── ACCORDION ── */
+.accordion-mes {
+  border:1px solid var(--border);border-radius:10px;overflow:hidden;
+}
+.accordion-header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:var(--light);cursor:pointer;
+  font-weight:600;font-size:13px;color:var(--purple);
+  user-select:none;
+}
+.accordion-header:hover { background:#ede6f7; }
+.accordion-header .acc-arrow { transition:transform .25s; font-size:11px; }
+.accordion-header.open .acc-arrow { transform:rotate(90deg); }
+.accordion-body { display:none; padding:0; }
+.accordion-body.open { display:block; }
+.accordion-body table { width:100%;border-collapse:collapse; }
+.accordion-body td,.accordion-body th {
+  padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--border);
+  text-align:left;
+}
+.accordion-body th { background:#faf7ff;color:#555;font-weight:600;font-size:11px; }
+/* ── EMPRESA CARD ── */
+.emp-card {
+  background:#fff;border:1px solid var(--border);border-radius:14px;
+  padding:20px;cursor:pointer;transition:box-shadow .2s,border-color .2s;
+}
+.emp-card:hover { box-shadow:0 4px 18px rgba(123,0,196,.12);border-color:var(--purple); }
+.emp-card-nome { font-size:15px;font-weight:700;color:#1a0a2e;margin-bottom:4px; }
+.emp-card-sub  { font-size:12px;color:var(--gray); }
+.emp-card-badges { display:flex;gap:6px;margin-top:12px; }
+.emp-card-badge { font-size:11px;padding:3px 10px;border-radius:20px;
+  background:#f0eaf7;color:var(--purple);font-weight:600; }
 /* PAGE TITLE */
 .page-title{
   font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
@@ -453,20 +485,44 @@ tr:hover td{background:#FAFAFE;}
       </div>
 
       <div class="page" id="page-empresas">
-        <div style="padding:28px;">
+        <div style="padding:28px;" id="empListView">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
             <div>
               <div class="page-title">Empresas / RH</div>
-              <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
+              <div class="page-subtitle">Clique em uma empresa para ver códigos e laudos</div>
             </div>
             <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
           </div>
-          <div class="table-card">
-            <table>
-              <thead><tr><th>Empresa</th><th>Responsável</th><th>E-mail</th><th>Créditos</th><th>Laudos Gerados</th><th>Status</th><th></th></tr></thead>
-              <tbody id="empresasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
-            </table>
+          <!-- Cards das empresas -->
+          <div id="empresasCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;"></div>
+          <!-- Tabela legada oculta (mantida para compatibilidade de código) -->
+          <tbody id="empresasTable" style="display:none;"></tbody>
+        </div>
+        <!-- Detalhe de empresa: abre ao clicar no card -->
+        <div style="padding:28px;display:none;" id="empDetailView">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <button onclick="empVoltarLista()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--purple);">←</button>
+            <div>
+              <div class="page-title" id="empDetailNome">Empresa</div>
+              <div class="page-subtitle" id="empDetailSub">Códigos e laudos desta empresa</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
           </div>
+          <!-- Sub-abas empresa -->
+          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0;">
+            <button id="empTabCod" onclick="empShowTab('codigos')"
+              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
+                     color:var(--purple);border-bottom:2px solid var(--purple);margin-bottom:-2px;">
+              🔑 Códigos
+            </button>
+            <button id="empTabLau" onclick="empShowTab('laudos')"
+              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
+                     color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;">
+              📄 Laudos
+            </button>
+          </div>
+          <div id="empSecCodigos"><div id="empAccordionCodigos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
+          <div id="empSecLaudos" style="display:none;"><div id="empAccordionLaudos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
         </div>
       </div>
 
@@ -488,16 +544,47 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
-      <div class="page" id="page-laudos">
+      <!-- PAGE PF: Pessoa Física -->
+      <div class="page" id="page-pf">
         <div style="padding:28px;">
-          <div class="page-title">Laudos Gerados</div>
-          <div class="page-subtitle">Histórico de todos os laudos do sistema</div>
-          <div class="table-card" style="margin-top:16px;">
-            <table>
-              <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
-              <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
-            </table>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <div>
+              <div class="page-title">Pessoa Física</div>
+              <div class="page-subtitle">Códigos e laudos de clientes diretos (PF)</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código PF</button>
           </div>
+
+          <!-- Sub-abas -->
+          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0;">
+            <button id="pfTabCod" onclick="pfShowTab('codigos')"
+              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
+                     color:var(--purple);border-bottom:2px solid var(--purple);margin-bottom:-2px;">
+              🔑 Códigos Gerados
+            </button>
+            <button id="pfTabLau" onclick="pfShowTab('laudos')"
+              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
+                     color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;">
+              📄 Laudos Emitidos
+            </button>
+          </div>
+
+          <!-- Seção Códigos PF -->
+          <div id="pfSecCodigos">
+            <div id="pfAccordionCodigos" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+
+          <!-- Seção Laudos PF -->
+          <div id="pfSecLaudos" style="display:none;">
+            <div id="pfAccordionLaudos" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE LAUDOS (oculta, mantida para compatibilidade) -->
+      <div class="page" id="page-laudos" style="display:none;">
+        <div style="padding:28px;">
+          <div id="laudosTable"></div>
         </div>
       </div>
 
@@ -1397,10 +1484,9 @@ function enterApp(profile, name, role) {
 // ── SIDEBAR ──
 const NAVS = {
   admin: [
-    {icon:'📊', label:'Painel', page:'dashboard'},
-    {icon:'🏢', label:'Empresas / RH', page:'empresas'},
-    {icon:'🔑', label:'Códigos de Acesso', page:'codigos'},
-    {icon:'📄', label:'Laudos', page:'laudos'},
+    {icon:'📊', label:'Painel Geral',       page:'dashboard'},
+    {icon:'👤', label:'Pessoa Física (PF)', page:'pf'},
+    {icon:'🏢', label:'Empresas / RH (PJ)', page:'empresas'},
   ],
   rh: [
     {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
@@ -1432,12 +1518,15 @@ window.navigateTo = function(page) {
   if(el) el.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   const labels = {
-    'dashboard':'Painel Geral','empresas':'Empresas / RH','codigos':'Códigos',
+    'dashboard':'Painel Geral','pf':'Pessoa Física','empresas':'Empresas / RH','codigos':'Códigos',
     'laudos':'Laudos','rh-dashboard':'Painel RH',
     'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
+  if(page==='pf')       { loadPF(); }
+  if(page==='empresas') { loadEmpresas(); }
+  if(page==='laudos')   {} // mantido para compatibilidade
 };
 
 // ── DASHBOARD ADMIN ──
@@ -1460,11 +1549,35 @@ async function loadDashboard() {
 
 // ── LOAD EMPRESAS ──
 async function loadEmpresas() {
-  const tbody = document.getElementById('empresasTable');
+  const container = document.getElementById('empresasCards');
+  const tbody = document.getElementById('empresasTable'); // compatibilidade
   try {
     const snap = await getDocs(collection(db,'nself_empresas'));
-    if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr>';return;}
-    tbody.innerHTML = snap.docs.map(d=>{
+    if(snap.empty){
+      container.innerHTML='<div style="color:#aaa;padding:24px;text-align:center;">Nenhuma empresa cadastrada</div>';
+      return;
+    }
+    // Buscar contagem de laudos por empresa para exibir no card
+    const laudoSnap = await getDocs(collection(db,'nself_laudos'));
+    const laudoCount = {};
+    laudoSnap.forEach(d=>{const emp=d.data().empresa; if(emp&&emp!=='PF') laudoCount[emp]=(laudoCount[emp]||0)+1;});
+
+    container.innerHTML = snap.docs.map(d=>{
+      const e=d.data(); const id=d.id;
+      const nLaudos = laudoCount[id]||laudoCount[e.nome]||0;
+      return `<div class="emp-card" onclick="abrirEmpresa('${id}','${(e.nome||'').replace(/'/g,"\'")}','${(e.email||'')}')">
+        <div class="emp-card-nome">${e.nome||'—'}</div>
+        <div class="emp-card-sub">${e.responsavel||''} · ${e.email||''}</div>
+        <div class="emp-card-badges">
+          <span class="emp-card-badge">💳 ${e.creditos||0} créditos</span>
+          <span class="emp-card-badge">📄 ${nLaudos} laudos</span>
+          <span class="emp-card-badge" style="background:${e.status==='ativo'?'#e8f5e9':'#fce4ec'};color:${e.status==='ativo'?'#2e7d32':'#c62828'};">${e.status==='ativo'?'✔ Ativo':'⏸ Inativo'}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Manter tbody legado oculto
+    if(tbody) tbody.innerHTML = snap.docs.map(d=>{
       const e=d.data();
       return `<tr>
         <td><strong>${e.nome}</strong></td>
@@ -2544,6 +2657,200 @@ window.navigateTo = function(page) {
   if(page==='codigos')  { loadCodigos(); gerarCodigoPreview(); }
   if(page==='laudos')   loadLaudos();
 };
+
+
+// ────────────────────────────────────────────────────────────────────
+// ── PF: Pessoa Física ───────────────────────────────────────────────
+window._pfTab = 'codigos';
+
+window.pfShowTab = function(tab) {
+  window._pfTab = tab;
+  const isCod = tab === 'codigos';
+  document.getElementById('pfSecCodigos').style.display = isCod ? '' : 'none';
+  document.getElementById('pfSecLaudos').style.display  = isCod ? 'none' : '';
+  document.getElementById('pfTabCod').style.color = isCod ? 'var(--purple)' : 'var(--gray)';
+  document.getElementById('pfTabCod').style.borderBottomColor = isCod ? 'var(--purple)' : 'transparent';
+  document.getElementById('pfTabLau').style.color = !isCod ? 'var(--purple)' : 'var(--gray)';
+  document.getElementById('pfTabLau').style.borderBottomColor = !isCod ? 'var(--purple)' : 'transparent';
+};
+
+async function loadPF() {
+  await Promise.all([loadPFCodigos(), loadPFLaudos()]);
+}
+
+async function loadPFCodigos() {
+  const container = document.getElementById('pfAccordionCodigos');
+  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
+  try {
+    const snap = await getDocs(collection(db,'nself_codigos'));
+    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(c => !c.empresa || c.empresa === 'pf' || c.empresa === 'PF' || c.empresa === null);
+    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum código PF</div>';return;}
+    container.innerHTML = _renderAccordionCodigos(todos);
+    _initAccordion(container);
+  } catch(e){console.warn(e);}
+}
+
+async function loadPFLaudos() {
+  const container = document.getElementById('pfAccordionLaudos');
+  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
+  try {
+    const snap = await getDocs(collection(db,'nself_laudos'));
+    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(l => !l.empresa || l.empresa === 'PF');
+    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum laudo PF</div>';return;}
+    container.innerHTML = _renderAccordionLaudos(todos);
+    _initAccordion(container);
+  } catch(e){console.warn(e);}
+}
+
+// ────────────────────────────────────────────────────────────────────
+// ── EMPRESAS: cards + detalhe ───────────────────────────────────────
+window._empAtual = null;
+
+window.empVoltarLista = function() {
+  document.getElementById('empListView').style.display   = '';
+  document.getElementById('empDetailView').style.display = 'none';
+  window._empAtual = null;
+};
+
+window.empShowTab = function(tab) {
+  const isCod = tab === 'codigos';
+  document.getElementById('empSecCodigos').style.display = isCod ? '' : 'none';
+  document.getElementById('empSecLaudos').style.display  = isCod ? 'none' : '';
+  document.getElementById('empTabCod').style.color = isCod ? 'var(--purple)' : 'var(--gray)';
+  document.getElementById('empTabCod').style.borderBottomColor = isCod ? 'var(--purple)' : 'transparent';
+  document.getElementById('empTabLau').style.color = !isCod ? 'var(--purple)' : 'var(--gray)';
+  document.getElementById('empTabLau').style.borderBottomColor = !isCod ? 'var(--purple)' : 'transparent';
+};
+
+window.abrirEmpresa = async function(empId, empNome, empEmail) {
+  window._empAtual = {id: empId, nome: empNome, email: empEmail};
+  document.getElementById('empListView').style.display   = 'none';
+  document.getElementById('empDetailView').style.display = '';
+  document.getElementById('empDetailNome').textContent   = empNome;
+  document.getElementById('empDetailSub').textContent    = empEmail;
+  empShowTab('codigos');
+  await Promise.all([loadEmpCodigos(empId, empNome), loadEmpLaudos(empId, empNome)]);
+};
+
+async function loadEmpCodigos(empId, empNome) {
+  const container = document.getElementById('empAccordionCodigos');
+  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
+  try {
+    const snap = await getDocs(collection(db,'nself_codigos'));
+    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(c => c.empresa === empId || c.empresa === empNome);
+    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum código para esta empresa</div>';return;}
+    container.innerHTML = _renderAccordionCodigos(todos);
+    _initAccordion(container);
+  } catch(e){console.warn(e);}
+}
+
+async function loadEmpLaudos(empId, empNome) {
+  const container = document.getElementById('empAccordionLaudos');
+  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
+  try {
+    const snap = await getDocs(collection(db,'nself_laudos'));
+    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(l => l.empresa === empId || l.empresa === empNome);
+    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum laudo para esta empresa</div>';return;}
+    container.innerHTML = _renderAccordionLaudos(todos);
+    _initAccordion(container);
+  } catch(e){console.warn(e);}
+}
+
+// ────────────────────────────────────────────────────────────────────
+// ── HELPERS ACCORDION ───────────────────────────────────────────────
+function _getMesAnoKey(item) {
+  const d = item.criadoEm?.toDate?.();
+  if(!d) return '9999-99::Data desconhecida';
+  const key = `${String(9999-d.getFullYear()).padStart(4,'0')}-${String(99-d.getMonth()).padStart(2,'0')}`;
+  const label = d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})
+                 .replace(/^\w/,c=>c.toUpperCase());
+  return `${key}::${label}`;
+}
+
+function _agruparPorMes(lista) {
+  const grupos = {};
+  lista.forEach(item => {
+    const k = _getMesAnoKey(item);
+    if(!grupos[k]) grupos[k] = [];
+    grupos[k].push(item);
+  });
+  // ordenar itens A→Z dentro de cada grupo
+  Object.values(grupos).forEach(arr =>
+    arr.sort((a,b)=>(a.nome||a.nomeDestinatario||'').localeCompare(b.nome||b.nomeDestinatario||'','pt-BR',{sensitivity:'base'}))
+  );
+  return Object.keys(grupos).sort().map(k=>({label:k.split('::')[1], itens:grupos[k]}));
+}
+
+function _renderAccordionCodigos(lista) {
+  const grupos = _agruparPorMes(lista);
+  return grupos.map((g,gi) => `
+    <div class="accordion-mes">
+      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
+        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length} código${g.itens.length!==1?'s':''})</span></span>
+        <span class="acc-arrow">▶</span>
+      </div>
+      <div class="accordion-body">
+        <table>
+          <thead><tr><th>Nome</th><th>Código</th><th>Status</th><th>Criado em</th><th></th></tr></thead>
+          <tbody>
+            ${g.itens.map(c=>`<tr>
+              <td>${c.nomeDestinatario||'—'}</td>
+              <td style="font-family:monospace;letter-spacing:2px;">${c.codigo||'—'}</td>
+              <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${c.status==='usado'?'#e8f5e9':'#fff3e0'};color:${c.status==='usado'?'#2e7d32':'#e65100'};">${c.status==='usado'?'✔ Usado':'⏳ Pendente'}</span></td>
+              <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+              <td><button class="btn btn-outline btn-sm" onclick="editarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\'")}','${(c.email||'').replace(/'/g,"\'")}','${(c.whatsapp||'').replace(/'/g,"\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `).join('');
+}
+
+const _NS_SUB = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+
+function _renderAccordionLaudos(lista) {
+  const grupos = _agruparPorMes(lista);
+  return grupos.map(g => `
+    <div class="accordion-mes">
+      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
+        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length} laudo${g.itens.length!==1?'s':''})</span></span>
+        <span class="acc-arrow">▶</span>
+      </div>
+      <div class="accordion-body">
+        <table>
+          <thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Laudo</th></tr></thead>
+          <tbody>
+            ${g.itens.map(l=>{
+              const lid=l.id;
+              const sub=[l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo].map(s=>_NS_SUB[s]||s||'—').join(' · ');
+              const btn=l.pdfUrl
+                ?`<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
+                :`<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')">🔄 Gerar</button>`;
+              return `<tr>
+                <td>${l.nome||'—'}</td>
+                <td style="font-size:12px;">${l.tipoNome||l.tipo||'—'}</td>
+                <td>Asa ${l.asaDominante||'—'}</td>
+                <td style="font-size:11px;">${sub}</td>
+                <td id="pdfcell_${lid}">${btn}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `).join('');
+}
+
+function _initAccordion(container) {
+  // Abrir o primeiro grupo automaticamente
+  const first = container.querySelector('.accordion-header');
+  if(first) { first.classList.add('open'); first.nextElementSibling.classList.add('open'); }
+}
 
 async function loadLaudos(){
   const tbody = document.getElementById('laudosTable');
