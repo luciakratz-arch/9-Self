@@ -911,10 +911,21 @@ window._carregarFontesCormorant = async function() {
         b += String.fromCharCode(...bytes.subarray(i, i + chunk));
       return btoa(b);
     };
+    // Adicionar ao vfs existente (que já tem Roboto do vfs_fonts.js) — NÃO sobrescrever
     window.pdfMake.vfs = window.pdfMake.vfs || {};
     window.pdfMake.vfs['CormorantGaramond.ttf']        = toB64(b1);
     window.pdfMake.vfs['CormorantGaramond-Italic.ttf'] = toB64(b2);
+    // Adicionar fonte sem remover Roboto já declarado
     window.pdfMake.fonts = window.pdfMake.fonts || {};
+    // Garantir que Roboto está declarado (vfs_fonts.js pode ainda não ter rodado)
+    if (!window.pdfMake.fonts['Roboto']) {
+      window.pdfMake.fonts['Roboto'] = {
+        normal:      'Roboto-Regular.ttf',
+        bold:        'Roboto-Medium.ttf',
+        italics:     'Roboto-Italic.ttf',
+        bolditalics: 'Roboto-MediumItalic.ttf',
+      };
+    }
     window.pdfMake.fonts['CormorantGaramond'] = {
       normal:      'CormorantGaramond.ttf',
       bold:        'CormorantGaramond.ttf',
