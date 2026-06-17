@@ -322,38 +322,6 @@ tr:hover td{background:#FAFAFE;}
   .cards-grid{grid-template-columns:1fr 1fr;}
 }
 
-/* ── ACCORDION ── */
-.accordion-mes {
-  border:1px solid var(--border);border-radius:10px;overflow:hidden;
-}
-.accordion-header {
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;background:var(--light);cursor:pointer;
-  font-weight:600;font-size:13px;color:var(--purple);
-  user-select:none;
-}
-.accordion-header:hover { background:#ede6f7; }
-.accordion-header .acc-arrow { transition:transform .25s; font-size:11px; }
-.accordion-header.open .acc-arrow { transform:rotate(90deg); }
-.accordion-body { display:none; padding:0; }
-.accordion-body.open { display:block; }
-.accordion-body table { width:100%;border-collapse:collapse; }
-.accordion-body td,.accordion-body th {
-  padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--border);
-  text-align:left;
-}
-.accordion-body th { background:#faf7ff;color:#555;font-weight:600;font-size:11px; }
-/* ── EMPRESA CARD ── */
-.emp-card {
-  background:#fff;border:1px solid var(--border);border-radius:14px;
-  padding:20px;cursor:pointer;transition:box-shadow .2s,border-color .2s;
-}
-.emp-card:hover { box-shadow:0 4px 18px rgba(123,0,196,.12);border-color:var(--purple); }
-.emp-card-nome { font-size:15px;font-weight:700;color:#1a0a2e;margin-bottom:4px; }
-.emp-card-sub  { font-size:12px;color:var(--gray); }
-.emp-card-badges { display:flex;gap:6px;margin-top:12px; }
-.emp-card-badge { font-size:11px;padding:3px 10px;border-radius:20px;
-  background:#f0eaf7;color:var(--purple);font-weight:600; }
 /* PAGE TITLE */
 .page-title{
   font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
@@ -379,6 +347,27 @@ tr:hover td{background:#FAFAFE;}
 
 .overlay-mobile{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99;}
 .overlay-mobile.open{display:block;}
+
+/* ── ACCORDION ── */
+.accordion-mes{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:0;}
+.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
+  background:var(--light);cursor:pointer;font-weight:600;font-size:13px;color:var(--purple);user-select:none;}
+.accordion-header:hover{background:#ede6f7;}
+.accordion-header .acc-arrow{transition:transform .25s;font-size:11px;}
+.accordion-header.open .acc-arrow{transform:rotate(90deg);}
+.accordion-body{display:none;}
+.accordion-body.open{display:block;}
+.accordion-body table{width:100%;border-collapse:collapse;}
+.accordion-body td,.accordion-body th{padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--border);text-align:left;}
+.accordion-body th{background:#faf7ff;color:#555;font-weight:600;font-size:11px;}
+/* ── EMP CARD ── */
+.emp-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:box-shadow .2s,border-color .2s;}
+.emp-card:hover{box-shadow:0 4px 18px rgba(123,0,196,.12);border-color:var(--purple);}
+.emp-card-nome{font-size:15px;font-weight:700;color:#1a0a2e;margin-bottom:4px;}
+.emp-card-sub{font-size:12px;color:var(--gray);}
+.emp-card-badges{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+.emp-card-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:#f0eaf7;color:var(--purple);font-weight:600;}
+
 </style>
 </head>
 <body>
@@ -485,44 +474,20 @@ tr:hover td{background:#FAFAFE;}
       </div>
 
       <div class="page" id="page-empresas">
-        <div style="padding:28px;" id="empListView">
+        <div style="padding:28px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
             <div>
               <div class="page-title">Empresas / RH</div>
-              <div class="page-subtitle">Clique em uma empresa para ver códigos e laudos</div>
+              <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
             </div>
             <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
           </div>
-          <!-- Cards das empresas -->
-          <div id="empresasCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;"></div>
-          <!-- Tabela legada oculta (mantida para compatibilidade de código) -->
-          <tbody id="empresasTable" style="display:none;"></tbody>
-        </div>
-        <!-- Detalhe de empresa: abre ao clicar no card -->
-        <div style="padding:28px;display:none;" id="empDetailView">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-            <button onclick="empVoltarLista()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--purple);">←</button>
-            <div>
-              <div class="page-title" id="empDetailNome">Empresa</div>
-              <div class="page-subtitle" id="empDetailSub">Códigos e laudos desta empresa</div>
-            </div>
-            <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+          <div class="table-card">
+            <table>
+              <thead><tr><th>Empresa</th><th>Responsável</th><th>E-mail</th><th>Créditos</th><th>Laudos Gerados</th><th>Status</th><th></th></tr></thead>
+              <tbody id="empresasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
+            </table>
           </div>
-          <!-- Sub-abas empresa -->
-          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0;">
-            <button id="empTabCod" onclick="empShowTab('codigos')"
-              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
-                     color:var(--purple);border-bottom:2px solid var(--purple);margin-bottom:-2px;">
-              🔑 Códigos
-            </button>
-            <button id="empTabLau" onclick="empShowTab('laudos')"
-              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
-                     color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;">
-              📄 Laudos
-            </button>
-          </div>
-          <div id="empSecCodigos"><div id="empAccordionCodigos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
-          <div id="empSecLaudos" style="display:none;"><div id="empAccordionLaudos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
         </div>
       </div>
 
@@ -544,211 +509,204 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
-      <!-- PAGE PF: Pessoa Física -->
-      <div class="page" id="page-pf">
+      <div class="page" id="page-laudos">
         <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-            <div>
-              <div class="page-title">Pessoa Física</div>
-              <div class="page-subtitle">Códigos e laudos de clientes diretos (PF)</div>
-            </div>
-            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código PF</button>
-          </div>
-
-          <!-- Sub-abas -->
-          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0;">
-            <button id="pfTabCod" onclick="pfShowTab('codigos')"
-              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
-                     color:var(--purple);border-bottom:2px solid var(--purple);margin-bottom:-2px;">
-              🔑 Códigos Gerados
-            </button>
-            <button id="pfTabLau" onclick="pfShowTab('laudos')"
-              style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;
-                     color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;">
-              📄 Laudos Emitidos
-            </button>
-          </div>
-
-          <!-- Seção Códigos PF -->
-          <div id="pfSecCodigos">
-            <div id="pfAccordionCodigos" style="display:flex;flex-direction:column;gap:8px;"></div>
-          </div>
-
-          <!-- Seção Laudos PF -->
-          <div id="pfSecLaudos" style="display:none;">
-            <div id="pfAccordionLaudos" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div class="page-title">Laudos Gerados</div>
+          <div class="page-subtitle">Histórico de todos os laudos do sistema</div>
+          <div class="table-card" style="margin-top:16px;">
+            <table>
+              <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
+              <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+            </table>
           </div>
         </div>
       </div>
 
 
-      <!-- ══ PAGE VENDAS ══ -->
+      <!-- ══ PAGE PF ══ -->
+      <div class="page" id="page-pf">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <div><div class="page-title">Pessoa Física</div><div class="page-subtitle">Códigos e laudos de clientes diretos (PF)</div></div>
+            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código PF</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0;">
+            <button id="pfTabCod" onclick="pfShowTab('codigos')" style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--purple);border-bottom:2px solid var(--purple);margin-bottom:-2px;">🔑 Códigos</button>
+            <button id="pfTabLau" onclick="pfShowTab('laudos')"  style="padding:8px 20px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;">📄 Laudos</button>
+          </div>
+          <div id="pfSecCodigos"><div id="pfAccordionCodigos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
+          <div id="pfSecLaudos" style="display:none;"><div id="pfAccordionLaudos" style="display:flex;flex-direction:column;gap:8px;"></div></div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE VENDAS (relatório admin limpo) ══ -->
       <div class="page" id="page-vendas">
         <div style="padding:28px;max-width:1100px;">
-
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-            <div>
-              <div class="page-title">Controle de Vendas</div>
-              <div class="page-subtitle">Links de venda, comissões e liberação automática de códigos</div>
-            </div>
+            <div><div class="page-title">Controle de Vendas</div><div class="page-subtitle">Faturamento, histórico e comissões</div></div>
+            <button class="btn btn-primary" onclick="openModal('modalLinkDesconto')">🔗 Gerar Link com Desconto / Afiliado</button>
           </div>
-
-          <!-- Cards resumo -->
-          <div class="cards-grid" id="vendasCards" style="margin-bottom:28px;"></div>
-
-          <!-- Layout 2 colunas -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
-
-            <!-- Gerador de links -->
-            <div class="table-card" style="padding:24px;">
-              <h3 style="margin:0 0 18px;font-size:15px;color:#1a0a2e;">🔗 Gerar Novo Link de Venda</h3>
-
-              <div class="form-row">
-                <label>Destino</label>
-                <select id="vDestino">
-                  <option value="pf">👤 Pessoa Física (direto)</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <label>Quantidade de Licenças</label>
-                <input type="number" id="vQtd" value="1" min="1" placeholder="Ex: 5"/>
-              </div>
-              <div class="form-row">
-                <label>Valor do Pacote (R$)</label>
-                <input type="number" id="vValor" placeholder="Ex: 297.00" step="0.01"/>
-              </div>
-              <div class="form-row">
-                <label>% de Comissão (parceiro)</label>
-                <input type="number" id="vComissao" value="0" min="0" max="100" placeholder="0"/>
-              </div>
-              <div class="form-row">
-                <label>Nome do Parceiro (opcional)</label>
-                <input type="text" id="vParceiro" placeholder="Ex: João Silva"/>
-              </div>
-
-              <div class="form-row">
-                <label>Sua Chave Pix <span style="color:#B00">*</span></label>
-                <input type="text" id="vChavePix" placeholder="CPF, e-mail, telefone ou chave aleatória"
-                  style="font-family:monospace;"/>
-              </div>
-              <div class="form-row">
-                <label>Seu nome (como aparece no Pix)</label>
-                <input type="text" id="vNomePix" placeholder="Ex: Lucia Kratz"/>
-              </div>
-              <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="gerarLinkVenda()">
-                ⚡ Gerar Link de Venda
-              </button>
-
-              <!-- Resultado do link gerado -->
-              <div id="vLinkResult" style="display:none;margin-top:16px;background:#f0eaf7;border-radius:10px;padding:14px;">
-                <div style="font-size:11px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Link gerado</div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                  <input id="vLinkUrl" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#333;"/>
-                  <button class="btn btn-outline btn-sm" onclick="copiarLink()">📋 Copiar</button>
-                </div>
-                <div id="vLinkInfo" style="font-size:12px;color:#666;margin-top:8px;"></div>
-              </div>
-            </div>
-
-            <!-- Lista de vendas -->
-            <div class="table-card" style="padding:24px;">
-              <h3 style="margin:0 0 18px;font-size:15px;color:#1a0a2e;">📋 Vendas Recentes</h3>
-              <div id="vendasLista" style="display:flex;flex-direction:column;gap:10px;">
-                <div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Carregando...</div>
+          <!-- Link público -->
+          <div class="table-card" style="padding:18px;margin-bottom:24px;background:linear-gradient(135deg,#f0eaf7,#e8f5ff);">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+              <div><div style="font-weight:700;color:#3d0a5e;font-size:14px;">🌐 Link Público de Vendas</div>
+                <div style="font-size:12px;color:#666;margin-top:2px;">Compartilhe para clientes comprarem diretamente</div></div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input id="linkPublicoPadrao" readonly value="https://luciakratz-arch.github.io/9-Self/?comprar=true"
+                  style="font-size:12px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;width:300px;font-family:monospace;color:#3d0a5e;background:#fff;"/>
+                <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('linkPublicoPadrao').value);showToast('✅ Link copiado!')">📋 Copiar</button>
               </div>
             </div>
           </div>
-
-          <!-- Comissões -->
-          <div class="table-card" style="margin-top:24px;padding:24px;">
-            <h3 style="margin:0 0 18px;font-size:15px;color:#1a0a2e;">💸 Relatório de Comissões</h3>
-            <table style="width:100%;border-collapse:collapse;">
-              <thead>
-                <tr style="background:#faf7ff;">
-                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Parceiro</th>
-                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Venda</th>
-                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">% Comissão</th>
-                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Valor</th>
-                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Status</th>
-                  <th style="padding:10px 14px;text-align:left;font-size:11px;color:#555;font-weight:600;border-bottom:1px solid #eee;">Data</th>
-                </tr>
-              </thead>
-              <tbody id="comissoesTable">
-                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Nenhuma comissão registrada</td></tr>
-              </tbody>
-            </table>
+          <!-- Cards e listas -->
+          <div class="cards-grid" id="vendasCards" style="margin-bottom:24px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div class="table-card" style="padding:20px;">
+              <h3 style="margin:0 0 14px;font-size:14px;color:#1a0a2e;">📋 Vendas Aprovadas</h3>
+              <div id="vendasLista" style="display:flex;flex-direction:column;gap:8px;"><div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Carregando...</div></div>
+            </div>
+            <div class="table-card" style="padding:20px;">
+              <h3 style="margin:0 0 14px;font-size:14px;color:#1a0a2e;">💸 Comissões de Afiliados</h3>
+              <table style="width:100%;border-collapse:collapse;">
+                <thead><tr style="background:#faf7ff;">
+                  <th style="padding:8px 10px;text-align:left;font-size:11px;color:#555;border-bottom:1px solid #eee;">Afiliado</th>
+                  <th style="padding:8px 10px;text-align:left;font-size:11px;color:#555;border-bottom:1px solid #eee;">Valor</th>
+                  <th style="padding:8px 10px;text-align:left;font-size:11px;color:#555;border-bottom:1px solid #eee;">Status</th>
+                </tr></thead>
+                <tbody id="comissoesTable"><tr><td colspan="3" style="text-align:center;color:#aaa;padding:16px;font-size:13px;">Nenhuma comissão</td></tr></tbody>
+              </table>
+            </div>
           </div>
-
         </div>
-      </div><!-- /page-vendas -->
+      </div>
 
-      <!-- ══ CHECKOUT (página pública de pagamento) ══ -->
-      <div class="page" id="page-checkout">
-        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;
-                    background:linear-gradient(135deg,#1a0a2e 0%,#3d0a5e 40%,#7B1D6B 75%,#1A9BAF 100%);
-                    padding:28px;">
-          <div style="background:rgba(255,255,255,0.96);border-radius:20px;padding:36px;
-                      max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            <div style="text-align:center;margin-bottom:24px;">
-              <div style="font-size:32px;font-weight:700;color:#1a0a2e;font-family:'Cormorant Garamond',serif;">9&Self</div>
-              <div style="font-size:13px;color:#888;margin-top:4px;">Teste de Perfil Comportamental</div>
-            </div>
-
-            <div style="background:#f0eaf7;border-radius:12px;padding:16px;margin-bottom:20px;text-align:center;">
-              <div id="ckProduto" style="font-size:15px;font-weight:700;color:#3d0a5e;"></div>
-              <div id="ckLicencas" style="font-size:13px;color:#666;margin-top:4px;"></div>
-              <div id="ckValor" style="font-size:28px;font-weight:700;color:#7B00C4;margin-top:8px;"></div>
+      <!-- ══ PAGE CHECKOUT PÚBLICO ══ -->
+      <div class="page" id="page-checkout" style="display:none;">
+        <div style="min-height:100vh;background:linear-gradient(135deg,#1a0a2e 0%,#3d0a5e 40%,#7B1D6B 75%,#1A9BAF 100%);
+                    display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="background:rgba(255,255,255,0.97);border-radius:24px;padding:36px;
+                      max-width:480px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.35);">
+            <!-- Logo -->
+            <div style="text-align:center;margin-bottom:28px;">
+              <div style="font-size:42px;font-family:'Cormorant Garamond',serif;font-weight:300;color:#1a0a2e;">9&Self</div>
+              <div style="font-size:9px;letter-spacing:6px;color:#888;margin-top:2px;">S E L F</div>
+              <div style="font-size:11px;color:#aaa;margin-top:4px;letter-spacing:1px;">DESCUBRA SUA PERSONALIDADE</div>
             </div>
 
-            <div class="form-row" style="margin-bottom:12px;">
-              <label style="font-size:12px;color:#555;margin-bottom:4px;display:block;">Nome completo</label>
-              <input type="text" id="ckNome" placeholder="Seu nome completo" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;"/>
-            </div>
-            <div class="form-row" style="margin-bottom:12px;">
-              <label style="font-size:12px;color:#555;margin-bottom:4px;display:block;">E-mail</label>
-              <input type="email" id="ckEmail" placeholder="seu@email.com" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;"/>
-            </div>
-            <div class="form-row" style="margin-bottom:12px;">
-              <label style="font-size:12px;color:#555;margin-bottom:4px;display:block;">CPF / CNPJ</label>
-              <input type="text" id="ckDoc" placeholder="000.000.000-00" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;"/>
-            </div>
-
-            <!-- QR Code Pix -->
-            <div style="text-align:center;background:#f0fff4;border-radius:12px;padding:20px;margin-bottom:16px;">
-              <div style="font-size:13px;color:#2e7d32;font-weight:600;margin-bottom:12px;">
-                ⚡ Pague via Pix
+            <!-- Etapa 1: Escolha do plano + dados -->
+            <div id="ckEtapa1">
+              <div style="font-size:13px;font-weight:700;color:#3d0a5e;margin-bottom:12px;text-align:center;">Escolha seu plano:</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+                <!-- PF -->
+                <div id="ckOpcaoPF" onclick="ckSelecionarPlano('pf')"
+                  style="border:2px solid #e0d0f5;border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:24px;">👤</span>
+                    <div style="flex:1;"><div style="font-weight:700;color:#1a0a2e;font-size:14px;">Teste Individual</div>
+                      <div style="font-size:12px;color:#666;margin-top:2px;">1 acesso completo ao 9&Self</div></div>
+                    <div style="text-align:right;">
+                      <div id="ckValorPF" style="font-size:20px;font-weight:800;color:#7B00C4;">R$ 297</div>
+                      <div style="font-size:10px;color:#aaa;">Pessoa Física</div></div>
+                  </div>
+                </div>
+                <!-- PJ -->
+                <div id="ckOpcaoPJ" onclick="ckSelecionarPlano('pj')"
+                  style="border:2px solid #e0d0f5;border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:24px;">🏢</span>
+                    <div style="flex:1;"><div style="font-weight:700;color:#1a0a2e;font-size:14px;">Pacote Empresa / RH</div>
+                      <div style="font-size:12px;color:#666;margin-top:2px;">Múltiplos acessos para sua equipe</div></div>
+                    <div style="text-align:right;">
+                      <div style="font-size:13px;font-weight:700;color:#7B00C4;">R$ 247/lic.</div>
+                      <div style="font-size:10px;color:#aaa;">mín. 5 licenças</div></div>
+                  </div>
+                  <div id="ckQtdPJRow" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #eee;">
+                    <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">Quantidade de licenças</label>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <input type="number" id="ckQtdPJ" value="5" min="5"
+                        style="width:80px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:15px;font-weight:700;text-align:center;"
+                        oninput="ckAtualizarTotalPJ()"/>
+                      <span style="font-size:13px;color:#666;">× R$ 247 =</span>
+                      <span id="ckTotalPJ" style="font-size:16px;font-weight:800;color:#7B00C4;">R$ 1.235</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div id="ckQrCode" style="margin:0 auto 12px;"></div>
-              <div style="font-size:11px;color:#555;margin-bottom:8px;">ou copie a chave:</div>
-              <div style="display:flex;gap:6px;">
-                <input id="ckChavePix" readonly
-                  style="flex:1;font-size:12px;padding:8px;border:1px solid #ccc;border-radius:6px;background:#fff;font-family:monospace;color:#333;"/>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('ckChavePix').value);document.getElementById('ckCopiadoMsg').style.display='block';setTimeout(()=>document.getElementById('ckCopiadoMsg').style.display='none',2000);"
-                  style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;">📋</button>
+              <!-- Dados do comprador -->
+              <div id="ckDadosComprador" style="display:none;">
+                <div style="height:1px;background:#eee;margin-bottom:20px;"></div>
+                <div style="font-size:13px;font-weight:700;color:#3d0a5e;margin-bottom:12px;">Seus dados:</div>
+                <input type="text"  id="ckNome"     placeholder="Nome completo *"  style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
+                <input type="email" id="ckEmail"    placeholder="E-mail *"         style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
+                <input type="tel"   id="ckWhatsapp" placeholder="WhatsApp *"       style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;"/>
+                <input type="text"  id="ckDoc"      placeholder="CPF / CNPJ"       style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:16px;"/>
+                <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;" onclick="ckIrParaPix()">
+                  ⚡ Ver QR Code Pix para Pagar
+                </button>
               </div>
-              <div id="ckCopiadoMsg" style="display:none;font-size:11px;color:#2e7d32;margin-top:4px;">✅ Copiado!</div>
-            </div>
+            </div><!-- /ckEtapa1 -->
 
-            <div style="background:#fff8e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#5d4037;">
-              <strong>⚠️ Como funciona:</strong><br>
-              1. Copie a chave Pix acima e pague pelo seu banco<br>
-              2. Clique em "Já Paguei" abaixo<br>
-              3. Seus códigos de acesso serão enviados por e-mail em até 1h após confirmação
-            </div>
+            <!-- Etapa 2: QR Code Pix -->
+            <div id="ckEtapa2" style="display:none;">
+              <div style="text-align:center;margin-bottom:16px;">
+                <div style="font-size:14px;font-weight:700;color:#3d0a5e;" id="ckResumoCompra"></div>
+              </div>
+              <div style="background:#f0fff4;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;">
+                <div style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:12px;">⚡ Pague via Pix</div>
+                <div id="ckQrCode" style="margin:0 auto 14px;"></div>
+                <div style="font-size:11px;color:#555;margin-bottom:6px;">ou copie a chave Pix:</div>
+                <div style="display:flex;gap:6px;">
+                  <input id="ckChavePix" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ccc;border-radius:6px;background:#fff;font-family:monospace;color:#333;"/>
+                  <button onclick="navigator.clipboard.writeText(document.getElementById('ckChavePix').value);document.getElementById('ckCopiado').style.display='block';setTimeout(()=>document.getElementById('ckCopiado').style.display='none',2000);"
+                    style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;">📋</button>
+                </div>
+                <div id="ckCopiado" style="display:none;font-size:11px;color:#2e7d32;margin-top:4px;">✅ Copiado!</div>
+                <div style="font-size:11px;color:#e65100;margin-top:10px;font-weight:600;" id="ckValorDestaque"></div>
+              </div>
+              <div style="background:#fff8e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#5d4037;line-height:1.6;">
+                <strong>Como funciona:</strong><br>
+                1. Pague o Pix pelo valor exato acima<br>
+                2. Clique em "Já Paguei" — o sistema libera seu acesso imediatamente
+              </div>
+              <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;font-weight:700;" onclick="ckConfirmarPagamento()">
+                ✅ Já Paguei — Iniciar Agora!
+              </button>
+              <button onclick="document.getElementById('ckEtapa2').style.display='none';document.getElementById('ckEtapa1').style.display='';"
+                style="width:100%;margin-top:8px;padding:10px;border:none;background:none;color:#888;cursor:pointer;font-size:13px;">← Voltar</button>
+              <div id="ckStatus" style="text-align:center;margin-top:12px;font-size:13px;min-height:20px;"></div>
+            </div><!-- /ckEtapa2 -->
 
-            <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;"
-              onclick="confirmarPagamento()">
-              ✅ Já Paguei — Enviar Comprovante
-            </button>
-            <div id="ckStatus" style="text-align:center;margin-top:12px;font-size:13px;min-height:20px;"></div>
+            <!-- Etapa 3: Sucesso PJ -->
+            <div id="ckEtapa3PJ" style="display:none;text-align:center;">
+              <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+              <div style="font-size:18px;font-weight:700;color:#2e7d32;margin-bottom:8px;">Acesso liberado!</div>
+              <div style="font-size:13px;color:#555;margin-bottom:20px;">Seus códigos de acesso:</div>
+              <div id="ckCodigosGerados" style="background:#f0eaf7;border-radius:12px;padding:16px;text-align:left;margin-bottom:16px;font-family:monospace;font-size:13px;line-height:2;color:#3d0a5e;"></div>
+              <button class="btn btn-primary" style="width:100%;margin-bottom:10px;" onclick="ckCopiarCodigosWhatsApp()">📲 Copiar para WhatsApp</button>
+              <div style="font-size:12px;color:#888;">Cópia enviada para seu e-mail.</div>
+            </div>
           </div>
         </div>
       </div><!-- /page-checkout -->
 
-      <!-- PAGE LAUDOS (oculta, mantida para compatibilidade) -->
-      <div class="page" id="page-laudos" style="display:none;">
-        <div style="padding:28px;">
-          <div id="laudosTable"></div>
+      <!-- Modal Link Desconto/Afiliado -->
+      <div class="modal-overlay" id="modalLinkDesconto">
+        <div class="modal">
+          <h3>🔗 Link com Desconto ou Afiliado</h3>
+          <div class="form-row"><label>Desconto (%)</label><input type="number" id="ldDesconto" value="0" min="0" max="100"/></div>
+          <div class="form-row"><label>Nome do Afiliado</label><input type="text" id="ldAfiliado" placeholder="Ex: João Silva"/></div>
+          <div class="form-row"><label>% Comissão do Afiliado</label><input type="number" id="ldComissao" value="0" min="0" max="100"/></div>
+          <div id="ldResultado" style="display:none;margin-top:12px;background:#f0eaf7;border-radius:8px;padding:12px;">
+            <div style="font-size:11px;color:#888;margin-bottom:6px;">Link gerado:</div>
+            <div style="display:flex;gap:6px;">
+              <input id="ldLinkUrl" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ddd;border-radius:6px;background:#fff;font-family:monospace;"/>
+              <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('ldLinkUrl').value);showToast('Copiado!')">📋</button>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalLinkDesconto')">Fechar</button>
+            <button class="btn btn-primary" onclick="gerarLinkDesconto()">⚡ Gerar</button>
+          </div>
         </div>
       </div>
 
@@ -831,7 +789,7 @@ tr:hover td{background:#FAFAFE;}
     </div><!-- /main -->
   </div><!-- /app-layout -->
   <footer class="app-footer">
-    <img src="Logo%20Dra.%20Lucia%20Kratz%20Transparente.png?v=2" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
+    <img src="dra%20luciakratz%20transparente.png" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
     <span>Desenvolvido por <strong>Dra. Lucia Kratz</strong> · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade 🦋</span>
   </footer>
 </div>
@@ -959,26 +917,6 @@ tr:hover td{background:#FAFAFE;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<script>
-// Declarar fontes padrão imediatamente após CDN carregar
-(function() {
-  function _initFonts() {
-    if (!window.pdfMake) return;
-    window.pdfMake.fonts = window.pdfMake.fonts || {};
-    window.pdfMake.fonts['Roboto'] = {
-      normal:      'Roboto-Regular.ttf',
-      bold:        'Roboto-Medium.ttf',
-      italics:     'Roboto-Italic.ttf',
-      bolditalics: 'Roboto-MediumItalic.ttf',
-    };
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _initFonts);
-  } else {
-    _initFonts();
-  }
-})();
-</script>
 
 <!-- ══ GERADOR PDF (pdfmake — script global, não module) ══ -->
 <script>
@@ -1162,61 +1100,30 @@ function _nivel(titulo, texto) {
 // ══════════════════════════════════════════════════════════════════
 // MOTOR PRINCIPAL
 // ══════════════════════════════════════════════════════════════════
-// ── ASSETS EMBUTIDOS ────────────────────────────────────────────
-const _ASSET_BG   = 'data:image/png;base64,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e9jDHvawNw97uWymxR72sIc97GGvjb3lt5vs2MMe9rCHPez9afay7+fDHvawhz3sYa+YvTzfZMce9rCHPexhr4C9p5vs2MMe9rCHPex1sLesm2mxhz3sYQ972CtnL7eb7NjDHvawhz3sNbGXMV7Ywx72sIc97M3DXi422bGHPexhD3vY62NvyfU+H/awhz3sYQ97Xewdd7JjD3vYwx72sNfKXk73+bCHPexhD3vYa2RvGeOFPexhD3vYw9487OVgnw972MMe9rCHvV72st3nwx72sIc97GGvmr2smmmxhz3sYQ972Gtnb/nZ58Me9rCHPexhbwL2vlqKsIc97GEPe9ibg72MvLCHPexhD3vYm4e9POvnwx72sIc97GGvhL1tehn2sIc97GEPe93srdLLsIc97GEPe9irZy+X/XzYwx72sIc97LWxt+S0nw972MMe9rCHvUL2Mo77+bCHPexhD3vY62QvR/182MMe9rCHPezVsreXD3vYwx72sIe9ZvaWdTMt9rCHPexhD3vl7H2ll2EPe9jDHvawNwd737ed2MMe9rCHPexNwd7HJjv2sIc97GEPe7Ow95lehj3sYQ972MPeJOyd7fNhD3vYwx72sNfJ3vsLF+xhD3vYwx72+tnL0SY79rCHPexhD3u17G32+bCHPexhD3vYK2cvV/182MMe9rCHPezVsbeSD3vYwx72sIe9evZ+bjuxhz3sYQ972JuBvRz082EPe9jDHvaw18testnnwx72sIc97GGvmr2s3nZiD3vYwx72sNfO3vLzwgV72MMe9rCHvQnYy6d82MMe9rCHPezNwV7GeGEPe9jDHvawNw97Od3nwx72sIc97GGvkb2fn/NhD3vYwx72sDcDe59vO7GHPexhD3vYm4S95GE/H/awhz3sYQ97Fewtj/r5sIc97GEPe9hrYS/jtp8Pe9jDHvawh70i9pLrfj7sYQ972MMe9rrY2575sIc97GEPe9jrZm/5p30+7GEPe9jDHvb+Knv5fuGCPexhD3vYw94M7P12nw972MMe9rCHvb/NXn6zz4c97GEPe9jD3p9nb0lev5gr7GEPe9jDHvb+OHsP9/mwhz3sYQ972CthLw/2+bCHPexhD3vY62Evm/Qy7GEPe9jDHva62VvG1T4f9rCHPexhD3tt7OW8nw972MMe9rCHvUL2PuXDHvawhz3sYW8S9pZxsM+HPexhD3vYw14te9n182EPe9jDHvaw18xe1lsN2MMe9rCHPeyVs/e+yY497GEPe9jDXj973+ll2MMe9rCHPexNwd7HmQ972MMe9rCHvVnY+3rhgj3sYQ972MPeHOwleWEPe9jDHvawNw97h/t82MMe9rCHPezVspezfj7sYQ972MMe9irZy+NmWuxhD3vYwx72GthbnjXTYg972MMe9rBXwt4+vQx72MMe9rCHvWb2tred2MMe9rCHPex1s5fLZlrsYQ972MMe9trYW86babGHPexhD3vYK2QvJ8202MMe9rCHPex1spcxXtjDHvawhz3szcNefr3Phz3sYQ972MPeX2Zvya/2+bCHPexhD3vY++PsZb/Jjj3sYQ972MNeMXt5us+HPexhD3vYw14Fe8t7hgv2sIc97GEPe/Xs/dx2Yg972MMe9rA3A3u52efDHvawhz3sYa+LvVw002IPe9jDHvaw18fecrrPhz3sYQ972MNeI3sHLUXYwx72sIc97BWzd7TPhz3sYQ972MNeL3vZ7vNhD3vYwx72sFfN3urnfNjDHvawhz3s1bP3ts+HPexhD3vYw94E7H3edmIPe9jDHvawNwl7yXhhD3vYwx72sDcPe8u46efDHvawhz3sYa+KvVz282EPe9jDHvaw18begXzYwx72sIc97BWzt73txB72sIc97GGvm70c9fNhD3vYwx72sFfL3s9tJ/awhz3sYQ97M7D3ucmOPexhD3vYw94k7C356efDHvawhz3sYa+fve/bTuxhD3vYwx72pmAvY7ywhz3sYQ972JuHvZzv82EPe9jDHvawV8je2T4f9rCHPexhD3ud7K3OfNjDHvawhz3s1bOX3T4f9rCHPexhD3vN7C3rfT7sYQ972MMe9srZS8YLe9jDHvawh7152Etu+vmwhz3sYQ972KtiL+Oqnw972MMe9rCHvTb2lqt9PuxhD3vYwx726tjb3nZiD3vYwx72sNfN3kd6Gfawhz3sYQ97s7CXg30+7GEPe9jDHvZ62fv8OR/2sIc97GEPe5Owl5EX9rCHPexhD3vzsPdz24k97GEPe9jD3gzsLfl44YI97GEPe9jD3hzsZeSFPexhD3vYw9487CW/7efDHvawhz3sYe8vs7dKL8Me9rCHPexhr5695Rf9fNjDHvawhz3s/X328vHCBXvYwx72sIe9Sdhb7/NhD3vYwx72sNfOXu77+bCHPexhD3vYK2JvyXU/H/awhz3sYQ97XewdNNNiD3vYwx72sFfMXn6zz4c97GEPe9jD3p9n7/NtJ/awhz3sYQ97k7C3jEf7fNjDHvawhz3slbCXbT8f9rCHPexhD3vV7CU3+3zYwx72sIc97FWxt4yrfT7sYQ972MMe9trYW71wwR72sIc97GGvnr3keJ8Pe9jDHvawh71O9rab7NjDHvawhz3sdbO3Si/DHvawhz3sYa+evaz7+bCHPexhD3vYK2cv46efD3vYwx72sIe9fvbytc+HPexhD3vYw94U7H3s82EPe9jDHvawNwt7WW01YA972MMe9rDXzt6bfNjDHvawhz3sTcDeV3oZ9rCHPexhD3tzsJeMF/awhz3sYQ9787CX3SY79rCHPexhD3vN7OVZMy32sIc97GEPeyXsLQ+aabGHPexhD3vY62Evd8202MMe9rCHPexVsfeZXoY97GEPe9jD3iTsJXlhD3vYwx72sDcPe8tJMy32sIc97GEPe53sHTbTYg972MMe9rBXy17+fZ8Pe9jDHvawh70/yF4yXv+r/+/GHvawhz3sYe//NXufuZ3Ywx72sIc97E3CXn69z4c97GEPe9jD3l9mL4dbDdjDHvawhz3stbK3jOf7fNjDHvawhz3s/X32fl64YA972MMe9rA3A3vP9vmwhz3sYQ972GthL/f7fNjDHvawhz3sFbH3k16GPexhD3vYw94M7OVqnw972MMe9rCHvTr2crrPhz3sYQ972MNeI3sHbzuxhz3sYQ972Ctm72ifD3vYwx72sIe9XvayzXDBHvawhz3sYa+avbV82MMe9rCHPey1s/d224k97GEPe9jD3gTsfb1wwR72sIc97GFvDvaSvLCHPexhD3vYm4e9jNN+PuxhD3vYwx72CtlbTvr5sIc97GEPe9jrZC9H8mEPe9jDHvawV8texjbDBXvYwx72sIe9ZvY2Zz7sYQ972MMe9srZe/85H/awhz3sYQ97/ex9d7JjD3vYwx72sDcFex+3ndjDHvawhz3szcLecr7Phz3sYQ972MNeIXsn/XzYwx72sIc97JWyl8NNduxhD3vYwx72WtnLvpkWe9jDHvawh71i9rbpZdjDHvawhz3sdbO3uu3EHvawhz3sYa+evZ/0MuxhD3vYwx72ZmDv88yHPexhD3vYw94k7C253ufDHvawhz3sYa+LvYO3ndjDHvawhz3sFbOX030+7GEPe9jDHvYa2TvIcMEe9rCHPexhr5i9Zez3+bCHPexhD3vY62Uv230+7GEPe9jDHvaq2fuRD3vYwx72sIe9Gdj7vO3EHvawhz3sYW8S9pLxwh72sIc97GFvHvYy8sIe9rCHPexhbx728ut+PuxhD3vYwx72/jJ7S37Vz4c97GEPe9jD3h9nL+N5Px/2sIc97GEPe3+fvTzt58Me9rCHPexhr4K9n/Qy7GEPe9jDHvZmYO9tnw972MMe9rCHvQnYy00/H/awhz3sYQ97XewlF/182MMe9rCHPezVsbeMR/t82MMe9rCHPeyVsHfSz4c97GEPe9jDXil729tO7GEPe9jDHva62VttsmMPe9jDHvawV8/esurnwx72sIc97GGvnb3P207sYQ972MMe9iZhL2O8sIc97GEPe9ibh73s9vmwhz3sYQ972Gtmb9NShD3sYQ972MNeOXvvbzuxhz3sYQ972Otn7/u2E3vYwx72sIe9Kdj7SC/DHvawhz3sYW8W9lbpZdjDHvawhz3s1bOXg0127GEPe9jDHvZ62cu2mRZ72MMe9rCHvWr2llUzLfawhz3sYQ977ez93HZiD3vYwx72sDcDexkfL1ywhz3sYQ972JuDvSQv7GEPe9jDHvbmYW+5a6bFHvawhz3sYa+KvetmWuxhD3vYwx722tjLeTMt9rCHPexhD3uF7H1muGAPe9jDHvawNwl7y8gLe9jDHvawh7152MuumRZ72MMe9rCHvWb2juXDHvawhz3sYa+VvWXs5MMe9rCHPexhr5i9VUsR9rCHPexhD3v17K1uO7GHPexhD3vYq2fvZ5Mde9jDHvawh70Z2PtML8Me9rCHPexhbxL28ot9PuxhD3vYwx72/j57ebrPhz3sYQ972MNeBXvbt53Ywx72sIc97HWz92CfD3vYwx72sIe9IvZy08+HPexhD3vYw14Xe7na58Me9rCHPexhr4695XSfD3vYwx72sIe9RvZO+vmwhz3sYQ972CtlL9nv82EPe9jDHvaw18tetm87sYc97GEPe9irZm9Zve3EHvawhz3sYa+dvfzIhz3sYQ972MPeBOxlfGS4YA972MMe9rA3B3tJXtjDHvawhz3szcPez8/5sIc97GEPe9ibgb2M/AdBSzupODTLQQAAAABJRU5ErkJggg==';
-
 window._carregarFontesCormorant = async function() {
-  if (window.pdfMake && window.pdfMake.vfs && window.pdfMake.vfs['CormorantGaramond.ttf']) return;
   const BASE = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/functions/fonts';
   try {
     const [r1, r2] = await Promise.all([
-      fetch(BASE + '/CormorantGaramond.ttf'),
-      fetch(BASE + '/CormorantGaramond-Italic.ttf'),
+      fetch(`${BASE}/CormorantGaramond.ttf`),
+      fetch(`${BASE}/CormorantGaramond-Italic.ttf`),
     ]);
-    if (!r1.ok || !r2.ok) throw new Error('Fonte não encontrada');
+    if (!r1.ok || !r2.ok) return;
     const [b1, b2] = await Promise.all([r1.arrayBuffer(), r2.arrayBuffer()]);
-    const toB64 = buf => {
-      const bytes = new Uint8Array(buf);
-      let b = ''; const chunk = 8192;
-      for (let i = 0; i < bytes.length; i += chunk)
-        b += String.fromCharCode(...bytes.subarray(i, i + chunk));
-      return btoa(b);
-    };
-    // Adicionar ao vfs existente (que já tem Roboto do vfs_fonts.js) — NÃO sobrescrever
-    window.pdfMake.vfs = window.pdfMake.vfs || {};
-    window.pdfMake.vfs['CormorantGaramond.ttf']        = toB64(b1);
-    window.pdfMake.vfs['CormorantGaramond-Italic.ttf'] = toB64(b2);
-    // Adicionar fonte sem remover Roboto já declarado
+    const toB64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+    const n = toB64(b1), i = toB64(b2);
     window.pdfMake.fonts = window.pdfMake.fonts || {};
-    // Garantir que Roboto está declarado (vfs_fonts.js pode ainda não ter rodado)
-    if (!window.pdfMake.fonts['Roboto']) {
-      window.pdfMake.fonts['Roboto'] = {
-        normal:      'Roboto-Regular.ttf',
-        bold:        'Roboto-Medium.ttf',
-        italics:     'Roboto-Italic.ttf',
-        bolditalics: 'Roboto-MediumItalic.ttf',
-      };
-    }
     window.pdfMake.fonts['CormorantGaramond'] = {
-      normal:      'CormorantGaramond.ttf',
-      bold:        'CormorantGaramond.ttf',
-      italics:     'CormorantGaramond-Italic.ttf',
-      bolditalics: 'CormorantGaramond-Italic.ttf',
+      normal: `data:font/truetype;base64,${n}`,
+      bold: `data:font/truetype;base64,${n}`,
+      italics: `data:font/truetype;base64,${i}`,
+      bolditalics: `data:font/truetype;base64,${i}`,
     };
-  } catch(e) { console.warn('Cormorant font load failed:', e); }
+  } catch(e) { console.warn('Cormorant:', e); }
 }
 
 window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
   // Carregar Cormorant Garamond
   await window._carregarFontesCormorant();
-  // Garantia extra: Roboto sempre declarado antes de gerar PDF
-  window.pdfMake.fonts = window.pdfMake.fonts || {};
-  window.pdfMake.fonts['Roboto'] = {
-    normal:      'Roboto-Regular.ttf',
-    bold:        'Roboto-Medium.ttf',
-    italics:     'Roboto-Italic.ttf',
-    bolditalics: 'Roboto-MediumItalic.ttf',
-  };
   const _NT = {1:'Perfeição e Excelência',2:'Prestativo e Relacional',3:'Performance e Imagem',
                4:'Autêntico e Profundo',5:'Observador e Privacidade',6:'Precavido e Questionador',
                7:'Visionário e Otimista',8:'Desafiador e Controlador',9:'Harmônico e Diplomático'};
@@ -1244,18 +1151,20 @@ window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, no
   if (!textoSub) { const k=Object.keys(S).find(x=>x.startsWith('SUBTIPO_')); if(k) textoSub=S[k]; }
   const textoAsa = S[`ASA_${asaFinal}`]||'';
 
-  // ── CAPA ─────────────────────────────────────────────────────
+  // ── CAPA (canvas + stack) ─────────────────────────────────────
+  const capa = {
+  };
 
   // ── RODAPÉ de todas as páginas ────────────────────────────────
   function _footer(page, pages) {
     return {
-      margin:[0,6,0,0],
-      table:{ widths:['*',30], body:[[
+      margin:[0,2,0,0],
+      table:{ widths:['*',25], body:[[
         { text:'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF\nDESENVOLVIDO POR LÚ CIA KRATZ E RYUZA GONÇALVES',
           font:'Roboto', fontSize:6.5, bold:true, color:'white',
-          alignment:'center', fillColor:'#7B1D6B', margin:[0,9,0,9] },
-        { text:page.toString(), font:'Roboto', fontSize:8.5, bold:true, color:'white',
-          alignment:'center', fillColor:'#7B1D6B', margin:[0,9,0,9] },
+          alignment:'center', fillColor:'#7B1D6B', margin:[20,8,20,8] },
+        { text:page.toString(), font:'Roboto', fontSize:8, color:'white',
+          alignment:'right', fillColor:'#7B1D6B', margin:[0,8,8,8] },
       ]]},
       layout:{ hLineWidth:()=>0, vLineWidth:()=>0,
                paddingLeft:()=>0, paddingRight:()=>0,
@@ -1277,54 +1186,85 @@ window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, no
   // ── CONTEÚDO ──────────────────────────────────────────────────
   const content = [];
 
-  // — CAPA — fundo PNG embutido + tabela branco sólido ──────────────
-  const _TABLE_H = 140;
+  // — CAPA — estilo glassmorphism igual ao login
   content.push({
     stack:[
-      { image: _ASSET_BG, width:595, absolutePosition:{x:0,y:0} },
-      { text:' ', fontSize:18, margin:[0,22,0,0] },
-      { text:'9&Self', font:'CormorantGaramond', fontSize:64, bold:false, italics:false,
-        color:'#C4E8F8', alignment:'center', margin:[0,0,0,0] },
-      { text:'S  E  L  F', fontSize:10, bold:true,
-        color:'rgba(255,255,255,0.80)', alignment:'center',
-        characterSpacing:5, margin:[0,4,0,4] },
-      { text:'DESCUBRA SUA PERSONALIDADE', fontSize:7.5,
-        color:'rgba(200,218,232,0.58)', alignment:'center',
-        characterSpacing:2, margin:[0,0,0,28] },
-      { canvas:[{type:'line',x1:110,y1:0,x2:373,y2:0,
-          lineWidth:0.5, lineColor:'rgba(255,255,255,0.35)'}], margin:[0,0,0,22] },
-      { text:nomeCapit, font:'CormorantGaramond', fontSize:30, bold:false,
-        color:'#FFFFFF', alignment:'center', margin:[0,0,0,6] },
-      (cargoTxt && cargoTxt!=='PF' && cargoTxt!=='B2B')
-        ? { text:cargoTxt, fontSize:10.5, color:'rgba(210,228,242,0.80)',
-            alignment:'center', margin:[0,0,0,12] }
-        : { text:' ', fontSize:4, margin:[0,0,0,12] },
-      { text:mesAno, fontSize:10, color:'rgba(200,218,232,0.52)',
-        alignment:'center', margin:[0,0,0,34] },
-      { canvas:[{type:'rect', x:20, y:0, w:443, h:_TABLE_H, color:'#FFFFFF'}],
-        margin:[0,0,0,-_TABLE_H] },
-      { table:{ widths:[88,'*'], body:[
-          [{ text:`Eneatipo ${tipo}:`, bold:true, color:'#5500AA', fontSize:10.5,
-             fillColor:'#FFFFFF', margin:[12,11,6,11] },
-           { text:`${nomeTipo} (Traço Tipo ${tipo})`, color:'#111', fontSize:10.5,
-             fillColor:'#FFFFFF', margin:[4,11,12,11] }],
-          [{ text:`Asa ${asaFinal}:`, bold:true, color:'#5500AA', fontSize:10.5,
-             fillColor:'#F0EAFF', margin:[12,11,6,11] },
-           { text:`${nomeAsa} (Traço Tipo ${asaFinal})`, color:'#111', fontSize:10.5,
-             fillColor:'#F0EAFF', margin:[4,11,12,11] }],
-          [{ text:'Subtipo:', bold:true, color:'#5500AA', fontSize:10.5,
-             fillColor:'#FFFFFF', margin:[12,11,6,11] },
-           { text:labelSub, color:'#111', fontSize:10.5,
-             fillColor:'#FFFFFF', margin:[4,11,12,11] }],
-        ]},
-        layout:{ hLineColor:()=>'#DDD0F0', vLineColor:()=>'#DDD0F0',
-                 hLineWidth:()=>0.5, vLineWidth:()=>0.5 },
-        margin:[20,0,20,0]
+      // Fundo degradê via canvas cobrindo página inteira
+      { canvas:[
+          { type:'rect', x:-56, y:-64, w:708, h:300, color:'#1A0A2E' },
+          { type:'rect', x:-56, y:236, w:708, h:300, color:'#3D0A5E' },
+          { type:'rect', x:-56, y:536, w:708, h:307, color:'#7B1D6B' },
+        ]
+      },
+
+      // Espaço topo
+      { text:' ', fontSize:6, margin:[0,60,0,0] },
+
+      // Caixa glassmorphism centralizada
+      { table:{ widths:['*'], body:[[
+          { stack:[
+              // Logo
+              { text:'9&Self', fontSize:46, color:'#A8E6F0', font:'CormorantGaramond',
+                alignment:'center', margin:[0,20,0,4] },
+              { text:'SELF', fontSize:12, bold:true, color:'white', font:'Roboto',
+                alignment:'center', characterSpacing:5, margin:[0,0,0,4] },
+              { text:'DESCUBRA SUA PERSONALIDADE', fontSize:8, color:'#C8D8E8',
+                alignment:'center', characterSpacing:2, margin:[0,0,0,24] },
+
+              // Nome
+              { text:nomeCapit, fontSize:16, color:'white',
+                alignment:'center', margin:[0,0,0,6] },
+              (cargoTxt && cargoTxt!=='PF' && cargoTxt!=='B2B')
+                ? { text:cargoTxt, fontSize:10, color:'#C8D8E8',
+                    alignment:'center', margin:[0,0,0,16] }
+                : { text:' ', fontSize:4, margin:[0,0,0,16] },
+
+              // Linha divisória
+              { canvas:[{ type:'line', x1:30, y1:0, x2:330, y2:0,
+                  lineWidth:0.5, lineColor:'rgba(255,255,255,0.3)' }],
+                margin:[0,0,0,16] },
+
+              // Resultados como badges
+              { table:{ widths:['*'], body:[
+                  [{ text:`Eneatipo ${tipo}:   ${nomeTipo}`,
+                    fontSize:10, color:'white', alignment:'center',
+                    fillColor:'rgba(255,255,255,0.12)',
+                    margin:[10,8,10,8] }],
+                  [{ text:`Asa ${asaFinal}:   ${nomeAsa}`,
+                    fontSize:10, color:'white', alignment:'center',
+                    fillColor:'rgba(255,255,255,0.08)',
+                    margin:[10,8,10,8] }],
+                  [{ text:`Subtipo:   ${labelSub}`,
+                    fontSize:10, color:'white', alignment:'center',
+                    fillColor:'rgba(255,255,255,0.12)',
+                    margin:[10,8,10,8] }],
+                ]},
+                layout:{ hLineColor:()=>'rgba(255,255,255,0.15)',
+                         vLineColor:()=>'transparent',
+                         hLineWidth:()=>0.5, vLineWidth:()=>0 },
+                margin:[0,0,0,20]
+              },
+
+              // Mês/ano
+              { text:mesAno, fontSize:10, color:'#C8D8E8',
+                alignment:'center', margin:[0,0,0,20] },
+            ],
+            fillColor:'rgba(255,255,255,0.08)',
+            margin:[0,0,0,0],
+          }
+        ]]},
+        layout:{
+          hLineWidth:()=>0.5, vLineWidth:()=>0.5,
+          hLineColor:()=>'rgba(255,255,255,0.2)',
+          vLineColor:()=>'rgba(255,255,255,0.2)',
+          paddingLeft:()=>20, paddingRight:()=>20,
+          paddingTop:()=>0, paddingBottom:()=>0,
+        },
+        margin:[40,0,40,0]
       },
     ],
     pageBreak:'after',
   });
-
   content.push(..._secTitle('Introdução'));
   content.push(_p('O <b>9&Self</b> é um instrumento de identificação de características pessoais e profissionais desenvolvido pelas especialistas <b>Dra. Lúcia Kratz</b> e <b>Ryuza Gonçalves</b>. O teste fundamenta-se nos traços de personalidade do Eneagrama — a partir dos estudos pioneiros de George Ivanovich Gurdjieff, Helen Palmer, David Daniels, Claudio Naranjo, Don Richards Riso e Russ Hudson —, aliados à teoria junguiana dos traços psicológicos e complementados pela Teoria das Necessidades Adquiridas de McClelland e pelo Coaching Executivo.'));
   content.push(_p('Dentro desses estudos, identificam-se 9 tipos básicos de personalidade que se subdividem em 216 padrões diferentes de comportamento. Os nove tipos básicos são: Perfeição e Excelência, Prestativo e Relacional, Performance e Imagem, Autêntico e Profundo, Observador e Privacidade, Precavido e Questionador, Visionário e Otimista, Desafiador e Controlador, Harmônico e Diplomático.'));
@@ -1539,7 +1479,7 @@ window.gerarPdfNavegador = async function({tipo, asa, subDom, subInt, subRem, no
   // ── MONTAR DOCUMENTO ─────────────────────────────────────────
   const docDef = {
     pageSize:'A4',
-    pageMargins:[56,64,56,52],
+    pageMargins:[56,64,56,45],
     header: _header,
     footer: _footer,
     content: content,
@@ -1683,16 +1623,15 @@ window.navigateTo = function(page) {
   if(el) el.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   const labels = {
-    'dashboard':'Painel Geral','pf':'Pessoa Física','empresas':'Empresas / RH','vendas':'Controle de Vendas','codigos':'Códigos',
+    'dashboard':'Painel Geral','empresas':'Empresas / RH','codigos':'Códigos',
     'laudos':'Laudos','rh-dashboard':'Painel RH',
     'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
-  if(page==='pf')       { loadPF(); }
-  if(page==='empresas') { loadEmpresas(); }
-  if(page==='laudos')   {}
-  if(page==='vendas')   { loadVendas(); }
+  if(page==='pf')      loadPF();
+  if(page==='empresas') loadEmpresas();
+  if(page==='vendas')   loadVendas();
 };
 
 // ── DASHBOARD ADMIN ──
@@ -1710,73 +1649,16 @@ async function loadDashboard() {
       <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${laudoSnap.size}</div><div class="sc-sub">gerados</div></div>
       <div class="stat-card"><div class="sc-label">Códigos Usados</div><div class="sc-value">${codSnap.docs.filter(d=>d.data().status==='usado').length}</div><div class="sc-sub">avaliações realizadas</div></div>
     `;
-
-    // ── Preencher tabela Últimas Avaliações ──
-    const NS = {'ap':'Autopreservação','sex':'1 a 1','so':'Social','AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','soc':'Social'};
-    const dashTable = document.getElementById('dashTable');
-    const laudos = laudoSnap.docs
-      .map(d=>({...d.data(), _id:d.id}))
-      .sort((a,b)=>{ // mais recente primeiro
-        const ta = a.criadoEm?.toDate?.()?.getTime()||0;
-        const tb = b.criadoEm?.toDate?.()?.getTime()||0;
-        return tb - ta;
-      })
-      .slice(0,10); // últimas 10
-
-    if(!laudos.length) {
-      dashTable.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação ainda</td></tr>';
-    } else {
-      dashTable.innerHTML = laudos.map(l=>{
-        const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
-                    .map(s=>NS[s]||s||'—').join(' · ');
-        const data = l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—';
-        const status = l.pdfUrl
-          ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:#2e7d32;">✔ PDF pronto</span>`
-          : `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#fff3e0;color:#e65100;">⏳ Pendente</span>`;
-        return `<tr>
-          <td>${l.nome||'—'}</td>
-          <td style="font-size:12px;">${l.tipoNome||l.tipo||'—'}</td>
-          <td>Asa ${l.asaDominante||'—'}</td>
-          <td style="font-size:11px;">${sub}</td>
-          <td>${data}</td>
-          <td>${status}</td>
-        </tr>`;
-      }).join('');
-    }
   } catch(e){console.warn('Dashboard:',e);}
 }
 
 // ── LOAD EMPRESAS ──
 async function loadEmpresas() {
-  const container = document.getElementById('empresasCards');
-  const tbody = document.getElementById('empresasTable'); // compatibilidade
+  const tbody = document.getElementById('empresasTable');
   try {
     const snap = await getDocs(collection(db,'nself_empresas'));
-    if(snap.empty){
-      container.innerHTML='<div style="color:#aaa;padding:24px;text-align:center;">Nenhuma empresa cadastrada</div>';
-      return;
-    }
-    // Buscar contagem de laudos por empresa para exibir no card
-    const laudoSnap = await getDocs(collection(db,'nself_laudos'));
-    const laudoCount = {};
-    laudoSnap.forEach(d=>{const emp=d.data().empresa; if(emp&&emp!=='PF') laudoCount[emp]=(laudoCount[emp]||0)+1;});
-
-    container.innerHTML = snap.docs.map(d=>{
-      const e=d.data(); const id=d.id;
-      const nLaudos = laudoCount[id]||laudoCount[e.nome]||0;
-      return `<div class="emp-card" onclick="abrirEmpresa('${id}','${(e.nome||'').replace(/'/g,"\'")}','${(e.email||'')}')">
-        <div class="emp-card-nome">${e.nome||'—'}</div>
-        <div class="emp-card-sub">${e.responsavel||''} · ${e.email||''}</div>
-        <div class="emp-card-badges">
-          <span class="emp-card-badge">💳 ${e.creditos||0} créditos</span>
-          <span class="emp-card-badge">📄 ${nLaudos} laudos</span>
-          <span class="emp-card-badge" style="background:${e.status==='ativo'?'#e8f5e9':'#fce4ec'};color:${e.status==='ativo'?'#2e7d32':'#c62828'};">${e.status==='ativo'?'✔ Ativo':'⏸ Inativo'}</span>
-        </div>
-      </div>`;
-    }).join('');
-
-    // Manter tbody legado oculto
-    if(tbody) tbody.innerHTML = snap.docs.map(d=>{
+    if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr>';return;}
+    tbody.innerHTML = snap.docs.map(d=>{
       const e=d.data();
       return `<tr>
         <td><strong>${e.nome}</strong></td>
@@ -2562,7 +2444,6 @@ window.confirmarSubtipos = function() {
 async function salvarResultadoFinal() {
   document.getElementById('testeContent').innerHTML=`<div style="text-align:center;padding:48px;color:var(--gray);">Calculando seu perfil... 🔮</div>`;
   const cod = window._state.codigoAtivo;
-  let laudoDocId = null;
   try {
     if(cod){
       await updateDoc(doc(db,'nself_codigos',cod.id),{status:'usado',usadoEm:serverTimestamp()});
@@ -2580,24 +2461,9 @@ async function salvarResultadoFinal() {
         scoresM1: TS.scoresM1,
         scoresSubtipo: TS.subScores,
         grupoI: TS.gi, grupoII: TS.gii,
-        email: cod.emailDestinatario||'',
         criadoEm: serverTimestamp(),
-        pdfStatus: 'gerando',
       });
-      laudoDocId = laudoRef.id;
-      window._state.laudoDocId = laudoDocId;
-
-      // ── Gerar PDF e subir no Storage em background ──
-      _gerarESubirPdf({
-        laudoDocId,
-        tipo:  TS.tipoFinal,
-        asa:   TS.asaDom,
-        subDom: TS.subDom,
-        subInt: TS.subInt,
-        subRem: TS.subRem,
-        nome:  cod.nomeDestinatario||'Anônimo',
-        cargo: cod.cargoFuncao||cod.empresa||'',
-      });
+      window._state.laudoDocId = laudoRef.id;
     }
   } catch(e){ console.warn('Salvar resultado:',e); }
 
@@ -2636,7 +2502,7 @@ async function salvarResultadoFinal() {
     btn.disabled = true; btn.textContent = '⏳ Gerando laudo...';
     status.textContent = 'Montando seu laudo personalizado...';
     try {
-      const blob = await window.gerarPdfNavegador({
+      const blob = await gerarPdfNavegador({
         tipo:TS.tipoFinal, asa:TS.asaDom,
         subDom:TS.subDom, subInt:TS.subInt, subRem:TS.subRem,
         nome, cargo:cod.cargo||(cod.empresa&&cod.empresa!=='PF'?cod.empresa:'')||'',
@@ -2857,200 +2723,6 @@ window.navigateTo = function(page) {
   if(page==='laudos')   loadLaudos();
 };
 
-
-// ────────────────────────────────────────────────────────────────────
-// ── PF: Pessoa Física ───────────────────────────────────────────────
-window._pfTab = 'codigos';
-
-window.pfShowTab = function(tab) {
-  window._pfTab = tab;
-  const isCod = tab === 'codigos';
-  document.getElementById('pfSecCodigos').style.display = isCod ? '' : 'none';
-  document.getElementById('pfSecLaudos').style.display  = isCod ? 'none' : '';
-  document.getElementById('pfTabCod').style.color = isCod ? 'var(--purple)' : 'var(--gray)';
-  document.getElementById('pfTabCod').style.borderBottomColor = isCod ? 'var(--purple)' : 'transparent';
-  document.getElementById('pfTabLau').style.color = !isCod ? 'var(--purple)' : 'var(--gray)';
-  document.getElementById('pfTabLau').style.borderBottomColor = !isCod ? 'var(--purple)' : 'transparent';
-};
-
-async function loadPF() {
-  await Promise.all([loadPFCodigos(), loadPFLaudos()]);
-}
-
-async function loadPFCodigos() {
-  const container = document.getElementById('pfAccordionCodigos');
-  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
-  try {
-    const snap = await getDocs(collection(db,'nself_codigos'));
-    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(c => !c.empresa || c.empresa === 'pf' || c.empresa === 'PF' || c.empresa === null);
-    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum código PF</div>';return;}
-    container.innerHTML = _renderAccordionCodigos(todos);
-    _initAccordion(container);
-  } catch(e){console.warn(e);}
-}
-
-async function loadPFLaudos() {
-  const container = document.getElementById('pfAccordionLaudos');
-  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
-  try {
-    const snap = await getDocs(collection(db,'nself_laudos'));
-    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(l => !l.empresa || l.empresa === 'PF');
-    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum laudo PF</div>';return;}
-    container.innerHTML = _renderAccordionLaudos(todos);
-    _initAccordion(container);
-  } catch(e){console.warn(e);}
-}
-
-// ────────────────────────────────────────────────────────────────────
-// ── EMPRESAS: cards + detalhe ───────────────────────────────────────
-window._empAtual = null;
-
-window.empVoltarLista = function() {
-  document.getElementById('empListView').style.display   = '';
-  document.getElementById('empDetailView').style.display = 'none';
-  window._empAtual = null;
-};
-
-window.empShowTab = function(tab) {
-  const isCod = tab === 'codigos';
-  document.getElementById('empSecCodigos').style.display = isCod ? '' : 'none';
-  document.getElementById('empSecLaudos').style.display  = isCod ? 'none' : '';
-  document.getElementById('empTabCod').style.color = isCod ? 'var(--purple)' : 'var(--gray)';
-  document.getElementById('empTabCod').style.borderBottomColor = isCod ? 'var(--purple)' : 'transparent';
-  document.getElementById('empTabLau').style.color = !isCod ? 'var(--purple)' : 'var(--gray)';
-  document.getElementById('empTabLau').style.borderBottomColor = !isCod ? 'var(--purple)' : 'transparent';
-};
-
-window.abrirEmpresa = async function(empId, empNome, empEmail) {
-  window._empAtual = {id: empId, nome: empNome, email: empEmail};
-  document.getElementById('empListView').style.display   = 'none';
-  document.getElementById('empDetailView').style.display = '';
-  document.getElementById('empDetailNome').textContent   = empNome;
-  document.getElementById('empDetailSub').textContent    = empEmail;
-  empShowTab('codigos');
-  await Promise.all([loadEmpCodigos(empId, empNome), loadEmpLaudos(empId, empNome)]);
-};
-
-async function loadEmpCodigos(empId, empNome) {
-  const container = document.getElementById('empAccordionCodigos');
-  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
-  try {
-    const snap = await getDocs(collection(db,'nself_codigos'));
-    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(c => c.empresa === empId || c.empresa === empNome);
-    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum código para esta empresa</div>';return;}
-    container.innerHTML = _renderAccordionCodigos(todos);
-    _initAccordion(container);
-  } catch(e){console.warn(e);}
-}
-
-async function loadEmpLaudos(empId, empNome) {
-  const container = document.getElementById('empAccordionLaudos');
-  container.innerHTML = '<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
-  try {
-    const snap = await getDocs(collection(db,'nself_laudos'));
-    const todos = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(l => l.empresa === empId || l.empresa === empNome);
-    if(!todos.length){container.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Nenhum laudo para esta empresa</div>';return;}
-    container.innerHTML = _renderAccordionLaudos(todos);
-    _initAccordion(container);
-  } catch(e){console.warn(e);}
-}
-
-// ────────────────────────────────────────────────────────────────────
-// ── HELPERS ACCORDION ───────────────────────────────────────────────
-function _getMesAnoKey(item) {
-  const d = item.criadoEm?.toDate?.();
-  if(!d) return '9999-99::Data desconhecida';
-  const key = `${String(9999-d.getFullYear()).padStart(4,'0')}-${String(99-d.getMonth()).padStart(2,'0')}`;
-  const label = d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})
-                 .replace(/^\w/,c=>c.toUpperCase());
-  return `${key}::${label}`;
-}
-
-function _agruparPorMes(lista) {
-  const grupos = {};
-  lista.forEach(item => {
-    const k = _getMesAnoKey(item);
-    if(!grupos[k]) grupos[k] = [];
-    grupos[k].push(item);
-  });
-  // ordenar itens A→Z dentro de cada grupo
-  Object.values(grupos).forEach(arr =>
-    arr.sort((a,b)=>(a.nome||a.nomeDestinatario||'').localeCompare(b.nome||b.nomeDestinatario||'','pt-BR',{sensitivity:'base'}))
-  );
-  return Object.keys(grupos).sort().map(k=>({label:k.split('::')[1], itens:grupos[k]}));
-}
-
-function _renderAccordionCodigos(lista) {
-  const grupos = _agruparPorMes(lista);
-  return grupos.map((g,gi) => `
-    <div class="accordion-mes">
-      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
-        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length} código${g.itens.length!==1?'s':''})</span></span>
-        <span class="acc-arrow">▶</span>
-      </div>
-      <div class="accordion-body">
-        <table>
-          <thead><tr><th>Nome</th><th>Código</th><th>Status</th><th>Criado em</th><th></th></tr></thead>
-          <tbody>
-            ${g.itens.map(c=>`<tr>
-              <td>${c.nomeDestinatario||'—'}</td>
-              <td style="font-family:monospace;letter-spacing:2px;">${c.codigo||'—'}</td>
-              <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${c.status==='usado'?'#e8f5e9':'#fff3e0'};color:${c.status==='usado'?'#2e7d32':'#e65100'};">${c.status==='usado'?'✔ Usado':'⏳ Pendente'}</span></td>
-              <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-              <td><button class="btn btn-outline btn-sm" onclick="editarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\'")}','${(c.email||'').replace(/'/g,"\'")}','${(c.whatsapp||'').replace(/'/g,"\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button></td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `).join('');
-}
-
-const _NS_SUB = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
-
-function _renderAccordionLaudos(lista) {
-  const grupos = _agruparPorMes(lista);
-  return grupos.map(g => `
-    <div class="accordion-mes">
-      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
-        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length} laudo${g.itens.length!==1?'s':''})</span></span>
-        <span class="acc-arrow">▶</span>
-      </div>
-      <div class="accordion-body">
-        <table>
-          <thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Laudo</th></tr></thead>
-          <tbody>
-            ${g.itens.map(l=>{
-              const lid=l.id;
-              const sub=[l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo].map(s=>_NS_SUB[s]||s||'—').join(' · ');
-              const btn=l.pdfUrl
-                ?`<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
-                :`<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')">🔄 Gerar</button>`;
-              return `<tr>
-                <td>${l.nome||'—'}</td>
-                <td style="font-size:12px;">${l.tipoNome||l.tipo||'—'}</td>
-                <td>Asa ${l.asaDominante||'—'}</td>
-                <td style="font-size:11px;">${sub}</td>
-                <td id="pdfcell_${lid}">${btn}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `).join('');
-}
-
-function _initAccordion(container) {
-  // Abrir o primeiro grupo automaticamente
-  const first = container.querySelector('.accordion-header');
-  if(first) { first.classList.add('open'); first.nextElementSibling.classList.add('open'); }
-}
-
 async function loadLaudos(){
   const tbody = document.getElementById('laudosTable');
   try {
@@ -3060,49 +2732,15 @@ async function loadLaudos(){
       return;
     }
     const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
-
-    // ── Montar lista completa de laudos ──
-    const laudos = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-
-    // ── Separar PF e PJ ──
-    const pfLaudos  = laudos.filter(l => !l.empresa || l.empresa === 'PF');
-    const pjLaudos  = laudos.filter(l => l.empresa && l.empresa !== 'PF');
-
-    // ── Agrupar por Mês/Ano e ordenar alfabeticamente dentro de cada grupo ──
-    const _getMesAno = l => {
-      const d = l.criadoEm?.toDate?.();
-      if(!d) return 'Data desconhecida';
-      return d.toLocaleDateString('pt-BR', { month:'long', year:'numeric' })
-               .replace(/^\w/, c => c.toUpperCase());
-    };
-    const _getMesAnoTs = l => {
-      const d = l.criadoEm?.toDate?.();
-      return d ? -(d.getFullYear()*100 + d.getMonth()) : 0; // negativo = mais recente primeiro
-    };
-
-    const _agrupar = lista => {
-      const grupos = {};
-      lista.forEach(l => {
-        const k = _getMesAno(l);
-        if(!grupos[k]) grupos[k] = { ts: _getMesAnoTs(l), itens:[] };
-        grupos[k].itens.push(l);
-      });
-      // Ordenar grupos: mais recente primeiro
-      const chaves = Object.keys(grupos).sort((a,b) => grupos[a].ts - grupos[b].ts);
-      // Dentro de cada grupo: A→Z pelo nome
-      chaves.forEach(k => grupos[k].itens.sort((a,b) =>
-        (a.nome||'').localeCompare(b.nome||'', 'pt-BR', {sensitivity:'base'})));
-      return { grupos, chaves };
-    };
-
-    const _btnPdf = (l, lid) => l.pdfUrl
-      ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
-      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
-
-    const _renderLinha = l => {
-      const lid = l.id;
+    tbody.innerHTML = snap.docs.map(d => {
+      const l   = d.data();
+      const lid = d.id;
       const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
                   .map(s => NS[s]||s||'—').join(' · ');
+      // Estado do botão PDF
+      const btnPdf = l.pdfUrl
+        ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
+        : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
       return `<tr>
         <td>${l.nome||'—'}</td>
         <td>${l.empresa||'PF'}</td>
@@ -3110,44 +2748,9 @@ async function loadLaudos(){
         <td>Asa ${l.asaDominante||l.asa||'—'}</td>
         <td style="font-size:11px;">${sub}</td>
         <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-        <td id="pdfcell_${lid}">${_btnPdf(l,lid)}</td>
+        <td id="pdfcell_${lid}">${btnPdf}</td>
       </tr>`;
-    };
-
-    const _renderGrupos = ({grupos, chaves}) => chaves.map(k => `
-      <tr>
-        <td colspan="7" style="background:#f0eaf7;color:#5500AA;font-weight:600;font-size:12px;
-            padding:6px 14px;letter-spacing:0.5px;text-transform:uppercase;border-top:2px solid #ddd0f0;">
-          ${k}
-        </td>
-      </tr>
-      ${grupos[k].itens.map(_renderLinha).join('')}
-    `).join('');
-
-    let html = '';
-
-    // ── Bloco PJ ──
-    if(pjLaudos.length) {
-      const ag = _agrupar(pjLaudos);
-      html += `<tr><td colspan="7" style="background:#3d0a5e;color:white;font-weight:700;
-                   font-size:13px;padding:8px 14px;letter-spacing:1px;">
-                 🏢 EMPRESAS / RH
-               </td></tr>`;
-      html += _renderGrupos(ag);
-    }
-
-    // ── Bloco PF ──
-    if(pfLaudos.length) {
-      const ag = _agrupar(pfLaudos);
-      html += `<tr><td colspan="7" style="background:#3d0a5e;color:white;font-weight:700;
-                   font-size:13px;padding:8px 14px;letter-spacing:1px;">
-                 👤 PESSOA FÍSICA
-               </td></tr>`;
-      html += _renderGrupos(ag);
-    }
-
-    tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
-
+    }).join('');
   } catch(e){ console.warn(e); }
 }
 
@@ -3161,104 +2764,6 @@ function normalizeSubtipo(raw) {
     'AP':'AP','1A1':'1A1','SOC':'SOC',
   };
   return m[raw.toString().toLowerCase()] || m[raw] || 'AP';
-}
-
-
-// ── GERAR PDF + UPLOAD STORAGE + SALVAR URL + VINCULAR CLÍNICA ────────────
-async function _gerarESubirPdf({laudoDocId, tipo, asa, subDom, subInt, subRem, nome, cargo}) {
-  try {
-    const { getStorage, ref, uploadBytes, getDownloadURL } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
-
-    // Normalizar subtipo
-    const _n = s => {
-      if(!s) return 'ap';
-      const m = {'autopreservacao':'ap','autopreservação':'ap','auto':'ap','ap':'ap',
-                 'social':'so','so':'so','soc':'so',
-                 '1a1':'sex','sex':'sex','1 a 1':'sex','umaum':'sex'};
-      return m[String(s).toLowerCase().replace(/[^a-z0-9]/g,'')] || 'ap';
-    };
-    const ASAS_VALIDAS = {1:[2,9],2:[1,3],3:[2,4],4:[3,5],5:[4,6],6:[5,7],7:[6,8],8:[7,9],9:[8,1]};
-    const asaFinal = ASAS_VALIDAS[tipo]?.includes(parseInt(asa)) ? parseInt(asa) : ASAS_VALIDAS[tipo][0];
-
-    // 1. Gerar PDF como Blob
-    const blob = await window.gerarPdfNavegador({
-      tipo, asa: asaFinal,
-      subDom: _n(subDom), subInt: _n(subInt), subRem: _n(subRem),
-      nome, cargo,
-    });
-
-    // 2. Upload para Firebase Storage
-    const storage = getStorage();
-    const nomeArq = `laudos_9self/${laudoDocId}_${Date.now()}.pdf`;
-    const storageRef = ref(storage, nomeArq);
-    const snap = await uploadBytes(storageRef, blob, { contentType:'application/pdf' });
-    const pdfUrl = await getDownloadURL(snap.ref);
-
-    // 3. Salvar URL no documento do laudo (nself_laudos)
-    await updateDoc(doc(db,'nself_laudos', laudoDocId), {
-      pdfUrl,
-      pdfStatus: 'pronto',
-      pdfGeradoEm: serverTimestamp(),
-    });
-
-    // 4. Vincular à Clínica: buscar paciente pelo EMAIL no clinica_pacientes
-    try {
-      // Email vem do código de acesso (cod.emailDestinatario) ou do colaborador logado
-      const emailBusca = (window._state.codigoAtivo?.emailDestinatario || '').trim().toLowerCase();
-      if (emailBusca) {
-        const { query: _q, where: _w } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-        const pacSnap = await getDocs(_q(collection(db,'clinica_pacientes'), _w('email','==',emailBusca)));
-        let pacId = null, pacNome = nome;
-        pacSnap.forEach(d => { pacId = d.id; pacNome = d.data().nome || nome; });
-
-        if (pacId) {
-          await addDoc(collection(db,'clinica_laudos_externos'), {
-            pacienteId: pacId,
-            nomePaciente: pacNome,
-            email: emailBusca,
-            origem: '9&Self',
-            laudoId: laudoDocId,
-            pdfUrl,
-            tipo, asaDominante: asaFinal,
-            subtipoDominante: subDom,
-            criadoEm: serverTimestamp(),
-          });
-          console.log('[9Self→Clínica] Vinculado ao paciente:', pacId);
-        } else {
-          // Paciente não encontrado na Clínica — salvar mesmo assim para vinculação futura
-          await addDoc(collection(db,'clinica_laudos_externos'), {
-            pacienteId: null,
-            nomePaciente: nome,
-            email: emailBusca,
-            origem: '9&Self',
-            laudoId: laudoDocId,
-            pdfUrl,
-            tipo, asaDominante: asaFinal,
-            subtipoDominante: subDom,
-            criadoEm: serverTimestamp(),
-          });
-          console.log('[9Self→Clínica] Email não encontrado na Clínica, salvo para vinculação futura.');
-        }
-      }
-    } catch(eClinica) {
-      console.warn('[9Self→Clínica] Vinculação falhou (não crítico):', eClinica.message);
-    }
-
-    console.log('[PDF] Gerado e salvo com sucesso:', pdfUrl);
-
-    // Atualizar botão na tabela de laudos se estiver visível
-    const cell = document.getElementById(`pdfcell_${laudoDocId}`);
-    if(cell) cell.innerHTML = `<a href="${pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`;
-
-  } catch(e) {
-    console.error('[_gerarESubirPdf]', e.message);
-    try {
-      await updateDoc(doc(db,'nself_laudos', laudoDocId), {
-        pdfStatus: 'erro', pdfErro: e.message
-      });
-    } catch(_){}
-  }
 }
 
 window.gerarPdfLaudo = async function(laudoId) {
@@ -3287,37 +2792,14 @@ window.gerarPdfLaudo = async function(laudoId) {
     const asaFinal = ASAS_VALIDAS[tipo]?.includes(asa) ? asa : ASAS_VALIDAS[tipo][0];
 
     // 3. Gerar PDF no navegador (mesmo motor do paciente)
-    // Gerar PDF
-    setCell(`<span style="font-size:12px;color:#888;">⏳ Gerando PDF...</span>`);
-    const blob = await window.gerarPdfNavegador({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo });
-
-    // Baixar direto no navegador + tentar Storage em background
-    const nomeDownload = `Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+    const blob = await gerarPdfNavegador({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo });
     const _url = URL.createObjectURL(blob);
     const _a = document.createElement('a');
-    _a.href=_url; _a.download=nomeDownload;
+    _a.href=_url; _a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
     document.body.appendChild(_a); _a.click();
-    document.body.removeChild(_a);
-    setTimeout(()=>URL.revokeObjectURL(_url), 5000);
-    setCell(`<button class="btn btn-teal btn-sm" onclick="gerarPdfLaudo('${laudoId}')">⬇ Baixar PDF</button>`);
+    document.body.removeChild(_a); URL.revokeObjectURL(_url);
 
-    // Tentar salvar no Storage em background (não bloqueia o download)
-    try {
-      const { getStorage, ref: sRef, uploadBytes, getDownloadURL } =
-        await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
-      const nomeArq = `laudos_9self/${laudoId}_${Date.now()}.pdf`;
-      const storageRef = sRef(getStorage(), nomeArq);
-      const uploadSnap = await uploadBytes(storageRef, blob, { contentType:'application/pdf' });
-      const pdfUrl = await getDownloadURL(uploadSnap.ref);
-      await updateDoc(doc(db,'nself_laudos', laudoId), {
-        pdfUrl, pdfStatus:'pronto', pdfGeradoEm: serverTimestamp()
-      });
-      // Se Storage funcionou, atualizar botão para link permanente
-      setCell(`<a href="${pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
-    } catch(eStorage) {
-      console.warn('[Storage CORS]', eStorage.message);
-      await updateDoc(doc(db,'nself_laudos', laudoId), { pdfStatus:'local', pdfErro: eStorage.message });
-    }
+    setCell(`<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}')">⬇ Re-gerar PDF</button>`);
 
   } catch(e) {
     console.error('[gerarPdfLaudo]', e.message);
@@ -3373,424 +2855,437 @@ window.closeSidebar=function(){
 window._state.profile = 'admin';
 gerarCodigoPreview();
 
-// Auto-detectar ?code= na URL (colaborador clicou no link)
+// ── DETECÇÃO DE URL: ?comprar=true | ?code=XXX ──────────────────────
 (function() {
   const params = new URLSearchParams(window.location.search);
-  const code   = params.get('code');
+
+  // 1. CHECKOUT PÚBLICO — esconde login, isola no checkout
+  if(params.get('comprar') === 'true') {
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginEl = document.getElementById('loginScreen');
+      const appEl   = document.getElementById('appShell');
+      if(loginEl) loginEl.style.display = 'none';
+      if(appEl)   appEl.style.display   = 'none';
+      const ck = document.getElementById('page-checkout');
+      if(ck) { ck.style.display = ''; ck.classList.add('active'); }
+      // Desconto via parâmetro ?desc=XX&af=AFID
+      const desc  = parseFloat(params.get('desc')||0);
+      const afId  = params.get('af')||null;
+      if(desc > 0) {
+        window._ckDesconto = {pct:desc, afId};
+        const novoValor = Math.round(297*(1-desc/100));
+        const el = document.getElementById('ckValorPF');
+        if(el) el.textContent = `R$ ${novoValor}`;
+      }
+    });
+    return; // não processar outros parâmetros
+  }
+
+  // 2. LINK DE CÓDIGO — pula login, entra direto como colaborador
+  const code = params.get('code') || params.get('c');
   if(code) {
-    // Mostrar tela de colaborador com código pré-preenchido
     window._state.profile = 'colaborador';
-    const el = document.getElementById('colabCode');
-    if(el) {
-      el.value = code.toUpperCase();
-      // Pequeno delay para DOM estar pronto
+    document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('colabCode');
+      if(el) el.value = code.toUpperCase();
       setTimeout(() => {
         const tabColab = document.querySelector('[onclick*="colaborador"]');
         if(tabColab) tabColab.click();
-        setTimeout(() => window.doLogin(), 300);
-      }, 400);
-    }
+        setTimeout(() => window.doLogin && window.doLogin(), 400);
+      }, 500);
+    });
   }
 })();
 
+
 // ════════════════════════════════════════════════════════════════════
-// ── CONTROLE DE VENDAS ──────────────────────────────────────────────
+// ── CHECKOUT PÚBLICO ─────────────────────────────────────────────────
 // ════════════════════════════════════════════════════════════════════
+window._ckPlano   = null;
+window._ckVendaId = null;
+window._ckCodigos = [];
+const _CK_VALOR_PF  = 297;
+const _CK_VALOR_PJ  = 247;
+// ⬇ Substitua pela sua chave Pix real
+const _PIX_CHAVE = 'luciakratz@gmail.com';
+const _PIX_NOME  = 'Lucia Kratz';
+const _PIX_CIDADE= 'Goiania';
 
-// Popular select de destino com empresas
-async function _popularDestinoVendas() {
-  const sel = document.getElementById('vDestino');
-  if(!sel) return;
-  sel.innerHTML = '<option value="pf">👤 Pessoa Física (direto)</option>';
-  try {
-    const snap = await getDocs(collection(db,'nself_empresas'));
-    snap.forEach(d => {
-      const e = d.data();
-      const opt = document.createElement('option');
-      opt.value = d.id;
-      opt.textContent = '🏢 ' + (e.nome||'Empresa');
-      sel.appendChild(opt);
-    });
-  } catch(e) { console.warn(e); }
-}
-
-async function loadVendas() {
-  await _popularDestinoVendas();
-  await Promise.all([_loadVendasCards(), _loadVendasLista(), _loadComissoes()]);
-}
-
-async function _loadVendasCards() {
-  const el = document.getElementById('vendasCards');
-  if(!el) return;
-  try {
-    const now = new Date();
-    const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
-    const snap = await getDocs(collection(db,'nself_vendas'));
-    let totalMes=0, codigosLiberados=0, comissaoTotal=0;
-    snap.forEach(d => {
-      const v = d.data();
-      const dt = v.criadoEm?.toDate?.();
-      if(dt && dt >= inicioMes) {
-        if(v.status==='pago') { totalMes += v.valor||0; codigosLiberados += v.qtd||0; }
-        comissaoTotal += v.comissaoValor||0;
-      }
-    });
-    el.innerHTML = `
-      <div class="stat-card">
-        <div class="sc-label">Total Vendido no Mês</div>
-        <div class="sc-value" style="color:#2e7d32;">R$ ${totalMes.toFixed(2).replace('.',',')}</div>
-        <div class="sc-sub">vendas aprovadas</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-label">Códigos Liberados</div>
-        <div class="sc-value">${codigosLiberados}</div>
-        <div class="sc-sub">automaticamente este mês</div>
-      </div>
-      <div class="stat-card">
-        <div class="sc-label">Comissões a Pagar</div>
-        <div class="sc-value" style="color:#e65100;">R$ ${comissaoTotal.toFixed(2).replace('.',',')}</div>
-        <div class="sc-sub">parceiros este mês</div>
-      </div>
-    `;
-  } catch(e){ console.warn(e); }
-}
-
-async function _loadVendasLista() {
-  const el = document.getElementById('vendasLista');
-  if(!el) return;
-  try {
-    const snap = await getDocs(collection(db,'nself_vendas'));
-    const itens = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0))
-      .slice(0,20);
-    if(!itens.length){ el.innerHTML='<div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Nenhuma venda ainda</div>';return;}
-    el.innerHTML = itens.map(v=>`
-      <div style="border:1px solid #eee;border-radius:10px;padding:12px 16px;background:#fafafa;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-weight:600;font-size:13px;color:#1a0a2e;">${v.destinoLabel||'PF'} · ${v.qtd||1} licença${(v.qtd||1)!==1?'s':''}</div>
-            <div style="font-size:11px;color:#888;margin-top:2px;">${v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'} · ${v.parceiro?'Parceiro: '+v.parceiro:''}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-weight:700;color:#7B00C4;font-size:15px;">R$ ${(v.valor||0).toFixed(2).replace('.',',')}</div>
-            <span style="font-size:11px;padding:2px 8px;border-radius:10px;
-              background:${v.status==='pago'?'#e8f5e9':'#fff3e0'};
-              color:${v.status==='pago'?'#2e7d32':'#e65100'};">
-              ${v.status==='pago'?'✔ Pago':'⏳ Aguardando'}
-            </span>
-          </div>
-        </div>
-        <div style="margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <input value="${v.linkUrl||''}" readonly style="flex:1;min-width:0;font-size:11px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;color:#555;background:#fff;"/>
-          <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('${v.linkUrl||''}');showToast('Link copiado!')">📋</button>
-          ${v.status==='aguardando_confirmacao'?`<button class="btn btn-primary btn-sm" style="background:#2e7d32;border-color:#2e7d32;" onclick="confirmarVendaAdmin('${v.id}','${(v.compradorEmail||'').replace(/'/g,"\'")}','${(v.comprador||'').replace(/'/g,"\'")}')">✅ Confirmar e Liberar</button>`:''}
-        </div>
-        ${v.comprador?`<div style="font-size:11px;color:#555;margin-top:4px;">👤 ${v.comprador} · ${v.compradorEmail||''}</div>`:''}
-      </div>
-    `).join('');
-  } catch(e){ console.warn(e); }
-}
-
-async function _loadComissoes() {
-  const tbody = document.getElementById('comissoesTable');
-  if(!tbody) return;
-  try {
-    const snap = await getDocs(collection(db,'nself_vendas'));
-    const comissoes = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(v => v.comissaoPct > 0)
-      .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0));
-    if(!comissoes.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Nenhuma comissão registrada</td></tr>';return;}
-    tbody.innerHTML = comissoes.map(v=>`<tr>
-      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;">${v.parceiro||'—'}</td>
-      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;">${v.destinoLabel||'PF'} · ${v.qtd} lic.</td>
-      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;">${v.comissaoPct||0}%</td>
-      <td style="padding:9px 14px;font-size:13px;border-bottom:1px solid #eee;font-weight:600;color:#7B00C4;">R$ ${(v.comissaoValor||0).toFixed(2).replace('.',',')}</td>
-      <td style="padding:9px 14px;border-bottom:1px solid #eee;">
-        <span style="font-size:11px;padding:2px 8px;border-radius:10px;
-          background:${v.comissaoPaga?'#e8f5e9':'#fff3e0'};
-          color:${v.comissaoPaga?'#2e7d32':'#e65100'};">
-          ${v.comissaoPaga?'✔ Paga':'⏳ Pendente'}
-        </span>
-      </td>
-      <td style="padding:9px 14px;font-size:12px;color:#888;border-bottom:1px solid #eee;">${v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-    </tr>`).join('');
-  } catch(e){ console.warn(e); }
-}
-
-
-// ── CONFIRMAR VENDA (admin) — libera códigos + envia e-mail ──────────
-window.confirmarVendaAdmin = async function(vendaId, email, nome) {
-  if(!confirm(`Confirmar pagamento de ${nome||email} e liberar os códigos?`)) return;
-  try {
-    // Buscar dados da venda
-    const vendaDoc = await getDoc(doc(db,'nself_vendas', vendaId));
-    if(!vendaDoc.exists()){ showToast('Venda não encontrada'); return; }
-    const venda = vendaDoc.data();
-
-    // 1. Gerar e salvar códigos
-    const BASE_URL = 'https://luciakratz-arch.github.io/9-Self/?c=';
-    const codigos = [];
-    for(let i=0; i<(venda.qtd||1); i++){
-      const cod = Math.random().toString(36).substr(2,6).toUpperCase();
-      await addDoc(collection(db,'nself_codigos'),{
-        codigo: cod,
-        nomeDestinatario: nome||'Cliente',
-        email: email||'',
-        empresa: venda.destino==='pf'?'PF':venda.destino,
-        status: 'pendente',
-        origem: 'venda_automatica',
-        vendaId,
-        linkAcesso: BASE_URL+cod,
-        criadoEm: serverTimestamp(),
-      });
-      codigos.push(cod);
-    }
-
-    // 2. Registrar comissão se houver
-    if((venda.comissaoPct||0) > 0) {
-      await addDoc(collection(db,'nself_comissoes'),{
-        vendaId, parceiro: venda.parceiro,
-        pct: venda.comissaoPct, valor: venda.comissaoValor,
-        pago: false, criadoEm: serverTimestamp(),
-      });
-    }
-
-    // 3. Marcar venda como paga
-    await updateDoc(doc(db,'nself_vendas', vendaId),{
-      status:'pago', pagoEm: serverTimestamp(), codigosGerados: codigos
-    });
-
-    // 4. Enviar e-mail via EmailJS (configurar chaves abaixo)
-    if(email && window._emailjsReady) {
-      await _enviarEmailCodigos({ nome, email, codigos, venda });
-    }
-
-    showToast(`✅ ${codigos.length} código(s) liberado(s)!`);
-    loadVendas();
-
-  } catch(e){ showToast('Erro: '+e.message); console.error(e); }
+window.ckSelecionarPlano = function(plano) {
+  window._ckPlano = plano;
+  const isPF = plano==='pf';
+  document.getElementById('ckOpcaoPF').style.border      = isPF?'2px solid #7B00C4':'2px solid #e0d0f5';
+  document.getElementById('ckOpcaoPF').style.background  = isPF?'#faf5ff':'';
+  document.getElementById('ckOpcaoPJ').style.border      = !isPF?'2px solid #7B00C4':'2px solid #e0d0f5';
+  document.getElementById('ckOpcaoPJ').style.background  = !isPF?'#faf5ff':'';
+  document.getElementById('ckQtdPJRow').style.display    = !isPF?'':'none';
+  document.getElementById('ckDadosComprador').style.display = '';
 };
 
-// ── ENVIO DE E-MAIL via EmailJS ────────────────────────────────────
-// Para ativar: crie conta em emailjs.com → crie template → preencha abaixo
-const _EMAILJS_SERVICE  = 'SEU_SERVICE_ID';   // ex: 'service_abc123'
-const _EMAILJS_TEMPLATE = 'SEU_TEMPLATE_ID';  // ex: 'template_xyz789'
-const _EMAILJS_KEY      = 'SUA_PUBLIC_KEY';   // ex: 'user_ABCDEF'
-window._emailjsReady = false;
+window.ckAtualizarTotalPJ = function() {
+  const qtd = parseInt(document.getElementById('ckQtdPJ').value)||5;
+  document.getElementById('ckTotalPJ').textContent = 'R$ '+( qtd*_CK_VALOR_PJ ).toLocaleString('pt-BR');
+};
 
-// Carregar EmailJS dinamicamente
+window.ckIrParaPix = function() {
+  const nome     = document.getElementById('ckNome').value.trim();
+  const email    = document.getElementById('ckEmail').value.trim();
+  const whatsapp = document.getElementById('ckWhatsapp').value.trim();
+  if(!nome||!email||!whatsapp){ alert('Preencha nome, e-mail e WhatsApp'); return; }
+  const isPF  = window._ckPlano==='pf';
+  const qtd   = isPF?1:(parseInt(document.getElementById('ckQtdPJ').value)||5);
+  const desc  = window._ckDesconto?.pct||0;
+  const valorBase = isPF?_CK_VALOR_PF:(qtd*_CK_VALOR_PJ);
+  const valor = desc>0 ? Math.round(valorBase*(1-desc/100)) : valorBase;
+
+  document.getElementById('ckResumoCompra').textContent =
+    isPF?`Teste Individual — R$ ${valor}`:`${qtd} licenças × R$ ${_CK_VALOR_PJ} = R$ ${valor.toLocaleString('pt-BR')}`;
+  document.getElementById('ckValorDestaque').textContent =
+    `⚠️ Pague exatamente R$ ${valor.toFixed(2).replace('.',',')}`;
+
+  // Gerar QR Code Pix
+  const txid = 'NS'+Math.random().toString(36).substr(2,5).toUpperCase();
+  const pixPayload = _gerarPixPayload({chave:_PIX_CHAVE,nome:_PIX_NOME,valor,cidade:_PIX_CIDADE,txid});
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixPayload)}`;
+  document.getElementById('ckQrCode').innerHTML =
+    `<img src="${qrUrl}" alt="QR Pix" style="border-radius:8px;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.1);"/>`;
+  document.getElementById('ckChavePix').value = _PIX_CHAVE;
+
+  // Salvar venda pendente no Firestore
+  const doc_ = document.getElementById('ckDoc').value.trim();
+  addDoc(collection(db,'nself_vendas'),{
+    plano:window._ckPlano, qtd, valor, comprador:nome,
+    compradorEmail:email, compradorWhatsapp:whatsapp, compradorDoc:doc_||'',
+    pixTxid:txid, status:'aguardando_pix',
+    afiliado:window._ckDesconto?.afId||null,
+    criadoEm:serverTimestamp(),
+  }).then(ref=>{ window._ckVendaId=ref.id; });
+
+  document.getElementById('ckEtapa1').style.display='none';
+  document.getElementById('ckEtapa2').style.display='';
+};
+
+// ── CONFIRMAR PAGAMENTO: esteira automática ──────────────────────────
+window.ckConfirmarPagamento = async function() {
+  const st    = document.getElementById('ckStatus');
+  const nome  = document.getElementById('ckNome').value.trim();
+  const email = document.getElementById('ckEmail').value.trim();
+  const isPF  = window._ckPlano==='pf';
+  const qtd   = isPF?1:(parseInt(document.getElementById('ckQtdPJ').value)||5);
+  const desc  = window._ckDesconto?.pct||0;
+  const valorBase = isPF?_CK_VALOR_PF:(qtd*_CK_VALOR_PJ);
+  const valor = desc>0?Math.round(valorBase*(1-desc/100)):valorBase;
+
+  st.innerHTML='<span style="color:#888;">⏳ Liberando seu acesso...</span>';
+  document.querySelector('#ckEtapa2 button.btn-primary').disabled=true;
+
+  try {
+    const BASE = 'https://luciakratz-arch.github.io/9-Self/index.html?code=';
+    window._ckCodigos = [];
+
+    // 1. Gerar códigos no Firestore
+    for(let i=0;i<qtd;i++){
+      const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let cod=''; for(let j=0;j<6;j++) cod+=chars[Math.floor(Math.random()*chars.length)];
+      await addDoc(collection(db,'nself_codigos'),{
+        codigo:cod, nomeDestinatario:nome, email,
+        empresa:isPF?'PF':'PJ_COMPRA',
+        status:'disponivel', origem:'compra_direta',
+        vendaId:window._ckVendaId||'',
+        linkAcesso:BASE+cod, criadoEm:serverTimestamp(),
+      });
+      window._ckCodigos.push(cod);
+    }
+
+    // 2. Marcar venda como PAGA
+    if(window._ckVendaId) {
+      await updateDoc(doc(db,'nself_vendas',window._ckVendaId),{
+        status:'pago', pagoEm:serverTimestamp(), codigos:window._ckCodigos
+      });
+    }
+
+    // 3. Registrar comissão de afiliado se houver
+    if(window._ckDesconto?.afId && desc>0) {
+      await addDoc(collection(db,'nself_comissoes'),{
+        vendaId:window._ckVendaId, afiliado:window._ckDesconto.afId,
+        pct:desc, valor:Math.round(valor*desc/100),
+        pago:false, criadoEm:serverTimestamp(),
+      });
+    }
+
+    // 4. PF → login automático e DIRETO para o teste
+    if(isPF) {
+      st.innerHTML='<span style="color:#2e7d32;font-weight:700;">✅ Acesso liberado! Iniciando seu teste...</span>';
+      // Esconder checkout, mostrar app, entrar como colaborador
+      document.getElementById('page-checkout').style.display='none';
+      const appShell = document.getElementById('appShell');
+      if(appShell) appShell.style.display='block';
+      // Simular login de colaborador com o código gerado
+      const cod = window._ckCodigos[0];
+      window._state.codigoAtivo = {
+        codigo:cod, nomeDestinatario:nome, email,
+        empresa:'PF', status:'disponivel',
+      };
+      enterApp('colaborador', nome, 'Colaborador');
+      // Ir direto para o teste sem passar por colab-inicio
+      setTimeout(()=>{
+        navigateTo('colab-teste');
+        if(window.iniciarTeste) iniciarTeste();
+      }, 200);
+      return;
+    }
+
+    // 5. PJ → mostrar códigos
+    document.getElementById('ckEtapa2').style.display='none';
+    document.getElementById('ckEtapa3PJ').style.display='';
+    document.getElementById('ckCodigosGerados').innerHTML =
+      window._ckCodigos.map((c,i)=>`<div>Código ${i+1}: <strong>${c}</strong> — ${BASE}${c}</div>`).join('');
+
+    // Enviar e-mail se EmailJS configurado
+    if(window._emailjsReady && email) {
+      const codigosTexto = window._ckCodigos.map((c,i)=>`Código ${i+1}: ${c}\nLink: ${BASE}${c}`).join('\n\n');
+      emailjs.send(_EMAILJS_SERVICE,_EMAILJS_TEMPLATE,{
+        to_name:nome, to_email:email,
+        produto:'9&Self — Pacote Empresa',
+        qtd, codigos:codigosTexto,
+        valor:`R$ ${valor.toFixed(2).replace('.',',')}`,
+      }).catch(()=>{});
+    }
+
+  } catch(e) {
+    st.innerHTML=`<span style="color:#c62828;">Erro: ${e.message}</span>`;
+    document.querySelector('#ckEtapa2 button.btn-primary').disabled=false;
+  }
+};
+
+window.ckCopiarCodigosWhatsApp = function() {
+  const BASE='https://luciakratz-arch.github.io/9-Self/index.html?code=';
+  const txt='*9&Self — Seus Códigos de Acesso*\n\n'+
+    window._ckCodigos.map((c,i)=>`Código ${i+1}: *${c}*\nLink: ${BASE}${c}`).join('\n\n')+
+    '\n\nAcesse seu link para iniciar o teste.';
+  navigator.clipboard.writeText(txt).then(()=>showToast('✅ Copiado para colar no WhatsApp!'));
+};
+
+// ── GERADOR PAYLOAD PIX EMV (QR Code estático) ──────────────────────
+function _gerarPixPayload({chave,nome,valor,cidade,txid}){
+  const _tlv=(id,val)=>{const v=String(val);return `${id}${String(v.length).padStart(2,'0')}${v}`;};
+  const gui  =_tlv('00','BR.GOV.BCB.PIX')+_tlv('01',chave);
+  const mai  =_tlv('26',gui);
+  const nome_=(nome||'9SELF').replace(/[^A-Za-z0-9 ]/g,'').substr(0,25).toUpperCase();
+  const city_=(cidade||'GOIANIA').replace(/[^A-Za-z0-9 ]/g,'').substr(0,15).toUpperCase();
+  const txid_=(txid||'9SELF').replace(/[^A-Za-z0-9]/g,'').substr(0,25).toUpperCase()||'***';
+  const val_ =valor>0?_tlv('54',valor.toFixed(2)):'';
+  const base =_tlv('00','01')+mai+_tlv('52','0000')+_tlv('53','986')+
+               val_+_tlv('58','BR')+_tlv('59',nome_)+_tlv('60',city_)+
+               _tlv('62',_tlv('05',txid_))+'6304';
+  let crc=0xFFFF;
+  for(const ch of base){crc^=ch.charCodeAt(0)<<8;for(let i=0;i<8;i++)crc=(crc&0x8000)?(crc<<1)^0x1021:(crc<<1);}
+  return base+(crc&0xFFFF).toString(16).toUpperCase().padStart(4,'0');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ── CONTROLE DE VENDAS (admin — somente relatório) ───────────────────
+// ════════════════════════════════════════════════════════════════════
+async function loadVendas(){
+  await Promise.all([_loadVendasCards(),_loadVendasLista(),_loadComissoes()]);
+}
+async function _loadVendasCards(){
+  const el=document.getElementById('vendasCards');
+  if(!el)return;
+  try{
+    const now=new Date(),ini=new Date(now.getFullYear(),now.getMonth(),1);
+    const snap=await getDocs(collection(db,'nself_vendas'));
+    let total=0,codigos=0,pendentes=0;
+    snap.forEach(d=>{const v=d.data(),dt=v.criadoEm?.toDate?.();
+      if(dt&&dt>=ini){
+        if(v.status==='pago'){total+=v.valor||0;codigos+=v.qtd||1;}
+        if(v.status==='aguardando_pix')pendentes++;
+      }
+    });
+    el.innerHTML=`
+      <div class="stat-card"><div class="sc-label">Total Faturado no Mês</div>
+        <div class="sc-value" style="color:#2e7d32;">R$ ${total.toFixed(2).replace('.',',')}</div>
+        <div class="sc-sub">vendas aprovadas</div></div>
+      <div class="stat-card"><div class="sc-label">Acessos Liberados</div>
+        <div class="sc-value">${codigos}</div><div class="sc-sub">automaticamente</div></div>
+      <div class="stat-card"><div class="sc-label">Pagamentos Pendentes</div>
+        <div class="sc-value" style="color:#e65100;">${pendentes}</div>
+        <div class="sc-sub">Pix aguardando</div></div>`;
+  }catch(e){console.warn(e);}
+}
+async function _loadVendasLista(){
+  const el=document.getElementById('vendasLista');
+  if(!el)return;
+  try{
+    const snap=await getDocs(collection(db,'nself_vendas'));
+    const itens=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(v=>v.status==='pago')
+      .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0))
+      .slice(0,20);
+    if(!itens.length){el.innerHTML='<div style="color:#aaa;text-align:center;padding:20px;font-size:13px;">Nenhuma venda aprovada ainda</div>';return;}
+    el.innerHTML=itens.map(v=>`
+      <div style="border:1px solid #eee;border-radius:10px;padding:12px 14px;background:#fafafa;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <div>
+            <div style="font-weight:600;font-size:13px;color:#1a0a2e;">${v.comprador||'—'}</div>
+            <div style="font-size:11px;color:#888;margin-top:2px;">
+              ${v.compradorEmail||''} · ${v.plano==='pf'?'PF':'PJ'} · ${v.qtd||1} lic.
+              · ${v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}
+            </div>
+          </div>
+          <div style="font-weight:700;color:#7B00C4;font-size:15px;white-space:nowrap;">
+            R$ ${(v.valor||0).toFixed(2).replace('.',',')}
+            <span style="display:block;font-size:11px;font-weight:400;color:#2e7d32;">✔ Pago</span>
+          </div>
+        </div>
+      </div>`).join('');
+  }catch(e){console.warn(e);}
+}
+async function _loadComissoes(){
+  const tbody=document.getElementById('comissoesTable');
+  if(!tbody)return;
+  try{
+    const snap=await getDocs(collection(db,'nself_comissoes'));
+    if(!snap.empty){
+      tbody.innerHTML=snap.docs.map(d=>{const c=d.data();return`<tr>
+        <td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #eee;">${c.afiliado||'—'}</td>
+        <td style="padding:8px 10px;font-size:13px;border-bottom:1px solid #eee;font-weight:600;color:#7B00C4;">R$ ${(c.valor||0).toFixed(2).replace('.',',')}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #eee;">
+          <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${c.pago?'#e8f5e9':'#fff3e0'};color:${c.pago?'#2e7d32':'#e65100'};">
+            ${c.pago?'✔ Paga':'⏳ Pendente'}</span></td>
+      </tr>`;}).join('');
+    }
+  }catch(e){console.warn(e);}
+}
+
+// Gerar link com desconto/afiliado
+window.gerarLinkDesconto = async function(){
+  const desc     =parseFloat(document.getElementById('ldDesconto').value)||0;
+  const afiliado =document.getElementById('ldAfiliado').value.trim();
+  const comissao =parseFloat(document.getElementById('ldComissao').value)||0;
+  const afId     =Math.random().toString(36).substr(2,6).toUpperCase();
+  const url      =`https://luciakratz-arch.github.io/9-Self/?comprar=true${desc>0?'&desc='+desc:''}${afiliado?'&af='+afId:''}`;
+  try{
+    if(afiliado){
+      await addDoc(collection(db,'nself_afiliados'),{
+        afId,afiliado,desconto:desc,comissao,criadoEm:serverTimestamp(),ativo:true
+      });
+    }
+  }catch(e){}
+  document.getElementById('ldLinkUrl').value=url;
+  document.getElementById('ldResultado').style.display='';
+  showToast('✅ Link gerado!');
+};
+
+// EmailJS (configurar para ativar e-mails automáticos)
+const _EMAILJS_SERVICE  = 'SEU_SERVICE_ID';
+const _EMAILJS_TEMPLATE = 'SEU_TEMPLATE_ID';
+window._emailjsReady    = false;
 (function(){
-  const s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-  s.onload = () => {
-    if(_EMAILJS_KEY !== 'SUA_PUBLIC_KEY') {
-      emailjs.init({ publicKey: _EMAILJS_KEY });
-      window._emailjsReady = true;
+  const s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+  s.onload=()=>{
+    if(_EMAILJS_SERVICE!=='SEU_SERVICE_ID'){
+      emailjs.init({publicKey:'SUA_PUBLIC_KEY'});
+      window._emailjsReady=true;
     }
   };
   document.head.appendChild(s);
 })();
 
-async function _enviarEmailCodigos({ nome, email, codigos, venda }) {
-  const codigosTexto = codigos.map((c,i) =>
-    `Código ${i+1}: ${c}\nLink: https://luciakratz-arch.github.io/9-Self/?c=${c}`
-  ).join('\n\n');
-
-  await emailjs.send(_EMAILJS_SERVICE, _EMAILJS_TEMPLATE, {
-    to_name:   nome||'Cliente',
-    to_email:  email,
-    produto:   '9&Self — Teste de Perfil Comportamental',
-    qtd:       codigos.length,
-    codigos:   codigosTexto,
-    valor:     `R$ ${(venda.valor||0).toFixed(2).replace('.',',')}`,
-  });
+// ════════════════════════════════════════════════════════════════════
+// ── ACCORDION (PF + Empresas) ────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════
+window.pfShowTab=function(tab){
+  const isCod=tab==='codigos';
+  document.getElementById('pfSecCodigos').style.display=isCod?'':'none';
+  document.getElementById('pfSecLaudos').style.display=isCod?'none':'';
+  document.getElementById('pfTabCod').style.color=isCod?'var(--purple)':'var(--gray)';
+  document.getElementById('pfTabCod').style.borderBottomColor=isCod?'var(--purple)':'transparent';
+  document.getElementById('pfTabLau').style.color=!isCod?'var(--purple)':'var(--gray)';
+  document.getElementById('pfTabLau').style.borderBottomColor=!isCod?'var(--purple)':'transparent';
+};
+async function loadPF(){
+  await Promise.all([_loadPFCodigos(),_loadPFLaudos()]);
 }
-
-// ── GERADOR PAYLOAD PIX EMV (QR Code estático) ─────────────────────
-function _gerarPixPayload({ chave, nome, valor, cidade, txid }) {
-  const _tlv = (id, val) => {
-    const v = String(val);
-    return `${id}${String(v.length).padStart(2,'0')}${v}`;
-  };
-  const gui  = _tlv('00','BR.GOV.BCB.PIX') + _tlv('01', chave);
-  const mai  = _tlv('26', gui);
-  const nome_ = (nome||'9SELF').replace(/[^A-Za-z0-9 ]/g,'').substr(0,25).toUpperCase();
-  const city_ = (cidade||'GOIANIA').replace(/[^A-Za-z0-9 ]/g,'').substr(0,15).toUpperCase();
-  const txid_ = (txid||'9SELF').replace(/[^A-Za-z0-9]/g,'').substr(0,25).toUpperCase()||'***';
-  const val_  = valor>0 ? _tlv('54', valor.toFixed(2)) : '';
-  const base  = _tlv('00','01') + mai + _tlv('52','0000') + _tlv('53','986') +
-                val_ + _tlv('58','BR') + _tlv('59',nome_) + _tlv('60',city_) +
-                _tlv('62',_tlv('05',txid_)) + '6304';
-  // CRC16-CCITT
-  let crc=0xFFFF;
-  for(const ch of base){
-    crc ^= ch.charCodeAt(0)<<8;
-    for(let i=0;i<8;i++) crc=(crc&0x8000)?(crc<<1)^0x1021:(crc<<1);
-  }
-  return base + (crc&0xFFFF).toString(16).toUpperCase().padStart(4,'0');
+async function _loadPFCodigos(){
+  const c=document.getElementById('pfAccordionCodigos');if(!c)return;
+  c.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
+  try{
+    const snap=await getDocs(collection(db,'nself_codigos'));
+    const todos=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(x=>!x.empresa||x.empresa==='PF'||x.empresa==='pf');
+    c.innerHTML=todos.length?_renderAccordionCodigos(todos):'<div style="color:#aaa;padding:16px;text-align:center;">Nenhum código PF</div>';
+    _initAccordion(c);
+  }catch(e){console.warn(e);}
 }
-
-window.gerarLinkVenda = async function() {
-  const destino      = document.getElementById('vDestino').value;
-  const destinoLabel = document.getElementById('vDestino').selectedOptions[0].text;
-  const qtd          = parseInt(document.getElementById('vQtd').value)||1;
-  const valor        = parseFloat(document.getElementById('vValor').value)||0;
-  const comPct       = parseFloat(document.getElementById('vComissao').value)||0;
-  const parceiro     = document.getElementById('vParceiro').value.trim();
-  const chavePix     = document.getElementById('vChavePix').value.trim();
-  const nomePix      = document.getElementById('vNomePix').value.trim();
-
-  if(!valor)    { showToast('Informe o valor do pacote'); return; }
-  if(!chavePix) { showToast('Informe sua chave Pix'); return; }
-
-  const comissaoValor = valor * comPct / 100;
-  const linkId  = Math.random().toString(36).substr(2,8).toUpperCase();
-  const linkUrl = `https://luciakratz-arch.github.io/9-Self/?checkout=${linkId}`;
-
-  try {
-    await addDoc(collection(db,'nself_vendas'), {
-      linkId, linkUrl,
-      destino, destinoLabel: destinoLabel.replace(/^[👤🏢] /,''),
-      qtd, valor, comissaoPct: comPct, comissaoValor,
-      parceiro: parceiro||null,
-      chavePix, nomePix: nomePix||'9&Self',
-      status: 'aguardando',
-      comissaoPaga: false,
-      criadoEm: serverTimestamp(),
-    });
-
-    document.getElementById('vLinkUrl').value = linkUrl;
-    document.getElementById('vLinkInfo').textContent =
-      `${qtd} licença${qtd!==1?'s':''} · R$ ${valor.toFixed(2).replace('.',',')} · Pix: ${chavePix}`;
-    document.getElementById('vLinkResult').style.display = '';
-    showToast('✅ Link gerado com sucesso!');
-    _loadVendasLista();
-  } catch(e) { showToast('Erro: '+e.message); }
-};
-
-window.copiarLink = function() {
-  const url = document.getElementById('vLinkUrl').value;
-  navigator.clipboard.writeText(url).then(()=>showToast('Link copiado!'));
-};
-
-// ── CHECKOUT ──────────────────────────────────────────────────────────
-window._checkoutData = null;
-
-window.ckTab = function(tab) {
-  const isCartao = tab==='cartao';
-  document.getElementById('ckCartaoFields').style.display = isCartao?'':'none';
-  document.getElementById('ckPixFields').style.display    = isCartao?'none':'';
-  document.getElementById('ckTabCartao').style.background = isCartao?'#7B00C4':'#fff';
-  document.getElementById('ckTabCartao').style.color      = isCartao?'#fff':'#555';
-  document.getElementById('ckTabCartao').style.borderColor= isCartao?'#7B00C4':'#ddd';
-  document.getElementById('ckTabPix').style.background    = !isCartao?'#7B00C4':'#fff';
-  document.getElementById('ckTabPix').style.color         = !isCartao?'#fff':'#555';
-  document.getElementById('ckTabPix').style.borderColor   = !isCartao?'#7B00C4':'#ddd';
-};
-
-// Verificar parâmetro ?checkout=ID na URL e abrir checkout
-async function _checkCheckoutParam() {
-  const params = new URLSearchParams(window.location.search);
-  const cid = params.get('checkout');
-  if(!cid) return;
-  try {
-    const snap = await getDocs(collection(db,'nself_vendas'));
-    let venda = null;
-    snap.forEach(d=>{ if(d.data().linkId===cid) venda={id:d.id,...d.data()}; });
-    if(!venda){ return; }
-    window._checkoutData = venda;
-    document.getElementById('ckProduto').textContent  = '9&Self — Teste de Perfil Comportamental';
-    document.getElementById('ckLicencas').textContent = `${venda.qtd} acesso${venda.qtd!==1?'s':''} incluído${venda.qtd!==1?'s':''}`;
-    document.getElementById('ckValor').textContent    = `R$ ${(venda.valor||0).toFixed(2).replace('.',',')}`;
-
-    // Preencher chave Pix
-    const chave = venda.chavePix||'';
-    document.getElementById('ckChavePix').value = chave;
-
-    // Gerar QR Code Pix usando API pública do gerador
-    const qrEl = document.getElementById('ckQrCode');
-    if(chave) {
-      // Payload Pix EMV simplificado para QR estático
-      const pixPayload = _gerarPixPayload({
-        chave,
-        nome:  venda.nomePix||'9Self',
-        valor: venda.valor||0,
-        cidade:'Goiania',
-        txid:  venda.linkId||'9SELF'
-      });
-      // Usar API QR Code pública
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pixPayload)}`;
-      qrEl.innerHTML = `<img src="${qrUrl}" alt="QR Code Pix" style="border-radius:8px;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.1);"/>`;
-    }
-
-    // Esconder app e mostrar checkout
-    document.getElementById('appContainer').style.display='none';
-    document.getElementById('page-checkout').style.display='flex';
-    document.getElementById('page-checkout').classList.add('active');
-  } catch(e){ console.warn('[checkout]',e); }
+async function _loadPFLaudos(){
+  const c=document.getElementById('pfAccordionLaudos');if(!c)return;
+  c.innerHTML='<div style="color:#aaa;padding:16px;text-align:center;">Carregando...</div>';
+  try{
+    const snap=await getDocs(collection(db,'nself_laudos'));
+    const todos=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(l=>!l.empresa||l.empresa==='PF');
+    c.innerHTML=todos.length?_renderAccordionLaudos(todos):'<div style="color:#aaa;padding:16px;text-align:center;">Nenhum laudo PF</div>';
+    _initAccordion(c);
+  }catch(e){console.warn(e);}
 }
-
-window.confirmarPagamento = async function() {
-  const nome  = document.getElementById('ckNome').value.trim();
-  const email = document.getElementById('ckEmail').value.trim();
-  const doc_  = document.getElementById('ckDoc').value.trim();
-  const st    = document.getElementById('ckStatus');
-
-  if(!nome||!email){ st.innerHTML='<span style="color:#c62828;">Preencha nome e e-mail</span>'; return; }
-
-  const venda = window._checkoutData;
-  if(!venda){ st.innerHTML='<span style="color:#c62828;">Link inválido</span>'; return; }
-
-  st.innerHTML = '<span style="color:#888;">⏳ Processando pagamento...</span>';
-
-  try {
-    // Simular aprovação (em produção: integrar Stripe/Pagar.me aqui)
-    await new Promise(r=>setTimeout(r,1800));
-
-    // 1. Atualizar venda como paga
-    const vendaRef = doc(db,'nself_vendas', venda.id);
-    await updateDoc(vendaRef,{
-      status:'pago', comprador:nome, compradorEmail:email, compradorDoc:doc_,
-      pagoEm: serverTimestamp(),
-    });
-
-    // 2. Liberar códigos automaticamente
-    const BASE_URL = 'https://luciakratz-arch.github.io/9-Self/?c=';
-    for(let i=0; i<(venda.qtd||1); i++){
-      const cod = Math.random().toString(36).substr(2,6).toUpperCase();
-      await addDoc(collection(db,'nself_codigos'),{
-        codigo: cod,
-        nomeDestinatario: nome,
-        email: email,
-        empresa: venda.destino==='pf' ? 'PF' : venda.destino,
-        status: 'pendente',
-        origem: 'venda_automatica',
-        vendaId: venda.id,
-        linkAcesso: BASE_URL+cod,
-        criadoEm: serverTimestamp(),
-      });
-    }
-
-    // 3. Registrar comissão se houver
-    if((venda.comissaoPct||0) > 0) {
-      await addDoc(collection(db,'nself_comissoes'),{
-        vendaId: venda.id, parceiro: venda.parceiro,
-        pct: venda.comissaoPct, valor: venda.comissaoValor,
-        pago: false, criadoEm: serverTimestamp(),
-      });
-    }
-
-    st.innerHTML = '<span style="color:#2e7d32;font-size:15px;font-weight:600;">✅ Pagamento aprovado! Seus códigos foram enviados por e-mail.</span>';
-    document.querySelector('#page-checkout button.btn-primary').disabled = true;
-
-  } catch(e){
-    st.innerHTML = `<span style="color:#c62828;">Erro: ${e.message}</span>`;
-  }
-};
-
-// Verificar checkout ao carregar
-document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(_checkCheckoutParam, 800); });
-
+function _getMesAnoKey(item){
+  const d=item.criadoEm?.toDate?.();
+  if(!d)return '9999-99::Data desconhecida';
+  const key=`${String(9999-d.getFullYear()).padStart(4,'0')}-${String(99-d.getMonth()).padStart(2,'0')}`;
+  const label=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+  return `${key}::${label}`;
+}
+function _agruparPorMes(lista){
+  const g={};
+  lista.forEach(item=>{const k=_getMesAnoKey(item);if(!g[k])g[k]=[];g[k].push(item);});
+  Object.values(g).forEach(arr=>arr.sort((a,b)=>(a.nome||a.nomeDestinatario||'').localeCompare(b.nome||b.nomeDestinatario||'','pt-BR',{sensitivity:'base'})));
+  return Object.keys(g).sort().map(k=>({label:k.split('::')[1],itens:g[k]}));
+}
+function _renderAccordionCodigos(lista){
+  return _agruparPorMes(lista).map(g=>`
+    <div class="accordion-mes">
+      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
+        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length})</span></span>
+        <span class="acc-arrow">▶</span>
+      </div>
+      <div class="accordion-body">
+        <table><thead><tr><th>Nome</th><th>Código</th><th>Status</th><th>Data</th></tr></thead>
+        <tbody>${g.itens.map(c=>`<tr>
+          <td>${c.nomeDestinatario||'—'}</td>
+          <td style="font-family:monospace;">${c.codigo||'—'}</td>
+          <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${c.status==='usado'?'#e8f5e9':'#fff3e0'};color:${c.status==='usado'?'#2e7d32':'#e65100'};">${c.status==='usado'?'✔ Usado':'⏳ Pendente'}</span></td>
+          <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        </tr>`).join('')}</tbody></table>
+      </div>
+    </div>`).join('');
+}
+const _NS={'ap':'Autopreservação','sex':'1 a 1','so':'Social','AP':'Autopreservação','1A1':'1 a 1','SOC':'Social'};
+function _renderAccordionLaudos(lista){
+  return _agruparPorMes(lista).map(g=>`
+    <div class="accordion-mes">
+      <div class="accordion-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
+        <span>📅 ${g.label} <span style="font-weight:400;color:#888;font-size:12px;">(${g.itens.length})</span></span>
+        <span class="acc-arrow">▶</span>
+      </div>
+      <div class="accordion-body">
+        <table><thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>PDF</th></tr></thead>
+        <tbody>${g.itens.map(l=>{
+          const lid=l.id,sub=[l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo].map(s=>_NS[s]||s||'—').join(' · ');
+          const btn=l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:
+            `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')">🔄</button>`;
+          return `<tr><td>${l.nome||'—'}</td><td style="font-size:12px;">${l.tipoNome||l.tipo||'—'}</td>
+            <td>Asa ${l.asaDominante||'—'}</td><td style="font-size:11px;">${sub}</td>
+            <td id="pdfcell_${lid}">${btn}</td></tr>`;
+        }).join('')}</tbody></table>
+      </div>
+    </div>`).join('');
+}
+function _initAccordion(container){
+  const first=container.querySelector('.accordion-header');
+  if(first){first.classList.add('open');first.nextElementSibling.classList.add('open');}
+}
 
 </script>
 </body>
