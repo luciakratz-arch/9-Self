@@ -2554,17 +2554,49 @@ async function loadLaudos(){
       return;
     }
     const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
-    tbody.innerHTML = snap.docs.map(d => {
-      const l   = d.data();
-      const lid = d.id;
+
+    // ── Montar lista completa de laudos ──
+    const laudos = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+
+    // ── Separar PF e PJ ──
+    const pfLaudos  = laudos.filter(l => !l.empresa || l.empresa === 'PF');
+    const pjLaudos  = laudos.filter(l => l.empresa && l.empresa !== 'PF');
+
+    // ── Agrupar por Mês/Ano e ordenar alfabeticamente dentro de cada grupo ──
+    const _getMesAno = l => {
+      const d = l.criadoEm?.toDate?.();
+      if(!d) return 'Data desconhecida';
+      return d.toLocaleDateString('pt-BR', { month:'long', year:'numeric' })
+               .replace(/^\w/, c => c.toUpperCase());
+    };
+    const _getMesAnoTs = l => {
+      const d = l.criadoEm?.toDate?.();
+      return d ? -(d.getFullYear()*100 + d.getMonth()) : 0; // negativo = mais recente primeiro
+    };
+
+    const _agrupar = lista => {
+      const grupos = {};
+      lista.forEach(l => {
+        const k = _getMesAno(l);
+        if(!grupos[k]) grupos[k] = { ts: _getMesAnoTs(l), itens:[] };
+        grupos[k].itens.push(l);
+      });
+      // Ordenar grupos: mais recente primeiro
+      const chaves = Object.keys(grupos).sort((a,b) => grupos[a].ts - grupos[b].ts);
+      // Dentro de cada grupo: A→Z pelo nome
+      chaves.forEach(k => grupos[k].itens.sort((a,b) =>
+        (a.nome||'').localeCompare(b.nome||'', 'pt-BR', {sensitivity:'base'})));
+      return { grupos, chaves };
+    };
+
+    const _btnPdf = (l, lid) => l.pdfUrl
+      ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
+      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
+
+    const _renderLinha = l => {
+      const lid = l.id;
       const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
                   .map(s => NS[s]||s||'—').join(' · ');
-      // Estado do botão PDF
-      const btnPdf = l.pdfUrl
-        ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
-        : l.pdfStatus === 'gerando'
-          ? `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Clique para tentar novamente">🔄 Gerar PDF</button>`
-          : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
       return `<tr>
         <td>${l.nome||'—'}</td>
         <td>${l.empresa||'PF'}</td>
@@ -2572,9 +2604,44 @@ async function loadLaudos(){
         <td>Asa ${l.asaDominante||l.asa||'—'}</td>
         <td style="font-size:11px;">${sub}</td>
         <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-        <td id="pdfcell_${lid}">${btnPdf}</td>
+        <td id="pdfcell_${lid}">${_btnPdf(l,lid)}</td>
       </tr>`;
-    }).join('');
+    };
+
+    const _renderGrupos = ({grupos, chaves}) => chaves.map(k => `
+      <tr>
+        <td colspan="7" style="background:#f0eaf7;color:#5500AA;font-weight:600;font-size:12px;
+            padding:6px 14px;letter-spacing:0.5px;text-transform:uppercase;border-top:2px solid #ddd0f0;">
+          ${k}
+        </td>
+      </tr>
+      ${grupos[k].itens.map(_renderLinha).join('')}
+    `).join('');
+
+    let html = '';
+
+    // ── Bloco PJ ──
+    if(pjLaudos.length) {
+      const ag = _agrupar(pjLaudos);
+      html += `<tr><td colspan="7" style="background:#3d0a5e;color:white;font-weight:700;
+                   font-size:13px;padding:8px 14px;letter-spacing:1px;">
+                 🏢 EMPRESAS / RH
+               </td></tr>`;
+      html += _renderGrupos(ag);
+    }
+
+    // ── Bloco PF ──
+    if(pfLaudos.length) {
+      const ag = _agrupar(pfLaudos);
+      html += `<tr><td colspan="7" style="background:#3d0a5e;color:white;font-weight:700;
+                   font-size:13px;padding:8px 14px;letter-spacing:1px;">
+                 👤 PESSOA FÍSICA
+               </td></tr>`;
+      html += _renderGrupos(ag);
+    }
+
+    tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
+
   } catch(e){ console.warn(e); }
 }
 
@@ -2718,30 +2785,32 @@ window.gerarPdfLaudo = async function(laudoId) {
     setCell(`<span style="font-size:12px;color:#888;">⏳ Gerando PDF...</span>`);
     const blob = await window.gerarPdfNavegador({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo });
 
-    // Tentar subir no Storage
-    let pdfUrl = null;
+    // Baixar direto no navegador + tentar Storage em background
+    const nomeDownload = `Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+    const _url = URL.createObjectURL(blob);
+    const _a = document.createElement('a');
+    _a.href=_url; _a.download=nomeDownload;
+    document.body.appendChild(_a); _a.click();
+    document.body.removeChild(_a);
+    setTimeout(()=>URL.revokeObjectURL(_url), 5000);
+    setCell(`<button class="btn btn-teal btn-sm" onclick="gerarPdfLaudo('${laudoId}')">⬇ Baixar PDF</button>`);
+
+    // Tentar salvar no Storage em background (não bloqueia o download)
     try {
-      setCell(`<span style="font-size:12px;color:#888;">⬆ Enviando...</span>`);
       const { getStorage, ref: sRef, uploadBytes, getDownloadURL } =
         await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
       const nomeArq = `laudos_9self/${laudoId}_${Date.now()}.pdf`;
       const storageRef = sRef(getStorage(), nomeArq);
       const uploadSnap = await uploadBytes(storageRef, blob, { contentType:'application/pdf' });
-      pdfUrl = await getDownloadURL(uploadSnap.ref);
+      const pdfUrl = await getDownloadURL(uploadSnap.ref);
       await updateDoc(doc(db,'nself_laudos', laudoId), {
         pdfUrl, pdfStatus:'pronto', pdfGeradoEm: serverTimestamp()
       });
+      // Se Storage funcionou, atualizar botão para link permanente
       setCell(`<a href="${pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
     } catch(eStorage) {
-      // Storage falhou (não habilitado?) — baixar localmente mesmo assim
-      console.warn('[Storage]', eStorage.message);
-      await updateDoc(doc(db,'nself_laudos', laudoId), { pdfStatus:'erro_storage', pdfErro: eStorage.message });
-      const _url = URL.createObjectURL(blob);
-      const _a = document.createElement('a');
-      _a.href=_url; _a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
-      document.body.appendChild(_a); _a.click();
-      document.body.removeChild(_a); URL.revokeObjectURL(_url);
-      setCell(`<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}')">🔄 Re-gerar</button>`);
+      console.warn('[Storage CORS]', eStorage.message);
+      await updateDoc(doc(db,'nself_laudos', laudoId), { pdfStatus:'local', pdfErro: eStorage.message });
     }
 
   } catch(e) {
