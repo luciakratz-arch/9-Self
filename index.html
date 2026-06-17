@@ -417,6 +417,7 @@ tr:hover td{background:#FAFAFE;}
     </div>
 
     <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
+  <button class="btn btn-outline" style="width:100%;margin-top:12px;border-color:var(--teal);color:var(--teal);" onclick="document.getElementById('loginScreen').style.display='none';const ck=document.getElementById('page-checkout');if(ck){ck.style.display='block';ck.classList.add('active');}">🛒 Não tenho um código — Quero Comprar o Teste</button>
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
@@ -2862,12 +2863,11 @@ gerarCodigoPreview();
   // 1. CHECKOUT PÚBLICO — esconde login, isola no checkout
   if(params.get('comprar') === 'true') {
     document.addEventListener('DOMContentLoaded', () => {
-      const loginEl = document.getElementById('loginScreen');
-      const appEl   = document.getElementById('appShell');
-      if(loginEl) loginEl.style.display = 'none';
-      if(appEl)   appEl.style.display   = 'none';
+      document.getElementById('loginScreen').style.display = 'none';
+      const appEl = document.getElementById('appShell');
+      if(appEl) appEl.style.display = 'none';
       const ck = document.getElementById('page-checkout');
-      if(ck) { ck.style.display = ''; ck.classList.add('active'); }
+      if(ck) { ck.style.display = 'block'; ck.classList.add('active'); }
       // Desconto via parâmetro ?desc=XX&af=AFID
       const desc  = parseFloat(params.get('desc')||0);
       const afId  = params.get('af')||null;
