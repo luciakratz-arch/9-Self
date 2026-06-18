@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>9&Self — Mapeamento de Perfil pelo Eneagrama</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #0E0818; color: #fff; -webkit-font-smoothing: antialiased; }
+a { text-decoration: none; color: inherit; }
+
+/* ── Tokens ── */
+:root {
+  --ink:    #0E0818;
+  --deep:   #180A2E;
+  --plum:   #3D0A5E;
+  --violet: #7B00C4;
+  --lilac:  #C4A6E8;
+  --mist:   #EDE8F7;
+  --rose:   #9B2589;
+  --cream:  #FAF8FF;
+}
+
+/* ── Typography ── */
+.font-display { font-family: 'Cormorant Garamond', serif; }
+
+/* ── Layout helpers ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.container-sm { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+section { padding: 96px 24px; }
+
+/* ── Brand gradient (purple-only, no teal) ── */
+.bg-brand {
+  background: linear-gradient(150deg, #0E0818 0%, #1A0A2E 30%, #3D0A5E 65%, #7B1D6B 100%);
+}
+.bg-deep   { background: #180A2E; }
+.bg-ink    { background: #0E0818; }
+.bg-plum   { background: #220A3A; }
+
+/* ── Eyebrow ── */
+.eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(196,166,232,.65);
+  margin-bottom: 16px;
+}
+
+/* ── Highlight (gradient text, purple only) ── */
+.highlight {
+  background: linear-gradient(90deg, #C4A6E8, #7B00C4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── CTA Button ── */
+.btn-primary {
+  display: inline-block;
+  background: linear-gradient(135deg, #7B00C4, #9B2589);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 18px 44px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 40px rgba(123,0,196,.5);
+  transition: box-shadow .3s, transform .2s;
+  animation: ring-pulse 2.8s ease-in-out infinite;
+}
+.btn-primary:hover { box-shadow: 0 0 70px rgba(123,0,196,.75); transform: translateY(-2px); animation: none; }
+
+.btn-secondary {
+  display: inline-block;
+  background: transparent;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(196,166,232,.4);
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+  width: 100%;
+  text-align: center;
+}
+.btn-secondary:hover { background: rgba(123,0,196,.2); border-color: rgba(196,166,232,.7); }
+
+@keyframes ring-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(123,0,196,.4), 0 0 40px rgba(123,0,196,.5); }
+  50%      { box-shadow: 0 0 0 14px rgba(123,0,196,0), 0 0 40px rgba(123,0,196,.5); }
+}
+
+/* ── Glass card ── */
+.glass {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(196,166,232,.18);
+  border-radius: 24px;
+  padding: 40px;
+}
+.glass-highlight {
+  background: linear-gradient(145deg, rgba(123,0,196,.22), rgba(155,37,137,.15));
+  border: 1px solid rgba(123,0,196,.45);
+  border-radius: 24px;
+  padding: 40px;
+}
+
+/* ── Orbs ── */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: .6;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.hero-inner { position: relative; z-index: 2; width: 100%; max-width: 860px; margin: 0 auto; padding: 120px 24px; }
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 6vw, 62px);
+  font-weight: 300;
+  line-height: 1.16;
+  color: #fff;
+  margin-bottom: 28px;
+}
+.hero p {
+  font-size: 17px;
+  line-height: 1.75;
+  color: rgba(255,255,255,.6);
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+.hero-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 40px;
+}
+.hero-logo span { color: var(--lilac); }
+
+/* ── STEPS ── */
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr 40px 1fr;
+  align-items: start;
+  gap: 0;
+}
+.step-circle {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(196,166,232,.55);
+  background: rgba(61,10,94,.5);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  color: var(--lilac);
+  margin: 0 auto 24px;
+}
+.step-connector {
+  border-top: 2px dashed rgba(196,166,232,.28);
+  margin-top: 32px;
+}
+@media (max-width: 720px) {
+  .steps-grid { grid-template-columns: 1fr; }
+  .step-connector { display: none; }
+}
+
+/* ── FOR WHOM ── */
+.for-whom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+@media (max-width: 780px) { .for-whom-grid { grid-template-columns: 1fr; } }
+
+.bullet { display: flex; gap: 16px; margin-bottom: 20px; }
+.bullet-icon { color: var(--lilac); font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+.bullet-title { font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px; }
+.bullet-text  { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.65; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(123,0,196,.2);
+  border: 1px solid rgba(123,0,196,.35);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--lilac);
+  margin-bottom: 24px;
+}
+
+/* ── 9 TIPOS ── */
+.tipos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 780px) { .tipos-grid { grid-template-columns: repeat(1, 1fr); } }
+@media (min-width: 500px) and (max-width: 780px) { .tipos-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.tipo-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(196,166,232,.14);
+  border-radius: 18px;
+  padding: 24px 20px;
+  transition: border-color .2s, background .2s;
+}
+.tipo-card:hover {
+  border-color: rgba(196,166,232,.4);
+  background: rgba(123,0,196,.1);
+}
+.tipo-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: rgba(196,166,232,.35);
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.tipo-nome { font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 6px; }
+.tipo-desc { font-size: 12.5px; color: rgba(255,255,255,.45); line-height: 1.6; }
+.tipo-tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(196,166,232,.55);
+  background: rgba(196,166,232,.08);
+  border-radius: 100px;
+  padding: 3px 10px;
+  margin-bottom: 14px;
+}
+
+/* ── PLANS ── */
+.plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 900px) { .plans-grid { grid-template-columns: 1fr; } }
+
+.badge-rec {
+  position: absolute; top: 20px; right: 20px;
+  background: var(--violet);
+  color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 100px;
+}
+
+.check { color: var(--lilac); margin-right: 10px; }
+
+/* ── NOTE BOX ── */
+.note-box {
+  border: 1px solid rgba(196,166,232,.22);
+  border-radius: 24px;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 80px;
+}
+.note-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(to bottom, #7B00C4, #9B2589);
+  border-radius: 24px 0 0 24px;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  border-top: 1px solid rgba(255,255,255,.05);
+  padding: 48px 24px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="hero bg-brand">
+  <div class="orb" style="width:500px;height:500px;background:#7B00C4;top:-10%;left:-8%;opacity:.25;"></div>
+  <div class="orb" style="width:420px;height:420px;background:#9B2589;bottom:-5%;right:-6%;opacity:.2;"></div>
+
+  <div class="hero-inner">
+    <p class="eyebrow">Mapeamento de Perfil · Eneagrama Avançado</p>
+    <div class="hero-logo">9<span>&</span>Self</div>
+    <h1>
+      Conheça a si mesmo.<br/>
+      <em class="highlight" style="font-style:normal;">Descubra quem você é</em><br/>
+      quando suas defesas não estão no controle.
+    </h1>
+    <p>
+      O 9&Self é uma plataforma avançada de mapeamento de perfil baseada no Eneagrama — a metodologia de autoconhecimento mais precisa do mundo para identificar as 9 estruturas fundamentais de personalidade. Nosso mapeamento revela as motivações profundas, as asas e os instintos inconscientes que governam suas decisões, seu nível de estresse e seu potencial oculto.
+    </p>
+    <a href="#planos" class="btn-primary">Adquirir Código de Acesso</a>
+    <p style="margin-top:28px;font-size:12px;color:rgba(255,255,255,.28);">
+      Desenvolvido por <span style="color:rgba(196,166,232,.55);">Dra. Lucia Kratz · CRP 09/20590</span> &nbsp;·&nbsp; Psicóloga Especialista em Eneagrama
+    </p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     COMO FUNCIONA
+══════════════════════════════════════════ -->
+<section class="bg-deep">
+  <div class="container-sm">
+    <p class="eyebrow" style="display:block;text-align:center;">Processo</p>
+    <h2 class="font-display" style="text-align:center;font-size:clamp(28px,4vw,44px);font-weight:300;margin-bottom:64px;">Como funciona?</h2>
+
+    <div class="steps-grid">
+      <!-- Step 1 -->
+      <div style="text-align:center;padding:0 16px;">
+        <div class="step-circle">1</div>
+        <h3 style="font-weight:600;font-size:15px;margin-bottom:10px;">Adquira Seu Código</h3>
+        <p style="font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.7;">Escolha o plano ideal para você ou sua empresa e receba seu acesso exclusivo na hora pelo e-mail.</p>
+      </div>
+      <div class="step-connector"></div>
+      <!-- Step 2 -->
+      <div style="text-align:center;padding:0 16px;">
+        <div class="step-circle">2</div>
+        <h3 style="font-weight:600;font-size:15px;margin-bottom:10px;">Responda em 15 Minutos</h3>
+        <p style="font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.7;">Acesse a plataforma intuitiva e responda às perguntas estruturadas de mapeamento — no seu ritmo, em qualquer dispositivo.</p>
+      </div>
+      <div class="step-connector"></div>
+      <!-- Step 3 -->
+      <div style="text-align:center;padding:0 16px;">
+        <div class="step-circle">3</div>
+        <h3 style="font-weight:600;font-size:15px;margin-bottom:10px;">Baixe Seu Laudo</h3>
+        <p style="font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.7;">Nosso algoritmo processa suas respostas e libera o download do relatório completo em PDF instantaneamente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     OS 9 TIPOS
+══════════════════════════════════════════ -->
+<section class="bg-ink">
+  <div class="container">
+    <p class="eyebrow" style="display:block;text-align:center;">O Mapa da Personalidade</p>
+    <h2 class="font-display" style="text-align:center;font-size:clamp(28px,4vw,44px);font-weight:300;margin-bottom:16px;">
+      Os 9 tipos fundamentais de personalidade
+    </h2>
+    <p style="text-align:center;color:rgba(255,255,255,.5);font-size:15px;max-width:580px;margin:0 auto 56px;line-height:1.7;">
+      Cada pessoa carrega um tipo dominante que molda sua forma de perceber o mundo, tomar decisões e se relacionar. Descubra qual é o seu.
+    </p>
+
+    <div class="tipos-grid">
+
+      <div class="tipo-card">
+        <div class="tipo-num">01</div>
+        <div class="tipo-tag">O Reformador</div>
+        <div class="tipo-nome">Perfeição e Excelência</div>
+        <div class="tipo-desc">Orientado por princípios rígidos e um senso profundo de propósito. Vive entre o ideal e a realidade — e sofre quando o mundo não segue as regras certas.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">02</div>
+        <div class="tipo-tag">O Prestativo</div>
+        <div class="tipo-nome">Prestativo e Relacional</div>
+        <div class="tipo-desc">Movido pela necessidade de ser amado e necessário. Doa-se ao extremo para os outros, mas raramente consegue pedir ajuda para si mesmo.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">03</div>
+        <div class="tipo-tag">O Realizador</div>
+        <div class="tipo-nome">Performance e Imagem</div>
+        <div class="tipo-desc">Adaptável e ambicioso, constrói sua identidade em torno do sucesso e da admiração dos outros. O maior medo? Ser percebido como um fracasso.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">04</div>
+        <div class="tipo-tag">O Individualista</div>
+        <div class="tipo-nome">Autêntico e Profundo</div>
+        <div class="tipo-desc">Intenso e criativo, vive em busca de significado e de uma identidade única. Sente que algo fundamental lhe falta — e isso alimenta sua profundidade.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">05</div>
+        <div class="tipo-tag">O Investigador</div>
+        <div class="tipo-nome">Observador e Privacidade</div>
+        <div class="tipo-desc">Analítico e reservado, acumula conhecimento como forma de se sentir seguro no mundo. Prefere observar a participar — até entender tudo.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">06</div>
+        <div class="tipo-tag">O Leal</div>
+        <div class="tipo-nome">Precavido e Questionador</div>
+        <div class="tipo-desc">Vigilante e comprometido, antecipa ameaças antes que aconteçam. Leal aos que ama, mas constantemente dividido entre a confiança e a dúvida.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">07</div>
+        <div class="tipo-tag">O Entusiasta</div>
+        <div class="tipo-nome">Visionário e Otimista</div>
+        <div class="tipo-desc">Energético e multifacetado, foge da dor redirecionando o foco para possibilidades futuras. A vida precisa ser estimulante — sempre.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">08</div>
+        <div class="tipo-tag">O Desafiador</div>
+        <div class="tipo-nome">Desafiador e Controlador</div>
+        <div class="tipo-desc">Intenso e protetor, não tolera injustiça ou fraqueza. Usa o poder para proteger os vulneráveis — e o maior desafio é aprender a confiar.</div>
+      </div>
+
+      <div class="tipo-card">
+        <div class="tipo-num">09</div>
+        <div class="tipo-tag">O Pacificador</div>
+        <div class="tipo-nome">Harmônico e Diplomático</div>
+        <div class="tipo-desc">Capaz de enxergar todos os lados, evita conflitos para manter a paz — às vezes ao custo de apagar a si mesmo no processo.</div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:52px;">
+      <a href="#planos" class="btn-primary" style="font-size:14px;padding:14px 36px;">Descobrir meu tipo agora</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PARA QUEM É
+══════════════════════════════════════════ -->
+<section class="bg-deep">
+  <div class="container">
+    <p class="eyebrow" style="display:block;text-align:center;">Para quem é</p>
+    <h2 class="font-display" style="text-align:center;font-size:clamp(28px,4vw,44px);font-weight:300;margin-bottom:56px;">
+      O 9&Self funciona para você — de qualquer ângulo.
+    </h2>
+
+    <div class="for-whom-grid">
+
+      <!-- PF -->
+      <div class="glass">
+        <div class="badge">👤 Para Você — Desenvolvimento Pessoal</div>
+        <h3 class="font-display" style="font-size:26px;font-weight:300;line-height:1.35;margin-bottom:14px;">
+          Você não precisa mais adivinhar quem é — ou por que comete os mesmos erros.
+        </h3>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:28px;">
+          O laudo individual do 9&Self funciona como um espelho de alta precisão que começa na sua mente e transforma todas as áreas da sua vida.
+        </p>
+        <div class="bullet">
+          <span class="bullet-icon">◈</span>
+          <div><div class="bullet-title">Decodifique a Si Mesmo</div><div class="bullet-text">Entenda suas motivações profundas, seus medos reais e identifique os comportamentos automáticos e defesas invisíveis que criam seus pontos cegos.</div></div>
+        </div>
+        <div class="bullet">
+          <span class="bullet-icon">◈</span>
+          <div><div class="bullet-title">Destrave sua Carreira</div><div class="bullet-text">Descubra seus talentos naturais, seu estilo de tomada de decisão e tenha um plano de ação claro para crescer profissionalmente.</div></div>
+        </div>
+        <div class="bullet">
+          <span class="bullet-icon">◈</span>
+          <div><div class="bullet-title">Fortaleça seu Casamento</div><div class="bullet-text">Decodifique os gatilhos que geram discussões repetitivas com o seu parceiro e mude a dinâmica da relação.</div></div>
+        </div>
+        <div class="bullet">
+          <span class="bullet-icon">◈</span>
+          <div><div class="bullet-title">Eduque Filhos com Leveza</div><div class="bullet-text">Enxergue a individualidade dos seus filhos e acolha cada um sem tentar moldá-los às suas próprias expectativas.</div></div>
+        </div>
+      </div>
+
+      <!-- PJ -->
+      <div class="glass" style="border-color:rgba(155,37,137,.3);">
+        <div class="badge" style="background:rgba(155,37,137,.2);border-color:rgba(155,37,137,.35);color:#D87CC8;">🏢 Para sua Empresa — RH e Liderança</div>
+        <h3 class="font-display" style="font-size:26px;font-weight:300;line-height:1.35;margin-bottom:14px;">
+          Decodifique o comportamento da equipe e coloque a pessoa certa na cadeira certa.
+        </h3>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:28px;">
+          Gerenciar pessoas sem um mapa comportamental é um jogo caro e imprevisível. O 9&Self traz a previsibilidade que sua gestão precisa.
+        </p>
+        <div class="bullet">
+          <span class="bullet-icon" style="color:#D87CC8;">◈</span>
+          <div><div class="bullet-title">Contratações Assertivas</div><div class="bullet-text">Filtre candidatos pela compatibilidade comportamental e inteligência emocional — não apenas pelo currículo técnico.</div></div>
+        </div>
+        <div class="bullet">
+          <span class="bullet-icon" style="color:#D87CC8;">◈</span>
+          <div><div class="bullet-title">Comunicação e Resolução de Conflitos</div><div class="bullet-text">Entenda o filtro de tomada de decisão de cada colaborador, mitigando ruídos e atritos internos nas equipes.</div></div>
+        </div>
+        <div class="bullet">
+          <span class="bullet-icon" style="color:#D87CC8;">◈</span>
+          <div><div class="bullet-title">Desenvolvimento de Líderes</div><div class="bullet-text">Descubra o estilo de liderança dos seus gestores e aprenda a motivar cada perfil de forma individualizada, reduzindo o turnover.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     NOTA + PLANOS
+══════════════════════════════════════════ -->
+<section class="bg-plum" id="planos">
+  <div class="container-sm">
+
+    <!-- Nota -->
+    <div class="note-box">
+      <p class="eyebrow">Antes de começar</p>
+      <h3 class="font-display" style="font-size:clamp(22px,3vw,32px);font-weight:300;margin-bottom:20px;color:#fff;">
+        O Mapeamento é o Primeiro Passo: o que você precisa saber
+      </h3>
+      <p style="font-size:14px;color:rgba(255,255,255,.6);line-height:1.85;">
+        O autoconhecimento é um processo constante. A sua personalidade não muda, mas a sua consciência sobre ela sim. Para que o seu laudo seja cirúrgico, responda pensando em quem você <strong style="color:#fff;">realmente é</strong> — sua tendência natural —, e não no seu desejo de quem gostaria de ser. Responda pensando em como você age no dia a dia, mesmo que hoje já tente controlar esse comportamento.
+        <br/><br/>
+        Se, ao ler o seu laudo final, você não se identificar com o perfil gerado, pode solicitar uma reanálise para refazer o teste novamente, <strong style="color:#fff;">sem custo adicional</strong>.
+      </p>
+    </div>
+
+    <!-- Título planos -->
+    <p class="eyebrow" style="display:block;text-align:center;">Planos</p>
+    <h2 class="font-display" style="text-align:center;font-size:clamp(28px,4vw,44px);font-weight:300;margin-bottom:48px;">
+      Escolha a sua profundidade.
+    </h2>
+
+    <div class="plans-grid">
+
+      <!-- Plano 1: Essencial -->
+      <div class="glass" style="display:flex;flex-direction:column;">
+        <p style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(196,166,232,.6);margin-bottom:10px;">Essencial</p>
+        <h3 class="font-display" style="font-size:26px;font-weight:300;color:#fff;margin-bottom:12px;">Laudo Automatizado</h3>
+        <p style="font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:24px;flex:1;">
+          Diagnóstico rápido, preciso e individualizado — disponível para download em PDF na hora, logo após concluir o teste.
+        </p>
+        <ul style="list-style:none;margin-bottom:32px;">
+          <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check">✓</span>Relatório completo em PDF</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check">✓</span>Eneatipo, Asa e Subtipo dominante</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check">✓</span>Disponível imediatamente</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.65);"><span class="check">✓</span>Reanálise gratuita se necessário</li>
+        </ul>
+        <a href="?comprar=true" class="btn-secondary">Adquirir Código de Acesso</a>
+      </div>
+
+      <!-- Plano 2: Premium (destaque) -->
+      <div class="glass-highlight" style="display:flex;flex-direction:column;position:relative;">
+        <div class="badge-rec">Recomendado</div>
+        <p style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(196,166,232,.7);margin-bottom:10px;">Premium</p>
+        <h3 class="font-display" style="font-size:26px;font-weight:300;color:#fff;margin-bottom:12px;">Laudo + Devolutiva</h3>
+        <p style="font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:24px;flex:1;">
+          O laudo é o ponto de partida, mas a mentoria acelera o resultado. Inclui uma sessão exclusiva de <strong style="color:#fff;">1 hora por videoconferência</strong> com a psicóloga para desdobrar o perfil, mapear os pontos cegos e traçar um plano de ação sob medida.
+        </p>
+        <ul style="list-style:none;margin-bottom:32px;">
+          <li style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:10px;"><span class="check">✓</span>Tudo do plano Essencial</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:10px;"><span class="check">✓</span>Sessão de 1h por videoconferência</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:10px;"><span class="check">✓</span>Mapeamento dos pontos cegos</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:10px;"><span class="check">✓</span>Plano de ação individualizado</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.75);"><span class="check">✓</span>Com Dra. Lucia Kratz · CRP 09/20590</li>
+        </ul>
+        <a href="?comprar=true" class="btn-primary" style="text-align:center;animation:none;box-shadow:0 0 30px rgba(123,0,196,.45);">
+          Quero o Laudo + Devolutiva
+        </a>
+      </div>
+
+      <!-- Plano 3: Empresarial -->
+      <div class="glass" style="display:flex;flex-direction:column;border-color:rgba(155,37,137,.3);">
+        <p style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(216,124,200,.6);margin-bottom:10px;">Empresarial</p>
+        <h3 class="font-display" style="font-size:26px;font-weight:300;color:#fff;margin-bottom:12px;">Pacote RH / Equipe</h3>
+        <p style="font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:24px;flex:1;">
+          Mapeamento comportamental para empresas de qualquer porte. Ideal para processos seletivos, desenvolvimento de liderança e gestão de equipes.
+        </p>
+        <ul style="list-style:none;margin-bottom:32px;">
+          <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check" style="color:#D87CC8;">✓</span>A partir de 5 licenças</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check" style="color:#D87CC8;">✓</span>Laudos individuais para cada colaborador</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check" style="color:#D87CC8;">✓</span>Painel de gestão para o RH</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check" style="color:#D87CC8;">✓</span>Relatório consolidado da equipe</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.65);"><span class="check" style="color:#D87CC8;">✓</span>Suporte dedicado</li>
+        </ul>
+        <a href="?comprar=true" class="btn-secondary" style="border-color:rgba(155,37,137,.5);color:rgba(216,124,200,.9);">
+          Adquirir Pacote Empresarial
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <div class="font-display" style="font-size:28px;color:rgba(255,255,255,.25);margin-bottom:12px;">
+    9<span style="color:rgba(196,166,232,.4);">&</span>Self
+  </div>
+  <p style="font-size:12px;color:rgba(255,255,255,.22);line-height:1.8;max-width:440px;margin:0 auto;">
+    Desenvolvido por <span style="color:rgba(196,166,232,.45);">Dra. Lucia Kratz · CRP 09/20590</span><br/>
+    Psicóloga Clínica e Organizacional · Especialista TCC, Neuromodulação e Musicoterapia · Goiânia, GO
+  </p>
+  <p style="font-size:11px;color:rgba(255,255,255,.12);margin-top:24px;">© 2025 9&Self · Todos os direitos reservados</p>
+</footer>
+
+</body>
+</html>
