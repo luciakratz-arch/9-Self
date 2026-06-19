@@ -283,6 +283,19 @@ footer {
   text-align: center;
 }
 </style>
+<script>
+  // Garante que o scroll até #planos funcione mesmo na primeira carga (link externo)
+  window.addEventListener('load', function() {
+    if (window.location.hash === '#planos') {
+      var el = document.getElementById('planos');
+      if (el) {
+        setTimeout(function() {
+          el.scrollIntoView({ block: 'start' });
+        }, 100);
+      }
+    }
+  });
+</script>
 </head>
 <body>
 
@@ -316,7 +329,7 @@ footer {
     <p>
       O 9&Self é uma plataforma avançada de mapeamento de perfil baseada no Eneagrama — a metodologia de autoconhecimento mais precisa do mundo para identificar as 9 estruturas fundamentais de personalidade. Nosso mapeamento revela as motivações profundas, as asas e os instintos inconscientes que governam suas decisões, seu nível de estresse e seu potencial oculto.
     </p>
-    <a href="#planos" class="btn-primary">Adquirir Código de Acesso</a>
+    <a href="https://mpago.la/1AUyHwD" target="_blank" class="btn-primary">Adquirir Código de Acesso</a>
     <p style="margin-top:28px;font-size:12px;color:rgba(255,255,255,.28);">
       Desenvolvido por <span style="color:rgba(196,166,232,.55);">Dra. Lucia Kratz · CRP 09/20590</span> &nbsp;·&nbsp; Psicóloga Especialista em Eneagrama
     </p>
