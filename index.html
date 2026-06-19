@@ -749,6 +749,49 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+      <!-- ══ PAGE FINANCEIRO ══ -->
+      <div class="page" id="page-financeiro">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div class="page-title">Gestão Financeira</div>
+              <div class="page-subtitle">Receita do 9&Self, vendas e fechamento mensal</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modalNovaVenda')">＋ Lançar Venda</button>
+          </div>
+
+          <div class="cards-grid" id="finCards"></div>
+
+          <!-- Fechamento do mês -->
+          <div class="table-card" style="margin-bottom:20px;">
+            <div class="table-header">
+              <h3>📤 Fechamento Mensal</h3>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <select id="finMesSelect" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;"></select>
+                <button class="btn btn-primary btn-sm" onclick="enviarReceitaClinica()">📨 Enviar Receita p/ Clínica</button>
+              </div>
+            </div>
+            <div style="padding:20px 24px;">
+              <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">
+                Envia a receita líquida fechada do mês selecionado para o sistema da Clínica (coleção <code>clinica_receitas_externas</code>), aparecendo no Painel Fiscal.
+              </p>
+              <div id="finResumoMes" style="background:var(--light);border-radius:10px;padding:16px;font-size:14px;"></div>
+            </div>
+          </div>
+
+          <!-- Histórico de vendas -->
+          <div class="table-card">
+            <div class="table-header"><h3>Histórico de Vendas</h3></div>
+            <div class="table-card-wrapper">
+              <table>
+                <thead><tr><th>Data</th><th>Cliente</th><th>Plano</th><th>Qtd</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+                <tbody id="vendasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma venda registrada</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="page" id="page-empresas">
         <div style="padding:28px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
@@ -910,6 +953,44 @@ tr:hover td{background:#FAFAFE;}
 </div>
 
 <!-- ══════════════════ MODAIS ══════════════════ -->
+
+<!-- Modal Nova Venda -->
+<div class="modal-overlay" id="modalNovaVenda">
+  <div class="modal">
+    <h3>＋ Lançar Venda Confirmada</h3>
+    <p style="font-size:12px;color:var(--gray);margin-bottom:16px;">
+      Registre aqui pagamentos confirmados no Mercado Pago. Os códigos de acesso são gerados automaticamente.
+    </p>
+    <div class="form-row">
+      <label>Plano</label>
+      <select id="vendaPlano" onchange="atualizarCamposVenda()">
+        <option value="pf_basico">Teste Individual — R$ 297</option>
+        <option value="pf_devolutiva">Laudo + Devolutiva — R$ 597</option>
+        <option value="pj">Pacote Empresa/RH (qtd. variável)</option>
+      </select>
+    </div>
+    <div class="form-row" id="vendaQtdRow" style="display:none;">
+      <label>Quantidade de licenças</label>
+      <input type="number" id="vendaQtd" min="5" value="5" oninput="atualizarValorPJ()"/>
+    </div>
+    <div class="form-row">
+      <label>Nome do Cliente</label>
+      <input type="text" id="vendaCliente" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>E-mail do Cliente</label>
+      <input type="email" id="vendaEmail" placeholder="cliente@email.com"/>
+    </div>
+    <div class="form-row">
+      <label>Valor (R$)</label>
+      <input type="number" id="vendaValor" step="0.01" value="297"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalNovaVenda')">Cancelar</button>
+      <button class="btn btn-primary" onclick="lancarVenda()">Confirmar e Gerar Código</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal Nova Empresa -->
 <div class="modal-overlay" id="modalNovaEmpresa">
@@ -1488,6 +1569,7 @@ function enterApp(profile, name, role) {
 const NAVS = {
   admin: [
     {icon:'📊', label:'Painel', page:'dashboard'},
+    {icon:'💰', label:'Financeiro', page:'financeiro'},
     {icon:'🏢', label:'Empresas / RH', page:'empresas'},
     {icon:'🔑', label:'Códigos de Acesso', page:'codigos'},
     {icon:'📄', label:'Laudos', page:'laudos'},
@@ -1522,6 +1604,7 @@ window.navigateTo = function(page) {
   if(page=='empresas') loadEmpresas();
   if(page=='codigos') { loadCodigos(); gerarCodigoPreview(); }
   if(page=='laudos') loadLaudos();
+  if(page=='financeiro') loadFinanceiro();
   closeSidebar();
 };
 
@@ -1535,6 +1618,228 @@ async function loadDashboard() {
     <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${laudoSnap.size}</div><div class="sc-sub">gerados</div></div>
   `;
 }
+
+// ── PÁGINA FINANCEIRA ──────────────────────────────────────────────
+window.atualizarCamposVenda = function() {
+  const plano = document.getElementById('vendaPlano').value;
+  const qtdRow = document.getElementById('vendaQtdRow');
+  const valorInput = document.getElementById('vendaValor');
+  if(plano === 'pj') {
+    qtdRow.style.display = '';
+    atualizarValorPJ();
+  } else {
+    qtdRow.style.display = 'none';
+    valorInput.value = plano === 'pf_basico' ? 297 : 597;
+  }
+};
+
+window.atualizarValorPJ = function() {
+  const qtd = parseInt(document.getElementById('vendaQtd').value) || 5;
+  let preco = 247;
+  if(qtd >= 31) preco = 147;
+  else if(qtd >= 11) preco = 197;
+  document.getElementById('vendaValor').value = (qtd * preco).toFixed(2);
+};
+
+window.lancarVenda = async function() {
+  const plano   = document.getElementById('vendaPlano').value;
+  const cliente = document.getElementById('vendaCliente').value.trim();
+  const email   = document.getElementById('vendaEmail').value.trim();
+  const valor   = parseFloat(document.getElementById('vendaValor').value) || 0;
+  const qtd     = plano === 'pj' ? (parseInt(document.getElementById('vendaQtd').value)||5) : 1;
+
+  if(!cliente || !email || !valor) { showToast('Preencha todos os campos'); return; }
+
+  try {
+    // 1. Registrar venda
+    const vendaRef = await addDoc(collection(db,'nself_vendas'), {
+      plano, comprador:cliente, compradorEmail:email,
+      qtd, valor, status:'pago',
+      origem:'lancamento_manual',
+      criadoEm: serverTimestamp(),
+    });
+
+    // 2. Gerar códigos automaticamente
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const codigos = [];
+    for(let i=0;i<qtd;i++){
+      let cod=''; for(let j=0;j<6;j++) cod+=chars[Math.floor(Math.random()*chars.length)];
+      await addDoc(collection(db,'nself_codigos'),{
+        codigo:cod, nomeDestinatario:cliente, email,
+        empresa: plano==='pj' ? 'PJ_COMPRA' : 'PF',
+        status:'disponivel', origem:'venda_manual_admin',
+        vendaId: vendaRef.id, criadoEm: serverTimestamp(),
+      });
+      codigos.push(cod);
+    }
+    await updateDoc(doc(db,'nself_vendas', vendaRef.id), { codigos });
+
+    showToast(`✅ Venda lançada! ${qtd} código(s) gerado(s).`);
+    closeModal('modalNovaVenda');
+    document.getElementById('vendaCliente').value='';
+    document.getElementById('vendaEmail').value='';
+    loadFinanceiro();
+  } catch(e) {
+    showToast('Erro: ' + e.message);
+  }
+};
+
+async function loadFinanceiro() {
+  const snap = await getDocs(collection(db,'nself_vendas'));
+  const vendas = snap.docs.map(d=>({id:d.id,...d.data()}))
+    .filter(v=>v.status==='pago')
+    .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0));
+
+  // ── Cards ──
+  const now = new Date();
+  const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const vendasMes = vendas.filter(v => {
+    const d = v.criadoEm?.toDate?.();
+    if(!d) return false;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` === mesAtual;
+  });
+  const receitaMes = vendasMes.reduce((s,v)=>s+(v.valor||0),0);
+  const receitaTotal = vendas.reduce((s,v)=>s+(v.valor||0),0);
+  const ticketMedio = vendas.length ? receitaTotal/vendas.length : 0;
+
+  document.getElementById('finCards').innerHTML = `
+    <div class="stat-card"><div class="sc-label">Receita do Mês</div><div class="sc-value">R$ ${receitaMes.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="sc-sub">${vendasMes.length} venda(s)</div></div>
+    <div class="stat-card"><div class="sc-label">Receita Total</div><div class="sc-value">R$ ${receitaTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="sc-sub">acumulado</div></div>
+    <div class="stat-card"><div class="sc-label">Ticket Médio</div><div class="sc-value">R$ ${ticketMedio.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="sc-sub">por venda</div></div>
+    <div class="stat-card"><div class="sc-label">Total de Vendas</div><div class="sc-value">${vendas.length}</div><div class="sc-sub">confirmadas</div></div>
+  `;
+
+  // ── Select de meses ──
+  const mesesSet = new Set();
+  vendas.forEach(v=>{
+    const d = v.criadoEm?.toDate?.();
+    if(d) mesesSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  });
+  const meses = Array.from(mesesSet).sort().reverse();
+  const sel = document.getElementById('finMesSelect');
+  sel.innerHTML = meses.map(m=>{
+    const [y,mo] = m.split('-');
+    const nomesMes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return `<option value="${m}">${nomesMes[parseInt(mo)-1]}/${y}</option>`;
+  }).join('') || `<option value="${mesAtual}">Mês atual</option>`;
+  sel.onchange = () => _atualizarResumoMes(vendas);
+  _atualizarResumoMes(vendas);
+
+  // ── Tabela ──
+  const tbody = document.getElementById('vendasTable');
+  if(!vendas.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma venda registrada</td></tr>';
+    return;
+  }
+  tbody.innerHTML = vendas.map(v=>{
+    const data = v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—';
+    const planoLabel = {pf_basico:'Individual',pf_devolutiva:'Devolutiva',pj:'Empresa/RH'}[v.plano]||v.plano||'—';
+    return `<tr>
+      <td>${data}</td>
+      <td>${v.comprador||'—'}</td>
+      <td>${planoLabel}</td>
+      <td>${v.qtd||1}</td>
+      <td>R$ ${(v.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+      <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:#2e7d32;">✔ Pago</span></td>
+      <td></td>
+    </tr>`;
+  }).join('');
+}
+
+function _atualizarResumoMes(vendas) {
+  const sel = document.getElementById('finMesSelect');
+  const mesEscolhido = sel.value;
+  if(!mesEscolhido) { document.getElementById('finResumoMes').innerHTML = 'Nenhuma venda registrada ainda.'; return; }
+  const filtradas = vendas.filter(v=>{
+    const d = v.criadoEm?.toDate?.();
+    if(!d) return false;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` === mesEscolhido;
+  });
+  const total = filtradas.reduce((s,v)=>s+(v.valor||0),0);
+  const [y,mo] = mesEscolhido.split('-');
+  const nomesMes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('finResumoMes').innerHTML = `
+    <strong>${nomesMes[parseInt(mo)-1]} de ${y}:</strong>
+    ${filtradas.length} venda(s) · Receita: <strong style="color:var(--purple);">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong>
+  `;
+}
+
+window.enviarReceitaClinica = async function() {
+  const sel = document.getElementById('finMesSelect');
+  const mesEscolhido = sel.value;
+  if(!mesEscolhido) { showToast('Nenhum mês disponível'); return; }
+
+  try {
+    const snap = await getDocs(collection(db,'nself_vendas'));
+    const vendas = snap.docs.map(d=>d.data()).filter(v=>{
+      if(v.status!=='pago') return false;
+      const d = v.criadoEm?.toDate?.();
+      if(!d) return false;
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` === mesEscolhido;
+    });
+    const receitaLiquida = vendas.reduce((s,v)=>s+(v.valor||0),0);
+    const [y,mo] = mesEscolhido.split('-');
+
+    // Salva na coleção que a Clínica pode ler (mesmo projeto Firebase: entrevista-inicial)
+    await addDoc(collection(db,'clinica_receitas_externas'), {
+      origem: '9&Self',
+      mesReferencia: mesEscolhido,
+      ano: parseInt(y), mes: parseInt(mo),
+      receitaLiquida,
+      qtdVendas: vendas.length,
+      enviadoEm: serverTimestamp(),
+    });
+
+    showToast('📨 Receita enviada para o Painel Fiscal da Clínica!');
+  } catch(e) {
+    showToast('Erro ao enviar: ' + e.message);
+  }
+};
+
+window.salvarEmpresa = async function() {
+  const nome        = document.getElementById('empNome').value.trim();
+  const responsavel = document.getElementById('empResponsavel').value.trim();
+  const email       = document.getElementById('empEmail').value.trim();
+  const senha       = document.getElementById('empSenha').value;
+  const creditos    = parseInt(document.getElementById('empCreditos').value) || 0;
+
+  if(!nome || !responsavel || !email || !senha) {
+    showToast('Preencha todos os campos obrigatórios'); return;
+  }
+  if(senha.length < 6) {
+    showToast('A senha precisa ter no mínimo 6 caracteres'); return;
+  }
+
+  try {
+    // 1. Criar usuário no Firebase Auth para o RH conseguir logar
+    await createUserWithEmailAndPassword(auth, email, senha);
+
+    // 2. Salvar dados da empresa no Firestore
+    await addDoc(collection(db,'nself_empresas'), {
+      nome, responsavel, email,
+      creditos, status:'ativo',
+      criadoEm: serverTimestamp(),
+    });
+
+    showToast('✅ Empresa cadastrada com sucesso!');
+    closeModal('modalNovaEmpresa');
+    // Limpar campos
+    document.getElementById('empNome').value='';
+    document.getElementById('empResponsavel').value='';
+    document.getElementById('empEmail').value='';
+    document.getElementById('empSenha').value='';
+    document.getElementById('empCreditos').value='';
+    loadEmpresas();
+
+  } catch(e) {
+    if(e.code === 'auth/email-already-in-use') {
+      showToast('Este e-mail já está em uso. Use outro e-mail.');
+    } else {
+      showToast('Erro ao salvar: ' + e.message);
+    }
+    console.error(e);
+  }
+};
 
 async function loadEmpresas() {
   const tbody = document.getElementById('empresasTable');
