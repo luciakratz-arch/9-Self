@@ -1839,13 +1839,24 @@ window.ckCopiarCodigosWhatsApp = function() {
 
 window.addEventListener('load', function() {
   const params = new URLSearchParams(window.location.search);
-  if(params.get('comprar') === 'true') {
-    var ls = document.getElementById('loginScreen');
-    var ap = document.getElementById('appShell');
+
+  // ?login=true → forçar tela de login (vindo da landing page)
+  if(params.get('login') === 'true') {
     var ck = document.getElementById('checkout-publico');
-    if(ls) ls.style.display = 'none';
-    if(ap) ap.style.display = 'none';
-    if(ck) ck.style.display = 'flex';
+    var ls = document.getElementById('loginScreen');
+    if(ck) ck.style.display = 'none';
+    if(ls) ls.style.display = 'flex';
+    return;
+  }
+
+  // ?comprar=true → mostrar checkout público antigo (compatibilidade)
+  if(params.get('comprar') === 'true') {
+    var ls2 = document.getElementById('loginScreen');
+    var ap  = document.getElementById('appShell');
+    var ck2 = document.getElementById('checkout-publico');
+    if(ls2) ls2.style.display = 'none';
+    if(ap)  ap.style.display  = 'none';
+    if(ck2) ck2.style.display = 'flex';
   }
 });
 </script>
