@@ -539,7 +539,7 @@ footer {
           <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check">✓</span>Disponível imediatamente</li>
           <li style="font-size:13px;color:rgba(255,255,255,.65);"><span class="check">✓</span>Reanálise gratuita se necessário</li>
         </ul>
-        <button class="btn-secondary" onclick="ckSelecionarPlanoVenda('pf_apenas')">Adquirir Código de Acesso</button>
+        <button class="btn-secondary" onclick="window.open('https://mpago.la/1AUyHwD','_blank')">Adquirir Código de Acesso — R$ 297</button>
       </div>
 
       <!-- Plano 2: Premium (destaque) -->
@@ -557,8 +557,8 @@ footer {
           <li style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:10px;"><span class="check">✓</span>Plano de ação individualizado</li>
           <li style="font-size:13px;color:rgba(255,255,255,.75);"><span class="check">✓</span>Com Dra. Lucia Kratz · CRP 09/20590</li>
         </ul>
-        <button class="btn-primary" onclick="ckSelecionarPlanoVenda('pf_devolutiva')" style="text-align:center;animation:none;box-shadow:0 0 30px rgba(123,0,196,.45);border:none;cursor:pointer;">
-          Quero o Laudo + Devolutiva
+        <button class="btn-primary" onclick="window.open('https://mpago.la/1M1XCVT','_blank')" style="text-align:center;animation:none;box-shadow:0 0 30px rgba(123,0,196,.45);border:none;cursor:pointer;">
+          Quero o Laudo + Devolutiva — R$ 597
         </button>
       </div>
 
@@ -576,7 +576,20 @@ footer {
           <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check" style="color:#D87CC8;">✓</span>Relatório consolidado da equipe</li>
           <li style="font-size:13px;color:rgba(255,255,255,.65);"><span class="check" style="color:#D87CC8;">✓</span>Suporte dedicado</li>
         </ul>
-        <button class="btn-secondary" onclick="ckSelecionarPlanoVenda('pj_corp')" style="border-color:rgba(155,37,137,.5);color:rgba(216,124,200,.9);cursor:pointer;">
+        <!-- Quantidade inline -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(216,124,200,.6);display:block;margin-bottom:8px;">Quantidade de Licenças (mín. 5)</label>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <input type="number" id="pj-qtd-card" value="5" min="5"
+              style="width:80px;padding:10px;border:1.5px solid rgba(155,37,137,.4);border-radius:10px;background:rgba(255,255,255,.06);color:#fff;font-size:16px;font-weight:700;text-align:center;font-family:'DM Sans',sans-serif;"
+              oninput="ckAtualizarCardPJ()"/>
+            <div>
+              <div id="pj-faixa-card" style="font-size:12px;color:#D87CC8;font-weight:600;">Faixa Inicial (5–10 testes)</div>
+              <div id="pj-total-card" style="font-size:13px;color:rgba(255,255,255,.5);margin-top:2px;">5 × R$ 247 = <strong style="color:#D87CC8;">R$ 1.235</strong></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-secondary" onclick="ckAbrirMPEmpresa()" style="border-color:rgba(155,37,137,.5);color:rgba(216,124,200,.9);cursor:pointer;">
           Adquirir Pacote Empresarial
         </button>
       </div>
@@ -876,7 +889,33 @@ window.ckCopiarWhatsApp = function() {
   navigator.clipboard.writeText(txt).then(()=>alert('✅ Copiado! Cole no WhatsApp.'));
 };
 
-// ── Gerador Pix EMV ─────────────────────────
+
+// ── Links Mercado Pago ──────────────────────
+const _MP_PF_BASICO     = 'https://mpago.la/1AUyHwD';
+const _MP_PF_DEVOLUTIVA = 'https://mpago.la/1M1XCVT';
+const _MP_PJ_5_10       = 'https://mpago.la/1eX5w3f';
+const _MP_PJ_11_30      = 'https://mpago.la/11ooMpF';
+const _MP_PJ_31PLUS     = 'https://mpago.la/2Nsvqpr';
+
+window.ckAtualizarCardPJ = function() {
+  const qtd   = parseInt(document.getElementById('pj-qtd-card').value) || 5;
+  const info  = _precoPJ(qtd);
+  const total = (qtd * info.preco).toLocaleString('pt-BR');
+  document.getElementById('pj-faixa-card').textContent = info.faixa;
+  document.getElementById('pj-total-card').innerHTML   =
+    `${qtd} × R$ ${info.preco} = <strong style="color:#D87CC8;">R$ ${total}</strong>`;
+};
+
+window.ckAbrirMPEmpresa = function() {
+  const qtd = parseInt(document.getElementById('pj-qtd-card').value) || 5;
+  if (qtd < 5) { alert('Quantidade mínima: 5 licenças'); return; }
+  let url;
+  if      (qtd <= 10) url = _MP_PJ_5_10   + '?quantity=' + qtd;
+  else if (qtd <= 30) url = _MP_PJ_11_30  + '?quantity=' + qtd;
+  else                url = _MP_PJ_31PLUS + '?quantity=' + qtd;
+  window.open(url, '_blank');
+};
+
 function _pixPayload({chave,nome,valor,cidade,txid}){
   const t=(id,v)=>{const s=String(v);return `${id}${String(s.length).padStart(2,'0')}${s}`;};
   const gui=t('00','BR.GOV.BCB.PIX')+t('01',chave);
