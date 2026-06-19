@@ -539,7 +539,7 @@ footer {
           <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check">✓</span>Disponível imediatamente</li>
           <li style="font-size:13px;color:rgba(255,255,255,.65);"><span class="check">✓</span>Reanálise gratuita se necessário</li>
         </ul>
-        <a href="?comprar=true" class="btn-secondary">Adquirir Código de Acesso</a>
+        <button class="btn-secondary" onclick="ckSelecionarPlanoVenda('pf_apenas')">Adquirir Código de Acesso</button>
       </div>
 
       <!-- Plano 2: Premium (destaque) -->
@@ -557,9 +557,9 @@ footer {
           <li style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:10px;"><span class="check">✓</span>Plano de ação individualizado</li>
           <li style="font-size:13px;color:rgba(255,255,255,.75);"><span class="check">✓</span>Com Dra. Lucia Kratz · CRP 09/20590</li>
         </ul>
-        <a href="?comprar=true" class="btn-primary" style="text-align:center;animation:none;box-shadow:0 0 30px rgba(123,0,196,.45);">
+        <button class="btn-primary" onclick="ckSelecionarPlanoVenda('pf_devolutiva')" style="text-align:center;animation:none;box-shadow:0 0 30px rgba(123,0,196,.45);border:none;cursor:pointer;">
           Quero o Laudo + Devolutiva
-        </a>
+        </button>
       </div>
 
       <!-- Plano 3: Empresarial -->
@@ -576,12 +576,103 @@ footer {
           <li style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px;"><span class="check" style="color:#D87CC8;">✓</span>Relatório consolidado da equipe</li>
           <li style="font-size:13px;color:rgba(255,255,255,.65);"><span class="check" style="color:#D87CC8;">✓</span>Suporte dedicado</li>
         </ul>
-        <a href="?comprar=true" class="btn-secondary" style="border-color:rgba(155,37,137,.5);color:rgba(216,124,200,.9);">
+        <button class="btn-secondary" onclick="ckSelecionarPlanoVenda('pj_corp')" style="border-color:rgba(155,37,137,.5);color:rgba(216,124,200,.9);cursor:pointer;">
           Adquirir Pacote Empresarial
-        </a>
+        </button>
       </div>
 
+    </div><!-- /plans-grid -->
+
+    <!-- ══ FORMULÁRIO DE FATURAMENTO (aparece ao selecionar plano) ══ -->
+    <div id="ck-form-wrap" style="display:none;margin-top:48px;">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(196,166,232,.25);border-radius:24px;padding:40px;max-width:520px;margin:0 auto;">
+
+        <!-- Resumo do plano selecionado -->
+        <div id="ck-resumo" style="background:rgba(123,0,196,.2);border:1px solid rgba(196,166,232,.3);border-radius:14px;padding:16px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div id="ck-resumo-nome" style="font-weight:600;font-size:15px;color:#fff;"></div>
+            <div id="ck-resumo-desc" style="font-size:12px;color:rgba(196,166,232,.7);margin-top:3px;"></div>
+          </div>
+          <div id="ck-resumo-valor" style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#C4A6E8;white-space:nowrap;"></div>
+        </div>
+
+        <!-- Campo de quantidade (só PJ) -->
+        <div id="ck-qtd-wrap" style="display:none;margin-bottom:20px;">
+          <label style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:rgba(196,166,232,.6);display:block;margin-bottom:8px;">Quantidade de Licenças</label>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <input type="number" id="ck-qtd" value="5" min="5"
+              style="width:90px;padding:12px;border:1.5px solid rgba(196,166,232,.3);border-radius:10px;background:rgba(255,255,255,.06);color:#fff;font-size:16px;font-weight:600;text-align:center;"
+              oninput="ckAtualizarQtdPJ()"/>
+            <div style="flex:1;">
+              <div id="ck-faixa-label" style="font-size:12px;color:#C4A6E8;font-weight:600;"></div>
+              <div id="ck-faixa-desc" style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;"></div>
+            </div>
+            <div id="ck-total-pj" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#C4A6E8;white-space:nowrap;"></div>
+          </div>
+        </div>
+
+        <!-- Dados de faturamento -->
+        <p style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:rgba(196,166,232,.55);margin-bottom:16px;">Seus Dados de Faturamento:</p>
+        <input type="text"  id="ck-nome"     placeholder="Nome completo *"
+          style="width:100%;padding:14px 16px;border:1.5px solid rgba(196,166,232,.2);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:14px;margin-bottom:12px;outline:none;font-family:'DM Sans',sans-serif;"/>
+        <input type="email" id="ck-email"    placeholder="E-mail *"
+          style="width:100%;padding:14px 16px;border:1.5px solid rgba(196,166,232,.2);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:14px;margin-bottom:12px;outline:none;font-family:'DM Sans',sans-serif;"/>
+        <input type="tel"   id="ck-whatsapp" placeholder="WhatsApp *"
+          style="width:100%;padding:14px 16px;border:1.5px solid rgba(196,166,232,.2);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:14px;margin-bottom:12px;outline:none;font-family:'DM Sans',sans-serif;"/>
+        <input type="text"  id="ck-doc"      placeholder="CPF / CNPJ"
+          style="width:100%;padding:14px 16px;border:1.5px solid rgba(196,166,232,.2);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:14px;margin-bottom:24px;outline:none;font-family:'DM Sans',sans-serif;"/>
+
+        <button id="ck-btn-pix" onclick="ckIrParaPix()"
+          style="width:100%;padding:18px;background:linear-gradient(135deg,#7B00C4,#9B2589);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;border:none;border-radius:14px;cursor:pointer;box-shadow:0 0 30px rgba(123,0,196,.45);transition:box-shadow .3s,transform .2s;">
+          ⚡ Ver QR Code Pix para Pagar
+        </button>
+        <p style="text-align:center;font-size:12px;color:rgba(255,255,255,.3);margin-top:12px;">🔒 Seus dados são protegidos e usados apenas para liberar seu acesso.</p>
+      </div>
+    </div><!-- /ck-form-wrap -->
+
+    <!-- ══ QR CODE PIX ══ -->
+    <div id="ck-pix-wrap" style="display:none;margin-top:48px;">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(196,166,232,.25);border-radius:24px;padding:40px;max-width:480px;margin:0 auto;text-align:center;">
+        <p style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:16px;background:#e8f5e9;border-radius:8px;padding:8px 16px;display:inline-block;">⚡ Pague via Pix</p>
+        <div id="ck-qrcode" style="margin:0 auto 20px;"></div>
+        <p style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;">ou copie a chave Pix:</p>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input id="ck-chave-display" readonly
+            style="flex:1;padding:10px 14px;border:1px solid rgba(196,166,232,.25);border-radius:8px;background:rgba(255,255,255,.05);color:#C4A6E8;font-size:13px;font-family:monospace;"/>
+          <button onclick="navigator.clipboard.writeText(document.getElementById('ck-chave-display').value);this.textContent='✅';setTimeout(()=>this.textContent='📋',2000);"
+            style="padding:10px 14px;border:1px solid rgba(196,166,232,.25);border-radius:8px;background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-size:16px;">📋</button>
+        </div>
+        <p id="ck-valor-aviso" style="font-size:12px;color:#e65100;font-weight:600;margin-bottom:20px;"></p>
+        <div style="background:rgba(255,248,225,.08);border:1px solid rgba(255,248,225,.15);border-radius:10px;padding:14px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:24px;text-align:left;">
+          <strong style="color:rgba(255,255,255,.8);">Como funciona:</strong><br/>
+          1. Pague o Pix pelo valor exato acima<br/>
+          2. Clique em "Já Paguei" — o acesso é liberado imediatamente
+        </div>
+        <button onclick="ckConfirmarPagamento()"
+          style="width:100%;padding:18px;background:linear-gradient(135deg,#7B00C4,#9B2589);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;border:none;border-radius:14px;cursor:pointer;box-shadow:0 0 30px rgba(123,0,196,.45);">
+          ✅ Já Paguei — Iniciar Agora!
+        </button>
+        <button onclick="document.getElementById('ck-pix-wrap').style.display='none';document.getElementById('ck-form-wrap').style.display='';"
+          style="background:none;border:none;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;margin-top:12px;width:100%;">← Voltar</button>
+        <div id="ck-status" style="margin-top:14px;font-size:13px;min-height:18px;"></div>
+      </div>
+    </div><!-- /ck-pix-wrap -->
+
+    <!-- ══ SUCESSO PJ ══ -->
+    <div id="ck-sucesso-pj" style="display:none;margin-top:48px;">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(196,166,232,.25);border-radius:24px;padding:40px;max-width:480px;margin:0 auto;text-align:center;">
+        <div style="font-size:52px;margin-bottom:16px;">🎉</div>
+        <h3 style="font-size:22px;font-weight:700;color:#fff;margin-bottom:8px;">Acesso liberado!</h3>
+        <p style="font-size:14px;color:rgba(255,255,255,.55);margin-bottom:24px;">Seus códigos de acesso:</p>
+        <div id="ck-codigos-gerados" style="background:rgba(196,166,232,.08);border-radius:12px;padding:20px;text-align:left;font-family:monospace;font-size:13px;line-height:2.2;color:#C4A6E8;margin-bottom:20px;"></div>
+        <button onclick="ckCopiarWhatsApp()"
+          style="width:100%;padding:14px;background:linear-gradient(135deg,#7B00C4,#9B2589);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;border:none;border-radius:12px;cursor:pointer;margin-bottom:10px;">
+          📲 Copiar Códigos para WhatsApp
+        </button>
+        <p style="font-size:12px;color:rgba(255,255,255,.3);">Uma cópia foi enviada para o seu e-mail.</p>
+      </div>
     </div>
+
   </div>
 </section>
 
@@ -600,5 +691,204 @@ footer {
   <p style="font-size:11px;color:rgba(255,255,255,.12);margin-top:24px;">© 2025 9&Self · Todos os direitos reservados</p>
 </footer>
 
+
+<!-- ══ SCRIPT DE CHECKOUT ══ -->
+<script type="module">
+import { initializeApp }                        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc,
+         serverTimestamp, doc, updateDoc }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const _FC = {
+  apiKey:            "AIzaSyC5TxoSQwv-9v26xsRTvl1iFjtnVkqNyGQ",
+  authDomain:        "entrevista-inicial.firebaseapp.com",
+  projectId:         "entrevista-inicial",
+  storageBucket:     "entrevista-inicial.appspot.com",
+  messagingSenderId: "583820959311",
+  appId:             "1:583820959311:web:a0e9db1a15c38c1e5d0f3d"
+};
+const _app = initializeApp(_FC);
+const _db  = getFirestore(_app);
+
+// ── Config Pix ──────────────────────────────
+const _PIX_CHAVE  = 'luciakratz@gmail.com'; // ← substituir pela chave Pix real
+const _PIX_NOME   = 'Lucia Kratz';
+const _PIX_CIDADE = 'Goiania';
+
+// ── Planos ──────────────────────────────────
+const PLANOS = {
+  pf_apenas:     { nome:'Teste Individual — Só o Teste',      desc:'1 acesso + Laudo Executivo em PDF',           valor:297,  qtd:1,  tipo:'pf' },
+  pf_devolutiva: { nome:'Teste + Devolutiva de 1h',           desc:'Laudo PDF + Sessão de 1h com a psicóloga',    valor:597,  qtd:1,  tipo:'pf' },
+  pj_corp:       { nome:'Pacote Empresa / RH',                desc:'Múltiplos acessos com desconto progressivo',  valor:0,    qtd:5,  tipo:'pj' },
+};
+
+// Desconto progressivo PJ
+function _precoPJ(qtd) {
+  if (qtd >= 31) return { preco:147, faixa:'Faixa Plus (31+ testes)', cor:'#D87CC8' };
+  if (qtd >= 11) return { preco:197, faixa:'Faixa Profissional (11–30 testes)', cor:'#C4A6E8' };
+  return           { preco:247, faixa:'Faixa Inicial (5 a 10 testes)', cor:'#C4A6E8' };
+}
+
+// ── Estado global ────────────────────────────
+window._ckPlanoId  = null;
+window._ckVendaId  = null;
+window._ckCodigos  = [];
+
+// ── Funções expostas globalmente ─────────────
+window.ckSelecionarPlanoVenda = function(planoId) {
+  window._ckPlanoId = planoId;
+  const p = PLANOS[planoId];
+
+  // Destacar card selecionado
+  document.querySelectorAll('.glass,.glass-highlight').forEach(el => el.style.outline = '');
+  const idx = ['pf_apenas','pf_devolutiva','pj_corp'].indexOf(planoId);
+  document.querySelectorAll('.glass,.glass-highlight')[idx].style.outline = '2px solid rgba(196,166,232,.7)';
+
+  // Preencher resumo
+  document.getElementById('ck-resumo-nome').textContent  = p.nome;
+  document.getElementById('ck-resumo-desc').textContent  = p.desc;
+
+  const isPJ = planoId === 'pj_corp';
+  if (isPJ) {
+    document.getElementById('ck-qtd-wrap').style.display = '';
+    document.getElementById('ck-resumo-valor').textContent = 'R$ 247/lic.';
+    ckAtualizarQtdPJ();
+  } else {
+    document.getElementById('ck-qtd-wrap').style.display = 'none';
+    document.getElementById('ck-resumo-valor').textContent = `R$ ${p.valor}`;
+  }
+
+  // Mostrar formulário e rolar
+  const form = document.getElementById('ck-form-wrap');
+  form.style.display = '';
+  setTimeout(() => form.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
+};
+
+window.ckAtualizarQtdPJ = function() {
+  const qtd  = parseInt(document.getElementById('ck-qtd').value) || 5;
+  const info = _precoPJ(qtd);
+  const total = qtd * info.preco;
+  document.getElementById('ck-faixa-label').textContent = info.faixa;
+  document.getElementById('ck-faixa-desc').textContent  = `${qtd} testes × R$ ${info.preco} =`;
+  document.getElementById('ck-faixa-label').style.color = info.cor;
+  document.getElementById('ck-total-pj').textContent    = `R$ ${total.toLocaleString('pt-BR')}`;
+  document.getElementById('ck-resumo-valor').textContent = `R$ ${total.toLocaleString('pt-BR')}`;
+};
+
+window.ckIrParaPix = function() {
+  const nome     = document.getElementById('ck-nome').value.trim();
+  const email    = document.getElementById('ck-email').value.trim();
+  const whatsapp = document.getElementById('ck-whatsapp').value.trim();
+  if (!nome || !email || !whatsapp) { alert('Preencha nome, e-mail e WhatsApp'); return; }
+
+  const p     = PLANOS[window._ckPlanoId];
+  const isPJ  = window._ckPlanoId === 'pj_corp';
+  const qtd   = isPJ ? (parseInt(document.getElementById('ck-qtd').value)||5) : p.qtd;
+  const preco = isPJ ? _precoPJ(qtd).preco : p.valor;
+  const total = isPJ ? qtd * preco : p.valor;
+
+  // Gerar QR Code Pix
+  const txid = 'NS' + Math.random().toString(36).substr(2,6).toUpperCase();
+  const payload = _pixPayload({ chave:_PIX_CHAVE, nome:_PIX_NOME, valor:total, cidade:_PIX_CIDADE, txid });
+  const qrUrl  = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
+  document.getElementById('ck-qrcode').innerHTML =
+    `<img src="${qrUrl}" alt="QR Pix" style="border-radius:12px;border:4px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(0,0,0,.4);"/>`;
+  document.getElementById('ck-chave-display').value  = _PIX_CHAVE;
+  document.getElementById('ck-valor-aviso').textContent = `⚠️ Pague exatamente R$ ${total.toFixed(2).replace('.',',')}`;
+
+  // Salvar venda pendente
+  const doc_ = document.getElementById('ck-doc').value.trim();
+  addDoc(collection(_db,'nself_vendas'), {
+    plano:window._ckPlanoId, qtd, valor:total, comprador:nome,
+    compradorEmail:email, compradorWhatsapp:whatsapp, compradorDoc:doc_||'',
+    pixTxid:txid, status:'aguardando_pix', criadoEm:serverTimestamp(),
+  }).then(ref => { window._ckVendaId = ref.id; }).catch(()=>{});
+
+  // Mostrar Pix, ocultar form
+  document.getElementById('ck-form-wrap').style.display = 'none';
+  const pixWrap = document.getElementById('ck-pix-wrap');
+  pixWrap.style.display = '';
+  setTimeout(() => pixWrap.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
+};
+
+window.ckConfirmarPagamento = async function() {
+  const st   = document.getElementById('ck-status');
+  const btn  = document.querySelector('#ck-pix-wrap button');
+  const nome = document.getElementById('ck-nome').value.trim();
+  const email= document.getElementById('ck-email').value.trim();
+  const isPJ = window._ckPlanoId === 'pj_corp';
+  const qtd  = isPJ ? (parseInt(document.getElementById('ck-qtd').value)||5) : PLANOS[window._ckPlanoId].qtd;
+  const preco= isPJ ? _precoPJ(qtd).preco : PLANOS[window._ckPlanoId].valor;
+  const total= isPJ ? qtd * preco : preco;
+  if(btn) btn.disabled = true;
+  st.innerHTML = '<span style="color:rgba(196,166,232,.7);">⏳ Liberando acesso...</span>';
+
+  try {
+    const BASE = 'https://luciakratz-arch.github.io/9-Self/index.html?code=';
+    window._ckCodigos = [];
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    for(let i=0; i<qtd; i++){
+      let cod = '';
+      for(let j=0;j<6;j++) cod += chars[Math.floor(Math.random()*chars.length)];
+      await addDoc(collection(_db,'nself_codigos'),{
+        codigo:cod, nomeDestinatario:nome, email,
+        empresa: isPJ ? 'PJ_COMPRA' : 'PF',
+        status:'disponivel', origem:'compra_landing',
+        vendaId: window._ckVendaId||'', linkAcesso:BASE+cod,
+        criadoEm:serverTimestamp(),
+      });
+      window._ckCodigos.push(cod);
+    }
+
+    if(window._ckVendaId){
+      await updateDoc(doc(_db,'nself_vendas',window._ckVendaId),{
+        status:'pago', pagoEm:serverTimestamp(), codigos:window._ckCodigos
+      });
+    }
+
+    if(!isPJ) {
+      // PF: redirecionar direto para o teste
+      st.innerHTML = '<span style="color:#C4A6E8;font-weight:700;">✅ Acesso liberado! Redirecionando...</span>';
+      setTimeout(() => {
+        window.location.href = `index.html?code=${window._ckCodigos[0]}`;
+      }, 1500);
+      return;
+    }
+
+    // PJ: mostrar códigos
+    document.getElementById('ck-pix-wrap').style.display = 'none';
+    const sucesso = document.getElementById('ck-sucesso-pj');
+    sucesso.style.display = '';
+    document.getElementById('ck-codigos-gerados').innerHTML =
+      window._ckCodigos.map((c,i)=>`<div>Código ${i+1}: <strong style="color:#fff;">${c}</strong><br/><small style="color:rgba(196,166,232,.5);">${BASE}${c}</small></div>`).join('');
+    setTimeout(() => sucesso.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
+
+  } catch(e) {
+    st.innerHTML = `<span style="color:#ef5350;">Erro: ${e.message}</span>`;
+    if(btn) btn.disabled = false;
+  }
+};
+
+window.ckCopiarWhatsApp = function() {
+  const BASE = 'https://luciakratz-arch.github.io/9-Self/index.html?code=';
+  const txt = '*9&Self — Seus Códigos de Acesso*\n\n' +
+    window._ckCodigos.map((c,i)=>`Código ${i+1}: *${c}*\nLink: ${BASE}${c}`).join('\n\n') +
+    '\n\nAcesse o link para iniciar seu teste.';
+  navigator.clipboard.writeText(txt).then(()=>alert('✅ Copiado! Cole no WhatsApp.'));
+};
+
+// ── Gerador Pix EMV ─────────────────────────
+function _pixPayload({chave,nome,valor,cidade,txid}){
+  const t=(id,v)=>{const s=String(v);return `${id}${String(s.length).padStart(2,'0')}${s}`;};
+  const gui=t('00','BR.GOV.BCB.PIX')+t('01',chave);
+  const n_=(nome||'9SELF').replace(/[^A-Za-z0-9 ]/g,'').substr(0,25).toUpperCase();
+  const c_=(cidade||'GOIANIA').replace(/[^A-Za-z0-9 ]/g,'').substr(0,15).toUpperCase();
+  const tx=(txid||'NS').replace(/[^A-Za-z0-9]/g,'').substr(0,25).toUpperCase()||'***';
+  const v_=valor>0?t('54',valor.toFixed(2)):'';
+  const base=t('00','01')+t('26',gui)+t('52','0000')+t('53','986')+v_+t('58','BR')+t('59',n_)+t('60',c_)+t('62',t('05',tx))+'6304';
+  let crc=0xFFFF;
+  for(const ch of base){crc^=ch.charCodeAt(0)<<8;for(let i=0;i<8;i++)crc=(crc&0x8000)?(crc<<1)^0x1021:(crc<<1);}
+  return base+(crc&0xFFFF).toString(16).toUpperCase().padStart(4,'0');
+}
+</script>
 </body>
 </html>
