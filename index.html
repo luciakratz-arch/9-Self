@@ -493,17 +493,22 @@ tr:hover td{background:#FAFAFE;}
           <input class="code-input" id="colabCode" placeholder="EX: A1B2C3" maxlength="8"
             onkeydown="if(event.key==='Enter')doLogin()" style="font-size:15px;letter-spacing:3px;"/>
         </div>
-        <div style="margin-top:18px;text-align:center;">
-          <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html#planos"
-             style="font-size:12px;color:rgba(196,166,232,0.75);text-decoration:none;">
-            Ainda não tenho um código — <strong>quero comprar</strong>
-          </a>
-        </div>
       </div>
     </div>
 
     <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
     <div class="login-error" id="loginError"></div>
+    <div style="margin-top:16px;text-align:center;">
+      <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html#planos"
+         style="display:inline-flex;align-items:center;gap:6px;
+                font-size:12px;color:rgba(196,166,232,0.7);
+                text-decoration:none;padding:8px 16px;
+                border:1px solid rgba(196,166,232,0.2);
+                border-radius:50px;
+                transition:border-color .2s,color .2s;">
+        🛒 Ainda não tenho um código — Quero comprar
+      </a>
+    </div>
   </div>
 </div>
 
@@ -1428,10 +1433,10 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
   content.push(..._paraMulti(S['COMUNICACAO']||''));
 
   if(_splitPipes(S['FALA']||'').length) {
-    content.push(_dualGrid('Estilo ao Falar','Linguagem Corporal',_splitPipes(S['FALA']||''),_splitPipes(S['LINGUAGEM_CORPORAL']||''),_TEAL);
+    content.push(_dualGrid('Estilo ao Falar','Linguagem Corporal',_splitPipes(S['FALA']||''),_splitPipes(S['LINGUAGEM_CORPORAL']||''),_TEAL));
   }
   content.push(_subTitle('Feedback:'));
-  content.push(_dualGrid('Pontos Cegos','Filtros e Distorções',_splitPipes(S['PONTOS_CEGOS']||''),_splitPipes(S['FILTROS_DISTORCOES']||''),_TEAL);
+  content.push(_dualGrid('Pontos Cegos','Filtros e Distorções',_splitPipes(S['PONTOS_CEGOS']||''),_splitPipes(S['FILTROS_DISTORCOES']||''),_TEAL));
   if(_splitPipes(S['FEEDBACK_ITENS']||'').length) content.push(_fbBox('Diretrizes para o Feedback:',_splitPipes(S['FEEDBACK_ITENS']||'')));
 
   content.push({ text:'', pageBreak:'before' });
