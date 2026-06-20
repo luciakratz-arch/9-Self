@@ -1,2190 +1,251 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>9&Self — Conheça sua Personalidade</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
-<style>
-:root {
-  --mag:    #7B1D6B;
-  --mag2:   #9B2589;
-  --teal:   #1A9BAF;
-  --teal2:  #13B5CC;
-  --purple: #7B00C4;
-  --purple2:#9B10E4;
-  --dark:   #2C2C2C;
-  --gray:   #6B6B6B;
-  --light:  #F7F4FB;
-  --white:  #FFFFFF;
-  --border: #E2D9EF;
-  --sidebar-w: 240px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);min-height:100vh;}
-
-/* ── TELA DE LOGIN ── */
-#loginScreen{
-  display:flex;align-items:center;justify-content:center;
-  min-height:100vh;
-  background: linear-gradient(135deg, #1a0a2e 0%, #3d0a5e 40%, #7B1D6B 75%, #1A9BAF 100%);
-  position:relative;overflow:hidden;
-}
-#loginScreen::before{
-  content:'';position:absolute;inset:0;
-  background: radial-gradient(ellipse at 20% 50%, rgba(123,0,196,0.3) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 20%, rgba(26,155,175,0.25) 0%, transparent 50%);
-}
-.login-card{
-  background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.15);
-  border-radius:24px;padding:48px 40px;width:100%;max-width:420px;
-  position:relative;z-index:1;
-  box-shadow:0 32px 80px rgba(0,0,0,0.4);
-}
-.login-logo{text-align:center;margin-bottom:32px;}
-.login-logo .brand-number{
-  font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;
-  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  line-height:1;letter-spacing:-2px;
-}
-.login-logo .brand-name{
-  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;
-  color:rgba(255,255,255,0.9);letter-spacing:4px;
-}
-.login-logo .brand-tagline{
-  font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:2px;margin-top:6px;
-  text-transform:uppercase;
-}
-.login-tabs{display:flex;gap:8px;margin-bottom:28px;background:rgba(0,0,0,0.2);padding:4px;border-radius:12px;}
-.login-tab{
-  flex:1;padding:8px;border:none;background:transparent;
-  color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;font-size:12px;
-  border-radius:8px;cursor:pointer;transition:all .2s;font-weight:500;
-}
-.login-tab.active{background:rgba(255,255,255,0.15);color:#fff;}
-.login-field{margin-bottom:16px;}
-.login-field label{display:block;font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
-.login-field input{
-  width:100%;padding:12px 16px;
-  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
-  border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;
-  outline:none;transition:border-color .2s;
-}
-.login-field input::placeholder{color:rgba(255,255,255,0.3);}
-.login-field input:focus{border-color:rgba(123,0,196,0.7);}
-.login-btn{
-  width:100%;padding:14px;border:none;border-radius:12px;
-  background:linear-gradient(135deg,var(--purple),var(--mag));
-  color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
-  cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:0.5px;
-}
-.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,0,196,0.4);}
-.login-error{color:#FF8FA3;font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
-
-/* ── APP SHELL ── */
-#appShell{display:none;min-height:100vh;}
-.app-layout{display:flex;min-height:100vh;}
-
-/* SIDEBAR */
-.sidebar{
-  width:var(--sidebar-w);background:#1a0a2e;
-  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;
-  z-index:100;border-right:1px solid rgba(255,255,255,0.06);
-  transition:transform .3s;
-}
-.sidebar-logo{
-  padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
-}
-.sidebar-logo .s-number{
-  font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;
-  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  line-height:1;letter-spacing:-1px;
-}
-.sidebar-logo .s-name{
-  font-family:'Cormorant Garamond',serif;font-size:12px;color:rgba(255,255,255,0.5);
-  letter-spacing:4px;margin-top:2px;
-}
-/* RODAPÉ */
-.app-footer{
-  margin-left:var(--sidebar-w);
-  background:#fff;border-top:1px solid var(--border);
-  padding:10px 28px;display:flex;align-items:center;gap:10px;
-}
-.app-footer span{font-size:11px;color:var(--gray);}
-@media(max-width:768px){.app-footer{margin-left:0;}}
-.sidebar-profile{
-  padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.07);
-}
-.sidebar-profile .sp-role{
-  font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;font-weight:600;
-}
-.sidebar-profile .sp-name{font-size:13px;color:#fff;margin-top:2px;font-weight:500;}
-.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto;}
-.nav-section{padding:8px 20px 4px;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;}
-.nav-item{
-  display:flex;align-items:center;gap:10px;padding:10px 20px;
-  color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;
-  transition:all .2s;border-left:3px solid transparent;
-}
-.nav-item:hover{color:#fff;background:rgba(255,255,255,0.05);}
-.nav-item.active{color:#fff;background:rgba(123,0,196,0.2);border-left-color:var(--purple);}
-.nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
-.sidebar-footer{
-  padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07);
-}
-.logout-btn{
-  width:100%;padding:10px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;
-  background:transparent;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;
-  font-size:12px;cursor:pointer;transition:all .2s;
-}
-.logout-btn:hover{background:rgba(255,0,80,0.1);color:#ff6b6b;border-color:rgba(255,0,80,0.2);}
-
-/* MAIN CONTENT */
-.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;}
-.topbar{
-  background:#fff;border-bottom:1px solid var(--border);
-  padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;
-}
-.topbar-title{font-size:16px;font-weight:600;color:var(--dark);}
-.topbar-actions{display:flex;align-items:center;gap:12px;}
-.badge{
-  display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;
-  font-size:11px;font-weight:600;letter-spacing:0.5px;
-}
-.badge-admin{background:rgba(123,0,196,0.1);color:var(--purple);}
-.badge-rh{background:rgba(26,155,175,0.1);color:var(--teal);}
-.badge-colab{background:rgba(123,29,107,0.1);color:var(--mag);}
-
-.page{padding:28px;display:none;}
-.page.active{display:block;}
-
-/* CARDS */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
-.stat-card{
-  background:#fff;border-radius:16px;padding:20px;
-  border:1px solid var(--border);position:relative;overflow:hidden;
-}
-.stat-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--purple),var(--mag));
-}
-.stat-card .sc-label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;}
-.stat-card .sc-value{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--dark);line-height:1;}
-.stat-card .sc-sub{font-size:12px;color:var(--teal);margin-top:4px;}
-
-/* TABLE */
-.table-card{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;}
-.table-card-wrapper { max-width: 100%; overflow-x: auto; }
-.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.table-header h3{font-size:14px;font-weight:600;}
-table{width:100%;border-collapse:collapse;}
-th{background:var(--light);padding:10px 16px;text-align:left;font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);}
-td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:#FAFAFE;}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all .2s;}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--mag));color:#fff;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(123,0,196,0.3);}
-.btn-teal{background:var(--teal);color:#fff;}
-.btn-teal:hover{background:var(--teal2);}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--dark);}
-.btn-outline:hover{border-color:var(--purple);color:var(--purple);}
-.btn-sm{padding:5px 12px;font-size:12px;}
-.btn-danger{background:rgba(220,50,50,0.08);color:#dc3232;border:1px solid rgba(220,50,50,0.15);}
-
-/* STATUS PILLS */
-.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.pill-green{background:#e6f9f0;color:#1a9460;}
-.pill-yellow{background:#fff8e1;color:#b8860b;}
-.pill-red{background:#ffeaea;color:#c0392b;}
-.pill-blue{background:#e3f2fd;color:#1565c0;}
-.pill-gray{background:#f0f0f0;color:#666;}
-
-/* MODAL */
-.modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
-  backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;
-}
-.modal-overlay.open{display:flex;}
-.modal{
-  background:#fff;border-radius:20px;padding:28px;width:100%;max-width:480px;
-  box-shadow:0 32px 80px rgba(0,0,0,0.2);
-}
-.modal h3{font-size:16px;font-weight:600;margin-bottom:20px;}
-.form-row{margin-bottom:14px;}
-.form-row label{display:block;font-size:11px;color:var(--gray);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
-.form-row input, .form-row select{
-  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
-  font-family:'DM Sans',sans-serif;font-size:13px;outline:none;
-  transition:border-color .2s;
-}
-.form-row input:focus, .form-row select:focus{border-color:var(--purple);}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
-
-/* PAINEL COLABORADOR — teste */
-.test-container{max-width:720px;margin:0 auto;}
-.test-progress{background:var(--border);border-radius:4px;height:6px;margin-bottom:28px;}
-.test-progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--teal));transition:width .4s;}
-.question-card{background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border);margin-bottom:16px;}
-.question-card .q-num{font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
-.question-card .q-text{font-size:15px;font-weight:500;line-height:1.5;}
-.q-options{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
-.q-option{
-  padding:8px 20px;border:2px solid var(--border);border-radius:20px;
-  background:#fff;cursor:pointer;font-size:13px;transition:all .2s;
-}
-.q-option:hover{border-color:var(--purple);color:var(--purple);}
-.q-option.selected{border-color:var(--purple);background:rgba(123,0,196,0.08);color:var(--purple);font-weight:600;}
-
-/* CÓDIGO DE ACESSO */
-.code-hero{
-  text-align:center;padding:48px 20px;
-  background:linear-gradient(135deg, #1a0a2e, #3d0a5e);
-  border-radius:20px;color:#fff;margin-bottom:24px;
-}
-.code-hero h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;margin-bottom:8px;}
-.code-hero p{color:rgba(255,255,255,0.6);font-size:14px;}
-.code-input-wrap{display:flex;gap:8px;max-width:320px;margin:24px auto 0;}
-.code-input{
-  flex:1;padding:14px 18px;border-radius:12px;border:none;
-  font-size:18px;text-align:center;letter-spacing:4px;font-weight:600;
-  background:rgba(255,255,255,0.12);color:#fff;font-family:'DM Sans',sans-serif;
-  outline:none;
-}
-.code-input::placeholder{color:rgba(255,255,255,0.3);letter-spacing:2px;font-size:14px;}
-.code-input:focus{background:rgba(255,255,255,0.18);}
-.code-submit{
-  padding:14px 20px;border:none;border-radius:12px;
-  background:linear-gradient(135deg,var(--purple),var(--mag));
-  color:#fff;cursor:pointer;font-size:18px;
-}
-
-/* SUBTIPO CARDS */
-.subtipo-card{
-  display:flex;align-items:flex-start;gap:12px;
-  background:#fff;border:2px solid var(--border);border-radius:14px;
-  padding:16px;transition:all .2s;cursor:default;
-}
-.subtipo-card:first-child{border-color:var(--purple);background:rgba(123,0,196,0.04);}
-.subtipo-pos{
-  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
-  color:var(--purple);min-width:32px;line-height:1;
-}
-
-/* SLIDERS */
-.pct-slider{
-  flex:1;-webkit-appearance:none;height:6px;border-radius:4px;
-  background:linear-gradient(90deg,var(--purple) 0%,var(--teal) 100%);
-  outline:none;cursor:pointer;
-}
-.pct-slider::-webkit-slider-thumb{
-  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
-  background:var(--purple);cursor:pointer;box-shadow:0 2px 6px rgba(123,0,196,0.3);
-}
-.slider-pct{
-  font-weight:700;font-size:14px;color:var(--purple);min-width:40px;text-align:right;
-}
-.slider-block{background:var(--light);border-radius:12px;padding:16px;}
-
-/* BLOCOS DE PARÁGRAFO */
-.para-block{
-  border:2px solid var(--border);border-radius:12px;padding:16px 18px;
-  margin-bottom:10px;cursor:pointer;transition:all .2s;
-  display:flex;gap:12px;align-items:flex-start;
-}
-.para-block:hover{border-color:var(--purple);background:rgba(123,0,196,0.03);}
-.para-block.para-selected{
-  border-color:var(--purple);
-  background:linear-gradient(135deg,rgba(123,0,196,0.08),rgba(26,155,175,0.05));
-  box-shadow:0 2px 12px rgba(123,0,196,0.15);
-}
-.para-letra{font-weight:800;font-size:16px;min-width:24px;padding-top:2px;}
-.para-texto{font-size:13px;line-height:1.75;color:var(--dark);}
-
-/* RESPONSIVO */
-.hamburger{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--dark);}
-@media(max-width:768px){
-  .sidebar{transform:translateX(-100%);}
-  .sidebar.open{transform:translateX(0);}
-  .main{margin-left:0;}
-  .hamburger{display:block;}
-  .cards-grid{grid-template-columns:1fr 1fr;}
-}
-
-/* PAGE TITLE */
-.page-title{
-  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
-  color:var(--dark);margin-bottom:4px;
-}
-.page-subtitle{font-size:13px;color:var(--gray);margin-bottom:24px;}
-
-/* EMPTY STATE */
-.empty-state{text-align:center;padding:48px;color:var(--gray);}
-.empty-state .es-icon{font-size:48px;margin-bottom:12px;}
-.empty-state p{font-size:13px;}
-
-/* TOAST */
-#toast{
-  position:fixed;bottom:24px;right:24px;
-  background:#2C2C2C;color:#fff;padding:12px 20px;border-radius:10px;
-  font-size:13px;z-index:999;transform:translateY(60px);opacity:0;
-  transition:all .3s;pointer-events:none;
-}
-#toast.show{transform:translateY(0);opacity:1;}
-#toast.success{background:#1a9460;}
-#toast.error{background:#c0392b;}
-
-.overlay-mobile{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99;}
-.overlay-mobile.open{display:block;}
-
-/* CLASSES EXCLUSIVAS DA NOVA PÁGINA DE VENDAS COMPLETA */
-.vendas-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 32px;
-  max-width: 1100px;
-  width: 100%;
-}
-@media(max-width: 900px) {
-  .vendas-grid { grid-template-columns: 1fr; gap: 24px; }
-}
-.col-info {
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.vendas-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 38px;
-  font-weight: 400;
-  line-height: 1.2;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #FFF, #7DEBF7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.vendas-subtitle {
-  font-size: 15px;
-  line-height: 1.6;
-  opacity: 0.85;
-  margin-bottom: 24px;
-}
-.beneficios-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-.beneficio-item {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  font-size: 13.5px;
-  line-height: 1.5;
-}
-.beneficio-icon {
-  background: rgba(255,255,255,0.15);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-.depoimentos-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 12px;
-}
-@media(max-width: 600px) { .depoimentos-row { grid-template-columns: 1fr; } }
-.depoimento-card {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 11.5px;
-  line-height: 1.5;
-  font-style: italic;
-  opacity: 0.9;
-}
-.depoimento-autor {
-  font-style: normal;
-  font-weight: 600;
-  font-size: 10.5px;
-  color: #7DEBF7;
-  margin-top: 6px;
-  display: block;
-}
-.planos-venda-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.plano-venda-box {
-  border: 2px solid #e2d9ef;
-  border-radius: 14px;
-  padding: 14px;
-  cursor: pointer;
-  transition: all .2s;
-  background: #fff;
-}
-.plano-venda-box:hover {
-  border-color: var(--purple);
-}
-.plano-venda-box.selected {
-  border-color: var(--purple);
-  background: #fdfaff;
-  box-shadow: 0 4px 12px rgba(123,0,196,0.08);
-}
-</style>
-</head>
-<body>
-
-<!-- ══════════════════ LOGIN ══════════════════ -->
-<div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="brand-number">9&amp;Self</div>
-      <div class="brand-name">SELF</div>
-      <div class="brand-tagline">Descubra sua personalidade</div>
-    </div>
-
-    <div class="login-tabs">
-      <button class="login-tab active" onclick="setLoginProfile('admin')">Admin</button>
-      <button class="login-tab" onclick="setLoginProfile('rh')">RH / Empresa</button>
-      <button class="login-tab" onclick="setLoginProfile('colaborador')">Colaborador</button>
-    </div>
-
-    <div id="loginAdmin">
-      <div class="login-field">
-        <label>Senha de Acesso</label>
-        <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
-      </div>
-    </div>
-
-    <div id="loginRH" style="display:none;">
-      <div class="login-field">
-        <label>E-mail</label>
-        <input type="email" id="rhEmail" placeholder="empresa@email.com" onkeydown="if(event.key==='Enter')doLogin()"/>
-      </div>
-      <div class="login-field">
-        <label>Senha</label>
-        <input type="password" id="rhPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
-      </div>
-    </div>
-
-    <div id="loginColab" style="display:none;">
-      <div class="code-hero" style="padding:28px 20px;margin-bottom:0;border-radius:12px;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:6px;">Acesse com seu código</div>
-        <p style="font-size:12px;opacity:.6;">Você recebeu um código único de acesso</p>
-        <div class="code-input-wrap">
-          <input class="code-input" id="colabCode" placeholder="EX: A1B2C3" maxlength="8"
-            onkeydown="if(event.key==='Enter')doLogin()" style="font-size:15px;letter-spacing:3px;"/>
-        </div>
-      </div>
-    </div>
-
-    <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
-    <div class="login-error" id="loginError"></div>
-    <div style="margin-top:16px;text-align:center;">
-      <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html"
-         style="display:inline-flex;align-items:center;gap:6px;
-                font-size:12px;color:rgba(196,166,232,0.7);
-                text-decoration:none;padding:8px 16px;
-                border:1px solid rgba(196,166,232,0.2);
-                border-radius:50px;
-                transition:border-color .2s,color .2s;">
-        🛒 Ainda não tenho um código — Quero comprar
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════ APP SHELL ══════════════════ -->
-
-<!-- ══ CHECKOUT PÚBLICO (PÁGINA DE VENDAS DINÂMICA REFORMULADA) ══ -->
-<div id="checkout-publico" style="display:none;min-height:100vh;
-  background:linear-gradient(135deg,#1a0a2e 0%,#3d0a5e 40%,#7B1D6B 75%,#1A9BAF 100%);
-  align-items:center;justify-content:center;padding:32px 24px;">
-  
-  <div class="vendas-grid">
-    
-    <!-- COLUNA DA ESQUERDA: APRESENTAÇÃO DO PRODUTO (LANDING PAGE) -->
-    <div class="col-info">
-      <h1 class="vendas-title">Mapeie sua Essência e Lidere com Consciência</h1>
-      <p class="vendas-subtitle">O <b>9&Self</b> é um ecossistema andragógico avançado de mapeamento comportamental. Unindo a precisão do Eneagrama, os traços junguianos e as teorias de motivação estrutural, geramos um raio-x completo do seu funcionamento interno e profissional.</p>
-      
-      <div class="beneficios-list">
-        <div class="beneficio-item">
-          <div class="beneficio-icon">📊</div>
-          <div><strong>Laudo Executivo Completo em PDF:</strong> Baixe o relatório completo de forma imediata assim que finalizar a sua avaliação.</div>
-        </div>
-        <div class="beneficio-item">
-          <div class="beneficio-icon">👁️</div>
-          <div><strong>Mapeamento de Pontos Cegos:</strong> Identifique as armaduras invisíveis que disparam seu estresse e travam seus resultados.</div>
-        </div>
-        <div class="beneficio-item">
-          <div class="beneficio-icon">⚡</div>
-          <div><strong>Comunicação e Liderança:</strong> Entenda seu filtro nas tomadas de decisão, dinâmicas de equipe e recepção de feedbacks.</div>
-        </div>
-        <div class="beneficio-item">
-          <div class="beneficio-icon">🎵</div>
-          <div><strong>Apoio à Caminhada:</strong> Hábitos saudáveis desenhados sob medida e Playlist da Personalidade exclusiva para o seu tipo.</div>
-        </div>
-      </div>
-
-      <div class="depoimentos-row">
-        <div class="depoimento-card">
-          "O laudo do 9&Self clareou todos os meus pontos cegos de liderança. O PDF gerado é extremamente assertivo."
-          <span class="depoimento-autor">— Mariana S., Diretora de Operações</span>
-        </div>
-        <div class="depoimento-card">
-          "Implementamos o pacote corporativo no RH e a harmonia das equipes mudou completamente. Recomendo muito!"
-          <span class="depoimento-autor">— Roberto J., Gerente de Gente & Gestão</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- COLUNA DA DIREITA: FORMULÁRIO DE SELEÇÃO E PAGAMENTO -->
-    <div style="background:rgba(255,255,255,0.98);border-radius:24px;padding:36px;
-                box-shadow:0 24px 80px rgba(0,0,0,.35);height:fit-content;">
-      
-      <div style="text-align:center;margin-bottom:24px;">
-        <div style="font-size:36px;font-family:'Cormorant Garamond',serif;font-weight:300;color:#1a0a2e;line-height:1;">9&Self</div>
-        <div style="font-size:9px;letter-spacing:6px;color:#888;margin-top:2px;">S E L F</div>
-        <div style="font-size:11px;color:#999;margin-top:4px;letter-spacing:1px;text-transform:uppercase;">Escolha o Plano Ideal:</div>
-      </div>
-
-      <!-- Etapa 1: Escolha do plano + dados -->
-      <div id="ckEtapa1">
-        <div class="planos-venda-container">
-          
-          <!-- PF - APENAS O TESTE -->
-          <div id="ckOpcaoPF_Apenas" class="plano-venda-box" onclick="ckSelecionarPlanoVenda('pf_apenas')">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="font-size:22px;">👤</span>
-              <div style="flex:1;">
-                <div style="font-weight:700;color:#1a0a2e;font-size:13.5px;">Teste Individual — Só o Teste</div>
-                <div style="font-size:11.5px;color:#666;margin-top:1px;">1 acesso completo + Emissão automática do Laudo Executivo em PDF.</div>
-              </div>
-              <div style="text-align:right;min-width:75px;">
-                <div id="ckValorPFApenas" style="font-size:18px;font-weight:800;color:#7B00C4;">R$ 297</div>
-                <div style="font-size:9px;color:#aaa;">Individual</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- PF - TESTE + DEVOLUTIVA (COM A PSICÓLOGA) -->
-          <div id="ckOpcaoPF_Devolutiva" class="plano-venda-box" onclick="ckSelecionarPlanoVenda('pf_devolutiva')">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="font-size:22px;">🦋</span>
-              <div style="flex:1;">
-                <div style="font-weight:700;color:#1a0a2e;font-size:13.5px;">Teste + Devolutiva de 1h</div>
-                <div style="font-size:11.5px;color:#666;margin-top:1px;">Acesso ao teste + Laudo PDF + <b>Devolutiva online (1h) com a psicóloga</b> para estruturar seu Plano de Ação.</div>
-              </div>
-              <div style="text-align:right;min-width:75px;">
-                <div id="ckValorPFDevolutiva" style="font-size:18px;font-weight:800;color:#7B00C4;">R$ 597</div>
-                <div style="font-size:9px;color:#2e7d32;font-weight:600;">Recomendado</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PJ - PACOTE EMPRESA COM ESCALA PROGRESSIVA -->
-          <div id="ckOpcaoPJ_Corporativo" class="plano-venda-box" onclick="ckSelecionarPlanoVenda('pj_corp')">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="font-size:22px;">🏢</span>
-              <div style="flex:1;">
-                <div style="font-weight:700;color:#1a0a2e;font-size:13.5px;">Pacote Empresa / RH</div>
-                <div style="font-size:11.5px;color:#666;margin-top:1px;">Múltiplos acessos com <b>desconto progressivo por volume</b> para equipes.</div>
-              </div>
-              <div style="text-align:right;min-width:75px;">
-                <div id="ckPrecoUnitarioPJ" style="font-size:15px;font-weight:700;color:#7B00C4;">R$ 247/lic.</div>
-                <div style="font-size:9px;color:#aaa;">Mín. 5 testes</div>
-              </div>
-            </div>
-            
-            <!-- Campo de quantidade dinâmico corporativo -->
-            <div id="ckQtdPJRow" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #eee;">
-              <label style="font-size:11px;color:#555;display:block;margin-bottom:4px;text-transform:uppercase;font-weight:500;">Quantidade de Licenças:</label>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <input type="number" id="ckQtdPJ" value="5" min="5"
-                  style="width:75px;padding:6px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-weight:700;text-align:center;"
-                  oninput="ckAtualizarPrecoCorporativo()"/>
-                <div style="font-size:12px;color:#666;flex:1;">
-                  <span id="ckFaixaDesconto" style="font-weight:600;color:#1a9460;">(Preço Base)</span><br>
-                  <span id="ckCalculoUnitario" style="font-size:11px;color:#888;">5 × R$ 247 =</span>
-                </div>
-                <span id="ckTotalPJ" style="font-size:18px;font-weight:800;color:#7B00C4;">R$ 1.235</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Dados do comprador -->
-        <div id="ckDadosComprador" style="display:none;">
-          <div style="height:1px;background:#eee;margin-bottom:16px;"></div>
-          <div style="font-size:12px;font-weight:700;color:#3d0a5e;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Seus dados de faturamento:</div>
-          <input type="text"  id="ckNome"     placeholder="Nome completo *"
-            style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;outline:none;"/>
-          <input type="email" id="ckEmail"    placeholder="E-mail *"
-            style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;outline:none;"/>
-          <input type="tel"   id="ckWhatsapp" placeholder="WhatsApp (com DDD) *"
-            style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:10px;outline:none;"/>
-          <input type="text"  id="ckDoc"      placeholder="CPF / CNPJ *"
-            style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;margin-bottom:16px;outline:none;"/>
-          <button style="width:100%;padding:14px;font-size:15px;background:#7B00C4;color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:700;box-shadow:0 4px 12px rgba(123,0,196,0.25);"
-            onclick="ckIrParaPix()">⚡ Ver QR Code Pix para Pagar</button>
-        </div>
-      </div>
-
-      <!-- Etapa 2: QR Code Pix -->
-      <div id="ckEtapa2" style="display:none;">
-        <div style="text-align:center;margin-bottom:16px;">
-          <div style="font-size:14px;font-weight:700;color:#3d0a5e;" id="ckResumoCompra"></div>
-        </div>
-        <div style="background:#f0fff4;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;">
-          <div style="font-size:12px;color:#2e7d32;font-weight:600;margin-bottom:12px;">⚡ Chave Pix Gerada</div>
-          <div id="ckQrCode" style="margin:0 auto 14px;"></div>
-          <div style="font-size:11px;color:#555;margin-bottom:6px;">ou copie a chave Pix (E-mail):</div>
-          <div style="display:flex;gap:6px;">
-            <input id="ckChavePix" readonly style="flex:1;font-size:12px;padding:8px;border:1px solid #ccc;border-radius:6px;background:#fff;font-family:monospace;color:#333;"/>
-            <button onclick="navigator.clipboard.writeText(document.getElementById('ckChavePix').value);document.getElementById('ckCopiado').style.display='block';setTimeout(()=>document.getElementById('ckCopiado').style.display='none',2000);"
-              style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;">📋</button>
-          </div>
-          <div id="ckCopiado" style="display:none;font-size:11px;color:#2e7d32;margin-top:4px;">✅ Copiado!</div>
-          <div style="font-size:11px;color:#e65100;margin-top:10px;font-weight:600;" id="ckValorDestaque"></div>
-        </div>
-        <div style="background:#fff8e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#5d4037;line-height:1.6;">
-          <strong>Como funciona a liberação:</strong><br>
-          1. Efetue o Pix no valor exato informado acima.<br>
-          2. Clique em "Já Paguei" — o sistema valida e libera seu acesso na mesma hora.
-        </div>
-        <button style="width:100%;padding:14px;font-size:15px;font-weight:700;background:#7B00C4;color:#fff;border:none;border-radius:12px;cursor:pointer;"
-          onclick="ckConfirmarPagamento()">✅ Já Paguei — Iniciar Agora!</button>
-        <button onclick="document.getElementById('ckEtapa2').style.display='none';document.getElementById('ckEtapa1').style.display='';"
-          style="width:100%;margin-top:8px;padding:10px;border:none;background:none;color:#888;cursor:pointer;font-size:13px;">← Voltar e mudar plano</button>
-        <div id="ckStatus" style="text-align:center;margin-top:12px;font-size:13px;min-height:20px;"></div>
-      </div>
-
-      <!-- Etapa 3: Sucesso PJ -->
-      <div id="ckEtapa3PJ" style="display:none;text-align:center;">
-        <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-        <div style="font-size:18px;font-weight:700;color:#2e7d32;margin-bottom:8px;">Acesso liberado!</div>
-        <div style="font-size:13px;color:#555;margin-bottom:20px;">Seus códigos de acesso gerados:</div>
-        <div id="ckCodigosGerados" style="background:#f0eaf7;border-radius:12px;padding:16px;text-align:left;margin-bottom:16px;font-family:monospace;font-size:13px;line-height:2;color:#3d0a5e;max-height:200px;overflow-y:auto;"></div>
-        <button style="width:100%;margin-bottom:10px;padding:13px;background:#7B00C4;color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:700;"
-          onclick="ckCopiarCodigosWhatsApp()">📲 Copiar para WhatsApp</button>
-        <div style="font-size:12px;color:#888;">Uma cópia completa foi associada ao e-mail informado.</div>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-<!-- /CHECKOUT PÚBLICO -->
-
-<div id="appShell">
-  <div class="overlay-mobile" id="overlayMobile" onclick="closeSidebar()"></div>
-  <div class="app-layout">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
-        <div class="s-number">9&amp;Self</div>
-        <div class="s-name">SELF</div>
-      </div>
-      <div class="sidebar-profile">
-        <div class="sp-role" id="sideRole">—</div>
-        <div class="sp-name" id="sideName">—</div>
-      </div>
-      <nav class="sidebar-nav" id="sideNav"></nav>
-      <div class="sidebar-footer">
-        <button class="logout-btn" onclick="doLogout()">↩ Sair</button>
-      </div>
-    </aside>
-
-    <!-- MAIN -->
-    <div class="main">
-      <div class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button class="hamburger" onclick="toggleSidebar()">☰</button>
-          <span class="topbar-title" id="topbarTitle">Painel</span>
-        </div>
-        <div class="topbar-actions">
-          <span class="badge" id="topbarBadge">Admin</span>
-        </div>
-      </div>
-
-      <!-- ── PÁGINAS ADMIN ── -->
-      <div class="page active" id="page-dashboard">
-        <div style="padding:28px;">
-          <div class="page-title">Painel Geral</div>
-          <div class="page-subtitle">Visão consolidada do sistema 9&amp;Self</div>
-          <div class="cards-grid" id="dashCards"></div>
-          <div class="table-card">
-            <div class="table-header">
-              <h3>Últimas Avaliações</h3>
-              <button class="btn btn-outline btn-sm">Ver todas</button>
-            </div>
-            <div class="table-card-wrapper">
-              <table>
-                <thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Status</th></tr></thead>
-                <tbody id="dashTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação ainda</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ PAGE FINANCEIRO ══ -->
-      <div class="page" id="page-financeiro">
-        <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-            <div>
-              <div class="page-title">Gestão Financeira</div>
-              <div class="page-subtitle">Receita do 9&Self, vendas e fechamento mensal</div>
-            </div>
-            <button class="btn btn-primary" onclick="openModal('modalNovaVenda')">＋ Lançar Venda</button>
-          </div>
-
-          <div class="cards-grid" id="finCards"></div>
-
-          <!-- Fechamento do mês -->
-          <div class="table-card" style="margin-bottom:20px;">
-            <div class="table-header">
-              <h3>📤 Fechamento Mensal</h3>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <select id="finMesSelect" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;"></select>
-                <button class="btn btn-primary btn-sm" onclick="enviarReceitaClinica()">📨 Enviar Receita p/ Clínica</button>
-              </div>
-            </div>
-            <div style="padding:20px 24px;">
-              <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">
-                Envia a receita líquida fechada do mês selecionado para o sistema da Clínica (coleção <code>clinica_receitas_externas</code>), aparecendo no Painel Fiscal.
-              </p>
-              <div id="finResumoMes" style="background:var(--light);border-radius:10px;padding:16px;font-size:14px;"></div>
-            </div>
-          </div>
-
-          <!-- Histórico de vendas -->
-          <div class="table-card">
-            <div class="table-header"><h3>Histórico de Vendas</h3></div>
-            <div class="table-card-wrapper">
-              <table>
-                <thead><tr><th>Data</th><th>Cliente</th><th>Plano</th><th>Qtd</th><th>Valor</th><th>Status</th><th></th></tr></thead>
-                <tbody id="vendasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma venda registrada</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page" id="page-empresas">
-        <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-            <div>
-              <div class="page-title">Empresas / RH</div>
-              <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
-            </div>
-            <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
-          </div>
-          <div class="table-card">
-            <div class="table-card-wrapper">
-              <table>
-                <thead><tr><th>Empresa</th><th>Responsável</th><th>E-mail</th><th>Créditos</th><th>Laudos Gerados</th><th>Status</th><th></th></tr></thead>
-                <tbody id="empresasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page" id="page-codigos">
-        <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-            <div>
-              <div class="page-title">Códigos de Acesso</div>
-              <div class="page-subtitle">Gere e gerencie códigos únicos por pessoa</div>
-            </div>
-            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
-          </div>
-          <div class="table-card">
-            <div class="table-card-wrapper">
-              <table>
-                <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
-                <tbody id="codigosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page" id="page-laudos">
-        <div style="padding:28px;">
-          <div class="page-title">Laudos Gerados</div>
-          <div class="page-subtitle">Histórico de todos os laudos do sistema</div>
-          <div class="table-card" style="margin-top:16px;">
-            <div class="table-card-wrapper">
-              <table>
-                <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
-                <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── PÁGINAS RH ── -->
-      <div class="page" id="page-rh-dashboard">
-        <div style="padding:28px;">
-          <div class="page-title" id="rhDashTitle">Painel RH</div>
-          <div class="page-subtitle">Gerencie seus colaboradores e créditos</div>
-          <div class="cards-grid" id="rhCards"></div>
-          <div class="table-card">
-            <div class="table-header">
-              <h3>Colaboradores</h3>
-              <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
-            </div>
-            <div class="table-card-wrapper">
-              <table>
-                <thead><tr><th>Nome</th><th>Código</th><th>Tipo</th><th>Status</th><th>Laudo</th></tr></thead>
-                <tbody id="rhColabTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum colaborador ainda</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── PÁGINAS COLABORADOR ── -->
-      <div class="page" id="page-colab-inicio" style="display:none;"></div>
-
-      <div class="page" id="page-colab-teste">
-        <div style="padding:28px;">
-          <div class="page-title">Avaliação de Personalidade</div>
-          <div class="page-subtitle" id="testeSubtitle">Módulo 1 de 3 — Identificação do Tipo</div>
-          <div class="test-container">
-            <div class="test-progress"><div class="test-progress-bar" id="progressBar" style="width:0%"></div></div>
-            <div id="testeContent"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="page" id="page-colab-resultado">
-        <div style="padding:28px;max-width:720px;margin:0 auto;text-align:center;">
-          <div style="font-size:64px;margin-bottom:16px;">🎉</div>
-          <div class="page-title">Avaliação Concluída!</div>
-          <p style="color:var(--gray);margin-bottom:28px;">Seu laudo personalizado está pronto para download.</p>
-          <div style="background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border);text-align:left;margin-bottom:20px;">
-            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-              <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--mag));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;" id="resultTipoCircle">—</div>
-              <div>
-                <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;">Seu Tipo</div>
-                <div style="font-size:18px;font-weight:600;" id="resultTipoNome">—</div>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div style="background:var(--light);border-radius:10px;padding:12px;">
-                <div style="font-size:11px;color:var(--gray);">Asa Dominante</div>
-                <div style="font-size:15px;font-weight:600;" id="resultAsa">—</div>
-              </div>
-              <div style="background:var(--light);border-radius:10px;padding:12px;">
-                <div style="font-size:11px;color:var(--gray);">Subtipo (Dom · Int · Rem)</div>
-                <div style="font-size:13px;font-weight:600;" id="resultSubtipo">—</div>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
-            <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;width:100%;max-width:320px;" onclick="baixarLaudo()">
-              ⬇ Baixar Laudo PDF
-            </button>
-            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
-              🔄 Gerar / Regenerar Laudo
-            </button>
-          </div>
-          <div id="pdfStatus" style="margin-top:10px;font-size:13px;color:var(--gray);min-height:20px;text-align:center;"></div>
-
-          <!-- Botão de nova compra -->
-          <div style="margin-top:20px;padding:18px 20px;background:linear-gradient(135deg,rgba(123,0,196,.08),rgba(155,37,137,.06));
-                      border:1px solid rgba(123,0,196,.2);border-radius:14px;text-align:center;">
-            <p style="font-size:12px;color:var(--gray);margin-bottom:10px;">
-              Quer presentear alguém ou fazer mais testes?
-            </p>
-            <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html"
-               target="_blank"
-               style="display:inline-flex;align-items:center;gap:8px;
-                      background:linear-gradient(135deg,#7B00C4,#9B2589);
-                      color:#fff;font-size:13px;font-weight:600;
-                      padding:11px 24px;border-radius:50px;
-                      text-decoration:none;
-                      box-shadow:0 4px 16px rgba(123,0,196,.35);">
-              🛒 Comprar mais acessos
-            </a>
-          </div>
-
-          <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #7B1D6B;border-radius:14px;padding:20px 22px;text-align:left;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:20px;">⚠️</span>
-              <strong style="color:#7B1D6B;font-size:13px;letter-spacing:.5px;text-transform:uppercase;">ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</strong>
-            </div>
-            <p style="color:#2C2C2C;font-size:13px;line-height:1.7;margin:0;">Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Se, após o seu processo de expansão, perceber que sua autopercepção changed, sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu processo e veja o laudo como um companheiro de caminhada.</p>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /main -->
-  </div><!-- /app-layout -->
-  <footer class="app-footer">
-    <img src="dra%20luciakratz%20transparente.png" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
-    <span>Desenvolvido por <strong>Dra. Lucia Kratz</strong> · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade 🦋</span>
-  </footer>
-</div>
-
-<!-- ══════════════════ MODAIS ══════════════════ -->
-
-<!-- Modal Nova Venda -->
-<div class="modal-overlay" id="modalNovaVenda">
-  <div class="modal">
-    <h3>＋ Lançar Venda Confirmada</h3>
-    <p style="font-size:12px;color:var(--gray);margin-bottom:16px;">
-      Registre aqui pagamentos confirmados no Mercado Pago. Os códigos de acesso são gerados automaticamente.
-    </p>
-    <div class="form-row">
-      <label>Plano</label>
-      <select id="vendaPlano" onchange="atualizarCamposVenda()">
-        <option value="pf_basico">Teste Individual — R$ 297</option>
-        <option value="pf_devolutiva">Laudo + Devolutiva — R$ 597</option>
-        <option value="pj">Pacote Empresa/RH (qtd. variável)</option>
-      </select>
-    </div>
-    <div class="form-row" id="vendaQtdRow" style="display:none;">
-      <label>Quantidade de licenças</label>
-      <input type="number" id="vendaQtd" min="5" value="5" oninput="atualizarValorPJ()"/>
-    </div>
-    <div class="form-row">
-      <label>Nome do Cliente</label>
-      <input type="text" id="vendaCliente" placeholder="Nome completo"/>
-    </div>
-    <div class="form-row">
-      <label>E-mail do Cliente</label>
-      <input type="email" id="vendaEmail" placeholder="cliente@email.com"/>
-    </div>
-    <div class="form-row">
-      <label>Valor (R$)</label>
-      <input type="number" id="vendaValor" step="0.01" value="297"/>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modalNovaVenda')">Cancelar</button>
-      <button class="btn btn-primary" onclick="lancarVenda()">Confirmar e Gerar Código</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Nova Empresa -->
-<div class="modal-overlay" id="modalNovaEmpresa">
-  <div class="modal">
-    <h3>Nova Empresa / RH</h3>
-    <div class="form-row">
-      <label>Nome da Empresa</label>
-      <input type="text" id="empNome" placeholder="Ex: Empresa Ltda"/>
-    </div>
-    <div class="form-row">
-      <label>Responsável RH</label>
-      <input type="text" id="empResponsavel" placeholder="Nome completo"/>
-    </div>
-    <div class="form-row">
-      <label>E-mail de acesso</label>
-      <input type="email" id="empEmail" placeholder="rh@empresa.com"/>
-    </div>
-    <div class="form-row">
-      <label>Senha de acesso</label>
-      <input type="password" id="empSenha" placeholder="Mínimo 6 caracteres"/>
-    </div>
-    <div class="form-row">
-      <label>Créditos iniciais</label>
-      <input type="number" id="empCreditos" placeholder="0" min="0"/>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modalNovaEmpresa')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarEmpresa()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Editar Código -->
-<div class="modal-overlay" id="modalEditarCodigo">
-  <div class="modal">
-    <h3>Editar e Reenviar Teste</h3>
-    <input type="hidden" id="editCodId"/>
-    <input type="hidden" id="editCodCodigo"/>
-    <div class="form-row">
-      <label>Nome do destinatário <span style="color:#B00">*</span></label>
-      <input type="text" id="editCodNome" placeholder="Nome completo"/>
-    </div>
-    <div class="form-row">
-      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
-      <input type="tel" id="editCodWhatsapp" placeholder="(11) 99999-9999"/>
-    </div>
-    <div class="form-row">
-      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
-      <input type="email" id="editCodEmail" placeholder="pessoa@email.com"/>
-    </div>
-    <div class="form-row">
-      <label>Empresa</label>
-      <select id="editCodEmpresa">
-        <option value="pf">— Pessoa Física (direto)</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label>Código do paciente</label>
-      <input type="text" id="editCodCodigoDisplay" readonly
-        style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
-    </div>
-    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
-      🔗 Link: <span id="editPreviewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modalEditarCodigo')">Cancelar</button>
-      <button class="btn btn-outline" onclick="salvarEdicaoCodigo()">💾 Salvar</button>
-      <button class="btn btn-primary" onclick="salvarEdicaoEnviarWhatsApp()">💬 Salvar e Enviar WhatsApp</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Novo Código -->
-<div class="modal-overlay" id="modalNovoCodigo">
-  <div class="modal">
-    <h3>Liberar Novo Teste</h3>
-    <div class="form-row">
-      <label>Nome do destinatário <span style="color:#B00">*</span></label>
-      <input type="text" id="codNome" placeholder="Nome completo"/>
-    </div>
-    <div class="form-row">
-      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
-      <input type="tel" id="codWhatsapp" placeholder="(11) 99999-9999"/>
-    </div>
-    <div class="form-row">
-      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
-      <input type="email" id="codEmail" placeholder="pessoa@email.com"/>
-    </div>
-    <div class="form-row" id="codEmpresaRow">
-      <label>Empresa</label>
-      <select id="codEmpresa">
-        <option value="pf">— Pessoa Física (direto)</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label>Cargo / Função</label>
-      <input type="text" id="codCargo" placeholder="Ex: Diretor, Analista, Gerente..."/>
-    </div>
-    <div class="form-row">
-      <label>Código gerado</label>
-      <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
-    </div>
-    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
-      🔗 Link: <span id="previewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="gerarCodigoPreview()">🔄 Novo Código</button>
-      <button class="btn btn-outline" onclick="closeModal('modalNovoCodigo')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarCodigo()">Liberar e Enviar WhatsApp</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div id="toast"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
-<!-- ══ GERADOR PDF ══ -->
-<script>
-const _RAW = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/functions/banco_dados_final';
-
-async function _carregarTxt(tipo) {
-  try {
-    const r = await fetch(`${_RAW}/tipo_${tipo}.txt`);
-    if (r.ok) return (await r.text()).replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-  } catch(_) {}
-  return '';
-}
-
-function _parsearSecoes(txt) {
-  const sec = {};
-  const partes = txt.split(/^=== (\w+) ===[ \t]*$/m);
-  for (let i=1; i<partes.length-1; i+=2)
-    sec[partes[i].trim()] = partes[i+1] ? partes[i+1].trim() : '';
-  return sec;
-}
-
-function _splitPipes(txt) {
-  if (!txt) return [];
-  if (txt.includes('|')) return txt.split('|').map(s=>s.trim()).filter(Boolean);
-  const pts = txt.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
-  return pts.length > 1 ? pts : (txt.trim() ? [txt.trim()] : []);
-}
-
-function _normSub(v) {
-  if (!v) return 'AP';
-  const m = {ap:'AP',sp:'AP','1a1':'1A1',sx:'1A1',sex:'1A1','1 a 1':'1A1',soc:'SOC',so:'SOC',social:'SOC'};
-  return m[String(v).toLowerCase()] || String(v).toUpperCase();
-}
-
-function _capitalizar(s) {
-  return (s||'').split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
-}
-
-const _MAG   = '#7B04B4';
-const _TEAL  = '#403071';
-const _DARK  = '#2C2C2C';
-const _GMID  = '#666666';
-const _GLT   = '#F5F3F7';
-const _TBOX  = '#EFE6F9';
-const _MBOX  = '#F7EFF5';
-const _GLIN  = '#DDDDDD';
-const _FOOT  = '#7B1D6B';
-const _LAV   = '#D9C7F5';
-const _FABULA= '#F3EEFB';
-
-function _estilos() {
-  return {
-    body:    { font:'Roboto', fontSize:10.5, lineHeight:1.6, color:'#333333', alignment:'justify' },
-    secT:    { font:'Roboto', fontSize:14,   bold:true,  color:'#7B00C4', margin:[0,6,0,4] },
-    subT:    { font:'Roboto', fontSize:11,   bold:true,  color:'#403071', margin:[0,14,0,6] },
-    bul:     { font:'Roboto', fontSize:10.5, color:'#333333', margin:[12,0,0,4], alignment:'justify' },
-    hdr:     { font:'Roboto', fontSize:8,    color:'#888888', bold:false },
-    lvlG:    { font:'Roboto', fontSize:11,   bold:true,  color:'#7B00C4', margin:[0,10,0,4] },
-    lvlS:    { font:'Roboto', fontSize:10.5, bold:true,  color:'#403071', margin:[0,6,0,2] },
-    lvlB:    { font:'Roboto', fontSize:10.5, color:'#333333', margin:[10,0,0,6], alignment:'justify' },
-    fable:   { font:'Roboto', fontSize:10.5, italics:true, color:'#333333', alignment:'justify', lineHeight:1.7 },
-    carimbo0:{ font:'Roboto', fontSize:12,   bold:true,  color:'#7B00C4', alignment:'center', margin:[0,0,0,4] },
-    carimbo1:{ font:'Roboto', fontSize:10,   bold:true,  color:'#7B00C4', alignment:'center', margin:[0,0,0,4] },
-    carimbo2:{ font:'Roboto', fontSize:9.5,  color:'#666666', alignment:'center', margin:[0,0,0,3] },
-  };
-}
-
-function _p(txt, style, margin) {
-  const o = { text: (txt||'').replace(/<[^>]+>/g,''), style: style||'body' };
-  if (margin) o.margin = margin;
-  return o;
-}
-
-function _bl(txt) {
-  return { text: '    •  ' + (txt||'').replace(/<[^>]+>/g,''), style:'bul', margin:[0,0,0,3] };
-}
-
-function _secLine() {
-  return { canvas:[{ type:'line', x1:0, y1:0, x2:515, y2:0, lineWidth:1.4, lineColor:_MAG }], margin:[0,2,0,6] };
-}
-
-function _secTitle(txt) {
-  return [ _p(txt,'secT'), _secLine() ];
-}
-
-function _subTitle(txt) {
-  return _p(txt,'subT');
-}
-
-function _paraMulti(txt) {
-  if (!txt) return [];
-  return txt.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean).map(s=>_p(s));
-}
-
-function _quoteBox(txt) {
-  const clean = (txt||'').replace(/^["\u201c]+/,'').replace(/["\u201d]+$/,'').trim();
-  return {
-    table:{ widths:['*'], body:[[ { text:clean, font:'Roboto', fontSize:10.5, italics:true, color:'#333333', alignment:'justify', lineHeight:1.7, margin:[16,14,16,14] } ]] },
-    layout:{ fillColor:()=>'#EFE6F9', hLineColor:()=>'#EFE6F9', vLineColor:(i)=>i===0?'#403071':'#EFE6F9', hLineWidth:()=>0, vLineWidth:(i)=>i===0?4:0, paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0 },
-    margin:[0,8,0,12]
-  };
-}
-
-function _infoBox(txt) {
-  const clean = (txt||'').replace(/<[^>]+>/g,'');
-  const partes = clean.split(/\n\n+/);
-  const titulo = partes[0].replace(/^[*_\u26a0]+\s*/,'').trim();
-  const corpo  = partes.slice(1).join(' ').trim();
-  const body_arr = [];
-  if (titulo) body_arr.push({ text:titulo, bold:true, color:'#7B00C4', fontSize:10.5, margin:[0,0,0,6] });
-  if (corpo)  body_arr.push({ text:corpo, font:'Roboto', fontSize:10.5, color:'#333333', alignment:'justify', lineHeight:1.6 });
-  return {
-    table:{ widths:['*'], body:[[ { stack:body_arr, margin:[16,14,16,14] } ]] },
-    layout:{ fillColor:()=>'#F7EFF5', hLineColor:()=>'#F7EFF5', vLineColor:(i)=>i===0?'#7B00C4':'#F7EFF5', hLineWidth:()=>0, vLineWidth:(i)=>i===0?4:0, paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0 },
-    margin:[0,8,0,12]
-  };
-}
-
-function _dualGrid(h1, h2, c1, c2, cor) {
-  cor = cor||_MAG;
-  const n = Math.max(c1.length, c2.length);
-  const rows = [[
-    { text:h1, bold:true, color:'white', alignment:'center', fillColor:cor, margin:[6,8,6,8] },
-    { text:h2, bold:true, color:'white', alignment:'center', fillColor:cor, margin:[6,8,6,8] },
-  ]];
-  for (let i=0; i<n; i++) {
-    const bg = i%2===0 ? _GLT : 'white';
-    rows.push([
-      { text:(c1[i]||''), fontSize:10, color:_DARK, fillColor:bg, margin:[8,8,8,8], alignment:'justify' },
-      { text:(c2[i]||''), fontSize:10, color:_DARK, fillColor:bg, margin:[8,8,8,8], alignment:'justify' },
-    ]);
+/**
+ * ════════════════════════════════════════════════════════════════════
+ * 9&SELF — CHECKOUT DINÂMICO VIA MERCADO PAGO
+ * ════════════════════════════════════════════════════════════════════
+ *
+ * Duas funções HTTP:
+ *
+ * 1) criarPreferenciaCheckout
+ *    Recebe { plano, qtd, comprador, email, whatsapp, doc }
+ *    Calcula o preço EXATO (incluindo faixas de desconto PJ)
+ *    Cria uma Preferência na API do Mercado Pago
+ *    Devolve { link } — a URL de checkout pronta com o valor certo
+ *
+ * 2) webhookMercadoPago
+ *    Recebe a notificação do Mercado Pago quando um pagamento é aprovado
+ *    Busca os detalhes do pagamento na API do MP
+ *    Gera os códigos de acesso no Firestore (coleção nself_codigos)
+ *    Atualiza o status da venda (coleção nself_vendas)
+ *    Envia e-mail com os códigos (se EmailJS/SMTP configurado — placeholder)
+ *
+ * ────────────────────────────────────────────────────────────────────
+ * VARIÁVEIS DE AMBIENTE NECESSÁRIAS (configurar com firebase functions:secrets:set)
+ *   MP_ACCESS_TOKEN   → seu Access Token de produção do Mercado Pago
+ * ────────────────────────────────────────────────────────────────────
+ */
+
+const { onRequest } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
+const admin = require("firebase-admin");
+const { MercadoPagoConfig, Preference, Payment } = require("mercadopago");
+
+admin.initializeApp();
+const db = admin.firestore();
+
+const MP_ACCESS_TOKEN = defineSecret("MP_ACCESS_TOKEN");
+
+// ── URL base do site (ajuste se o domínio mudar) ──
+const BASE_URL = "https://luciakratz-arch.github.io/9-Self";
+
+// ── Preços ──
+const PRECO_PF_BASICO = 297;
+const PRECO_PF_DEVOLUTIVA = 597;
+
+function precoPorFaixaPJ(qtd) {
+  if (qtd >= 31) return 147;
+  if (qtd >= 11) return 197;
+  return 247; // 5 a 10
+}
+
+function calcularValor(plano, qtd) {
+  if (plano === "pf_basico") return { valor: PRECO_PF_BASICO, qtdFinal: 1 };
+  if (plano === "pf_devolutiva") return { valor: PRECO_PF_DEVOLUTIVA, qtdFinal: 1 };
+  if (plano === "pj") {
+    const qtdFinal = Math.max(5, parseInt(qtd) || 5);
+    const precoUnit = precoPorFaixaPJ(qtdFinal);
+    return { valor: qtdFinal * precoUnit, qtdFinal, precoUnit };
   }
-  return {
-    table:{ widths:['*','*'], body:rows, dontBreakRows:false },
-    layout:{ hLineColor:()=>_GLIN, vLineColor:()=>_GLIN, hLineWidth:()=>0.5, vLineWidth:()=>0.5 },
-    margin:[0,4,0,10]
-  };
+  throw new Error("Plano inválido: " + plano);
 }
 
-function _fbBox(titulo, itens) {
-  const stack = [
-    { text: titulo, bold:true, color:_TEAL, fontSize:10.5, margin:[0,0,0,6] },
-    ...itens.map((it,i)=>({ text:'•  '+it, fontSize:10.5,
-        color: i===itens.length-1 ? _MAG : _DARK,
-        bold:  i===itens.length-1,
-        margin:[0,0,0,4] }))
-  ];
-  return {
-    table:{ widths:['*'], body:[[ { stack, margin:[12,10,12,10] } ]] },
-    layout:{ fillColor:()=>_TBOX, hLineColor:()=>_TEAL, vLineColor:(i)=>i===0?_TEAL:_TBOX,
-             hLineWidth:(i,n)=>i===0||i===n?0.5:0, vLineWidth:(i)=>i===0?4:0 },
-    margin:[0,6,0,10]
-  };
+function tituloPlano(plano, qtd) {
+  if (plano === "pf_basico") return "9&Self — Teste Individual (Laudo Automatizado)";
+  if (plano === "pf_devolutiva") return "9&Self — Laudo + Devolutiva (1h com psicóloga)";
+  if (plano === "pj") return `9&Self — Pacote Empresarial (${qtd} licenças)`;
+  return "9&Self";
 }
-
-function _fableBox(paras, autor) {
-  const stack = paras.map(p=>({ text:p, style:'fable', margin:[0,0,0,8] }));
-  if (autor) stack.push({ text: autor, fontSize:9.5, italics:true, color:_GMID, alignment:'right', margin:[0,4,0,0] });
-  return {
-    table:{ widths:['*'], body:[[ { stack, margin:[14,12,14,12] } ]] },
-    layout:{ fillColor:()=>_FABULA, hLineColor:()=>_MAG, vLineColor:()=>_MAG,
-             hLineWidth:(i,n)=>i===0||i===n?0.5:0, vLineWidth:()=>0.5 },
-    margin:[0,6,0,10]
-  };
-}
-
-function _nivel(titulo, texto) {
-  return { stack:[
-    { text: titulo, style:'lvlS' },
-    { text: texto,  style:'lvlB' },
-  ], margin:[0,0,0,6] };
-}
-
-async function _carregarFontesCormorant() {
-  const BASE = 'https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/functions/fonts';
-  try {
-    const [r1, r2] = await Promise.all([
-      fetch(`${BASE}/CormorantGaramond.ttf`),
-      fetch(`${BASE}/CormorantGaramond-Italic.ttf`),
-    ]);
-    if (!r1.ok || !r2.ok) return;
-    const [b1, b2] = await Promise.all([r1.arrayBuffer(), r2.arrayBuffer()]);
-    const toB64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
-    const n = toB64(b1), i = toB64(b2);
-    window.pdfMake.fonts = window.pdfMake.fonts || {};
-    window.pdfMake.fonts['CormorantGaramond'] = {
-      normal: `data:font/truetype;base64,${n}`,
-      bold: `data:font/truetype;base64,${n}`,
-      italics: `data:font/truetype;base64,${i}`,
-      bolditalics: `data:font/truetype;base64,${i}`,
-    };
-  } catch(e) { console.warn('Cormorant:', e); }
-}
-
-async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo}) {
-  await _carregarFontesCormorant();
-  const _NT = {1:'Perfeição e Excelência',2:'Prestativo e Relacional',3:'Performance e Imagem',
-               4:'Autêntico e Profundo',5:'Observador e Privacidade',6:'Precavido e Questionador',
-               7:'Visionário e Otimista',8:'Desafiador e Controlador',9:'Harmônico e Diplomático'};
-  const _NS = {AP:'Autopreservação','1A1':'1 a 1',SOC:'Social'};
-  const _NL = {AP:'Autopreservação','1A1':'Um a Um',SOC:'Social'};
-  const _ASAS = {1:[2,9],2:[1,3],3:[2,4],4:[3,5],5:[4,6],6:[5,7],7:[6,8],8:[7,9],9:[8,1]};
-
-  const sD=_normSub(subDom), sI=_normSub(subInt), sR=_normSub(subRem);
-  const asaInt = parseInt(asa)||0;
-  const asaFinal = _ASAS[tipo]?.includes(asaInt) ? asaInt : _ASAS[tipo][0];
-  const nomeTipo  = _NT[tipo]    || `Tipo ${tipo}`;
-  const nomeAsa   = _NT[asaFinal]|| `Tipo ${asaFinal}`;
-  const labelSub  = `${_NS[sD]} (${_NL[sI]} e ${_NL[sR]} reprimidos)`;
-  const nomeCapit = _capitalizar(nome||'Participante');
-  const cargoTxt  = cargo||'';
-  const mesAno    = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})
-                             .replace(/^./,c=>c.toUpperCase());
-
-  const txt = await _carregarTxt(tipo);
-  const S   = _parsearSecoes(txt);
-
-  const chaveSub = `SUBTIPO_${sD}_${sI}_${sR}`;
-  let textoSub = S[chaveSub]||'';
-  if (!textoSub) { const k=Object.keys(S).find(x=>x.startsWith('SUBTIPO_')); if(k) textoSub=S[k]; }
-  const textoAsa = S[`ASA_${asaFinal}`]||'';
-
-  function _footer(page, pages) {
-    return {
-      margin:[0,2,0,0],
-      table:{ widths:['*',25], body:[[
-        { text:'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF\nDESENVOLVIDO POR LÚ CIA KRATZ E RYUZA GONÇALVES',
-          font:'Roboto', fontSize:6.5, bold:true, color:'white',
-          alignment:'center', fillColor:'#7B1D6B', margin:[20,8,20,8] },
-        { text:page.toString(), font:'Roboto', fontSize:8, color:'white',
-          alignment:'right', fillColor:'#7B1D6B', margin:[0,8,8,8] },
-      ]]},
-      layout:{ hLineWidth:()=>0, vLineWidth:()=>0, paddingLeft:()=>0, paddingRight:()=>0, paddingTop:()=>0, paddingBottom:()=>0 },
-    };
-  }
-
-  function _header(page) {
-    if (page===1) return null;
-    return {
-      stack:[
-        { text: (cargoTxt&&cargoTxt!=='PF'&&cargoTxt!=='B2B') ? `| ${nomeCapit}  |  ${cargoTxt} |` : `| ${nomeCapit} |`, font:'Roboto', fontSize:8, color:'#888888', bold:false, margin:[40,12,40,0] },
-        { canvas:[{ type:'line', x1:40, y1:0, x2:555, y2:0, lineWidth:0.3, lineColor:'#DDDDDD' }], margin:[0,3,0,0] }
-      ]
-    };
-  }
-
-  const content = [];
-
-  content.push({
-    stack:[
-      { canvas:[
-          { type:'rect', x:-56, y:-64, w:708, h:300, color:'#1A0A2E' },
-          { type:'rect', x:-56, y:236, w:708, h:300, color:'#3D0A5E' },
-          { type:'rect', x:-56, y:536, w:708, h:307, color:'#7B1D6B' },
-        ]
-      },
-      { text:' ', fontSize:6, margin:[0,60,0,0] },
-      { table:{ widths:['*'], body:[[
-          { stack:[
-              { text:'9&Self', fontSize:46, color:'#A8E6F0', font:'CormorantGaramond', alignment:'center', margin:[0,20,0,4] },
-              { text:'SELF', fontSize:12, bold:true, color:'white', font:'Roboto', alignment:'center', characterSpacing:5, margin:[0,0,0,4] },
-              { text:'DESCUBRA SUA PERSONALIDADE', fontSize:8, color:'#C8D8E8', alignment:'center', characterSpacing:2, margin:[0,0,0,24] },
-              { text:nomeCapit, fontSize:16, color:'white', alignment:'center', margin:[0,0,0,6] },
-              (cargoTxt && cargoTxt!=='PF' && cargoTxt!=='B2B') ? { text:cargoTxt, fontSize:10, color:'#C8D8E8', alignment:'center', margin:[0,0,0,16] } : { text:' ', fontSize:4, margin:[0,0,0,16] },
-              { canvas:[{ type:'line', x1:30, y1:0, x2:330, y2:0, lineWidth:0.5, lineColor:'rgba(255,255,255,0.3)' }], margin:[0,0,0,16] },
-              { table:{ widths:['*'], body:[
-                  [{ text:`Eneatipo ${tipo}:   ${nomeTipo}`, fontSize:10, color:'white', alignment:'center', fillColor:'rgba(255,255,255,0.12)', margin:[10,8,10,8] }],
-                  [{ text:`Asa ${asaFinal}:   ${nomeAsa}`, fontSize:10, color:'white', alignment:'center', fillColor:'rgba(255,255,255,0.08)', margin:[10,8,10,8] }],
-                  [{ text:`Subtipo:   ${labelSub}`, fontSize:10, color:'white', alignment:'center', fillColor:'rgba(255,255,255,0.12)', margin:[10,8,10,8] }],
-                ]},
-                layout:{ hLineColor:()=>'rgba(255,255,255,0.15)', vLineColor:()=>'transparent', hLineWidth:()=>0.5, vLineWidth:()=>0 },
-                margin:[0,0,0,20]
-              },
-              { text:mesAno, fontSize:10, color:'#C8D8E8', alignment:'center', margin:[0,0,0,20] },
-            ],
-            fillColor:'rgba(255,255,255,0.08)', margin:[0,0,0,0],
-          }
-        ]]},
-        layout:{ hLineWidth:()=>0.5, vLineWidth:()=>0.5, hLineColor:()=>'rgba(255,255,255,0.2)', vLineColor:()=>'rgba(255,255,255,0.2)', paddingLeft:()=>20, paddingRight:()=>20, paddingTop:()=>0, paddingBottom:()=>0 },
-        margin:[40,0,40,0]
-      },
-    ],
-    pageBreak:'after',
-  });
-
-  content.push(..._secTitle('Introdução'));
-  content.push(_p('O <b>9&Self</b> é um instrumento de identificação de características pessoais e profissionais desenvolvido pelas especialistas <b>Dra. Lúcia Kratz</b> e <b>Ryuza Gonçalves</b>. O teste fundamenta-se nos traços de personalidade do Eneagrama — a partir dos estudos pioneiros de George Ivanovich Gurdjieff, Helen Palmer, David Daniels, Claudio Naranjo, Don Richards Riso e Russ Hudson —, aliados à teoria junguiana dos traços psicológicos e complementados pela Teoria das Necessidades Adquiridas de McClelland e pelo Coaching Executivo.'));
-  content.push(_p('Dentro desses estudos, identificam-se 9 tipos básicos de personalidade que se subdividem em 216 padrões diferentes de comportamento...'));
-  content.push(_p('O 9&Self está organizado da seguinte forma:', null, [0,0,0,4]));
-  ['Tipologia da Personalidade','Subtipo da Personalidade','Influência das Personalidades','Interação Social','Estilo de Trabalho','Ambiente de Trabalho','Estresse da Personalidade','Comunicação e Feedback','Tendências na Liderança','Motivação','Desenvolvimento e Evolução da Personalidade','Fábula'].forEach(it=>content.push(_bl(it)));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Tipologia da Personalidade'));
-  if (S['TIPOLOGIA']) {
-    S['TIPOLOGIA'].split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean).forEach(p2=>{
-      if (p2.startsWith('"')||p2.startsWith('\u201c')) content.push(_quoteBox(p2));
-      else content.push(_p(p2));
-    });
-  }
-  content.push(_infoBox('⚠ ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO\n\nNa filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Acolha o seu processo e veja o laudo como um companheiro de caminhada.'));
-  content.push(_subTitle('Padrão na Infância'));
-  content.push(..._paraMulti(S['PADRAO_INFANCIA']||''));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Pontos Fortes e Fracos da Personalidade'));
-  content.push(_dualGrid('✓  Pontos Fortes','✗  Pontos Fracos',_splitPipes(S['PONTOS_FORTES']||''),_splitPipes(S['PONTOS_FRACOS']||''),_MAG));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Subtipo da Personalidade'));
-  content.push(_subTitle(`Influência das Personalidades | ${nomeAsa} |`));
-  (textoAsa||'').split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach(l=>content.push(_p(l)));
-  content.push(_subTitle(`Interação Social | ${_NS[sD]} · ${_NL[sI]} · ${_NL[sR]} Reprimido |`));
-  content.push(..._paraMulti(textoSub||''));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Estilo de Trabalho'));
-  content.push(_subTitle('Ambiente de Trabalho:'));
-  content.push(..._paraMulti(S['AMBIENTE_TRABALHO']||''));
-  content.push(_subTitle('Estresse da Personalidade:'));
-  content.push(..._paraMulti(S['ESTRESSE']||''));
-  content.push(_subTitle('Comunicação:'));
-  content.push(..._paraMulti(S['COMUNICACAO']||''));
-
-  if(_splitPipes(S['FALA']||'').length) {
-    content.push(_dualGrid('Estilo ao Falar','Linguagem Corporal',_splitPipes(S['FALA']||''),_splitPipes(S['LINGUAGEM_CORPORAL']||''),_TEAL);
-  }
-  content.push(_subTitle('Feedback:'));
-  content.push(_dualGrid('Pontos Cegos','Filtros e Distorções',_splitPipes(S['PONTOS_CEGOS']||''),_splitPipes(S['FILTROS_DISTORCOES']||''),_TEAL);
-  if(_splitPipes(S['FEEDBACK_ITENS']||'').length) content.push(_fbBox('Diretrizes para o Feedback:',_splitPipes(S['FEEDBACK_ITENS']||'')));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Liderança e Motivação'));
-  content.push(_subTitle('Tendências na Liderança:'));
-  content.push(..._paraMulti(S['LIDERANCA']||''));
-  if(S['ASPECTOS_DESENVOLVER']) {
-    content.push(_subTitle('Principais Aspectos a Desenvolver:'));
-    _splitPipes(S['ASPECTOS_DESENVOLVER']).forEach(it=>content.push(_p(it)));
-  }
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Crie Hábitos Positivos para sua Personalidade'));
-  content.push(..._paraMulti(S['HABITOS']||''));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Níveis de Saúde da Personalidade'));
-  const niveisItens=_splitPipes(S['NIVEIS_SAUDE']||'');
-  niveisItens.forEach((item,idx)=>{
-    content.push(_nivel(`Nível ${idx+1}`,item));
-  });
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('O Despertar da Consciência: O Caminho do Autodesenvolvimento'));
-  content.push(..._paraMulti(S['DESENVOLVIMENTO']||''));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Fábula'));
-  content.push(_fableBox([S['FABULA']||''],'Autor Desconhecido'));
-
-  content.push({ text:'', pageBreak:'before' });
-  content.push(..._secTitle('Playlist da Personalidade'));
-  content.push(_p(S['PLAYLIST']||''));
-
-  content.push({ text:'', margin:[0,30,0,0] });
-  const _imgUrl='https://raw.githubusercontent.com/luciakratz-arch/9-Self/main/dra%20luciakratz%20transparente.png';
-  try {
-    const _imgResp=await fetch(_imgUrl);
-    if(_imgResp.ok){
-      const _blob=await _imgResp.blob();
-      const _b64=await new Promise(res=>{const rd=new FileReader();rd.onload=()=>res(rd.result);rd.readAsDataURL(_blob);});
-      content.push({ image:_b64, width:160, alignment:'center', margin:[0,0,0,8] });
-    }
-  } catch(_){}
-  content.push({ canvas:[{ type:'line', x1:158, y1:0, x2:397, y2:0, lineWidth:0.8, lineColor:_MAG }], margin:[0,0,0,8] });
-  content.push({ text:'Dra. Lucia Kratz',         style:'carimbo0' });
-  content.push({ text:'CRP 09/20590',              style:'carimbo1' });
-  content.push({ text:'Doutora em Psicologia',     style:'carimbo2' });
-
-  const docDef = { pageSize:'A4', pageMargins:[56,64,56,45], header: _header, footer: _footer, content: content, styles: _estilos() };
-  return new Promise(resolve=>{ window.pdfMake.createPdf(docDef).getBlob(blob=>resolve(blob)); });
-}
-</script>
-
-<!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDnrgaY8R0Zetkr18uHQJAZXIUa4EwDnv4",
-  authDomain: "entrevista-inicial.firebaseapp.com",
-  projectId: "entrevista-inicial",
-  storageBucket: "entrevista-inicial.firebasestorage.app",
-  messagingSenderId: "437375609844",
-  appId: "1:437375609844:web:36082771a32d262b2e27a1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-window._state = { profile: null, user: null, empresa: null, codigoAtivo: null };
-
-window.setLoginProfile = function(p) {
-  window._state.profile = p;
-  document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',['admin','rh','colaborador'][i]===p));
-  document.getElementById('loginAdmin').style.display = p==='admin'?'block':'none';
-  document.getElementById('loginRH').style.display = p==='rh'?'block':'none';
-  document.getElementById('loginColab').style.display = p==='colaborador'?'block':'none';
-  document.getElementById('loginError').textContent='';
-};
-
-window.doLogin = async function() {
-  const btn = document.getElementById('loginBtnEl');
-  btn.textContent='Entrando...';btn.disabled=true;
-  const err = document.getElementById('loginError');
-  err.textContent='';
-  const p = window._state.profile || 'admin';
-  try {
-    if(p==='admin') {
-      const pass = document.getElementById('adminPass').value;
-      if(pass==='1234') { enterApp('admin','Lucia Kratz','Administradora'); }
-      else { err.textContent='Senha incorreta.'; }
-    } else if(p==='rh') {
-      const email = document.getElementById('rhEmail').value;
-      const pass  = document.getElementById('rhPass').value;
-      await signInWithEmailAndPassword(auth, email, pass);
-      const q = query(collection(db,'nself_empresas'), where('email','==',email));
-      const snap = await getDocs(q);
-      if(!snap.empty) {
-        const emp = snap.docs[0].data();
-        window._state.empresa = {id:snap.docs[0].id,...emp};
-        enterApp('rh', emp.responsavel, emp.nome);
-      } else { err.textContent='Empresa não encontrada.'; }
-    } else {
-      await validarCodigo();
-    }
-  } catch(e) { err.textContent = 'Erro de credenciais.'; }
-  btn.textContent='Entrar';btn.disabled=false;
-};
-
-function enterApp(profile, name, role) {
-  window._state.profile = profile;
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('appShell').style.display='block';
-  document.getElementById('sideRole').textContent = role;
-  document.getElementById('sideName').textContent = name;
-  const badge = document.getElementById('topbarBadge');
-  badge.textContent = role; badge.className = 'badge badge-'+profile;
-  buildSidebar(profile);
-  navigateTo(profile==='admin'?'dashboard':profile==='rh'?'rh-dashboard':'colab-inicio');
-  if(profile==='admin') loadDashboard();
-  if(profile==='rh') loadRHDashboard();
-}
-
-const NAVS = {
-  admin: [
-    {icon:'📊', label:'Painel', page:'dashboard'},
-    {icon:'💰', label:'Financeiro', page:'financeiro'},
-    {icon:'🏢', label:'Empresas / RH', page:'empresas'},
-    {icon:'🔑', label:'Códigos de Acesso', page:'codigos'},
-    {icon:'📄', label:'Laudos', page:'laudos'},
-  ],
-  rh: [
-    {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
-    {icon:'🔑', label:'Gerar Código', page:'codigos'},
-    {icon:'📄', label:'Laudos', page:'laudos'},
-  ],
-  colaborador: [
-    {icon:'🧠', label:'Minha Avaliação', page:'colab-teste'},
-    {icon:'📄', label:'Meu Laudo', page:'colab-resultado'},
-  ],
-};
-
-function buildSidebar(profile) {
-  const nav = document.getElementById('sideNav'); nav.innerHTML='';
-  (NAVS[profile]||[]).forEach(item=>{
-    const d = document.createElement('div'); d.className='nav-item'; d.dataset.page=item.page;
-    d.innerHTML=`<span class="nav-icon">${item.icon}</span><span>${item.label}</span>`;
-    d.onclick=()=>navigateTo(item.page); nav.appendChild(d);
-  });
-}
-
-const origNav = window.navigateTo;
-window.navigateTo = function(page) {
-  if(origNav) origNav(page);
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const el = document.getElementById('page-'+page);
-  if(el) el.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
-  if(page=='empresas') loadEmpresas();
-  if(page=='codigos') { loadCodigos(); gerarCodigoPreview(); }
-  if(page=='laudos') loadLaudos();
-  if(page=='financeiro') loadFinanceiro();
-  closeSidebar();
-};
-
-async function loadDashboard() {
-  const empSnap = await getDocs(collection(db,'nself_empresas'));
-  const codSnap = await getDocs(collection(db,'nself_codigos'));
-  const laudoSnap = await getDocs(collection(db,'nself_laudos'));
-  document.getElementById('dashCards').innerHTML=`
-    <div class="stat-card"><div class="sc-label">Empresas</div><div class="sc-value">${empSnap.size}</div><div class="sc-sub">cadastradas</div></div>
-    <div class="stat-card"><div class="sc-label">Códigos Gerados</div><div class="sc-value">${codSnap.size}</div><div class="sc-sub">emitidos</div></div>
-    <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${laudoSnap.size}</div><div class="sc-sub">gerados</div></div>
-  `;
-}
-
-// ── PÁGINA FINANCEIRA ──────────────────────────────────────────────
-window.atualizarCamposVenda = function() {
-  const plano = document.getElementById('vendaPlano').value;
-  const qtdRow = document.getElementById('vendaQtdRow');
-  const valorInput = document.getElementById('vendaValor');
-  if(plano === 'pj') {
-    qtdRow.style.display = '';
-    atualizarValorPJ();
-  } else {
-    qtdRow.style.display = 'none';
-    valorInput.value = plano === 'pf_basico' ? 297 : 597;
-  }
-};
-
-window.atualizarValorPJ = function() {
-  const qtd = parseInt(document.getElementById('vendaQtd').value) || 5;
-  let preco = 247;
-  if(qtd >= 31) preco = 147;
-  else if(qtd >= 11) preco = 197;
-  document.getElementById('vendaValor').value = (qtd * preco).toFixed(2);
-};
-
-window.lancarVenda = async function() {
-  const plano   = document.getElementById('vendaPlano').value;
-  const cliente = document.getElementById('vendaCliente').value.trim();
-  const email   = document.getElementById('vendaEmail').value.trim();
-  const valor   = parseFloat(document.getElementById('vendaValor').value) || 0;
-  const qtd     = plano === 'pj' ? (parseInt(document.getElementById('vendaQtd').value)||5) : 1;
-
-  if(!cliente || !email || !valor) { showToast('Preencha todos os campos'); return; }
-
-  try {
-    // 1. Registrar venda
-    const vendaRef = await addDoc(collection(db,'nself_vendas'), {
-      plano, comprador:cliente, compradorEmail:email,
-      qtd, valor, status:'pago',
-      origem:'lancamento_manual',
-      criadoEm: serverTimestamp(),
-    });
-
-    // 2. Gerar códigos automaticamente
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const codigos = [];
-    for(let i=0;i<qtd;i++){
-      let cod=''; for(let j=0;j<6;j++) cod+=chars[Math.floor(Math.random()*chars.length)];
-      await addDoc(collection(db,'nself_codigos'),{
-        codigo:cod, nomeDestinatario:cliente, email,
-        empresa: plano==='pj' ? 'PJ_COMPRA' : 'PF',
-        status:'disponivel', origem:'venda_manual_admin',
-        vendaId: vendaRef.id, criadoEm: serverTimestamp(),
-      });
-      codigos.push(cod);
-    }
-    await updateDoc(doc(db,'nself_vendas', vendaRef.id), { codigos });
-
-    showToast(`✅ Venda lançada! ${qtd} código(s) gerado(s).`);
-    closeModal('modalNovaVenda');
-    document.getElementById('vendaCliente').value='';
-    document.getElementById('vendaEmail').value='';
-    loadFinanceiro();
-  } catch(e) {
-    showToast('Erro: ' + e.message);
-  }
-};
-
-async function loadFinanceiro() {
-  const snap = await getDocs(collection(db,'nself_vendas'));
-  const vendas = snap.docs.map(d=>({id:d.id,...d.data()}))
-    .filter(v=>v.status==='pago')
-    .sort((a,b)=>(b.criadoEm?.toDate?.()?.getTime()||0)-(a.criadoEm?.toDate?.()?.getTime()||0));
-
-  // ── Cards ──
-  const now = new Date();
-  const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const vendasMes = vendas.filter(v => {
-    const d = v.criadoEm?.toDate?.();
-    if(!d) return false;
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` === mesAtual;
-  });
-  const receitaMes = vendasMes.reduce((s,v)=>s+(v.valor||0),0);
-  const receitaTotal = vendas.reduce((s,v)=>s+(v.valor||0),0);
-  const ticketMedio = vendas.length ? receitaTotal/vendas.length : 0;
-
-  document.getElementById('finCards').innerHTML = `
-    <div class="stat-card"><div class="sc-label">Receita do Mês</div><div class="sc-value">R$ ${receitaMes.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="sc-sub">${vendasMes.length} venda(s)</div></div>
-    <div class="stat-card"><div class="sc-label">Receita Total</div><div class="sc-value">R$ ${receitaTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="sc-sub">acumulado</div></div>
-    <div class="stat-card"><div class="sc-label">Ticket Médio</div><div class="sc-value">R$ ${ticketMedio.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="sc-sub">por venda</div></div>
-    <div class="stat-card"><div class="sc-label">Total de Vendas</div><div class="sc-value">${vendas.length}</div><div class="sc-sub">confirmadas</div></div>
-  `;
-
-  // ── Select de meses ──
-  const mesesSet = new Set();
-  vendas.forEach(v=>{
-    const d = v.criadoEm?.toDate?.();
-    if(d) mesesSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
-  });
-  const meses = Array.from(mesesSet).sort().reverse();
-  const sel = document.getElementById('finMesSelect');
-  sel.innerHTML = meses.map(m=>{
-    const [y,mo] = m.split('-');
-    const nomesMes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    return `<option value="${m}">${nomesMes[parseInt(mo)-1]}/${y}</option>`;
-  }).join('') || `<option value="${mesAtual}">Mês atual</option>`;
-  sel.onchange = () => _atualizarResumoMes(vendas);
-  _atualizarResumoMes(vendas);
-
-  // ── Tabela ──
-  const tbody = document.getElementById('vendasTable');
-  if(!vendas.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma venda registrada</td></tr>';
-    return;
-  }
-  tbody.innerHTML = vendas.map(v=>{
-    const data = v.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—';
-    const planoLabel = {pf_basico:'Individual',pf_devolutiva:'Devolutiva',pj:'Empresa/RH'}[v.plano]||v.plano||'—';
-    return `<tr>
-      <td>${data}</td>
-      <td>${v.comprador||'—'}</td>
-      <td>${planoLabel}</td>
-      <td>${v.qtd||1}</td>
-      <td>R$ ${(v.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
-      <td><span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:#2e7d32;">✔ Pago</span></td>
-      <td></td>
-    </tr>`;
-  }).join('');
-}
-
-function _atualizarResumoMes(vendas) {
-  const sel = document.getElementById('finMesSelect');
-  const mesEscolhido = sel.value;
-  if(!mesEscolhido) { document.getElementById('finResumoMes').innerHTML = 'Nenhuma venda registrada ainda.'; return; }
-  const filtradas = vendas.filter(v=>{
-    const d = v.criadoEm?.toDate?.();
-    if(!d) return false;
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` === mesEscolhido;
-  });
-  const total = filtradas.reduce((s,v)=>s+(v.valor||0),0);
-  const [y,mo] = mesEscolhido.split('-');
-  const nomesMes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('finResumoMes').innerHTML = `
-    <strong>${nomesMes[parseInt(mo)-1]} de ${y}:</strong>
-    ${filtradas.length} venda(s) · Receita: <strong style="color:var(--purple);">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong>
-  `;
-}
-
-window.enviarReceitaClinica = async function() {
-  const sel = document.getElementById('finMesSelect');
-  const mesEscolhido = sel.value;
-  if(!mesEscolhido) { showToast('Nenhum mês disponível'); return; }
-
-  try {
-    const snap = await getDocs(collection(db,'nself_vendas'));
-    const vendas = snap.docs.map(d=>d.data()).filter(v=>{
-      if(v.status!=='pago') return false;
-      const d = v.criadoEm?.toDate?.();
-      if(!d) return false;
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` === mesEscolhido;
-    });
-    const receitaLiquida = vendas.reduce((s,v)=>s+(v.valor||0),0);
-    const [y,mo] = mesEscolhido.split('-');
-
-    // Salva na coleção que a Clínica pode ler (mesmo projeto Firebase: entrevista-inicial)
-    await addDoc(collection(db,'clinica_receitas_externas'), {
-      origem: '9&Self',
-      mesReferencia: mesEscolhido,
-      ano: parseInt(y), mes: parseInt(mo),
-      receitaLiquida,
-      qtdVendas: vendas.length,
-      enviadoEm: serverTimestamp(),
-    });
-
-    showToast('📨 Receita enviada para o Painel Fiscal da Clínica!');
-  } catch(e) {
-    showToast('Erro ao enviar: ' + e.message);
-  }
-};
-
-window.salvarEmpresa = async function() {
-  const nome        = document.getElementById('empNome').value.trim();
-  const responsavel = document.getElementById('empResponsavel').value.trim();
-  const email       = document.getElementById('empEmail').value.trim();
-  const senha       = document.getElementById('empSenha').value;
-  const creditos    = parseInt(document.getElementById('empCreditos').value) || 0;
-
-  if(!nome || !responsavel || !email || !senha) {
-    showToast('Preencha todos os campos obrigatórios'); return;
-  }
-  if(senha.length < 6) {
-    showToast('A senha precisa ter no mínimo 6 caracteres'); return;
-  }
-
-  try {
-    // 1. Criar usuário no Firebase Auth para o RH conseguir logar
-    await createUserWithEmailAndPassword(auth, email, senha);
-
-    // 2. Salvar dados da empresa no Firestore
-    await addDoc(collection(db,'nself_empresas'), {
-      nome, responsavel, email,
-      creditos, status:'ativo',
-      criadoEm: serverTimestamp(),
-    });
-
-    showToast('✅ Empresa cadastrada com sucesso!');
-    closeModal('modalNovaEmpresa');
-    // Limpar campos
-    document.getElementById('empNome').value='';
-    document.getElementById('empResponsavel').value='';
-    document.getElementById('empEmail').value='';
-    document.getElementById('empSenha').value='';
-    document.getElementById('empCreditos').value='';
-    loadEmpresas();
-
-  } catch(e) {
-    if(e.code === 'auth/email-already-in-use') {
-      showToast('Este e-mail já está em uso. Use outro e-mail.');
-    } else {
-      showToast('Erro ao salvar: ' + e.message);
-    }
-    console.error(e);
-  }
-};
-
-async function loadEmpresas() {
-  const tbody = document.getElementById('empresasTable');
-  const snap = await getDocs(collection(db,'nself_empresas'));
-  tbody.innerHTML = snap.docs.map(d=>{
-    const e=d.data();
-    return `<tr><td><strong>${e.nome}</strong></td><td>${e.responsavel}</td><td>${e.email}</td><td>${e.creditos||0}</td><td>${e.laudosGerados||0}</td><td>Ativo</td><td>—</td></tr>`;
-  }).join('');
-}
-
-async function loadCodigos() {
-  const tbody = document.getElementById('codigosTable');
-  const snap = await getDocs(collection(db,'nself_codigos'));
-  tbody.innerHTML = snap.docs.map(d=>{
-    const c=d.data();
-    return `<tr><td><strong>${c.codigo}</strong></td><td>${c.nomeDestinatario||'—'}</td><td>${c.empresa||'PF'}</td><td>Link</td><td>—</td><td>${c.status}</td><td>—</td></tr>`;
-  }).join('');
-}
-
-async function loadRHDashboard() {
-  const emp = window._state.empresa; if(!emp) return;
-  document.getElementById('rhCards').innerHTML=`<div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${emp.creditos||0}</div></div>`;
-}
-
-async function loadLaudos() {
-  const tbody = document.getElementById('laudosTable');
-  const snap = await getDocs(collection(db,'nself_laudos'));
-  tbody.innerHTML = snap.docs.map(d=>{
-    const l=d.data();
-    return `<tr><td>${l.nome}</td><td>${l.empresa||'PF'}</td><td>${l.tipo}</td><td>Asa</td><td>—</td><td>—</td><td><button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${d.id}')">PDF</button></td></tr>`;
-  }).join('');
-}
-
-window.gerarPdfLaudo = async function(id) {
-  alert('Gerando PDF via motor local...');
-};
-
-async function validarCodigo() {
-  const codigo = document.getElementById('colabCode').value.trim().toUpperCase();
-  const q = query(collection(db,'nself_codigos'), where('codigo','==',codigo));
-  const snap = await getDocs(q);
-  if(snap.empty){ alert('Código inválido'); return; }
-  const data = snap.docs[0].data();
-  window._state.codigoAtivo = {id:snap.docs[0].id,...data};
-  enterApp('colaborador', data.nomeDestinatario, 'Paciente/Colaborador');
-  navigateTo('colab-teste'); iniciarTeste();
-}
-
-// ─── MOTOR DO TESTE DE PERSONALIDADE ───
-const TABELA_TIPO = { 'AX':7,'AY':8,'AZ':3, 'BX':9,'BY':4,'BZ':5, 'CX':2,'CY':6,'CZ':1 };
-const PERGUNTAS_M1 = [
-  {tipo:1, texto:"Você costuma organizar seus espaços seguindo uma lógica própria de ordem e sequências precisas."},
-  {tipo:2, texto:"Você costuma assumir tarefas que as pessoas pedem mesmo quando sua própria agenda já está lotada."},
-  {tipo:3, texto:"Você se adapta ao ambiente mudando sua postura ou estilo para transmitir eficiência e competência."},
-  {tipo:4, texto:"Você busca profundidade nas relações e prefere roupas ou ambientes que expressem sua identidade singular."},
-  {tipo:5, texto:"Você valoriza profundamente sua privacidade e precisa de isolamento para recarregar as energias."},
-  {tipo:6, texto:"Você revisa cenários e antecipa riscos para garantir segurança e previsibilidade antes de decidir."},
-  {tipo:7, texto:"Você busca novidades e múltiplos projetos simultâneos para manter o dia estimulante e dinâmico."},
-  {tipo:8, texto:"Você se posiciona de forma direta e firme, encarando confrontos com naturalidade se necessário."},
-  {tipo:9, texto:"Você prefere a harmonia mútua e se adapta facilmente à vontade do grupo para evitar atritos."}
-];
-
-const ASAS_PERGUNTAS = {
-  1:{ asaA:9, asaB:2, perguntas:[{a:"Mais calmo e flexível com erros.", b:"Mais relacional e voltado a ajudar."}]},
-  2:{ asaA:1, asaB:3, perguntas:[{a:"Mais metódico e ligado a regras.", b:"Mais focado em metas e sucesso."}]},
-  3:{ asaA:2, asaB:4, perguntas:[{a:"Mais focado no grupo.", b:"Mais voltado à expressão autêntica."}]},
-  4:{ asaA:3, asaB:5, perguntas:[{a:"Mais focado em resultados rápidos.", b:"Mais isolado e analítico."}]},
-  5:{ asaA:4, asaB:6, perguntas:[{a:"Mais criativo e subjetivo.", b:"Mais cauteloso e preventivo."}]},
-  6:{ asaA:5, asaB:7, perguntas:[{a:"Mais focado em dados brutos.", b:"Mais otimista e ativo."}]},
-  7:{ asaA:6, asaB:8, perguntas:[{a:"Mais ponderado com riscos.", b:"Mais assertivo e dominante."}]},
-  8:{ asaA:7, asaB:9, perguntas:[{a:"Mais cheio de ideias novas.", b:"Mais diplomático e mediador."}]},
-  9:{ asaA:8, asaB:1, perguntas:[{a:"Mais firme e confrontador.", b:"Mais metódico e perfeccionista."}]}
-};
-
-const SUBTIPOS_TEXTOS = {
-  1: { sex:"Intenso nas relações.", ap:"Perfeccionista na rotina caseira.", soc:"Exigente com regras do grupo." },
-  2: { sex:"Shedutor nas conexões.", ap:"Esquece de si para agradar o outro.", soc:"Busca destaque social amplo." },
-  3: { sex:"Focado no apoio ao par.", ap:"Valoriza rituais exclusivos.", soc:"Busca status, cargos e conquistas." },
-  4: { sex:"Competitivo e passional.", ap:"Materialista, foca em conforto.", soc:"Sensível, artístico e incompreendido." },
-  5: { sex:"Busca intimidade com receio.", ap:"Isolamento extremo e refúgio.", soc:"Mestre intelectual do saber." },
-  6: { sex:"Enfrenta o medo com força.", ap:"Busca alianças protetoras.", soc:"Apegado a regras e deveres." },
-  7: { sex:"Fascinador com ideias.", ap:"Focado em segurança material.", soc:"Idealista em causas nobres." },
-  8: { sex:"Dominante e carismático.", ap:"Zelo extremo por suas posses.", soc:"Pacto inabalável de lealdade." },
-  9: { sex:"Fusão total com o parceiro.", ap:"Rotinas simples para paz.", soc:"Abnegado pelo bem do grupo." }
-};
-
-window.iniciarTeste = function() {
-  window.TS = { etapa:'grupos', tipoFinal:null, asaDom:null, subDom:null, subInt:null, subRem:null };
-  renderGrupos();
-};
-
-function renderGrupos() {
-  document.getElementById('testeContent').innerHTML = `
-    <div class="question-card">
-      <div class="q-text">Módulo Inicial: Mova os controles para definir o quanto você se identifica com as posturas:</div>
-      <br>
-      <label>Postura A (Assertivo/Independente)</label>
-      <input type="range" id="sl_A" value="50" min="0" max="100" class="pct-slider"/><br><br>
-      <label>Postura B (Reservado/Tranquilo)</label>
-      <input type="range" id="sl_B" value="50" min="0" max="100" class="pct-slider"/><br><br>
-      <label>Postura C (Responsável/Dedicado)</label>
-      <input type="range" id="sl_C" value="50" min="0" max="100" class="pct-slider"/><br><br>
-      <hr><br>
-      <label>Reação X (Otimista/Positivo)</label>
-      <input type="range" id="sl_X" value="50" min="0" max="100" class="pct-slider"/><br><br>
-      <label>Reação Y (Emocional/Direto)</label>
-      <input type="range" id="sl_Y" value="50" min="0" max="100" class="pct-slider"/><br><br>
-      <label>Reação Z (Racional/Lógico)</label>
-      <input type="range" id="sl_Z" value="50" min="0" max="100" class="pct-slider"/><br><br>
-      <button class="btn btn-primary" onclick="calcularFiltroTipos()">Avançar Avaliação</button>
-    </div>`;
-}
-
-window.calcularFiltroTipos = function() {
-  window.TS.tipoFinal = 4; // Tipo simulado padrão para avanço rápido
-  window.TS.etapa = 'asas';
-  renderAsas();
-};
-
-function renderAsas() {
-  const bloco = ASAS_PERGUNTAS[window.TS.tipoFinal];
-  document.getElementById('testeContent').innerHTML = `
-    <div class="question-card">
-      <div class="q-text">Módulo Asa: Escolha a característica mais presente em você:</div>
-      <br>
-      <button class="btn btn-outline" onclick="definirAsa('${bloco.asaA}')">Opção A: ${bloco.perguntas[0].a}</button>
-      <br><br>
-      <button class="btn btn-outline" onclick="definirAsa('${bloco.asaB}')">Opção B: ${bloco.perguntas[0].b}</button>
-    </div>`;
-}
-
-window.definirAsa = function(asa) {
-  window.TS.asaDom = asa;
-  window.TS.etapa = 'subtipos';
-  renderSubtipos();
-};
-
-function renderSubtipos() {
-  document.getElementById('testeContent').innerHTML = `
-    <div class="question-card">
-      <div class="q-text">Módulo Final: Defina seu subtipo dominante:</div>
-      <br>
-      <button class="btn btn-primary" onclick="definirSubtipo('sex','ap','soc')">1 a 1 (Sexual)</button>
-      <button class="btn btn-primary" onclick="definirSubtipo('ap','sex','soc')">Autopreservação</button>
-      <button class="btn btn-primary" onclick="definirSubtipo('soc','ap','sex')">Social</button>
-    </div>`;
-}
-
-window.definirSubtipo = function(d, i, r) {
-  window.TS.subDom = d; window.TS.subInt = i; window.TS.subRem = r;
-  salvarResultadoFinal();
-};
-
-async function salvarResultadoFinal() {
-  const cod = window._state.codigoAtivo;
-  if(cod) {
-    await updateDoc(doc(db,'nself_codigos',cod.id), {status:'usado'});
-    await addDoc(collection(db,'nself_laudos'), {
-      nome: cod.nomeDestinatario, empresa: cod.empresa||'PF', tipo: window.TS.tipoFinal,
-      asaDominante: window.TS.asaDom, subtipoDominante: window.TS.subDom, subtipoIntermediario: window.TS.subInt, subtipoRemissivo: window.TS.subRem, criadoEm: serverTimestamp()
-    });
-  }
-  document.getElementById('resultTipoCircle').textContent = window.TS.tipoFinal;
-  document.getElementById('resultTipoNome').textContent = "Perfil Identificado";
-  document.getElementById('resultAsa').textContent = `Asa Dominante: ${window.TS.asaDom}`;
-  document.getElementById('resultSubtipo').textContent = `Subtipo Dominante: ${window.TS.subDom}`;
-  navigateTo('colaborador-resultado');
-}
-
-window.gerarLaudoManual = function() { window.baixarLaudo(); };
-window.baixarLaudo = async function() { alert('Baixando laudo estruturado...'); };
-window.doLogout = function() { window.location.reload(); };
-window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
-window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
-window.showToast = function(m) { alert(m); };
-window.gerarCodigoPreview = function() {};
-window.salvarCodigo = function() {};
 
 // ════════════════════════════════════════════════════════════════════
-// ── CONFIGURAÇÕES DO CHECKOUT E DA NOVA PÁGINA DE VENDAS COMPLETA ──
+// 1) CRIAR PREFERÊNCIA DE CHECKOUT (chamado pela landing page)
 // ════════════════════════════════════════════════════════════════════
-window._ckPlano   = null;
-window._ckVendaId = null;
-window._ckCodigos = [];
+exports.criarPreferenciaCheckout = onRequest(
+  {
+    cors: true,
+    secrets: [MP_ACCESS_TOKEN],
+    region: "southamerica-east1",
+  },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Método não permitido. Use POST." });
+    }
 
-const _PIX_CHAVE = 'luciakratz@gmail.com';
-const _PIX_NOME  = 'Lucia Kratz';
-const _PIX_CIDADE= 'Goiania';
+    try {
+      const { plano, qtd, comprador, email, whatsapp, doc } = req.body;
 
-window.ckSelecionarPlanoVenda = function(plano) {
-  window._ckPlano = plano;
-  
-  // Resetar seleções visuais
-  document.getElementById('ckOpcaoPF_Apenas').classList.remove('selected');
-  document.getElementById('ckOpcaoPF_Devolutiva').classList.remove('selected');
-  document.getElementById('ckOpcaoPJ_Corporativo').classList.remove('selected');
-  
-  // Ativar plano correto
-  if(plano === 'pf_apenas') document.getElementById('ckOpcaoPF_Apenas').classList.add('selected');
-  if(plano === 'pf_devolutiva') document.getElementById('ckOpcaoPF_Devolutiva').classList.add('selected');
-  if(plano === 'pj_corp') document.getElementById('ckOpcaoPJ_Corporativo').classList.add('selected');
+      if (!plano || !comprador || !email) {
+        return res.status(400).json({ error: "Campos obrigatórios: plano, comprador, email" });
+      }
 
-  // Mostrar quantidade se for corporativo
-  document.getElementById('ckQtdPJRow').style.display = (plano === 'pj_corp') ? 'block' : 'none';
-  
-  // Abrir campos de dados comprador
-  document.getElementById('ckDadosComprador').style.display = 'block';
-  
-  if(plano === 'pj_corp') ckAtualizarPrecoCorporativo();
-};
+      const { valor, qtdFinal, precoUnit } = calcularValor(plano, qtd);
 
-window.ckAtualizarPrecoCorporativo = function() {
-  const qtd = parseInt(document.getElementById('ckQtdPJ').value) || 5;
-  if(qtd < 5) { document.getElementById('ckQtdPJ').value = 5; return; }
-  
-  let valorUnitario = 247;
-  let faixa = "Faixa Inicial (5 a 10 testes)";
-  
-  if(qtd >= 11 && qtd <= 30) {
-    valorUnitario = 197;
-    faixa = "🔥 Desconto Intermediário (11 a 30 testes)";
-  } else if(qtd > 30) {
-    valorUnitario = 147;
-    faixa = "🚀 Preço de Larga Escala (Acima de 30 testes)";
-  }
-  
-  const total = qtd * valorUnitario;
-  
-  document.getElementById('ckFaixaDesconto').textContent = faixa;
-  document.getElementById('ckCalculoUnitario').textContent = `${qtd} testes × R$ ${valorUnitario} =`;
-  document.getElementById('ckTotalPJ').textContent = 'R$ ' + total.toLocaleString('pt-BR');
-};
-
-window.ckIrParaPix = function() {
-  const nome = document.getElementById('ckNome').value.trim();
-  const email = document.getElementById('ckEmail').value.trim();
-  const whatsapp = document.getElementById('ckWhatsapp').value.trim();
-  const doc_ = document.getElementById('ckDoc').value.trim();
-  
-  if(!nome || !email || !whatsapp || !doc_){ alert('Por favor, preencha todos os campos obrigatórios (*).'); return; }
-  
-  let valorFinal = 0;
-  let resumo = "";
-  
-  if(window._ckPlano === 'pf_apenas') {
-    valorFinal = 297;
-    resumo = "9&Self — Apenas o Teste Individual";
-  } else if(window._ckPlano === 'pf_devolutiva') {
-    valorFinal = 597;
-    resumo = "9&Self — Teste Individual + Devolutiva (1h) com Psicóloga";
-  } else if(window._ckPlano === 'pj_corp') {
-    const qtd = parseInt(document.getElementById('ckQtdPJ').value) || 5;
-    let unit = 247;
-    if(qtd >= 11 && qtd <= 30) unit = 197;
-    if(qtd > 30) unit = 147;
-    valorFinal = qtd * unit;
-    resumo = `Pacote Corporativo — ${qtd} Licenças de Acesso`;
-  }
-  
-  document.getElementById('ckResumoCompra').textContent = `${resumo} — Total: R$ ${valorFinal.toLocaleString('pt-BR')}`;
-  document.getElementById('ckValorDestaque').textContent = `⚠️ Transfira exatamente: R$ ${valorFinal.toFixed(2).replace('.',',')}`;
-  
-  const txid = 'NS'+Math.random().toString(36).substr(2,5).toUpperCase();
-  const base_pix = `00020101021126340014br.gov.bcb.pix0114${_PIX_CHAVE}5204000053039865405${valorFinal.toFixed(2)}5802BR5911LUCIAKRATZ6007GOIANIA62070503***6304`;
-  
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(base_pix)}`;
-  document.getElementById('ckQrCode').innerHTML = `<img src="${qrUrl}" alt="QR Pix" style="border-radius:8px; border:4px solid #fff; box-shadow:0 2px 10px rgba(0,0,0,0.1);"/>`;
-  document.getElementById('ckChavePix').value = _PIX_CHAVE;
-
-  addDoc(collection(db,'nself_vendas'), {
-    plano: window._ckPlano, valor: valorFinal, comprador: nome, email, whatsapp, documento: doc_, pixTxid: txid, status: 'aguardando_pix', criadoEm: serverTimestamp()
-  }).then(ref => { window._ckVendaId = ref.id; });
-
-  document.getElementById('ckEtapa1').style.display = 'none';
-  document.getElementById('ckEtapa2').style.display = 'block';
-};
-
-window.ckConfirmarPagamento = async function() {
-  const st = document.getElementById('ckStatus');
-  const nome = document.getElementById('ckNome').value.trim();
-  const email = document.getElementById('ckEmail').value.trim();
-  const isPF = window._ckPlano.startsWith('pf');
-  const qtd = isPF ? 1 : (parseInt(document.getElementById('ckQtdPJ').value) || 5);
-  
-  st.innerHTML = '<span>⏳ Confirmando e gerando seus acessos...</span>';
-  
-  try {
-    window._ckCodigos = [];
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    for(let i=0; i<qtd; i++) {
-      let cod = ''; for(let j=0; j<6; j++) cod += chars[Math.floor(Math.random()*chars.length)];
-      await addDoc(collection(db,'nself_codigos'), {
-        codigo: cod, nomeDestinatario: nome, email, empresa: isPF?'PF':'Corporativo', status: 'disponivel', criadoEm: serverTimestamp()
+      // 1. Registrar a venda como pendente no Firestore
+      const vendaRef = await db.collection("nself_vendas").add({
+        plano,
+        qtd: qtdFinal,
+        valor,
+        precoUnit: precoUnit || valor,
+        comprador,
+        compradorEmail: email,
+        compradorWhatsapp: whatsapp || "",
+        compradorDoc: doc || "",
+        status: "aguardando_pagamento",
+        origem: "checkout_dinamico_mp",
+        criadoEm: admin.firestore.FieldValue.serverTimestamp(),
       });
-      window._ckCodigos.push(cod);
-    }
-    
-    if(window._ckVendaId) {
-      await updateDoc(doc(db,'nself_vendas', window._ckVendaId), { status:'pago', codigos: window._ckCodigos });
-    }
-    
-    if(isPF) {
-      st.innerHTML = '<span style="color:green;">✅ Pago com sucesso! Carregando avaliação...</span>';
-      window._state.codigoAtivo = { codigo: window._ckCodigos[0], nomeDestinatario: nome, email, empresa:'PF', status:'disponivel' };
-      document.getElementById('checkout-publico').style.display = 'none';
-      document.getElementById('appShell').style.display = 'block';
-      enterApp('colaborador', nome, 'Paciente');
-      return;
-    }
-    
-    document.getElementById('ckEtapa2').style.display = 'none';
-    document.getElementById('ckEtapa3PJ').style.display = 'block';
-    const B = 'https://luciakratz-arch.github.io/9-Self/index.html?code=';
-    document.getElementById('ckCodigosGerados').innerHTML = window._ckCodigos.map((c,i)=>`<div>Acesso ${i+1}: <b>${c}</b><br><small>${B}${c}</small></div>`).join('');
-  } catch(e) { st.innerHTML = '<span>Erro ao processar ativação.</span>'; }
-};
 
-window.ckCopiarCodigosWhatsApp = function() {
-  const B = 'https://luciakratz-arch.github.io/9-Self/index.html?code=';
-  const txt = '*Meus Acessos Liberados 9&Self*\n\n' + window._ckCodigos.map((c,i)=>`Acesso ${i+1}: *${c}*\nLink: ${B}${c}`).join('\n\n');
-  navigator.clipboard.writeText(txt).then(()=>alert('Copiado com sucesso!'));
-};
+      // 2. Criar a preferência no Mercado Pago com o valor EXATO calculado
+      const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN.value() });
+      const preference = new Preference(client);
 
-window.addEventListener('load', function() {
-  const params = new URLSearchParams(window.location.search);
+      const response = await preference.create({
+        body: {
+          items: [
+            {
+              id: vendaRef.id,
+              title: tituloPlano(plano, qtdFinal),
+              quantity: 1, // já embutimos a quantidade no valor unitário
+              unit_price: valor,
+              currency_id: "BRL",
+            },
+          ],
+          payer: {
+            name: comprador,
+            email,
+          },
+          external_reference: vendaRef.id, // amarra o pagamento à venda no Firestore
+          back_urls: {
+            success: `${BASE_URL}/9self-landing.html?status=sucesso&venda=${vendaRef.id}`,
+            failure: `${BASE_URL}/9self-landing.html?status=falha`,
+            pending: `${BASE_URL}/9self-landing.html?status=pendente`,
+          },
+          auto_return: "approved",
+          notification_url:
+            "https://southamerica-east1-entrevista-inicial.cloudfunctions.net/webhookMercadoPago",
+          statement_descriptor: "9SELF",
+        },
+      });
 
-  // ?login=true → forçar tela de login (vindo da landing page)
-  if(params.get('login') === 'true') {
-    var ck = document.getElementById('checkout-publico');
-    var ls = document.getElementById('loginScreen');
-    if(ck) ck.style.display = 'none';
-    if(ls) ls.style.display = 'flex';
-    return;
+      // 3. Salvar o ID da preferência na venda (para rastreabilidade)
+      await vendaRef.update({ preferenceId: response.id });
+
+      return res.status(200).json({
+        link: response.init_point,
+        vendaId: vendaRef.id,
+        valor,
+        qtd: qtdFinal,
+      });
+    } catch (err) {
+      console.error("[criarPreferenciaCheckout]", err);
+      return res.status(500).json({ error: err.message });
+    }
   }
+);
 
-  // ?comprar=true → mostrar checkout público antigo (compatibilidade)
-  if(params.get('comprar') === 'true') {
-    var ls2 = document.getElementById('loginScreen');
-    var ap  = document.getElementById('appShell');
-    var ck2 = document.getElementById('checkout-publico');
-    if(ls2) ls2.style.display = 'none';
-    if(ap)  ap.style.display  = 'none';
-    if(ck2) ck2.style.display = 'flex';
+// ════════════════════════════════════════════════════════════════════
+// 2) WEBHOOK — recebe a confirmação de pagamento do Mercado Pago
+// ════════════════════════════════════════════════════════════════════
+exports.webhookMercadoPago = onRequest(
+  {
+    secrets: [MP_ACCESS_TOKEN],
+    region: "southamerica-east1",
+  },
+  async (req, res) => {
+    try {
+      // O MP manda notificações de vários tipos; só nos importa "payment"
+      const topic = req.query.topic || req.query.type || req.body?.type;
+      const paymentId = req.query["data.id"] || req.body?.data?.id || req.query.id;
+
+      if (topic !== "payment" || !paymentId) {
+        // Confirma recebimento mesmo assim para o MP não reenviar
+        return res.status(200).send("ok");
+      }
+
+      // 1. Buscar os detalhes do pagamento na API do MP
+      const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN.value() });
+      const paymentClient = new Payment(client);
+      const payment = await paymentClient.get({ id: paymentId });
+
+      if (payment.status !== "approved") {
+        // Pagamento ainda não aprovado (pendente, rejeitado etc.) — não libera nada
+        return res.status(200).send("ok");
+      }
+
+      const vendaId = payment.external_reference;
+      if (!vendaId) {
+        console.warn("[webhook] Pagamento aprovado sem external_reference:", paymentId);
+        return res.status(200).send("ok");
+      }
+
+      const vendaRef = db.collection("nself_vendas").doc(vendaId);
+      const vendaSnap = await vendaRef.get();
+
+      if (!vendaSnap.exists) {
+        console.warn("[webhook] Venda não encontrada:", vendaId);
+        return res.status(200).send("ok");
+      }
+
+      const venda = vendaSnap.data();
+
+      // Evita gerar códigos duplicados se o webhook for chamado mais de uma vez
+      if (venda.status === "pago") {
+        return res.status(200).send("ok");
+      }
+
+      // 2. Gerar os códigos de acesso
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      const codigos = [];
+      const batch = db.batch();
+
+      for (let i = 0; i < (venda.qtd || 1); i++) {
+        let cod = "";
+        for (let j = 0; j < 6; j++) {
+          cod += chars[Math.floor(Math.random() * chars.length)];
+        }
+        const codRef = db.collection("nself_codigos").doc();
+        batch.set(codRef, {
+          codigo: cod,
+          nomeDestinatario: venda.comprador,
+          email: venda.compradorEmail,
+          empresa: venda.plano === "pj" ? "PJ_COMPRA" : "PF",
+          status: "disponivel",
+          origem: "checkout_dinamico_mp",
+          vendaId,
+          linkAcesso: `${BASE_URL}/index.html?code=${cod}`,
+          criadoEm: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        codigos.push(cod);
+      }
+
+      // 3. Marcar a venda como paga
+      batch.update(vendaRef, {
+        status: "pago",
+        codigos,
+        paymentId: String(paymentId),
+        pagoEm: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await batch.commit();
+
+      console.log(`[webhook] Venda ${vendaId} confirmada. ${codigos.length} código(s) gerado(s).`);
+
+      // 4. (Opcional) Enviar e-mail — implementar com SendGrid/EmailJS quando desejar
+      // await enviarEmailCodigos(venda.compradorEmail, venda.comprador, codigos);
+
+      return res.status(200).send("ok");
+    } catch (err) {
+      console.error("[webhookMercadoPago]", err);
+      // Sempre responder 200 para o MP não ficar reenviando indefinidamente
+      return res.status(200).send("erro processado");
+    }
   }
-});
-</script>
-</body>
-</html>
+);
