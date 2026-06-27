@@ -2013,7 +2013,7 @@ window.gerarLaudoManual = function() { window.baixarLaudo(); };
 window.baixarLaudo = async function() {
   const estado = window._state;
   if(!estado || !estado.tipoFinal) { alert('Nenhum laudo disponível.'); return; }
-  const tipo = estado.tipoFinal;
+  const tipo = estado.tipoFinal || 'Não identificado';
   const nome = estado.nomeUsuario || 'Colaborador';
   const docDefinition = {
     content: [
@@ -2035,9 +2035,7 @@ window.showToast = function(m) { alert(m); };
 window.gerarCodigoPreview = function() {
   const cod = Math.random().toString(36).substring(2,10).toUpperCase();
   const link = `https://luciakratz-arch.github.io/9-Self/?codigo=${cod}`;
-  document.getElementById('codCodigo').value = cod;
-  const linkEl = document.getElementById('codLink');
-  if(linkEl) linkEl.textContent = 'Link: ' + link;
+  document.getElementById('codGerado').value = cod;
   window._codigoPreview = cod;
   window._linkPreview = link;
 };
@@ -2048,26 +2046,14 @@ window.salvarCodigo = async function() {
   const wpp   = document.getElementById('codWhatsapp')?.value?.trim();
   const emp   = document.getElementById('codEmpresa')?.value?.trim() || 'PF';
   const cod   = window._codigoPreview;
-
   if(!nome || !wpp || !cod) { showToast('Preencha nome e WhatsApp'); return; }
-
   await addDoc(collection(db,'nself_codigos'), {
-    codigo: cod,
-    nomeDestinatario: nome,
-    email: email || '',
-    empresa: emp,
-    status: 'disponivel',
-    criadoEm: serverTimestamp()
+    codigo: cod, nomeDestinatario: nome, email: email||'', empresa: emp,
+    status: 'disponivel', criadoEm: serverTimestamp()
   });
-
-  const link = window._linkPreview;
-  const msg  = encodeURIComponent(
-    `Olá ${nome}! 🦋\n\nSeu acesso ao 9&Self está liberado!\n\n*Código:* ${cod}\n*Link:* ${link}\n\nDra. Lucia Kratz`
-  );
-  const numero = wpp.replace(/\D/g,'');
-  window.open(`https://wa.me/55${numero}?text=${msg}`, '_blank');
-
-  showToast('✅ Código salvo e WhatsApp aberto!');
+  const msg = encodeURIComponent(`Olá ${nome}! 🦋\n\nSeu acesso ao 9&Self está liberado!\n\n*Código:* ${cod}\n*Link:* ${window._linkPreview}\n\nDra. Lucia Kratz`);
+  window.open(`https://wa.me/55${wpp.replace(/\D/g,'')}?text=${msg}`, '_blank');
+  showToast('✅ Código salvo!');
   closeModal('modalNovoCodigo');
   loadCodigos();
 };
