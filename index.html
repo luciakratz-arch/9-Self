@@ -1511,6 +1511,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+window._db = db;
+window._getDoc = getDoc;
+window._doc = doc;
 
 window._state = { profile: 'colaborador', user: null, empresa: null, codigoAtivo: null };
 
@@ -1875,7 +1878,7 @@ async function loadLaudos() {
 
 window.gerarPdfLaudo = async function(id) {
   try {
-    const snap = await getDoc(doc(db,'nself_laudos', id));
+    const snap = await window._getDoc(window._doc(window._db,'nself_laudos', id));
     if(!snap.exists()){ alert('Laudo não encontrado.'); return; }
     const l = snap.data();
     const blob = await gerarPdfNavegador({
