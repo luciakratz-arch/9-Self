@@ -934,11 +934,11 @@ window.ckAtualizarCardPJ = function() {
 window.ckAbrirMPEmpresa = function() {
   const qtd = parseInt(document.getElementById('pj-qtd-card').value) || 5;
   if (qtd < 5) { alert('Quantidade mínima: 5 licenças'); return; }
-  let url;
-  if      (qtd <= 10) url = _MP_PJ_5_10   + '?quantity=' + qtd;
-  else if (qtd <= 30) url = _MP_PJ_11_30  + '?quantity=' + qtd;
-  else                url = _MP_PJ_31PLUS + '?quantity=' + qtd;
-  window.open(url, '_blank');
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbwakte29CGMaY4QJK4Dlq-WiXLE0jfmftsYZSgWjB1UIGDOZuAWLncTPukRXXy9BAfBXw/exec';
+  fetch(scriptUrl + '?qtd=' + qtd)
+    .then(r => r.json())
+    .then(data => { window.open(data.url, '_blank'); })
+    .catch(() => { alert('Erro ao gerar checkout. Tente novamente.'); });
 };
 
 function _pixPayload({chave,nome,valor,cidade,txid}){
