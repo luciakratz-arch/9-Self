@@ -1494,7 +1494,7 @@ async function gerarPdfNavegador({tipo, asa, subDom, subInt, subRem, nome, cargo
 <!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, serverTimestamp }
+import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, query, where, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -1874,7 +1874,25 @@ async function loadLaudos() {
 }
 
 window.gerarPdfLaudo = async function(id) {
-  alert('Gerando PDF via motor local...');
+  const snap = await getDoc(doc(db,'nself_laudos', id));
+  if(!snap.exists()){ alert('Laudo não encontrado.'); return; }
+  const l = snap.data();
+  const nome = l.nome || 'Colaborador';
+  const tipo = l.tipo || '—';
+  const asa  = l.asa  || '—';
+  const docDefinition = {
+    content: [
+      { text: '9&Self — Laudo Executivo', style: 'header' },
+      { text: `Nome: ${nome}`, margin:[0,12,0,4] },
+      { text: `Tipo Eneagrama: ${tipo}`, margin:[0,0,0,4] },
+      { text: `Asa: ${asa}`, margin:[0,0,0,16] },
+      { text: 'Este laudo foi gerado automaticamente pelo sistema 9&Self.', italics:true, color:'#666' }
+    ],
+    styles: {
+      header: { fontSize:22, bold:true, color:'#7B00C4', margin:[0,0,0,16] }
+    }
+  };
+  pdfMake.createPdf(docDefinition).download(`laudo_9self_${nome}.pdf`);
 };
 
 async function validarCodigo() {
