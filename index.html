@@ -2010,13 +2010,67 @@ async function salvarResultadoFinal() {
 }
 
 window.gerarLaudoManual = function() { window.baixarLaudo(); };
-window.baixarLaudo = async function() { alert('Baixando laudo estruturado...'); };
+window.baixarLaudo = async function() {
+  const estado = window._state;
+  if(!estado || !estado.tipoFinal) { alert('Nenhum laudo disponível.'); return; }
+  const tipo = estado.tipoFinal;
+  const nome = estado.nomeUsuario || 'Colaborador';
+  const docDefinition = {
+    content: [
+      { text: '9&Self — Laudo Executivo', style: 'header' },
+      { text: `Nome: ${nome}`, margin: [0,10,0,5] },
+      { text: `Tipo Principal: ${tipo}`, margin: [0,0,0,10] },
+      { text: 'Este laudo foi gerado automaticamente pelo sistema 9&Self.', italics: true }
+    ],
+    styles: {
+      header: { fontSize: 22, bold: true, color: '#7B00C4', margin: [0,0,0,20] }
+    }
+  };
+  pdfMake.createPdf(docDefinition).download(`laudo_9self_${nome}.pdf`);
+};
 window.doLogout = function() { window.location.reload(); };
 window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
 window.showToast = function(m) { alert(m); };
-window.gerarCodigoPreview = function() {};
-window.salvarCodigo = function() {};
+window.gerarCodigoPreview = function() {
+  const cod = Math.random().toString(36).substring(2,10).toUpperCase();
+  const link = `https://luciakratz-arch.github.io/9-Self/?codigo=${cod}`;
+  document.getElementById('codCodigo').value = cod;
+  const linkEl = document.getElementById('codLink');
+  if(linkEl) linkEl.textContent = 'Link: ' + link;
+  window._codigoPreview = cod;
+  window._linkPreview = link;
+};
+
+window.salvarCodigo = async function() {
+  const nome  = document.getElementById('codNome')?.value?.trim();
+  const email = document.getElementById('codEmail')?.value?.trim();
+  const wpp   = document.getElementById('codWhatsapp')?.value?.trim();
+  const emp   = document.getElementById('codEmpresa')?.value?.trim() || 'PF';
+  const cod   = window._codigoPreview;
+
+  if(!nome || !wpp || !cod) { showToast('Preencha nome e WhatsApp'); return; }
+
+  await addDoc(collection(db,'nself_codigos'), {
+    codigo: cod,
+    nomeDestinatario: nome,
+    email: email || '',
+    empresa: emp,
+    status: 'disponivel',
+    criadoEm: serverTimestamp()
+  });
+
+  const link = window._linkPreview;
+  const msg  = encodeURIComponent(
+    `Olá ${nome}! 🦋\n\nSeu acesso ao 9&Self está liberado!\n\n*Código:* ${cod}\n*Link:* ${link}\n\nDra. Lucia Kratz`
+  );
+  const numero = wpp.replace(/\D/g,'');
+  window.open(`https://wa.me/55${numero}?text=${msg}`, '_blank');
+
+  showToast('✅ Código salvo e WhatsApp aberto!');
+  closeModal('modalNovoCodigo');
+  loadCodigos();
+};
 
 // ════════════════════════════════════════════════════════════════════
 // ── CONFIGURAÇÕES DO CHECKOUT E DA NOVA PÁGINA DE VENDAS COMPLETA ──
