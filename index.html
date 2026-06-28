@@ -1883,10 +1883,10 @@ window.gerarPdfLaudo = async function(id) {
     const l = snap.data();
     const blob = await gerarPdfNavegador({
       tipo: parseInt(l.tipo)||7,
-      asa:  parseInt(l.asa)||0,
-      subDom: l.subtipoDom||'AP',
-      subInt: l.subtipoInt||'1A1',
-      subRem: l.subtipoRem||'SOC',
+      asa:  parseInt(l.asaDominante)||0,
+      subDom: l.subtipoDominante||'AP',
+      subInt: l.subtipoIntermediario||'1A1',
+      subRem: l.subtipoRemissivo||'SOC',
       nome:  l.nome||'Participante',
       cargo: l.cargo||''
     });
