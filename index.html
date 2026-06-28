@@ -1608,6 +1608,7 @@ window.navigateTo = function(page) {
   if(page=='codigos') { loadCodigos(); gerarCodigoPreview(); }
   if(page=='laudos') loadLaudos();
   if(page=='financeiro') loadFinanceiro();
+  if(page=='colab-resultado') loadMeuLaudo();
   closeSidebar();
 };
 
@@ -2014,6 +2015,37 @@ window.definirSubtipo = function(d, i, r) {
   window.TS.subDom = d; window.TS.subInt = i; window.TS.subRem = r;
   salvarResultadoFinal();
 };
+
+async function loadMeuLaudo() {
+  if(window.TS && window.TS.tipoFinal) return; // já tem dados da sessão atual
+  const cod = window._state?.codigoAtivo;
+  if(!cod) return;
+  const q = query(collection(db,'nself_laudos'), where('codigoId','==', cod.id));
+  const snap = await getDocs(q);
+  if(snap.empty) {
+    // tenta buscar pelo nome
+    const q2 = query(collection(db,'nself_laudos'), where('nome','==', cod.nomeDestinatario));
+    const snap2 = await getDocs(q2);
+    if(snap2.empty) return;
+    const l = snap2.docs[0].data();
+    _preencherResultado(l);
+  } else {
+    _preencherResultado(snap.docs[0].data());
+  }
+}
+
+function _preencherResultado(l) {
+  document.getElementById('resultTipoCircle').textContent = l.tipo||'—';
+  document.getElementById('resultTipoNome').textContent = 'Perfil Identificado';
+  document.getElementById('resultAsa').textContent = `Asa Dominante: ${l.asaDominante||'—'}`;
+  document.getElementById('resultSubtipo').textContent = `Subtipo Dominante: ${l.subtipoDominante||'—'}`;
+  window.TS = window.TS || {};
+  window.TS.tipoFinal = l.tipo;
+  window.TS.asaDom = l.asaDominante;
+  window.TS.subDom = l.subtipoDominante;
+  window.TS.subInt = l.subtipoIntermediario;
+  window.TS.subRem = l.subtipoRemissivo;
+}
 
 async function salvarResultadoFinal() {
   const cod = window._state.codigoAtivo;
