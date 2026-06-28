@@ -2087,8 +2087,31 @@ window.doLogout = function() { window.location.reload(); };
 window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
 window.showToast = function(m) { alert(m); };
-window.gerarCodigoPreview = function() {};
-window.salvarCodigo = function() {};
+window.gerarCodigoPreview = function() {
+  const cod = Math.random().toString(36).substring(2,10).toUpperCase();
+  const link = `https://luciakratz-arch.github.io/9-Self/?codigo=${cod}`;
+  document.getElementById('codGerado').value = cod;
+  window._codigoPreview = cod;
+  window._linkPreview = link;
+};
+
+window.salvarCodigo = async function() {
+  const nome  = document.getElementById('codNome')?.value?.trim();
+  const email = document.getElementById('codEmail')?.value?.trim();
+  const wpp   = document.getElementById('codWhatsapp')?.value?.trim();
+  const emp   = document.getElementById('codEmpresa')?.value?.trim() || 'PF';
+  const cod   = window._codigoPreview;
+  if(!nome || !wpp || !cod) { showToast('Preencha nome e WhatsApp'); return; }
+  await addDoc(collection(db,'nself_codigos'), {
+    codigo: cod, nomeDestinatario: nome, email: email||'', empresa: emp,
+    status: 'disponivel', criadoEm: serverTimestamp()
+  });
+  const msg = encodeURIComponent(`Olá ${nome}! 🦋\n\nSeu acesso ao 9&Self está liberado!\n\n*Código:* ${cod}\n*Link:* ${window._linkPreview}\n\nDra. Lucia Kratz`);
+  window.open(`https://wa.me/55${wpp.replace(/\D/g,'')}?text=${msg}`, '_blank');
+  showToast('✅ Código salvo!');
+  closeModal('modalNovoCodigo');
+  loadCodigos();
+};
 
 // ════════════════════════════════════════════════════════════════════
 // ── CONFIGURAÇÕES DO CHECKOUT E DA NOVA PÁGINA DE VENDAS COMPLETA ──
