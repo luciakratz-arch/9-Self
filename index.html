@@ -1882,19 +1882,21 @@ window.gerarPdfLaudo = async function(id) {
     if(!snap.exists()){ alert('Laudo não encontrado.'); return; }
     const l = snap.data();
     const blob = await gerarPdfNavegador({
-      tipo: parseInt(l.tipo)||7,
-      asa:  parseInt(l.asaDominante)||0,
+      tipo:   parseInt(l.tipo)||7,
+      asa:    l.asaDominante||0,
       subDom: l.subtipoDominante||'AP',
       subInt: l.subtipoIntermediario||'1A1',
       subRem: l.subtipoRemissivo||'SOC',
-      nome:  l.nome||'Participante',
-      cargo: l.cargo||''
+      nome:   l.nome||'Participante',
+      cargo:  l.cargo||''
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `laudo_9self_${(l.nome||'participante').replace(/\s+/g,'_')}.pdf`;
-    a.click(); URL.revokeObjectURL(url);
-  } catch(e) { console.error(e); alert('Erro ao gerar PDF.'); }
+    a.href = url;
+    a.download = `laudo_9self_${(l.nome||'participante').replace(/\s+/g,'_')}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { console.error(e); alert('Erro ao gerar PDF: ' + e.message); }
 };
 
 async function validarCodigo() {
@@ -2030,7 +2032,25 @@ async function salvarResultadoFinal() {
 }
 
 window.gerarLaudoManual = function() { window.baixarLaudo(); };
-window.baixarLaudo = async function() { alert('Baixando laudo estruturado...'); };
+window.baixarLaudo = async function() {
+  const ts = window.TS;
+  if(!ts || !ts.tipoFinal) { alert('Nenhum resultado disponível. Complete o teste primeiro.'); return; }
+  const blob = await gerarPdfNavegador({
+    tipo:   ts.tipoFinal,
+    asa:    ts.asaDom,
+    subDom: ts.subDom,
+    subInt: ts.subInt,
+    subRem: ts.subRem,
+    nome:   window._state?.user || 'Participante',
+    cargo:  ''
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `laudo_9self_${(window._state?.user||'participante').replace(/\s+/g,'_')}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 window.doLogout = function() { window.location.reload(); };
 window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
