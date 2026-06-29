@@ -365,7 +365,7 @@ tr:hover td{background:#FAFAFE;}
       <button class="login-tab active" onclick="setLoginProfile('colaborador')">Usuário</button>
     </div>
 
-    <div id="loginAdmin">
+    <div id="loginAdmin" style="display:none;">
       <div class="login-field">
         <label>Senha de Acesso</label>
         <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
@@ -383,7 +383,7 @@ tr:hover td{background:#FAFAFE;}
       </div>
     </div>
 
-    <div id="loginColab" style="display:none;">
+    <div id="loginColab" style="display:block;">
       <div class="code-hero" style="padding:28px 20px;margin-bottom:0;border-radius:12px;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:6px;">Acesse com seu código</div>
         <p style="font-size:12px;opacity:.6;">Você recebeu um código único de acesso</p>
