@@ -1,0 +1,171 @@
+"""
+Firebase Cloud Function — webhookMercadoPago
+Deploy: firebase deploy --only functions:webhookMercadoPago
+
+Esta função é SEPARADA da gerarLaudoPDF — não interfere em nada existente.
+"""
+
+import os
+import json
+import string
+import random
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+import firebase_admin
+from firebase_admin import firestore
+from firebase_functions import https_fn
+from firebase_functions.params import StringParam
+import urllib.request
+
+# Inicializar app (só uma vez)
+if not firebase_admin._apps:
+    firebase_admin.initialize_app()
+
+db = firestore.client()
+
+# ── PARÂMETROS DE CONFIGURAÇÃO ──
+# Configure via: firebase functions:config:set gmail.pass="SUA_APP_PASSWORD" mercadopago.token="SEU_ACCESS_TOKEN"
+GMAIL_PASS    = StringParam("GMAIL_PASS")
+MP_TOKEN      = StringParam("MP_TOKEN")
+GMAIL_USER    = "luciakratz@gmail.com"
+APP_URL       = "https://luciakratz.github.io/app-eneagrama/index.html"
+
+# ── GERAR CÓDIGO ÚNICO ──
+def gerar_codigo():
+    chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+    return ''.join(random.choices(chars, k=6))
+
+# ── ENVIAR E-MAIL ──
+def enviar_email(destinatario, nome, codigo):
+    link = f"{APP_URL}?code={codigo}"
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = '🎉 Seu código de acesso ao 9&Self chegou!'
+    msg['From']    = f'"9&Self | Lúcia Kratz" <{GMAIL_USER}>'
+    msg['To']      = destinatario
+
+    html = f"""
+    <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#1a0a2e;color:#fff;border-radius:16px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#3d0a5e,#7B1D6B);padding:32px;text-align:center;">
+        <h1 style="font-size:36px;margin:0;letter-spacing:-1px;">9&amp;Self</h1>
+        <p style="opacity:.7;margin:8px 0 0;letter-spacing:2px;font-size:12px;">DESCUBRA SUA PERSONALIDADE</p>
+      </div>
+      <div style="padding:32px;">
+        <p>Olá, <strong>{nome}</strong>!</p>
+        <p>Seu pagamento foi confirmado. Aqui está seu código exclusivo de acesso:</p>
+        <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:24px;text-align:center;margin:24px 0;">
+          <p style="margin:0 0 8px;font-size:12px;opacity:.6;letter-spacing:2px;">SEU CÓDIGO</p>
+          <p style="font-size:36px;font-weight:700;letter-spacing:6px;margin:0;color:#E8B4F8;">{codigo}</p>
+        </div>
+        <p>Clique no botão abaixo para acessar seu teste:</p>
+        <div style="text-align:center;margin:24px 0;">
+          <a href="{link}"
+            style="background:linear-gradient(135deg,#7B00C4,#7B1D6B);color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:600;display:inline-block;">
+            Acessar meu teste →
+          </a>
+        </div>
+        <p style="font-size:11px;opacity:.5;margin-top:32px;">
+          Ou acesse <a href="{APP_URL}" style="color:#E8B4F8;">{APP_URL}</a>
+          e insira o código <strong>{codigo}</strong> na aba <strong>Usuário</strong>.
+        </p>
+        <p style="font-size:11px;opacity:.5;">Dúvidas? Responda este e-mail.</p>
+      </div>
+    </div>
+    """
+
+    msg.attach(MIMEText(html, 'html'))
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        server.login(GMAIL_USER, GMAIL_PASS.value)
+        server.sendmail(GMAIL_USER, destinatario, msg.as_string())
+
+# ── WEBHOOK MERCADO PAGO ──
+@https_fn.on_request(
+    cors=https_fn.options.CorsOptions(
+        cors_origins=["*"],
+        cors_methods=["GET", "POST", "OPTIONS"],
+    )
+)
+def webhookMercadoPago(req: https_fn.Request) -> https_fn.Response:
+    # Mercado Pago valida o endpoint com GET
+    if req.method == 'GET':
+        return https_fn.Response('OK', status=200)
+
+    if req.method == 'OPTIONS':
+        return https_fn.Response('', status=204)
+
+    try:
+        body = req.get_json(silent=True) or {}
+        tipo = body.get('type', '')
+        data = body.get('data', {})
+
+        # Só processa notificações de pagamento
+        if tipo != 'payment':
+            return https_fn.Response('ignored', status=200)
+
+        payment_id = str(data.get('id', ''))
+        if not payment_id:
+            return https_fn.Response('sem payment id', status=400)
+
+        # Buscar detalhes do pagamento na API do Mercado Pago
+        mp_url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
+        mp_req = urllib.request.Request(
+            mp_url,
+            headers={"Authorization": f"Bearer {MP_TOKEN.value}"}
+        )
+        with urllib.request.urlopen(mp_req) as resp:
+            payment = json.loads(resp.read())
+
+        # Só processa pagamentos aprovados
+        if payment.get('status') != 'approved':
+            return https_fn.Response('nao aprovado', status=200)
+
+        email = payment.get('payer', {}).get('email', '')
+        nome  = payment.get('payer', {}).get('first_name', 'Cliente')
+        valor = payment.get('transaction_amount', 0)
+
+        if not email:
+            return https_fn.Response('sem email', status=400)
+
+        # Evitar processamento duplicado
+        existente = db.collection('nself_codigos') \
+            .where('pagamentoId', '==', payment_id).get()
+        if len(existente) > 0:
+            return https_fn.Response('ja processado', status=200)
+
+        # Gerar código único
+        codigo = gerar_codigo()
+        tentativas = 0
+        while tentativas < 10:
+            snap = db.collection('nself_codigos') \
+                .where('codigo', '==', codigo).get()
+            if len(snap) == 0:
+                break
+            codigo = gerar_codigo()
+            tentativas += 1
+
+        # Salvar no Firebase
+        db.collection('nself_codigos').add({
+            'codigo': codigo,
+            'nomeDestinatario': nome,
+            'email': email,
+            'empresa': None,
+            'tipo': 'PF',
+            'status': 'Pendente',
+            'origem': 'mercadopago',
+            'pagamentoId': payment_id,
+            'valorPago': valor,
+            'linkTeste': f"{APP_URL}?code={codigo}",
+            'criadoEm': firestore.SERVER_TIMESTAMP,
+        })
+
+        # Enviar e-mail com o código
+        enviar_email(email, nome, codigo)
+
+        print(f"[webhook] Código {codigo} gerado e enviado para {email}")
+        return https_fn.Response('ok', status=200)
+
+    except Exception as e:
+        print(f"[webhook] Erro: {e}")
+        return https_fn.Response(f'erro: {str(e)}', status=500)
