@@ -360,9 +360,9 @@ tr:hover td{background:#FAFAFE;}
     </div>
 
     <div class="login-tabs">
-      <button class="login-tab active" onclick="setLoginProfile('admin')">Admin</button>
+      <button class="login-tab" onclick="setLoginProfile('admin')">Admin</button>
       <button class="login-tab" onclick="setLoginProfile('rh')">RH / Empresa</button>
-      <button class="login-tab" onclick="setLoginProfile('colaborador')">Colaborador</button>
+      <button class="login-tab active" onclick="setLoginProfile('colaborador')">Usuário</button>
     </div>
 
     <div id="loginAdmin">
@@ -396,6 +396,9 @@ tr:hover td{background:#FAFAFE;}
 
     <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
     <div class="login-error" id="loginError"></div>
+    <div style="text-align:center;margin-top:16px;">
+      <a href="https://luciakratz.github.io/app-eneagrama" target="_blank" style="color:#b39ddb;font-size:13px;text-decoration:none;">🛒 Não tem um código? Adquira o seu aqui</a>
+    </div>
   </div>
 </div>
 
@@ -2115,7 +2118,7 @@ window.closeSidebar=function(){
 };
 
 // ── INIT ──
-window._state.profile = 'admin';
+window._state.profile = 'colaborador';
 gerarCodigoPreview();
 
 // Auto-detectar ?code= na URL (colaborador clicou no link)
