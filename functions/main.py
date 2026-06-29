@@ -1,358 +1,2162 @@
-"""
-Cloud Function: gerarLaudoPDF
-Projeto Firebase: entrevista-inicial
-Sistema: 9&Self — Avaliação de Personalidade
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>9&Self — Conheça sua Personalidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --mag:    #7B1D6B;
+  --mag2:   #9B2589;
+  --teal:   #1A9BAF;
+  --teal2:  #13B5CC;
+  --purple: #7B00C4;
+  --purple2:#9B10E4;
+  --dark:   #2C2C2C;
+  --gray:   #6B6B6B;
+  --light:  #F7F4FB;
+  --white:  #FFFFFF;
+  --border: #E2D9EF;
+  --sidebar-w: 240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);min-height:100vh;}
 
-CORREÇÃO APLICADA (jun/2025):
-  Os arquivos banco_dados_final/tipo_X.txt estão DENTRO da pasta functions/,
-  no mesmo nível deste main.py. O caminho usa os.path.dirname(__file__)
-  apontando diretamente para banco_dados_final/ sem subir nenhum nível.
-  Um try/except por arquivo garante fallback seguro sem travar a geração.
-"""
+/* ── TELA DE LOGIN ── */
+#loginScreen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  background: linear-gradient(135deg, #1a0a2e 0%, #3d0a5e 40%, #7B1D6B 75%, #1A9BAF 100%);
+  position:relative;overflow:hidden;
+}
+#loginScreen::before{
+  content:'';position:absolute;inset:0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(123,0,196,0.3) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(26,155,175,0.25) 0%, transparent 50%);
+}
+.login-card{
+  background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:24px;padding:48px 40px;width:100%;max-width:420px;
+  position:relative;z-index:1;
+  box-shadow:0 32px 80px rgba(0,0,0,0.4);
+}
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-logo .brand-number{
+  font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;
+  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;letter-spacing:-2px;
+}
+.login-logo .brand-name{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;
+  color:rgba(255,255,255,0.9);letter-spacing:4px;
+}
+.login-logo .brand-tagline{
+  font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:2px;margin-top:6px;
+  text-transform:uppercase;
+}
+.login-tabs{display:flex;gap:8px;margin-bottom:28px;background:rgba(0,0,0,0.2);padding:4px;border-radius:12px;}
+.login-tab{
+  flex:1;padding:8px;border:none;background:transparent;
+  color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;font-size:12px;
+  border-radius:8px;cursor:pointer;transition:all .2s;font-weight:500;
+}
+.login-tab.active{background:rgba(255,255,255,0.15);color:#fff;}
+.login-field{margin-bottom:16px;}
+.login-field label{display:block;font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
+.login-field input{
+  width:100%;padding:12px 16px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;
+  outline:none;transition:border-color .2s;
+}
+.login-field input::placeholder{color:rgba(255,255,255,0.3);}
+.login-field input:focus{border-color:rgba(123,0,196,0.7);}
+.login-btn{
+  width:100%;padding:14px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--mag));
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:0.5px;
+}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,0,196,0.4);}
+.login-error{color:#FF8FA3;font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
 
-import os
-import json
-import tempfile
-import firebase_admin
-from firebase_admin import credentials, firestore, storage
-from flask import jsonify
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import cm
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, KeepTogether
-)
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
-from datetime import datetime
+/* ── APP SHELL ── */
+#appShell{display:none;min-height:100vh;}
+.app-layout{display:flex;min-height:100vh;}
 
-# ── INICIALIZAÇÃO FIREBASE ──────────────────────────────────────────────────
-if not firebase_admin._apps:
-    firebase_admin.initialize_app()
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar-w);background:#1a0a2e;
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;
+  z-index:100;border-right:1px solid rgba(255,255,255,0.06);
+  transition:transform .3s;
+}
+.sidebar-logo{
+  padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.sidebar-logo .s-number{
+  font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;
+  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;letter-spacing:-1px;
+}
+.sidebar-logo .s-name{
+  font-family:'Cormorant Garamond',serif;font-size:12px;color:rgba(255,255,255,0.5);
+  letter-spacing:4px;margin-top:2px;
+}
+/* RODAPÉ */
+.app-footer{
+  margin-left:var(--sidebar-w);
+  background:#fff;border-top:1px solid var(--border);
+  padding:10px 28px;display:flex;align-items:center;gap:10px;
+}
+.app-footer span{font-size:11px;color:var(--gray);}
+@media(max-width:768px){.app-footer{margin-left:0;}}
+.sidebar-profile{
+  padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.sidebar-profile .sp-role{
+  font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;font-weight:600;
+}
+.sidebar-profile .sp-name{font-size:13px;color:#fff;margin-top:2px;font-weight:500;}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto;}
+.nav-section{padding:8px 20px 4px;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 20px;
+  color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;
+  transition:all .2s;border-left:3px solid transparent;
+}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.05);}
+.nav-item.active{color:#fff;background:rgba(123,0,196,0.2);border-left-color:var(--purple);}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-footer{
+  padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07);
+}
+.logout-btn{
+  width:100%;padding:10px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;
+  background:transparent;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;
+  font-size:12px;cursor:pointer;transition:all .2s;
+}
+.logout-btn:hover{background:rgba(255,0,80,0.1);color:#ff6b6b;border-color:rgba(255,0,80,0.2);}
 
-db  = firestore.client()
-bkt = storage.bucket()
+/* MAIN CONTENT */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;}
+.topbar{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-size:16px;font-weight:600;color:var(--dark);}
+.topbar-actions{display:flex;align-items:center;gap:12px;}
+.badge{
+  display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;letter-spacing:0.5px;
+}
+.badge-admin{background:rgba(123,0,196,0.1);color:var(--purple);}
+.badge-rh{background:rgba(26,155,175,0.1);color:var(--teal);}
+.badge-colab{background:rgba(123,29,107,0.1);color:var(--mag);}
 
-# ── CONSTANTES ─────────────────────────────────────────────────────────────
-NOMES = {
-    1: "Perfeição e Excelência",
-    2: "Amor e Generosidade",
-    3: "Sucesso e Realização",
-    4: "Identidade e Profundidade",
-    5: "Conhecimento e Investigação",
-    6: "Segurança e Lealdade",
-    7: "Entusiasmo e Possibilidades",
-    8: "Poder e Proteção",
-    9: "Paz e Harmonia",
+.page{padding:28px;display:none;}
+.page.active{display:block;}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+.stat-card{
+  background:#fff;border-radius:16px;padding:20px;
+  border:1px solid var(--border);position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--purple),var(--mag));
+}
+.stat-card .sc-label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;}
+.stat-card .sc-value{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--dark);line-height:1;}
+.stat-card .sc-sub{font-size:12px;color:var(--teal);margin-top:4px;}
+
+/* TABLE */
+.table-card{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;}
+.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-header h3{font-size:14px;font-weight:600;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--light);padding:10px 16px;text-align:left;font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#FAFAFE;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--mag));color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(123,0,196,0.3);}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-teal:hover{background:var(--teal2);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--dark);}
+.btn-outline:hover{border-color:var(--purple);color:var(--purple);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-danger{background:rgba(220,50,50,0.08);color:#dc3232;border:1px solid rgba(220,50,50,0.15);}
+
+/* STATUS PILLS */
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.pill-green{background:#e6f9f0;color:#1a9460;}
+.pill-yellow{background:#fff8e1;color:#b8860b;}
+.pill-red{background:#ffeaea;color:#c0392b;}
+.pill-blue{background:#e3f2fd;color:#1565c0;}
+.pill-gray{background:#f0f0f0;color:#666;}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:#fff;border-radius:20px;padding:28px;width:100%;max-width:480px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.2);
+}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:20px;}
+.form-row{margin-bottom:14px;}
+.form-row label{display:block;font-size:11px;color:var(--gray);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.form-row input, .form-row select{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:13px;outline:none;
+  transition:border-color .2s;
+}
+.form-row input:focus, .form-row select:focus{border-color:var(--purple);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+
+/* PAINEL COLABORADOR — teste */
+.test-container{max-width:720px;margin:0 auto;}
+.test-progress{background:var(--border);border-radius:4px;height:6px;margin-bottom:28px;}
+.test-progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--teal));transition:width .4s;}
+.question-card{background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border);margin-bottom:16px;}
+.question-card .q-num{font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.question-card .q-text{font-size:15px;font-weight:500;line-height:1.5;}
+.q-options{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.q-option{
+  padding:8px 20px;border:2px solid var(--border);border-radius:20px;
+  background:#fff;cursor:pointer;font-size:13px;transition:all .2s;
+}
+.q-option:hover{border-color:var(--purple);color:var(--purple);}
+.q-option.selected{border-color:var(--purple);background:rgba(123,0,196,0.08);color:var(--purple);font-weight:600;}
+
+/* CÓDIGO DE ACESSO */
+.code-hero{
+  text-align:center;padding:48px 20px;
+  background:linear-gradient(135deg, #1a0a2e, #3d0a5e);
+  border-radius:20px;color:#fff;margin-bottom:24px;
+}
+.code-hero h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;margin-bottom:8px;}
+.code-hero p{color:rgba(255,255,255,0.6);font-size:14px;}
+.code-input-wrap{display:flex;gap:8px;max-width:320px;margin:24px auto 0;}
+.code-input{
+  flex:1;padding:14px 18px;border-radius:12px;border:none;
+  font-size:18px;text-align:center;letter-spacing:4px;font-weight:600;
+  background:rgba(255,255,255,0.12);color:#fff;font-family:'DM Sans',sans-serif;
+  outline:none;
+}
+.code-input::placeholder{color:rgba(255,255,255,0.3);letter-spacing:2px;font-size:14px;}
+.code-input:focus{background:rgba(255,255,255,0.18);}
+.code-submit{
+  padding:14px 20px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--mag));
+  color:#fff;cursor:pointer;font-size:18px;
 }
 
-SUBTIPO_LABEL = {
-    "sx":  "1 a 1",
-    "so":  "Social",
-    "sp":  "Conservação",
-    "1a1": "1 a 1",
+
+
+
+
+/* SUBTIPO CARDS */
+.subtipo-card{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:2px solid var(--border);border-radius:14px;
+  padding:16px;transition:all .2s;cursor:default;
+}
+.subtipo-card:first-child{border-color:var(--purple);background:rgba(123,0,196,0.04);}
+.subtipo-pos{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
+  color:var(--purple);min-width:32px;line-height:1;
 }
 
-CORES = {
-    "purple": colors.HexColor("#7B00C4"),
-    "mag":    colors.HexColor("#7B1D6B"),
-    "teal":   colors.HexColor("#1A9BAF"),
-    "light":  colors.HexColor("#F7F4FB"),
-    "dark":   colors.HexColor("#2C2C2C"),
-    "gray":   colors.HexColor("#6B6B6B"),
-    "border": colors.HexColor("#E2D9EF"),
-    "white":  colors.white,
+/* SLIDERS */
+.pct-slider{
+  flex:1;-webkit-appearance:none;height:6px;border-radius:4px;
+  background:linear-gradient(90deg,var(--purple) 0%,var(--teal) 100%);
+  outline:none;cursor:pointer;
+}
+.pct-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--purple);cursor:pointer;box-shadow:0 2px 6px rgba(123,0,196,0.3);
+}
+.slider-pct{
+  font-weight:700;font-size:14px;color:var(--purple);min-width:40px;text-align:right;
+}
+.slider-block{background:var(--light);border-radius:12px;padding:16px;}
+
+/* BLOCOS DE PARÁGRAFO */
+.para-block{
+  border:2px solid var(--border);border-radius:12px;padding:16px 18px;
+  margin-bottom:10px;cursor:pointer;transition:all .2s;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.para-block:hover{border-color:var(--purple);background:rgba(123,0,196,0.03);}
+.para-block.para-selected{
+  border-color:var(--purple);
+  background:linear-gradient(135deg,rgba(123,0,196,0.08),rgba(26,155,175,0.05));
+  box-shadow:0 2px 12px rgba(123,0,196,0.15);
+}
+.para-letra{font-weight:800;font-size:16px;min-width:24px;padding-top:2px;}
+.para-texto{font-size:13px;line-height:1.75;color:var(--dark);}
+
+
+/* RESPONSIVO */
+.hamburger{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--dark);}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .hamburger{display:block;}
+  .cards-grid{grid-template-columns:1fr 1fr;}
 }
 
-# ── CAMINHO DOS ARQUIVOS DE PERFIL ──────────────────────────────────────────
-# main.py fica em  .../functions/main.py
-# banco_dados_final fica em  .../banco_dados_final/  (raiz do repo)
-# Logo: subimos um nível com os.path.dirname + os.pardir
-_THIS_DIR   = os.path.dirname(os.path.abspath(__file__))
-_BANCO_DIR  = os.path.join(_THIS_DIR, "banco_dados_final")
+/* PAGE TITLE */
+.page-title{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  color:var(--dark);margin-bottom:4px;
+}
+.page-subtitle{font-size:13px;color:var(--gray);margin-bottom:24px;}
 
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px;color:var(--gray);}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:13px;}
 
-def ler_perfil_tipo(tipo: int) -> str:
-    """
-    Lê o arquivo tipo_X.txt de banco_dados_final/.
-    Retorna o conteúdo completo ou um texto-fallback seguro se o arquivo
-    não for encontrado (evita que a função trave e exiba erro no botão).
-    """
-    caminho = os.path.join(_BANCO_DIR, f"tipo_{tipo}.txt")
-    try:
-        with open(caminho, "r", encoding="utf-8") as f:
-            return f.read()
-    except FileNotFoundError:
-        return (
-            f"[Perfil do Tipo {tipo} não localizado no servidor. "
-            f"Verifique se banco_dados_final/tipo_{tipo}.txt está na raiz do repositório.]"
-        )
-    except Exception as exc:
-        return f"[Erro ao carregar perfil do Tipo {tipo}: {exc}]"
+/* TOAST */
+#toast{
+  position:fixed;bottom:24px;right:24px;
+  background:#2C2C2C;color:#fff;padding:12px 20px;border-radius:10px;
+  font-size:13px;z-index:999;transform:translateY(60px);opacity:0;
+  transition:all .3s;pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.success{background:#1a9460;}
+#toast.error{background:#c0392b;}
 
+.overlay-mobile{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99;}
+.overlay-mobile.open{display:block;}
+</style>
+</head>
+<body>
 
-def normalizar_subtipo(raw: str) -> str:
-    if not raw:
-        return "sp"
-    r = str(raw).lower().strip()
-    if r in ("sx", "1a1", "1 a 1"):
-        return "sx"
-    if r in ("so", "social"):
-        return "so"
-    return "sp"
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand-number">9&amp;Self</div>
+      <div class="brand-name">SELF</div>
+      <div class="brand-tagline">Descubra sua personalidade</div>
+    </div>
 
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="setLoginProfile('admin')">Admin</button>
+      <button class="login-tab" onclick="setLoginProfile('rh')">RH / Empresa</button>
+      <button class="login-tab" onclick="setLoginProfile('colaborador')">Colaborador</button>
+    </div>
 
-# ── GERAÇÃO DO PDF ──────────────────────────────────────────────────────────
+    <div id="loginAdmin">
+      <div class="login-field">
+        <label>Senha de Acesso</label>
+        <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+    </div>
 
-def build_pdf(tipo: int, asa: int, sub_dom: str, sub_int: str, sub_rem: str,
-              nome: str, cargo: str) -> bytes:
-    """Monta o PDF do laudo e retorna os bytes."""
+    <div id="loginRH" style="display:none;">
+      <div class="login-field">
+        <label>E-mail</label>
+        <input type="email" id="rhEmail" placeholder="empresa@email.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="login-field">
+        <label>Senha</label>
+        <input type="password" id="rhPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+    </div>
 
-    buf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-    buf.close()
+    <div id="loginColab" style="display:none;">
+      <div class="code-hero" style="padding:28px 20px;margin-bottom:0;border-radius:12px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:6px;">Acesse com seu código</div>
+        <p style="font-size:12px;opacity:.6;">Você recebeu um código único de acesso</p>
+        <div class="code-input-wrap">
+          <input class="code-input" id="colabCode" placeholder="EX: A1B2C3" maxlength="8"
+            onkeydown="if(event.key==='Enter')doLogin()" style="font-size:15px;letter-spacing:3px;"/>
+        </div>
+      </div>
+    </div>
 
-    doc = SimpleDocTemplate(
-        buf.name,
-        pagesize=A4,
-        leftMargin=2*cm, rightMargin=2*cm,
-        topMargin=2*cm,  bottomMargin=2*cm,
-        title=f"Laudo 9&Self — {nome}",
-        author="9&Self | Dra. Lucia Kratz",
-    )
+    <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
 
-    styles = getSampleStyleSheet()
+<!-- ══════════════════ APP SHELL ══════════════════ -->
+<div id="appShell">
+  <div class="overlay-mobile" id="overlayMobile" onclick="closeSidebar()"></div>
+  <div class="app-layout">
 
-    def estilo(name, **kw):
-        base = styles["Normal"]
-        return ParagraphStyle(name, parent=base, **kw)
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="s-number">9&amp;Self</div>
+        <div class="s-name">SELF</div>
+      </div>
+      <div class="sidebar-profile">
+        <div class="sp-role" id="sideRole">—</div>
+        <div class="sp-name" id="sideName">—</div>
+      </div>
+      <nav class="sidebar-nav" id="sideNav"></nav>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="doLogout()">↩ Sair</button>
+      </div>
+    </aside>
 
-    s_titulo   = estilo("titulo",   fontName="Helvetica-Bold", fontSize=22,
-                        textColor=CORES["purple"], spaceAfter=6, alignment=TA_CENTER)
-    s_sub      = estilo("sub",      fontName="Helvetica",      fontSize=12,
-                        textColor=CORES["gray"],  spaceAfter=4, alignment=TA_CENTER)
-    s_secao    = estilo("secao",    fontName="Helvetica-Bold", fontSize=13,
-                        textColor=CORES["purple"], spaceBefore=14, spaceAfter=4)
-    s_corpo    = estilo("corpo",    fontName="Helvetica",      fontSize=10,
-                        textColor=CORES["dark"],  leading=15, spaceAfter=6,
-                        alignment=TA_JUSTIFY)
-    s_label    = estilo("label",    fontName="Helvetica-Bold", fontSize=9,
-                        textColor=CORES["purple"])
-    s_valor    = estilo("valor",    fontName="Helvetica",      fontSize=10,
-                        textColor=CORES["dark"])
-    s_rodape   = estilo("rodape",   fontName="Helvetica",      fontSize=8,
-                        textColor=CORES["gray"],  alignment=TA_CENTER)
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="hamburger" onclick="toggleSidebar()">☰</button>
+          <span class="topbar-title" id="topbarTitle">Painel</span>
+        </div>
+        <div class="topbar-actions">
+          <span class="badge" id="topbarBadge">Admin</span>
+        </div>
+      </div>
 
-    perfil_texto = ler_perfil_tipo(tipo)
+      <!-- ── PÁGINAS ADMIN ── -->
+      <div class="page active" id="page-dashboard">
+        <div style="padding:28px;">
+          <div class="page-title">Painel Geral</div>
+          <div class="page-subtitle">Visão consolidada do sistema 9&amp;Self</div>
+          <div class="cards-grid" id="dashCards"></div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Últimas Avaliações</h3>
+              <button class="btn btn-outline btn-sm">Ver todas</button>
+            </div>
+            <table>
+              <thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Status</th></tr></thead>
+              <tbody id="dashTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação ainda</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-    # Separar seções por marcador === (adapte ao formato real dos seus .txt)
-    secoes = [s.strip() for s in perfil_texto.split("===") if s.strip()]
+      <div class="page" id="page-empresas">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div>
+              <div class="page-title">Empresas / RH</div>
+              <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead><tr><th>Empresa</th><th>Responsável</th><th>E-mail</th><th>Créditos</th><th>Laudos Gerados</th><th>Status</th><th></th></tr></thead>
+              <tbody id="empresasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-    data_hoje = datetime.now().strftime("%d/%m/%Y")
+      <div class="page" id="page-codigos">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div>
+              <div class="page-title">Códigos de Acesso</div>
+              <div class="page-subtitle">Gere e gerencie códigos únicos por pessoa</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <tbody id="codigosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-    story = []
+      <div class="page" id="page-laudos">
+        <div style="padding:28px;">
+          <div class="page-title">Laudos Gerados</div>
+          <div class="page-subtitle">Histórico de todos os laudos do sistema</div>
+          <div class="table-card" style="margin-top:16px;">
+            <table>
+              <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
+              <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-    # ── CABEÇALHO ────────────────────────────────────────────────────────────
-    story.append(Paragraph("9&amp;Self", s_titulo))
-    story.append(Paragraph("Avaliação de Personalidade", s_sub))
-    story.append(HRFlowable(width="100%", thickness=2, color=CORES["purple"],
-                             spaceAfter=12))
+      <!-- ── PÁGINAS RH ── -->
+      <div class="page" id="page-rh-dashboard">
+        <div style="padding:28px;">
+          <div class="page-title" id="rhDashTitle">Painel RH</div>
+          <div class="page-subtitle">Gerencie seus colaboradores e créditos</div>
+          <div class="cards-grid" id="rhCards"></div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Colaboradores</h3>
+              <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+            </div>
+            <table>
+              <thead><tr><th>Nome</th><th>Código</th><th>Tipo</th><th>Status</th><th>Laudo</th></tr></thead>
+              <tbody id="rhColabTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum colaborador ainda</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-    # ── DADOS DO PARTICIPANTE ────────────────────────────────────────────────
-    dados_tabela = [
-        [Paragraph("Participante", s_label), Paragraph(nome, s_valor)],
-        [Paragraph("Cargo / Função", s_label), Paragraph(cargo or "—", s_valor)],
-        [Paragraph("Data de Emissão", s_label), Paragraph(data_hoje, s_valor)],
-    ]
-    t = Table(dados_tabela, colWidths=[4*cm, 13*cm])
-    t.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (0, -1), CORES["light"]),
-        ("TEXTCOLOR",  (0, 0), (0, -1), CORES["purple"]),
-        ("GRID",       (0, 0), (-1, -1), 0.5, CORES["border"]),
-        ("ROWBACKGROUNDS", (0, 0), (-1, -1), [CORES["white"], CORES["light"]]),
-        ("VALIGN",     (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ("LEFTPADDING",   (0, 0), (-1, -1), 8),
-    ]))
-    story.append(t)
-    story.append(Spacer(1, 14))
+      <!-- ── PÁGINAS COLABORADOR ── -->
+      <div class="page" id="page-colab-inicio" style="display:none;"></div>
 
-    # ── RESULTADO ────────────────────────────────────────────────────────────
-    story.append(Paragraph("Resultado da Avaliação", s_secao))
+      <div class="page" id="page-colab-teste">
+        <div style="padding:28px;">
+          <div class="page-title">Avaliação de Personalidade</div>
+          <div class="page-subtitle" id="testeSubtitle">Módulo 1 de 3 — Identificação do Tipo</div>
+          <div class="test-container">
+            <div class="test-progress"><div class="test-progress-bar" id="progressBar" style="width:0%"></div></div>
+            <div id="testeContent"></div>
+          </div>
+        </div>
+      </div>
 
-    resultado_tabela = [
-        [
-            Paragraph("Tipo Principal", s_label),
-            Paragraph(f"Tipo {tipo} — {NOMES.get(tipo, '')}", s_valor),
-        ],
-        [
-            Paragraph("Asa Dominante", s_label),
-            Paragraph(f"Asa {asa}", s_valor),
-        ],
-        [
-            Paragraph("Subtipo Dominante", s_label),
-            Paragraph(SUBTIPO_LABEL.get(sub_dom, sub_dom), s_valor),
-        ],
-        [
-            Paragraph("Subtipo Intermediário", s_label),
-            Paragraph(SUBTIPO_LABEL.get(sub_int, sub_int), s_valor),
-        ],
-        [
-            Paragraph("Subtipo de Menor Ênfase", s_label),
-            Paragraph(SUBTIPO_LABEL.get(sub_rem, sub_rem), s_valor),
-        ],
-    ]
-    tr = Table(resultado_tabela, colWidths=[5*cm, 12*cm])
-    tr.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#EDD9FF")),
-        ("GRID",       (0, 0), (-1, -1), 0.5, CORES["border"]),
-        ("ROWBACKGROUNDS", (0, 0), (-1, -1), [CORES["white"], CORES["light"]]),
-        ("VALIGN",     (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ("LEFTPADDING",   (0, 0), (-1, -1), 8),
-    ]))
-    story.append(tr)
-    story.append(Spacer(1, 14))
+      <div class="page" id="page-colab-resultado">
+        <div style="padding:28px;max-width:720px;margin:0 auto;text-align:center;">
+          <div style="font-size:64px;margin-bottom:16px;">🎉</div>
+          <div class="page-title">Avaliação Concluída!</div>
+          <p style="color:var(--gray);margin-bottom:28px;">Seu laudo personalizado está pronto para download.</p>
+          <div style="background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border);text-align:left;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+              <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--mag));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;" id="resultTipoCircle">—</div>
+              <div>
+                <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;">Seu Tipo</div>
+                <div style="font-size:18px;font-weight:600;" id="resultTipoNome">—</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="background:var(--light);border-radius:10px;padding:12px;">
+                <div style="font-size:11px;color:var(--gray);">Asa Dominante</div>
+                <div style="font-size:15px;font-weight:600;" id="resultAsa">—</div>
+              </div>
+              <div style="background:var(--light);border-radius:10px;padding:12px;">
+                <div style="font-size:11px;color:var(--gray);">Subtipo (Dom · Int · Rem)</div>
+                <div style="font-size:13px;font-weight:600;" id="resultSubtipo">—</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;width:100%;max-width:320px;" onclick="baixarLaudo()">
+              ⬇ Baixar Laudo PDF
+            </button>
+            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
+              🔄 Gerar / Regenerar Laudo
+            </button>
+          </div>
+          <div id="pdfStatus" style="margin-top:10px;font-size:13px;color:var(--gray);min-height:20px;text-align:center;"></div>
+          <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #7B1D6B;border-radius:14px;padding:20px 22px;text-align:left;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:20px;">⚠️</span>
+              <strong style="color:#7B1D6B;font-size:13px;letter-spacing:.5px;text-transform:uppercase;">ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</strong>
+            </div>
+            <p style="color:#2C2C2C;font-size:13px;line-height:1.7;margin:0;">Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu processo e veja o laudo como um companheiro de caminhada.</p>
+          </div>
+        </div>
+      </div>
 
-    # ── PERFIL TEXTUAL ───────────────────────────────────────────────────────
-    story.append(Paragraph("Perfil de Personalidade", s_secao))
-    story.append(HRFlowable(width="100%", thickness=1, color=CORES["border"],
-                             spaceAfter=8))
+    </div><!-- /main -->
+  </div><!-- /app-layout -->
+  <footer class="app-footer">
+    <img src="dra%20luciakratz%20transparente.png" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
+    <span>Desenvolvido por <strong>Dra. Lucia Kratz</strong> · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade 🦋</span>
+  </footer>
+</div>
 
-    if secoes:
-        for secao in secoes:
-            linhas = secao.split("\n")
-            titulo_secao = linhas[0].strip() if linhas else ""
-            corpo_secao  = " ".join(l.strip() for l in linhas[1:] if l.strip())
-            if titulo_secao:
-                story.append(Paragraph(titulo_secao, s_secao))
-            if corpo_secao:
-                story.append(Paragraph(corpo_secao, s_corpo))
-    else:
-        # Arquivo sem marcadores === → exibe texto completo
-        for para in perfil_texto.split("\n\n"):
-            para = para.strip()
-            if para:
-                story.append(Paragraph(para.replace("\n", " "), s_corpo))
+<!-- ══════════════════ MODAIS ══════════════════ -->
 
-    story.append(Spacer(1, 20))
+<!-- Modal Nova Empresa -->
+<div class="modal-overlay" id="modalNovaEmpresa">
+  <div class="modal">
+    <h3>Nova Empresa / RH</h3>
+    <div class="form-row">
+      <label>Nome da Empresa</label>
+      <input type="text" id="empNome" placeholder="Ex: Empresa Ltda"/>
+    </div>
+    <div class="form-row">
+      <label>Responsável RH</label>
+      <input type="text" id="empResponsavel" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>E-mail de acesso</label>
+      <input type="email" id="empEmail" placeholder="rh@empresa.com"/>
+    </div>
+    <div class="form-row">
+      <label>Senha de acesso</label>
+      <input type="password" id="empSenha" placeholder="Mínimo 6 caracteres"/>
+    </div>
+    <div class="form-row">
+      <label>Créditos iniciais</label>
+      <input type="number" id="empCreditos" placeholder="0" min="0"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalNovaEmpresa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEmpresa()">Salvar</button>
+    </div>
+  </div>
+</div>
 
-    # ── NOTA ÉTICA ───────────────────────────────────────────────────────────
-    nota = (
-        "Na filosofia do Eneagrama, não existe personalidade melhor ou pior. "
-        "Este laudo não é um rótulo, mas um mapa para o autodesenvolvimento. "
-        "As respostas refletem a autopercepção atual; a personalidade é o ponto "
-        "de partida, mas a consciência de si se fortalece com a terapia e a vivência. "
-        "Acolha o seu processo e veja este laudo como um companheiro de caminhada."
-    )
-    story.append(
-        Table([[Paragraph(nota, estilo("nota", fontName="Helvetica-Oblique",
-                                       fontSize=9, textColor=CORES["gray"],
-                                       alignment=TA_JUSTIFY))]],
-              colWidths=[17*cm],
-              style=[("BACKGROUND", (0,0), (-1,-1), CORES["light"]),
-                     ("BOX",        (0,0), (-1,-1), 1, CORES["border"]),
-                     ("TOPPADDING", (0,0), (-1,-1), 10),
-                     ("BOTTOMPADDING", (0,0), (-1,-1), 10),
-                     ("LEFTPADDING",   (0,0), (-1,-1), 12),
-                     ("RIGHTPADDING",  (0,0), (-1,-1), 12)])
-    )
+<!-- Modal Editar Código -->
+<div class="modal-overlay" id="modalEditarCodigo">
+  <div class="modal">
+    <h3>Editar e Reenviar Teste</h3>
+    <input type="hidden" id="editCodId"/>
+    <input type="hidden" id="editCodCodigo"/>
+    <div class="form-row">
+      <label>Nome do destinatário <span style="color:#B00">*</span></label>
+      <input type="text" id="editCodNome" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="tel" id="editCodWhatsapp" placeholder="(11) 99999-9999"/>
+    </div>
+    <div class="form-row">
+      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="email" id="editCodEmail" placeholder="pessoa@email.com"/>
+    </div>
+    <div class="form-row">
+      <label>Empresa</label>
+      <select id="editCodEmpresa">
+        <option value="pf">— Pessoa Física (direto)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Código do paciente</label>
+      <input type="text" id="editCodCodigoDisplay" readonly
+        style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
+    </div>
+    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
+      🔗 Link: <span id="editPreviewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalEditarCodigo')">Cancelar</button>
+      <button class="btn btn-outline" onclick="salvarEdicaoCodigo()">💾 Salvar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoEnviarWhatsApp()">💬 Salvar e Enviar WhatsApp</button>
+    </div>
+  </div>
+</div>
 
-    story.append(Spacer(1, 16))
-    story.append(Paragraph(
-        f"Documento gerado em {data_hoje} · 9&amp;Self by A!Equipe Desenvolvimento Humano &amp; Cultural · "
-        "Dra. Lucia Kratz · CRP 09/20590",
-        s_rodape
-    ))
+<!-- Modal Novo Código -->
+<div class="modal-overlay" id="modalNovoCodigo">
+  <div class="modal">
+    <h3>Liberar Novo Teste</h3>
+    <div class="form-row">
+      <label>Nome do destinatário <span style="color:#B00">*</span></label>
+      <input type="text" id="codNome" placeholder="Nome completo"/>
+    </div>
+    <div class="form-row">
+      <label>WHATSAPP (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="tel" id="codWhatsapp" placeholder="(11) 99999-9999"/>
+    </div>
+    <div class="form-row">
+      <label>E-MAIL (OBRIGATÓRIO) <span style="color:#B00">*</span></label>
+      <input type="email" id="codEmail" placeholder="pessoa@email.com"/>
+    </div>
+    <div class="form-row" id="codEmpresaRow">
+      <label>Empresa</label>
+      <select id="codEmpresa">
+        <option value="pf">— Pessoa Física (direto)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Código gerado</label>
+      <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
+    </div>
+    <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
+      🔗 Link: <span id="previewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="gerarCodigoPreview()">🔄 Novo Código</button>
+      <button class="btn btn-outline" onclick="closeModal('modalNovoCodigo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCodigo()">Liberar e Enviar WhatsApp</button>
+    </div>
+  </div>
+</div>
 
-    doc.build(story)
+<!-- TOAST -->
+<div id="toast"></div>
 
-    with open(buf.name, "rb") as f:
-        pdf_bytes = f.read()
-    os.unlink(buf.name)
-    return pdf_bytes
+<!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyDnrgaY8R0Zetkr18uHQJAZXIUa4EwDnv4",
+  authDomain: "entrevista-inicial.firebaseapp.com",
+  projectId: "entrevista-inicial",
+  storageBucket: "entrevista-inicial.firebasestorage.app",
+  messagingSenderId: "437375609844",
+  appId: "1:437375609844:web:36082771a32d262b2e27a1"
+};
 
-# ── ENTRY POINT DA CLOUD FUNCTION ──────────────────────────────────────────
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-def gerarLaudoPDF(request):
-    """
-    HTTP Cloud Function (POST).
-    Espera JSON: { tipo, asa, subDom, subInt, subRem, nome, cargo, codigoId }
-    Retorna JSON: { url, path }
-    """
-    # CORS pre-flight
-    if request.method == "OPTIONS":
-        headers = {
-            "Access-Control-Allow-Origin":  "*",
-            "Access-Control-Allow-Methods": "POST",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age":       "3600",
+// ── ESTADO GLOBAL ──
+window._state = {
+  profile: null, // 'admin' | 'rh' | 'colaborador'
+  user: null,
+  empresa: null,
+  codigoAtivo: null,
+};
+
+// ── PERFIL DE LOGIN ──
+window.setLoginProfile = function(p) {
+  window._state.profile = p;
+  document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',['admin','rh','colaborador'][i]===p));
+  document.getElementById('loginAdmin').style.display = p==='admin'?'block':'none';
+  document.getElementById('loginRH').style.display = p==='rh'?'block':'none';
+  document.getElementById('loginColab').style.display = p==='colaborador'?'block':'none';
+  document.getElementById('loginError').textContent='';
+};
+
+// ── LOGIN ──
+window.doLogin = async function() {
+  const btn = document.getElementById('loginBtnEl');
+  btn.textContent='Entrando...';btn.disabled=true;
+  const err = document.getElementById('loginError');
+  err.textContent='';
+  const p = window._state.profile || 'admin';
+  try {
+    if(p==='admin') {
+      const pass = document.getElementById('adminPass').value;
+      if(pass==='1234') { enterApp('admin','Lucia Kratz','Administradora'); }
+      else { err.textContent='Senha incorreta.'; }
+    } else if(p==='rh') {
+      const email = document.getElementById('rhEmail').value;
+      const pass  = document.getElementById('rhPass').value;
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      // busca dados da empresa no Firestore
+      const q = query(collection(db,'nself_empresas'), where('email','==',email));
+      const snap = await getDocs(q);
+      if(!snap.empty) {
+        const emp = snap.docs[0].data();
+        window._state.empresa = {id:snap.docs[0].id,...emp};
+        enterApp('rh', emp.responsavel, emp.nome);
+      } else {
+        err.textContent='Empresa não encontrada. Contate o administrador.';
+      }
+    } else {
+      // colaborador — valida código
+      await validarCodigo();
+      btn.textContent='Entrar'; btn.disabled=false;
+      return;
+    }
+  } catch(e) {
+    err.textContent = e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Erro ao entrar. Tente novamente.';
+  }
+  btn.textContent='Entrar';btn.disabled=false;
+};
+
+function enterApp(profile, name, role) {
+  window._state.profile = profile;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='block';
+  document.getElementById('sideRole').textContent = role;
+  document.getElementById('sideName').textContent = name;
+  const badge = document.getElementById('topbarBadge');
+  badge.textContent = role;
+  badge.className = 'badge badge-'+profile;
+  buildSidebar(profile);
+  navigateTo(profile==='admin'?'dashboard':profile==='rh'?'rh-dashboard':'colab-inicio');
+  if(profile==='admin') loadDashboard();
+  if(profile==='rh') loadRHDashboard();
+}
+
+// ── SIDEBAR ──
+const NAVS = {
+  admin: [
+    {icon:'📊', label:'Painel', page:'dashboard'},
+    {icon:'🏢', label:'Empresas / RH', page:'empresas'},
+    {icon:'🔑', label:'Códigos de Acesso', page:'codigos'},
+    {icon:'📄', label:'Laudos', page:'laudos'},
+  ],
+  rh: [
+    {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
+    {icon:'🔑', label:'Gerar Código', page:'codigos'},
+    {icon:'📄', label:'Laudos', page:'laudos'},
+  ],
+  colaborador: [
+    {icon:'🧠', label:'Minha Avaliação', page:'colab-teste'},
+    {icon:'📄', label:'Meu Laudo', page:'colab-resultado'},
+  ],
+};
+
+function buildSidebar(profile) {
+  const nav = document.getElementById('sideNav');
+  nav.innerHTML='';
+  (NAVS[profile]||[]).forEach(item=>{
+    const d = document.createElement('div');
+    d.className='nav-item';
+    d.dataset.page=item.page;
+    d.innerHTML=`<span class="nav-icon">${item.icon}</span><span>${item.label}</span>`;
+    d.onclick=()=>navigateTo(item.page);
+    nav.appendChild(d);
+  });
+}
+
+window.navigateTo = function(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el = document.getElementById('page-'+page);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
+  const labels = {
+    'dashboard':'Painel Geral','empresas':'Empresas / RH','codigos':'Códigos',
+    'laudos':'Laudos','rh-dashboard':'Painel RH',
+    'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo'
+  };
+  document.getElementById('topbarTitle').textContent = labels[page]||'';
+  closeSidebar();
+};
+
+// ── DASHBOARD ADMIN ──
+async function loadDashboard() {
+  try {
+    const [empSnap, codSnap, laudoSnap] = await Promise.all([
+      getDocs(collection(db,'nself_empresas')),
+      getDocs(collection(db,'nself_codigos')),
+      getDocs(collection(db,'nself_laudos')),
+    ]);
+    const cards = document.getElementById('dashCards');
+    cards.innerHTML=`
+      <div class="stat-card"><div class="sc-label">Empresas</div><div class="sc-value">${empSnap.size}</div><div class="sc-sub">cadastradas</div></div>
+      <div class="stat-card"><div class="sc-label">Códigos Gerados</div><div class="sc-value">${codSnap.size}</div><div class="sc-sub">total emitido</div></div>
+      <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${laudoSnap.size}</div><div class="sc-sub">gerados</div></div>
+      <div class="stat-card"><div class="sc-label">Códigos Usados</div><div class="sc-value">${codSnap.docs.filter(d=>d.data().status==='usado').length}</div><div class="sc-sub">avaliações realizadas</div></div>
+    `;
+  } catch(e){console.warn('Dashboard:',e);}
+}
+
+// ── LOAD EMPRESAS ──
+async function loadEmpresas() {
+  const tbody = document.getElementById('empresasTable');
+  try {
+    const snap = await getDocs(collection(db,'nself_empresas'));
+    if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr>';return;}
+    tbody.innerHTML = snap.docs.map(d=>{
+      const e=d.data();
+      return `<tr>
+        <td><strong>${e.nome}</strong></td>
+        <td>${e.responsavel}</td>
+        <td>${e.email}</td>
+        <td><strong>${e.creditos||0}</strong></td>
+        <td>${e.laudosGerados||0}</td>
+        <td><span class="pill ${e.ativo?'pill-green':'pill-gray'}">${e.ativo?'Ativo':'Inativo'}</span></td>
+        <td><button class="btn btn-outline btn-sm">Ver</button></td>
+      </tr>`;
+    }).join('');
+  } catch(e){console.warn(e);}
+}
+
+// ── LOAD CÓDIGOS ──
+async function loadCodigos() {
+  const tbody = document.getElementById('codigosTable');
+  try {
+    const snap = await getDocs(collection(db,'nself_codigos'));
+    if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr>';return;}
+    tbody.innerHTML = snap.docs.map(d=>{
+      const c = d.data();
+      const statusCls = {'Pendente':'pill-gray','Respondido':'pill-blue','disponivel':'pill-green','revogado':'pill-red'};
+      const link  = c.linkTeste || gerarLinkTeste(c.codigo||'');
+      const pdf   = c.pdfPath || '';
+      const wbtn  = c.whatsapp
+        ? `<a href="${gerarLinkWhatsApp(c.whatsapp,c.nomeDestinatario||'',c.codigo)}" target="_blank" class="btn btn-outline btn-sm" title="Reenviar WhatsApp">💬</a>`
+        : '';
+      return `<tr>
+        <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
+        <td>${c.nomeDestinatario||'—'}</td>
+        <td>${c.empresa||'Pessoa Física'}</td>
+        <td style="font-size:11px;max-width:140px;word-break:break-all;">
+          <a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
+        <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+        <td style="display:flex;gap:6px;align-items:center;">
+          ${wbtn}
+          <button class="btn btn-outline btn-sm" title="Editar e Reenviar"
+            onclick="editarCodigo('${d.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.email||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button>
+          <button class="btn btn-danger btn-sm" title="Excluir"
+            onclick="excluirCodigo('${d.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
+        </td></tr>`;
+    }).join('');
+  } catch(e){console.warn(e);}
+}
+
+// ── RH DASHBOARD ──
+async function loadRHDashboard() {
+  const emp = window._state.empresa;
+  if(!emp) return;
+  document.getElementById('rhDashTitle').textContent = emp.nome||'Painel RH';
+  const cards = document.getElementById('rhCards');
+  cards.innerHTML=`
+    <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${emp.creditos||0}</div><div class="sc-sub">disponíveis</div></div>
+    <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${emp.laudosGerados||0}</div><div class="sc-sub">gerados</div></div>
+  `;
+}
+
+// ── VALIDAR CÓDIGO (COLABORADOR) ──
+window.validarCodigo = async function() {
+  // Código digitado na tela de login
+  const codigo = (document.getElementById('colabCode').value||'').trim().toUpperCase();
+  const errEl  = document.getElementById('loginError');
+  const btn    = document.getElementById('loginBtnEl');
+  errEl.textContent='';
+  if(!codigo){errEl.textContent='Insira seu código.';return;}
+  btn.textContent='Verificando...'; btn.disabled=true;
+  try {
+    const q = query(collection(db,'nself_codigos'), where('codigo','==',codigo));
+    const snap = await getDocs(q);
+    if(snap.empty){errEl.textContent='Código não encontrado.';btn.textContent='Entrar';btn.disabled=false;return;}
+    const docRef = snap.docs[0];
+    const data   = docRef.data();
+    if(data.status==='usado'){
+      // Buscar laudo já gerado para mostrar resultado
+      window._state.codigoAtivo = {id:docRef.id,...data};
+      enterApp('colaborador', data.nomeDestinatario||'Colaborador', 'Acesso por Código');
+      setTimeout(async ()=>{
+        const q2 = query(collection(db,'nself_laudos'), where('codigoId','==',docRef.id));
+        const ls  = await getDocs(q2);
+        if(!ls.empty){
+          const laudo = ls.docs[0].data();
+          const laudoId = ls.docs[0].id;
+          // Preencher tela de resultado com dados do Firestore
+          const NOMES = {'1':'Perfeição e Excelência','2':'Prestativo e Relacional','3':'Performance e Imagem','4':'Autêntico e Profundo','5':'Observador e Privacidade','6':'Precavido e Questionador','7':'Visionário e Otimista','8':'Desafiador e Controlador','9':'Harmônico e Diplomático'};
+          const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+          document.getElementById('resultTipoCircle').textContent = laudo.tipo;
+          document.getElementById('resultTipoNome').textContent   = laudo.tipoNome || NOMES[laudo.tipo] || '—';
+          document.getElementById('resultAsa').textContent        = `Asa ${laudo.asaDominante} (dominante) · Asa ${laudo.asaSecundaria} (secundária)`;
+          document.getElementById('resultSubtipo').textContent    = `${NS[laudo.subtipoDominante]||laudo.subtipoDominante} · ${NS[laudo.subtipoIntermediario]||laudo.subtipoIntermediario} · ${NS[laudo.subtipoRemissivo]||laudo.subtipoRemissivo}`;
+          window._state.laudoDocId = laudoId;
+          if(laudo.pdfUrl) window._state.laudoUrl = laudo.pdfUrl;
+          // Reconstituir TS mínimo para baixarLaudo()
+          window.TS = window.TS || {};
+          TS.tipoFinal = laudo.tipo;
+          TS.asaDom    = laudo.asaDominante;
+          TS.subDom    = laudo.subtipoDominante;
+          TS.subInt    = laudo.subtipoIntermediario;
+          TS.subRem    = laudo.subtipoRemissivo;
         }
-        return ("", 204, headers)
+        navigateTo('colab-resultado');
+      }, 100);
+      btn.textContent='Entrar'; btn.disabled=false;
+      return;
+    }
+    if(data.status==='revogado'){errEl.textContent='Este código foi revogado.';btn.textContent='Entrar';btn.disabled=false;return;}
+    window._state.codigoAtivo = {id:docRef.id,...data};
+    enterApp('colaborador', data.nomeDestinatario||'Colaborador', 'Acesso por Código');
+    setTimeout(()=>{ navigateTo('colab-teste'); iniciarTeste(); }, 100);
+  } catch(e){errEl.textContent='Erro ao validar código. Tente novamente.';}
+  btn.textContent='Entrar'; btn.disabled=false;
+};
 
-    cors_headers = {"Access-Control-Allow-Origin": "*"}
+// ══════════════════════════════════════════
+// TESTE COMPLETO — LÓGICA OFICIAL 9&SELF
+// ══════════════════════════════════════════
 
-    try:
-        data = request.get_json(silent=True) or {}
+// ── TABULAÇÃO GRUPO I + II → TIPO ──
+const TABELA_TIPO = {
+  'AX':7,'AY':8,'AZ':3,
+  'BX':9,'BY':4,'BZ':5,
+  'CX':2,'CY':6,'CZ':1,
+};
 
-        tipo    = int(data.get("tipo", 0))
-        asa     = int(data.get("asa",  0))
-        sub_dom = normalizar_subtipo(data.get("subDom", "sp"))
-        sub_int = normalizar_subtipo(data.get("subInt", "so"))
-        sub_rem = normalizar_subtipo(data.get("subRem", "sx"))
-        nome    = str(data.get("nome",  "Participante")).strip() or "Participante"
-        cargo   = str(data.get("cargo", "")).strip()
-        codigo_id = str(data.get("codigoId", "")).strip()
+// Ordem de prioridade quando há certeza dupla, simples ou nenhuma
+function gerarOrdemPrioridade(gi, gii) {
+  // gi = array ordenado ex: ['A','C','B'], gii = array ordenado ex: ['Y','X','Z']
+  const ordens = [];
+  for(let i=0;i<gi.length;i++)
+    for(let j=0;j<gii.length;j++)
+      ordens.push(gi[i]+gii[j]);
+  // Remove duplicatas
+  return [...new Set(ordens)];
+}
 
-        if tipo not in range(1, 10):
-            return (jsonify({"error": f"Tipo inválido: {tipo}"}), 400, cors_headers)
-        if asa not in range(1, 10):
-            return (jsonify({"error": f"Asa inválida: {asa}"}), 400, cors_headers)
+// ── PERGUNTAS MÓDULO 1 — 45 COMPORTAMENTAIS OFICIAIS ──
+const PERGUNTAS_M1 = [
+  // TIPO 1
+  {tipo:1, texto:"Você costuma organizar seus espaços (armário, mesa, arquivos) seguindo uma lógica própria, com categorias, sequências ou padrões que você mantém ao longo do tempo."},
+  {tipo:1, texto:"Você prefere ambientes simples, limpos ou minimalistas porque isso facilita manter tudo em ordem e evita distrações."},
+  {tipo:1, texto:"Você tende a combinar objetos, roupas ou elementos da casa de forma harmoniosa, porque sente que \"cada coisa tem seu lugar\" e deve seguir um padrão."},
+  {tipo:1, texto:"Quando vê algo fora do lugar, desalinhado ou mal feito, você naturalmente ajusta, corrige ou melhora — mesmo sem ninguém pedir."},
+  {tipo:1, texto:"Você cria rotinas, listas ou métodos para garantir que as coisas sejam feitas da forma correta e no tempo certo."},
+  // TIPO 2
+  {tipo:2, texto:"Você costuma assumir tarefas que pessoas próximas pedem — mesmo quando já está com sua própria rotina cheia — porque sente que é natural ajudar quem você gosta."},
+  {tipo:2, texto:"É comum você perceber que está fazendo várias atividades dos outros junto com as suas, porque quer facilitar a vida de quem é importante para você."},
+  {tipo:2, texto:"Você demonstra carinho fazendo coisas práticas para agradar — como resolver algo para a pessoa, antecipar necessidades ou organizar algo para ela."},
+  {tipo:2, texto:"Você espera que a pessoa perceba o cuidado que você tem e, de alguma forma, também te priorize ou retribua a atenção."},
+  {tipo:2, texto:"Quando você se dedica muito a alguém, tende a notar se a pessoa reconhece ou valoriza o que você faz."},
+  // TIPO 3
+  {tipo:3, texto:"Você observa pessoas que considera referência e tende a ajustar seu comportamento para alcançar um padrão parecido — ou até superior — ao delas."},
+  {tipo:3, texto:"Você costuma aceitar projetos ou desafios apenas quando percebe que tem alta chance de entregar um bom resultado."},
+  {tipo:3, texto:"Mesmo quando está passando por dificuldades, você mantém a aparência de que está tudo bem e funcionando."},
+  {tipo:3, texto:"Você ajusta sua postura, forma de falar ou estilo conforme o ambiente para transmitir competência."},
+  {tipo:3, texto:"Você monitora como está sendo percebida e busca constantemente melhorar sua performance para manter uma imagem de eficiência."},
+  // TIPO 4
+  {tipo:4, texto:"Você escolhe roupas, acessórios ou objetos que expressem sua identidade, mesmo que não sigam o padrão das outras pessoas ao seu redor."},
+  {tipo:4, texto:"Você organiza seus espaços (quarto, mesa, casa) de um jeito que reflita seu estilo pessoal, priorizando estética, significado ou atmosfera."},
+  {tipo:4, texto:"Quando algo te afeta, você tende a se afastar um pouco para entender o que está sentindo antes de voltar a interagir."},
+  {tipo:4, texto:"Você percebe detalhes estéticos, simbólicos ou emocionais em músicas, filmes, ambientes ou conversas que outras pessoas geralmente não notam."},
+  {tipo:4, texto:"Você prefere conversas, atividades ou relações que tenham profundidade e significado, evitando interações superficiais."},
+  // TIPO 5
+  {tipo:5, texto:"Você não gosta que pessoas entrem no seu ambiente (casa, quarto, mesa, escritório) sem sua permissão e prefere controlar quem tem acesso ao seu espaço."},
+  {tipo:5, texto:"Você costuma manter uma reserva financeira e usa seus objetos, roupas ou equipamentos até o limite, evitando comprar coisas novas sem necessidade."},
+  {tipo:5, texto:"Quando um assunto te interessa, você passa horas pesquisando, estudando ou explorando o tema, a ponto de perder a noção do tempo ou do ambiente."},
+  {tipo:5, texto:"As pessoas ao seu redor costumam comentar que você é mais isolada, reservada ou pouco social, mesmo sem você fazer isso de propósito."},
+  {tipo:5, texto:"Você costuma ter ideias claras e detalhadas quando fala sobre algo que domina, mas se irrita ou perde a paciência quando outras pessoas são prolixas ou falam mais do que o necessário."},
+  // TIPO 6
+  {tipo:6, texto:"Mesmo quando você confia em alguém, continua observando, analisando e avaliando se a pessoa mantém coerência ao longo do tempo."},
+  {tipo:6, texto:"Você revisa detalhes, confirma informações ou verifica se algo está certo antes de tomar decisões importantes."},
+  {tipo:6, texto:"Você costuma imaginar cenários possíveis (bons e ruins) para se preparar antes de agir."},
+  {tipo:6, texto:"Você tende a procurar pessoas, regras, métodos ou estruturas que transmitam segurança e previsibilidade."},
+  {tipo:6, texto:"Você percebe rapidamente sinais de risco, inconsistência ou possíveis problemas ao seu redor, mesmo quando ninguém mais notou."},
+  // TIPO 7
+  {tipo:7, texto:"Você costuma procurar atividades, ideias ou experiências novas para manter o dia mais interessante e evitar sensação de monotonia."},
+  {tipo:7, texto:"Você se envolve em vários projetos, hobbies ou planos ao mesmo tempo, mudando de foco quando algo perde o brilho."},
+  {tipo:7, texto:"Você evita rotinas muito estruturadas ou ambientes que limitem sua liberdade de escolha."},
+  {tipo:7, texto:"Você passa tempo pensando, pesquisando ou planejando viagens, cursos, passeios ou novas possibilidades."},
+  {tipo:7, texto:"Você tende a manter a agenda cheia e prefere dias dinâmicos, com variedade de atividades, do que dias muito parados."},
+  // TIPO 8
+  {tipo:8, texto:"Você costuma se posicionar com firmeza quando algo importa para você, mesmo que isso gere tensão ou confronto."},
+  {tipo:8, texto:"As pessoas às vezes dizem que você parece \"brava\" ou \"intensa\", mesmo quando está apenas falando de forma direta."},
+  {tipo:8, texto:"Você vê discussões ou confrontos como algo natural e até produtivo, porque revelam quem é forte e confiável."},
+  {tipo:8, texto:"Você defende pessoas próximas com intensidade e não tolera injustiças contra elas."},
+  {tipo:8, texto:"Você evita demonstrar fragilidade ou pedir ajuda, preferindo resolver as coisas por conta própria."},
+  // TIPO 9
+  {tipo:9, texto:"Você acompanha o ritmo das pessoas ao seu redor para manter a harmonia no ambiente."},
+  {tipo:9, texto:"Você mantém rotinas tranquilas e previsíveis, evitando mudanças ou surpresas bruscas."},
+  {tipo:9, texto:"Você se adapta facilmente às escolhas e vontades dos outros para evitar tensões ou conflitos."},
+  {tipo:9, texto:"Você tende a deixar decisões ou tarefas complexas para depois quando sente que elas podem gerar estresse."},
+  {tipo:9, texto:"Você prefere ambientes calmos, interações previsíveis e relações estáveis, evitando confrontos diretos."},
+];
 
-        # Gerar PDF
-        pdf_bytes = build_pdf(tipo, asa, sub_dom, sub_int, sub_rem, nome, cargo)
+// ── PERGUNTAS DE VALIDAÇÃO (3 por tipo) ──
+const VALIDACAO = {
+  1:[
+    "Você sente uma necessidade constante de fazer as coisas \"do jeito certo\", mesmo quando ninguém está olhando.",
+    "Você se irrita internamente quando percebe erros, injustiças ou falta de organização.",
+    "Você se cobra muito e raramente sente que fez \"o suficiente\"."
+  ],
+  2:[
+    "Você percebe que muitas vezes coloca as necessidades dos outros acima das suas.",
+    "Você sente que precisa ser importante para alguém para se sentir bem consigo mesma.",
+    "Você se frustra quando ajuda muito e não recebe reconhecimento ou reciprocidade."
+  ],
+  3:[
+    "Você sente que precisa alcançar resultados para se sentir valiosa.",
+    "Você adapta sua imagem conforme o ambiente para causar boa impressão.",
+    "Você se sente desconfortável quando não está produzindo ou sendo eficiente."
+  ],
+  4:[
+    "Você sente emoções intensas e profundas, mesmo quando não demonstra.",
+    "Você frequentemente sente que falta \"algo\" em você ou na sua vida.",
+    "Você busca significado e profundidade em tudo o que faz."
+  ],
+  5:[
+    "Você precisa de tempo sozinho para se recarregar e organizar sua mente.",
+    "Você evita depender dos outros e prefere resolver tudo por conta própria.",
+    "Você observa mais do que participa e analisa antes de agir."
+  ],
+  6:[
+    "Você pensa muito nos possíveis riscos antes de tomar decisões.",
+    "Você busca segurança em pessoas, regras ou estruturas confiáveis.",
+    "Você alterna entre confiar e desconfiar, dependendo do contexto."
+  ],
+  7:[
+    "Você se entedia facilmente e busca novas experiências para se sentir viva.",
+    "Você evita ficar presa a rotinas, limitações ou emoções negativas.",
+    "Você pensa rápido e tem muitas ideias ao mesmo tempo."
+  ],
+  8:[
+    "Você assume o controle naturalmente quando percebe que algo está errado.",
+    "Você evita demonstrar vulnerabilidade para não se sentir fraca.",
+    "Você reage com intensidade quando sente injustiça ou desrespeito."
+  ],
+  9:[
+    "Você evita conflitos e prefere manter a paz, mesmo sacrificando suas vontades.",
+    "Você tende a procrastinar decisões importantes para não se estressar.",
+    "Você se adapta aos outros e às situações para não gerar atrito."
+  ],
+};
 
-        # Upload no Firebase Storage
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        nome_arquivo = f"{nome.replace(' ','_')}_{timestamp}"
-        storage_path = f"laudos/9self_{nome_arquivo}.pdf"
+// ── PERGUNTAS DAS ASAS (3 perguntas A/B por tipo) ──
+const ASAS_PERGUNTAS = {
+  1:{ asaA:9, asaB:2, perguntas:[
+    {a:"Você se percebe mais calmo, menos crítico e mais flexível ao lidar com erros.", b:"Você se percebe mais voltado para as pessoas próximas, atento ao impacto que causa nelas."},
+    {a:"Você tende a suavizar tensões e buscar harmonia, evitando rigidez.", b:"Você tende a orientar, ajudar e aperfeiçoar quem está ao seu redor."},
+    {a:"Você costuma desacelerar, aceitar ritmos mais tranquilos e reduzir autocobrança.", b:"Você costuma assumir responsabilidades emocionais e práticas pelas pessoas."},
+  ]},
+  2:{ asaA:1, asaB:3, perguntas:[
+    {a:"Você se percebe mais organizado, cuidadoso e atento a regras internas.", b:"Você se percebe mais competitivo, focado em metas e resultados."},
+    {a:"Você tende a agir de forma educada, controlada e estruturada.", b:"Você tende a agir de forma eficiente, prática e orientada a desempenho."},
+    {a:"Você costuma priorizar fazer o certo e manter padrões elevados.", b:"Você costuma priorizar eficácia, reconhecimento e produtividade."},
+  ]},
+  3:{ asaA:2, asaB:4, perguntas:[
+    {a:"Você se percebe mais acolhedor, atento ao grupo e sensível ao impacto emocional.", b:"Você se percebe mais criativo, introspectivo e voltado para diferenciação."},
+    {a:"Você tende a buscar proximidade e conexão com pessoas importantes.", b:"Você tende a buscar expressão pessoal e autenticidade."},
+    {a:"Você costuma ajustar seu comportamento para apoiar e agradar pessoas próximas.", b:"Você costuma ajustar seu comportamento para manter singularidade e profundidade."},
+  ]},
+  4:{ asaA:3, asaB:5, perguntas:[
+    {a:"Você se percebe mais orientado para metas e ação.", b:"Você se percebe mais analítico, reservado e observador."},
+    {a:"Você tende a buscar reconhecimento por realizações.", b:"Você tende a buscar compreensão e domínio intelectual."},
+    {a:"Você costuma se motivar por resultados concretos.", b:"Você costuma se motivar por entendimento profundo."},
+  ]},
+  5:{ asaA:4, asaB:6, perguntas:[
+    {a:"Você se percebe mais criativo, sensível e movido por interesses pessoais.", b:"Você se percebe mais cauteloso, atento a riscos e preocupado com segurança."},
+    {a:"Você tende a alternar entre proximidade intensa e afastamento.", b:"Você tende a buscar rotina, previsibilidade e isolamento protetor."},
+    {a:"Você costuma agir quando sente conexão emocional com o tema.", b:"Você costuma agir quando tem certeza suficiente e critérios claros."},
+  ]},
+  6:{ asaA:5, asaB:7, perguntas:[
+    {a:"Você se percebe mais analítico, reservado e focado em informação.", b:"Você se percebe mais otimista, ativo e aberto a novas experiências."},
+    {a:"Você tende a buscar segurança através de controle e vigilância.", b:"Você tende a buscar segurança através de movimento e variedade."},
+    {a:"Você costuma se preparar para riscos antes de agir.", b:"Você costuma agir para evitar ficar preso em preocupações."},
+  ]},
+  7:{ asaA:6, asaB:8, perguntas:[
+    {a:"Você se percebe mais ponderado, atento a riscos e cuidadoso ao decidir.", b:"Você se percebe mais assertivo, direto e impulsivo."},
+    {a:"Você tende a convencer com lógica e planejamento.", b:"Você tende a convencer com força, presença e intensidade."},
+    {a:"Você costuma reduzir velocidade para avaliar consequências.", b:"Você costuma acelerar para aproveitar oportunidades rapidamente."},
+  ]},
+  8:{ asaA:7, asaB:9, perguntas:[
+    {a:"Você se percebe mais acelerado, cheio de ideias e impulsivo.", b:"Você se percebe mais calmo, tolerante e flexível."},
+    {a:"Você tende a agir com intensidade e marcar território.", b:"Você tende a evitar conflitos e buscar estabilidade."},
+    {a:"Você costuma avançar rapidamente para assumir controle.", b:"Você costuma recuar para manter paz e equilíbrio."},
+  ]},
+  9:{ asaA:8, asaB:1, perguntas:[
+    {a:"Você se percebe mais decidido, firme e disposto a confrontar.", b:"Você se percebe mais organizado, metódico e preocupado com fazer o certo."},
+    {a:"Você tende a se unir intensamente a pessoas importantes.", b:"Você tende a buscar rotina, conforto e evitar desafios."},
+    {a:"Você costuma agir com força quando algo importa.", b:"Você costuma adiar ações para manter estabilidade."},
+  ]},
+};
 
-        blob = bkt.blob(storage_path)
-        blob.upload_from_string(pdf_bytes, content_type="application/pdf")
-        blob.make_public()
+// ── PERGUNTAS SUBTIPOS ──
+const PERGUNTAS_SUBTIPO = [
+  {sub:'sp', texto:"Você costuma organizar sua rotina para garantir conforto físico, segurança e estabilidade no dia a dia."},
+  {sub:'sp', texto:"Você tende a evitar situações que possam gerar desgaste, risco ou imprevisibilidade."},
+  {sub:'sp', texto:"Você se sente mais tranquilo quando tem recursos, tempo e espaço suficientes para se manter bem."},
+  {sub:'sx', texto:"Você costuma direcionar muita energia para conexões intensas com pessoas específicas."},
+  {sub:'sx', texto:"Você tende a se envolver profundamente quando algo ou alguém desperta seu interesse."},
+  {sub:'sx', texto:"Você se sente mais vivo e motivado quando está em interações intensas, exclusivas ou de forte impacto."},
+  {sub:'so', texto:"Você costuma se envolver naturalmente em grupos, atividades coletivas ou ambientes sociais."},
+  {sub:'so', texto:"Você tende a perceber rapidamente dinâmicas de grupo, papéis sociais e necessidades coletivas."},
+  {sub:'so', texto:"Você se sente confortável participando, contribuindo ou mantendo presença em contextos sociais."},
+];
 
-        url = blob.public_url
+// ── NOMES ──
+const NOMES_TIPO = {1:'Perfeição e Excelência (Traço Tipo 1)',2:'Prestativo e Relacional (Traço Tipo 2)',3:'Performance e Imagem (Traço Tipo 3)',4:'Autêntico e Profundo (Traço Tipo 4)',5:'Observador e Privacidade (Traço Tipo 5)',6:'Precavido e Questionador (Traço Tipo 6)',7:'Visionário e Otimista (Traço Tipo 7)',8:'Desafiador e Controlador (Traço Tipo 8)',9:'Harmônico e Diplomático (Traço Tipo 9)'};
+const NOMES_SUB = {sp:'Autopreservação',sx:'1 a 1',so:'Social'};
 
-        # Salvar registro no Firestore (opcional — o frontend também salva)
-        if codigo_id:
-            try:
-                db.collection("nself_laudos_gerados").add({
-                    "codigoId":   codigo_id,
-                    "tipo":       tipo,
-                    "asa":        asa,
-                    "subDom":     sub_dom,
-                    "subInt":     sub_int,
-                    "subRem":     sub_rem,
-                    "nome":       nome,
-                    "cargo":      cargo,
-                    "pdfUrl":     url,
-                    "pdfPath":    storage_path,
-                    "geradoEm":   firestore.SERVER_TIMESTAMP,
-                })
-            except Exception:
-                pass  # não bloqueia a resposta se o registro falhar
+// ── GRUPO I TEXTOS ──
+const GRUPO_I = {
+  A: "Você tende a ser independente, direto e decidido. Prefere agir do que esperar, define suas próprias metas e gosta de fazer as coisas acontecerem. Não busca confronto, mas também não aceita pressão. Normalmente sabe o que quer e se envolve intensamente tanto no trabalho quanto no lazer.",
+  B: "Você costuma ser tranquilo, reservado e autossuficiente. Não gosta de chamar atenção e evita competir. Prefere ambientes calmos e não se sente confortável em posições de liderança. Sua imaginação e vida interna são fortes, e você não precisa estar ativo o tempo todo para se sentir bem.",
+  C: "Você costuma ser responsável, dedicado e comprometido. Faz o possível para atender expectativas e ajudar os outros, mesmo que isso exija sacrifícios pessoais. Muitas vezes coloca as necessidades alheias antes das suas e só relaxa depois de cumprir o que considera necessário.",
+};
+const GRUPO_II = {
+  X: "Você tende a manter uma visão positiva da vida e acredita que as coisas podem dar certo. Gosta de se envolver em atividades variadas, busca entusiasmo e tenta manter o clima leve. Às vezes adia problemas pessoais para preservar essa visão otimista.",
+  Y: "Você expressa claramente quando algo o incomoda. É sensível, mesmo que não demonstre sempre. Quer saber em quem pode confiar e costuma ter opiniões fortes sobre pessoas e situações. Não gosta que lhe digam o que fazer e prefere decidir por conta própria.",
+  Z: "Você é lógico, autocontrolado e prefere lidar com situações de forma racional. Evita envolver emoções em conflitos e tende a trabalhar sozinho. Algumas pessoas podem achar você distante, mas isso ajuda a manter o foco no que considera importante.",
+};
 
-        return (jsonify({"url": url, "path": storage_path}), 200, cors_headers)
+// ── ESTADO GLOBAL DO TESTE ──
+let TS = {};
 
-    except Exception as exc:
-        import traceback
-        trace = traceback.format_exc()
-        print(f"[gerarLaudoPDF ERROR] {exc}\n{trace}")
-        return (
-            jsonify({"error": str(exc), "trace": trace[-500:]}),
-            500,
-            cors_headers,
-        )
+function iniciarTeste() {
+  TS = {
+    etapa: 'grupos',          // grupos | m1 | validacao | asas | subtipos
+    // Grupo I/II
+    gi: null, gii: null,      // letra escolhida
+    giExtra: null, giiExtra: null, // segunda letra se dois parágrafos
+    ordemPrioridade: [],      // ex: ['CY','CX','CZ','AY',...]
+    prioIdx: 0,               // qual combinação estamos tentando validar
+    // M1
+    scoresM1: {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
+    m1Idx: 0,
+    // Validação
+    tipoTentado: null,
+    validacaoIdx: 0,
+    validacaoSim: 0,
+    // Resultado
+    tipoFinal: null,
+    asaVotos: {A:0,B:0},
+    asaIdx: 0,
+    asaDom: null, asaSec: null,
+    subScores: {sp:0,sx:0,so:0},
+    subIdx: 0,
+  };
+  renderTeste();
+}
+
+function renderTeste() {
+  switch(TS.etapa) {
+    case 'grupos':   renderGrupos(); break;
+    case 'm1':       renderM1();     break;
+    case 'asas':     renderAsas();   break;
+    case 'subtipos': renderSubtipos(); break;
+  }
+}
+
+// ─── ETAPA 0 — GRUPOS ───────────────────────────────────────────────────────
+
+let _giSel = [], _giiSel = [];
+
+function renderGrupos() {
+  _giSel=[]; _giiSel=[];
+  document.getElementById('progressBar').style.width='5%';
+  document.getElementById('testeSubtitle').textContent='Fase 1 — Identificação Inicial';
+  document.getElementById('testeContent').innerHTML=`
+    <div class="question-card" style="margin-bottom:16px;">
+      <div class="q-num" style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--dark);">INSTRUÇÕES</div>
+      <div style="font-size:13px;line-height:1.8;color:var(--gray);">
+        <p style="margin-bottom:8px;">Leia cada parágrafo com atenção e indique <strong>o quanto ele combina com você</strong>, usando a barra de 0% a 100%.</p>
+        <p style="margin-bottom:8px;">Não é preciso concordar inteiramente — o importante é o tom geral e a "filosofia" do parágrafo. <strong>Siga sua intuição.</strong></p>
+        <p>Faça isso para os dois grupos.</p>
+      </div>
+    </div>
+
+    <div class="question-card" style="margin-bottom:16px;">
+      <div class="q-num" style="color:var(--purple);font-weight:700;font-size:14px;margin-bottom:20px;">GRUPO I — Quanto cada parágrafo combina com você?</div>
+
+      <div class="slider-block" style="margin-bottom:24px;">
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <span style="font-weight:800;color:var(--purple);font-size:16px;min-width:20px;">A.</span>
+          <div style="font-size:13px;line-height:1.75;color:var(--dark);">Até hoje, tendi a ser bastante independente e assertivo: para mim, a vida funciona melhor quando você a encara de frente. Defino minhas próprias metas, envolvo-me com as coisas e quero fazê-las acontecer. Não gosto de ficar de braços cruzados — quero realizar grandes coisas e causar impacto. Não ando em busca de confrontos, mas também não deixo que ninguém me pressione. Na maioria das vezes, sei o que quero e procuro consegui-lo. Geralmente entro de cabeça tanto no trabalho quanto na diversão.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+          <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_A" oninput="updateSliderLabel('A')"/>
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+          <span class="slider-pct" id="lbl_A">50%</span>
+        </div>
+      </div>
+
+      <div class="slider-block" style="margin-bottom:24px;">
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <span style="font-weight:800;color:var(--purple);font-size:16px;min-width:20px;">B.</span>
+          <div style="font-size:13px;line-height:1.75;color:var(--dark);">Até hoje tenho sido uma pessoa tranquila e estou acostumado a "me virar" sozinho. Em sociedade, normalmente não chamo a atenção, e é raro que me imponha a qualquer custo. Não me sinto à vontade em posições de liderança nem em competições, como tanta gente. É provável que me julguem um tanto sonhador — é a imaginação que alimenta boa parte da emoção que sinto. Não me incomodo se não tiver de ser ativo o tempo inteiro.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+          <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_B" oninput="updateSliderLabel('B')"/>
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+          <span class="slider-pct" id="lbl_B">50%</span>
+        </div>
+      </div>
+
+      <div class="slider-block" style="margin-bottom:24px;">
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <span style="font-weight:800;color:var(--purple);font-size:16px;min-width:20px;">C.</span>
+          <div style="font-size:13px;line-height:1.75;color:var(--dark);">Até hoje, tenho sido extremamente responsável e dedicado. Para mim é terrível não poder honrar meus compromissos ou colocar-me à altura das expectativas. Quero que as pessoas saibam que desejo ajudá-las e fazer o que acredito ser melhor para elas. Já fiz grandes sacrifícios para o bem dos outros, estivessem eles sabendo ou não. Muitas vezes esqueço de mim mesmo; faço o que tenho que fazer e depois — se sobrar tempo — relaxo (e faço o que realmente queria).</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+          <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_C" oninput="updateSliderLabel('C')"/>
+          <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+          <span class="slider-pct" id="lbl_C">50%</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarGrupoI()">Confirmar Grupo I e continuar →</button>
+    </div>
+
+    <div id="cardGrupoII" style="display:none;">
+      <div class="question-card" style="margin-bottom:16px;">
+        <div class="q-num" style="color:var(--teal);font-weight:700;font-size:14px;margin-bottom:20px;">GRUPO II — Quanto cada parágrafo combina com você?</div>
+
+        <div class="slider-block" style="margin-bottom:24px;">
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <span style="font-weight:800;color:var(--teal);font-size:16px;min-width:20px;">X.</span>
+            <div style="font-size:13px;line-height:1.75;color:var(--dark);">Sou uma pessoa que geralmente procura ter uma visão positiva e achar que as coisas correrão da melhor forma possível. Sempre encontro alguma coisa que me entusiasme e atividades diferentes com que me ocupar. Gosto de companhia e de ajudar os outros a serem felizes — gosto de compartilhar o bem-estar que sinto. (Nem sempre estou tão bem, mas tento não deixar transparecer!) Porém, para manter essa visão positiva, às vezes tive de adiar demais a resolução de alguns problemas pessoais.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+            <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_X" oninput="updateSliderLabel('X')"/>
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+            <span class="slider-pct" id="lbl_X">50%</span>
+          </div>
+        </div>
+
+        <div class="slider-block" style="margin-bottom:24px;">
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <span style="font-weight:800;color:var(--teal);font-size:16px;min-width:20px;">Y.</span>
+            <div style="font-size:13px;line-height:1.75;color:var(--dark);">Sou uma pessoa que não esconde o que sente — todo mundo sabe quando não gosto de alguma coisa. Posso ser reservado, mas no fundo sou mais sensível do que deixo transparecer. Quero saber como as pessoas me julgam e com quem ou o que eu posso contar — na minha opinião sobre elas quase sempre é bem clara. Quando alguma coisa me aborrece, quero que os outros reajam e se afetem tanto quanto eu. Sei quais são as regras, mas não gosto que ninguém me diga o que fazer. Quero decidir por mim mesmo.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+            <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_Y" oninput="updateSliderLabel('Y')"/>
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+            <span class="slider-pct" id="lbl_Y">50%</span>
+          </div>
+        </div>
+
+        <div class="slider-block" style="margin-bottom:24px;">
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <span style="font-weight:800;color:var(--teal);font-size:16px;min-width:20px;">Z.</span>
+            <div style="font-size:13px;line-height:1.75;color:var(--dark);">Sou uma pessoa lógica e autocontrolada — não fico à vontade com os sentimentos. Sou competente — até perfeccionista — e prefiro trabalhar sozinho. Quando surgem conflitos ou problemas pessoais, procuro não envolver meus sentimentos. Há quem me considere muito frio e distante, mas não quero que minhas reações emocionais me afastem do que realmente me importa. Geralmente não demonstro minhas reações quando alguém me "incomoda".</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Não combina</span>
+            <input type="range" min="0" max="100" value="50" class="pct-slider" id="sl_Z" oninput="updateSliderLabel('Z')"/>
+            <span style="font-size:11px;color:var(--gray);white-space:nowrap;">Combina muito</span>
+            <span class="slider-pct" id="lbl_Z">50%</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarGrupos()">Iniciar avaliação →</button>
+      </div>
+    </div>
+  `;
+}
+
+window.updateSliderLabel = function(l) {
+  const val = document.getElementById('sl_'+l).value;
+  document.getElementById('lbl_'+l).textContent = val+'%';
+  document.getElementById('lbl_'+l).style.color = val>60?'var(--purple)':val<40?'var(--gray)':'var(--teal)';
+};
+
+window.confirmarGrupoI = function() {
+  document.getElementById('cardGrupoII').style.display='block';
+  setTimeout(()=>document.getElementById('cardGrupoII').scrollIntoView({behavior:'smooth'}),100);
+};
+
+window.confirmarGrupos = function() {
+  // Ler percentuais
+  const pctGI  = { A: parseInt(document.getElementById('sl_A').value), B: parseInt(document.getElementById('sl_B').value), C: parseInt(document.getElementById('sl_C').value) };
+  const pctGII = { X: parseInt(document.getElementById('sl_X').value), Y: parseInt(document.getElementById('sl_Y').value), Z: parseInt(document.getElementById('sl_Z').value) };
+
+  // Guardar percentuais no estado
+  TS.pctGI  = pctGI;
+  TS.pctGII = pctGII;
+
+  // Gerar todas as combinações com score = pctGI * pctGII
+  const combos = [];
+  for(const gi of ['A','B','C']) {
+    for(const gii of ['X','Y','Z']) {
+      const tipo = TABELA_TIPO[gi+gii];
+      if(tipo) combos.push({ combo: gi+gii, tipo, score: pctGI[gi] * pctGII[gii] });
+    }
+  }
+  // Ordenar do maior score para o menor
+  combos.sort((a,b)=>b.score-a.score);
+  TS.ordemPrioridade = combos.map(x=>x.combo);
+  TS.ordemTipos      = combos.map(x=>x.tipo);
+  TS.gi  = combos[0].combo[0];
+  TS.gii = combos[0].combo[1];
+
+  // Pegar os 3 tipos mais prováveis e iniciar teste do primeiro
+  TS.filaValidacao = [...new Set(TS.ordemTipos)].slice(0, 3);
+  TS.prioIdx = 0;
+  iniciarM1ParaTipo(TS.filaValidacao[0]);
+};
+
+// ─── ETAPA 1+2 — 5 PERGUNTAS DO TIPO CANDIDATO + VALIDAÇÃO ────────────────
+
+function iniciarM1ParaTipo(tipo) {
+  TS.tipoTentado  = tipo;
+  TS.m1RespostasAtual = []; // respostas das 5 perguntas deste tipo
+  TS.m1Idx = 0;
+  TS.etapa = 'm1';
+  renderM1();
+}
+
+function renderM1() {
+  const tipo  = TS.tipoTentado;
+  const pergs = PERGUNTAS_M1.filter(p => p.tipo === tipo);
+  const idx   = TS.m1Idx;
+
+  if(idx >= pergs.length) { validarTipoAtual(); return; }
+
+  const hipotese = TS.prioIdx + 1;
+  const pct = 20 + Math.round((TS.prioIdx/3)*20) + Math.round((idx/5)*15);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('testeSubtitle').textContent =
+    `Hipótese ${hipotese} — Pergunta ${idx+1} de 5`;
+
+  const p = pergs[idx];
+  document.getElementById('testeContent').innerHTML = `
+    <div class="question-card">
+      <div class="q-num">Pergunta ${idx+1} de 5</div>
+      <div class="q-text">${p.texto}</div>
+      <div class="q-options">
+        <button class="q-option" onclick="responderM1(1)">✅ Tenho essa tendência</button>
+        <button class="q-option" onclick="responderM1(0)">❌ Não tenho essa tendência</button>
+      </div>
+    </div>
+  `;
+}
+
+window.responderM1 = function(v) {
+  TS.m1RespostasAtual.push(v);
+  TS.m1Idx++;
+  renderM1();
+};
+
+function validarTipoAtual() {
+  const score   = TS.m1RespostasAtual.reduce((a,b)=>a+b, 0);
+  const tipo    = TS.tipoTentado;
+  const validado = score >= 3;
+  const pct     = Math.round((score/5)*100);
+  const hipotese = TS.prioIdx + 1;
+
+  document.getElementById('progressBar').style.width = (35 + TS.prioIdx*10) + '%';
+  document.getElementById('testeSubtitle').textContent = 'Confirmação do Perfil';
+
+  document.getElementById('testeContent').innerHTML = `
+    <div class="question-card" style="border-left:4px solid var(--purple);text-align:center;padding:32px;">
+      <div class="q-num" style="color:var(--purple);font-size:12px;margin-bottom:8px;">
+        HIPÓTESE ${hipotese} — VERIFICANDO
+      </div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:6px;">
+        ${NOMES_TIPO[tipo]}
+      </div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:20px;">
+        Compatibilidade: <strong style="color:var(--purple)">${pct}%</strong>
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:8px;margin-bottom:24px;">
+        <div style="width:${pct}%;height:100%;border-radius:4px;
+          background:linear-gradient(90deg,var(--purple),var(--teal));"></div>
+      </div>
+      ${validado
+        ? `<div style="color:#1a9460;font-weight:600;margin-bottom:20px;">✅ Perfil confirmado!</div>
+           <button class="btn btn-primary" style="padding:14px 32px;" onclick="confirmarTipo()">
+             Continuar →
+           </button>`
+        : hipotese < 3
+          ? `<div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
+               Baixa compatibilidade com este perfil. Verificando a próxima hipótese...
+             </div>
+             <button class="btn btn-outline" style="padding:14px 32px;" onclick="proximaHipotese()">
+               Verificar próxima hipótese →
+             </button>`
+          : `<div style="color:var(--mag);font-weight:600;margin-bottom:8px;">⚠️ Resultado Inconclusivo</div>
+             <div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
+               Suas respostas variaram bastante entre os perfis testados.<br>
+               Para um resultado preciso, recomendamos refazer o teste com mais atenção.
+             </div>
+             <button class="btn btn-primary" style="padding:14px 32px;" onclick="reiniciarTeste()">
+               🔄 Refazer o teste
+             </button>`
+      }
+    </div>
+  `;
+}
+
+window.confirmarTipo = function() {
+  TS.tipoFinal = TS.tipoTentado;
+  TS.etapa = 'asas';
+  TS.asaVotos = {A:0, B:0};
+  TS.asaIdx = 0;
+  renderTeste();
+};
+
+window.proximaHipotese = function() {
+  TS.prioIdx++;
+  const fila  = TS.filaValidacao;
+  const proximo = fila[TS.prioIdx];
+  if(!proximo) { reiniciarTeste(); return; }
+  iniciarM1ParaTipo(proximo);
+};
+
+window.reiniciarTeste = function() {
+  // Volta para os Grupos I+II
+  iniciarTeste();
+};
+
+// ─── ETAPA 3 — ASAS ─────────────────────────────────────────────────────────
+
+function renderAsas() {
+  const tipo = TS.tipoFinal;
+  const bloco = ASAS_PERGUNTAS[tipo];
+  const idx   = TS.asaIdx;
+  if(idx>=3){ calcularAsa(); return; }
+  document.getElementById('progressBar').style.width=(60+idx*5)+'%';
+  document.getElementById('testeSubtitle').textContent=`Etapa 4 de 5 — Asa Dominante (${idx+1}/3)`;
+  const p = bloco.perguntas[idx];
+  document.getElementById('testeContent').innerHTML=`
+    <div class="question-card">
+      <div class="q-num">Qual alternativa mais combina com você?</div>
+      <div class="q-options" style="flex-direction:column;gap:12px;margin-top:16px;">
+        <button class="q-option" style="text-align:left;padding:16px 20px;line-height:1.5;" onclick="responderAsa('A')">
+          <strong style="color:var(--purple);">A.</strong> ${p.a}
+        </button>
+        <button class="q-option" style="text-align:left;padding:16px 20px;line-height:1.5;" onclick="responderAsa('B')">
+          <strong style="color:var(--teal);">B.</strong> ${p.b}
+        </button>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--gray);margin-top:8px;">
+      A = Asa ${bloco.asaA} · B = Asa ${bloco.asaB}
+    </div>
+  `;
+}
+
+window.responderAsa = function(v) {
+  TS.asaVotos[v]++;
+  TS.asaIdx++;
+  renderAsas();
+};
+
+function calcularAsa() {
+  const bloco = ASAS_PERGUNTAS[TS.tipoFinal];
+  if(TS.asaVotos.A>=2){ TS.asaDom=bloco.asaA; TS.asaSec=bloco.asaB; }
+  else { TS.asaDom=bloco.asaB; TS.asaSec=bloco.asaA; }
+  TS.etapa='subtipos'; TS.subIdx=0;
+  renderTeste();
+}
+
+// ─── ETAPA 4 — SUBTIPOS ─────────────────────────────────────────────────────
+
+// Textos dos subtipos por tipo (Pergunta 2 do PDF, redação melhorada)
+const SUBTIPOS_TEXTOS = {
+  1: {
+    sex: "Tem padrões elevados para si e para quem ama. Busca relações intensas e idealizadas, esperando que o parceiro compartilhe os mesmos valores. Tende a se decepcionar quando as pessoas não correspondem às suas expectativas. É emotivo e exigente nas relações próximas.",
+    ap:  "É detalhista e perfeccionista nas coisas do cotidiano. Preocupa-se com saúde, finanças e bem-estar material. Cobra-se muito por não fazer o suficiente. Pode oscilar entre satisfazer todos os desejos e suprimi-los completamente.",
+    soc: "Mantém postura rígida e impecável socialmente. Tem regras claras sobre como as pessoas devem se comportar e se incomoda quando não são seguidas. Evita espontaneidade e tende a criticar quem não segue seus princípios.",
+  },
+  2: {
+    sex: "Tem uma forma sedutora de falar e de se conectar com as pessoas. Investe energia em conquistar quem admira, especialmente quando percebe resistência ou desafio. Age pelo impulso de se aproximar emocional e fisicamente dos outros.",
+    ap:  "Teme ser esquecido e não ter suas necessidades atendidas. Por isso, foca em satisfazer as necessidades alheias antes das próprias. Aparenta se sacrificar pelos outros, mas espera reconhecimento e reciprocidade em troca.",
+    soc: "Tem muito 'pé na terra' e ambição por espaço social, profissional e material. Precisa ser querido, admirado e aceito em seu círculo. Tem agenda cheia, gosta de fazer contatos e ser o centro das atenções para evitar ser esquecido.",
+  },
+  3: {
+    sex: "Valoriza pertencer a grupos próximos e se preocupa genuinamente com essas pessoas. Essa conexão o ajuda a perceber o impacto negativo que causa quando está focado apenas em suas metas.",
+    ap:  "Aprecia rituais exclusivos e grupos seletivos que o façam sentir diferenciado. É nessa dimensão que encontra criatividade e conceitos para superar desafios. Manifesta emotividade e compaixão sem se deixar envolver emocionalmente.",
+    soc: "Mede seu valor pelo êxito que obtém, pelo aplauso e pelos resultados. Acredita que precisa de uma imagem prestigiosa para se relacionar. Títulos, cargos e reconhecimento são muito importantes — identifica-se com seu papel social.",
+  },
+  4: {
+    sex: "Competitivo e intenso emocionalmente. Sua vida afetiva gira em torno de quem o atrai. Luta por realizações que o tornem aceitável aos olhos do outro, quer ser uma estrela, mas sente rancor de quem atinge os mesmos objetivos.",
+    ap:  "É o mais prático e materialista deste tipo. Ama as coisas boas da vida e é muito sensível à sensualidade do mundo. Tende a manter um estilo de vida além de suas possibilidades quando está emocionalmente envolvido.",
+    soc: "Sente vergonha do próprio desejo e de si mesmo. Tem sentimento de não-merecimento e pessimismo. É o mais sensível, refinado e artístico. Acredita que existe um jeito certo de ser e sente que nunca consegue se encaixar.",
+  },
+  5: {
+    sex: "Gosta de compartilhar segredos com pessoas íntimas. Sente-se impelido a se aproximar dos outros, mas com ansiedade e tendência a recuar de repente. Vive entre o distanciamento e o desejo de intensa proximidade.",
+    ap:  "É o mais caseiro e solitário. Precisa de um refúgio pessoal para se isolar do mundo e se recarregar. Monta guarda sobre seu espaço e privacidade. Tende a acumular recursos, especialmente dinheiro, como forma de segurança.",
+    soc: "É o mais intelectual e comunicativo deste tipo. Conquista pelo saber e qualificação. Gosta de ser visto como mestre da sabedoria e tornar-se indispensável. Sua interação social se pauta pelo debate de ideias e análise de tendências.",
+  },
+  6: {
+    sex: "Mascara inseguranças com autoafirmação ostensiva. Parece corajoso e confrontador — usa força, intimidação ou sedução para se proteger. Desafia a autoridade e busca ser visível e reconhecido como alguém forte.",
+    ap:  "É o mais tímido e dependente deste tipo. Por baixo da aparente fragilidade, há doçura. Oferece compromisso e solicitude esperando receber o mesmo em troca. Faz amizades devagar, observando longamente se pode confiar.",
+    soc: "Conquista pelo saber e qualificação, gosta de ser referência intelectual em seu grupo. Usa sua área de domínio para se tornar indispensável. Sua interação social é pautada pelo debate de ideias e pela análise crítica.",
+  },
+  7: {
+    sex: "Tem capacidade especial de convencer e vender suas ideias. Vive intensamente em todas as interações. Demonstra curiosidade ampla, raciocínio rápido e capacidade de fascinar os outros com seu entusiasmo.",
+    ap:  "É o mais ligado à família e ao prático. Cheio de energia e determinação. Ambicioso e trabalhador, faz questão de garantir que nunca falte nada para si e para os seus. Teme depender dos outros e ter privações.",
+    soc: "Dedica-se a causas nobres e ideais sociais. Abre mão de liberdade pessoal em nome do coletivo. Cultiva grupos de amigos que compartilham seus entusiasmos. É idealista e gosta de se envolver em causas sociais.",
+  },
+  8: {
+    sex: "Marca território com intensidade e carisma. Reage com paixão ao que lhe interessa e quer causar impacto na vida das pessoas. Pode ser ríspido com os mais íntimos. Encara relacionamentos como conquista.",
+    ap:  "Tem intolerância à frustração e quer satisfação a qualquer custo. Protege suas posses e investimentos com zelo. Faz questão de ter controle total. Tende a se viciar no trabalho para garantir renda e poder.",
+    soc: "Trata a amizade como um pacto profundo de lealdade e fraternidade. O abuso de confiança é algo que não consegue perdoar. Honra e lealdade são valores centrais — age com força para proteger seu grupo.",
+  },
+  9: {
+    sex: "Busca fusão total com o outro. Vive através da pessoa amada, que se torna o centro de sua identidade. A fusão com o outro parece ser a chave da felicidade — precisa que o outro se integre completamente a ele.",
+    ap:  "Prefere os prazeres simples e de fácil obtenção. Acomodado e de trato fácil, não pede muito da vida. Lida com a ansiedade envolvendo-se em rotinas e afazeres corriqueiros para evitar enfrentar desafios.",
+    soc: "Funde-se com o grupo e defende causas coletivas, não pessoais. Muito abnegado e autêntico. Tem vontade de fazer parte de um grupo mas não tem certeza de que pertence. Promove a paz e cumpre as expectativas do seu círculo.",
+  },
+};
+
+function renderSubtipos() {
+  const tipo = TS.tipoFinal;
+  const textos = SUBTIPOS_TEXTOS[tipo];
+  document.getElementById('progressBar').style.width='90%';
+  document.getElementById('testeSubtitle').textContent='Etapa Final — Subtipos';
+
+  document.getElementById('testeContent').innerHTML=`
+    <div class="question-card" style="margin-bottom:16px;">
+      <div class="q-num" style="font-weight:700;color:var(--dark);margin-bottom:8px;">SUBTIPOS — Hierarquize por conforto</div>
+      <div style="font-size:13px;color:var(--gray);line-height:1.6;">
+        Leia os três perfis abaixo e arraste-os (ou clique nas setas) para ordenar do que <strong>mais combina</strong> com você para o que <strong>menos combina</strong>.
+      </div>
+    </div>
+    <div id="subtipo-lista" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+      ${['sex','ap','soc'].map((sub,i) => `
+        <div class="subtipo-card" id="sub_${sub}" data-sub="${sub}" data-pos="${i}">
+          <div class="subtipo-pos" id="pos_${sub}">${i+1}º</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:12px;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">
+              ${ sub==='sex'?'1 a 1':sub==='ap'?'Autopreservação':'Social' }
+            </div>
+            <div style="font-size:13px;line-height:1.65;color:var(--dark);">${textos[sub]}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-left:8px;">
+            <button class="btn btn-outline btn-sm" onclick="moverSub('${sub}',-1)" title="Subir">↑</button>
+            <button class="btn btn-outline btn-sm" onclick="moverSub('${sub}',+1)" title="Descer">↓</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:14px;" onclick="confirmarSubtipos()">
+      Finalizar avaliação →
+    </button>
+  `;
+
+  // Estado da ordem
+  TS.subOrdem = ['sex','ap','soc'];
+}
+
+window.moverSub = function(sub, dir) {
+  const ordem = TS.subOrdem;
+  const idx   = ordem.indexOf(sub);
+  const novo  = idx + dir;
+  if(novo < 0 || novo >= ordem.length) return;
+  // Trocar
+  [ordem[idx], ordem[novo]] = [ordem[novo], ordem[idx]];
+  TS.subOrdem = ordem;
+  // Reordenar visualmente
+  const lista = document.getElementById('subtipo-lista');
+  const cards = ordem.map(s => document.getElementById('sub_'+s));
+  cards.forEach((card,i) => {
+    lista.appendChild(card);
+    document.getElementById('pos_'+ordem[i]).textContent = (i+1)+'º';
+  });
+};
+
+window.confirmarSubtipos = function() {
+  const ordem = TS.subOrdem;
+  TS.subDom = ordem[0];
+  TS.subInt = ordem[1];
+  TS.subRem = ordem[2];
+  salvarResultadoFinal();
+};
+
+async function salvarResultadoFinal() {
+  document.getElementById('testeContent').innerHTML=`<div style="text-align:center;padding:48px;color:var(--gray);">Calculando seu perfil... 🔮</div>`;
+  const cod = window._state.codigoAtivo;
+  try {
+    if(cod){
+      await updateDoc(doc(db,'nself_codigos',cod.id),{status:'usado',usadoEm:serverTimestamp()});
+      const laudoRef = await addDoc(collection(db,'nself_laudos'),{
+        nome: cod.nomeDestinatario||'Anônimo',
+        empresa: cod.empresa||'PF',
+        codigoId: cod.id,
+        tipo: TS.tipoFinal,
+        tipoNome: NOMES_TIPO[TS.tipoFinal],
+        asaDominante: TS.asaDom,
+        asaSecundaria: TS.asaSec,
+        subtipoDominante: TS.subDom,
+        subtipoIntermediario: TS.subInt,
+        subtipoRemissivo: TS.subRem,
+        scoresM1: TS.scoresM1,
+        scoresSubtipo: TS.subScores,
+        grupoI: TS.gi, grupoII: TS.gii,
+        criadoEm: serverTimestamp(),
+      });
+      window._state.laudoDocId = laudoRef.id;
+    }
+  } catch(e){ console.warn('Salvar resultado:',e); }
+
+  // Mostrar resultado
+  const nomeSub = {
+    'sex':'1 a 1','ap':'Autopreservação','so':'Social','soc':'Social',
+    'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social',
+    'SEX':'1 a 1','SO':'Social'
+  };
+  document.getElementById('resultTipoCircle').textContent = TS.tipoFinal;
+  document.getElementById('resultTipoNome').textContent   = NOMES_TIPO[TS.tipoFinal];
+  document.getElementById('resultAsa').textContent        = `Asa ${TS.asaDom} (dominante) · Asa ${TS.asaSec} (secundária)`;
+  document.getElementById('resultSubtipo').textContent    = 
+    `${nomeSub[TS.subDom]||TS.subDom} · ${nomeSub[TS.subInt]||TS.subInt} · ${nomeSub[TS.subRem]||TS.subRem}`;
+  navigateTo('colab-resultado');
+  showToast('Avaliação concluída!','success');
+}
+
+  // ── GERAR LAUDO MANUAL (botão Gerar/Regenerar) ──
+  window.gerarLaudoManual = async function() {
+    window._state.laudoUrl = null; // limpa cache para forçar geração nova
+    const btnG = document.getElementById('btnGerarLaudo');
+    btnG.disabled = true; btnG.textContent = '⏳ Gerando...';
+    await window.baixarLaudo();
+    btnG.disabled = false; btnG.textContent = '🔄 Gerar / Regenerar Laudo';
+  };
+
+  // ── GERAR E BAIXAR PDF ──
+  const CF_GERAR_PDF = 'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarLaudoPDF';
+
+  window.baixarLaudo = async function() {
+    const btn    = document.getElementById('btnDownloadPdf');
+    const status = document.getElementById('pdfStatus');
+    const cod    = window._state.codigoAtivo || {};
+    const nome   = cod.nomeDestinatario || 'resultado';
+
+    // CASO 1: URL já disponível (gerada anteriormente ou salva no Firestore)
+    if(window._state.laudoUrl) {
+      const a = document.createElement('a');
+      a.href     = window._state.laudoUrl;
+      a.download = `Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+      a.target   = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+
+    // CASO 2: Buscar URL no Firestore (laudo já gerado em sessão anterior)
+    if(window._state.laudoDocId) {
+      try {
+        const { getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        const snap = await getDoc(doc(db,'nself_laudos', window._state.laudoDocId));
+        if(snap.exists() && snap.data().pdfUrl) {
+          window._state.laudoUrl = snap.data().pdfUrl;
+          window.baixarLaudo();
+          return;
+        }
+      } catch(_) {}
+    }
+
+    // CASO 3: Chamar Cloud Function para gerar PDF
+    if(!window.TS || !window.TS.tipoFinal) {
+      showToast('Dados do teste não encontrados. Refaça o teste.','error');
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = '⏳ Gerando laudo...';
+    status.textContent = 'Aguarde, preparando seu laudo personalizado...';
+
+    const payload = {
+      tipo:     TS.tipoFinal,
+      asa:      TS.asaDom,
+      subDom:   TS.subDom,
+      subInt:   TS.subInt,
+      subRem:   TS.subRem,
+      nome:     cod.nomeDestinatario || 'Participante',
+      cargo:    cod.cargo || '',
+      codigoId: cod.id   || '',
+    };
+
+    try {
+      const resp = await fetch(CF_GERAR_PDF, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+      });
+      if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if(!data.url) throw new Error('URL não retornada');
+
+      window._state.laudoUrl = data.url;
+      if(window._state.laudoDocId) {
+        try {
+          await updateDoc(doc(db,'nself_laudos', window._state.laudoDocId),
+            {pdfUrl: data.url, pdfPath: data.path||'', geradoEm: serverTimestamp()});
+        } catch(_) {}
+      }
+      status.textContent  = '✅ Laudo pronto!';
+      btn.textContent     = '⬇ Baixar Laudo PDF';
+      btn.disabled        = false;
+
+      // Download automático abrindo em nova aba
+      const a = document.createElement('a');
+      a.href     = data.url;
+      a.target   = '_blank';
+      a.download = `Laudo_9Self_${(payload.nome||'participante').replace(/\s+/g,'_')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+    } catch(e) {
+      btn.disabled    = false;
+      btn.textContent = '⬇ Baixar Laudo PDF';
+      status.innerHTML = `<span style="color:#c00;">⚠ Não foi possível gerar agora. 
+        <a href="mailto:contato@9self.com.br" style="color:#7B1D6B;">Entre em contato.</a></span>`;
+      console.error('Erro PDF:', e);
+    }
+  };
+const BASE_URL = 'https://luciakratz.github.io/app-eneagrama';
+function gerarLinkTeste(codigo) {
+  // GitHub Pages: index.html explícito evita ambiguidade de roteamento
+  return `${BASE_URL}/index.html?code=${codigo}`;
+}
+function gerarLinkWhatsApp(whatsapp, nome, codigo) {
+  const msg = encodeURIComponent(
+    `Olá, ${nome}! Seu link exclusivo para o teste 9&Self está pronto:\n` +
+    `${gerarLinkTeste(codigo)}\n\nAcesse e responda com calma. 🌟`
+  );
+  const num = whatsapp.replace(/\D/g,'');
+  return `https://wa.me/55${num}?text=${msg}`;
+}
+
+// ── GERAR CÓDIGO PREVIEW ──
+window.gerarCodigoPreview = function() {
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c=''; for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('codGerado').value = c;
+  const prev = document.getElementById('previewLink');
+  if(prev) prev.textContent = gerarLinkTeste(c);
+};
+
+// ── SALVAR CÓDIGO ──
+window.salvarCodigo = async function() {
+  const nome     = document.getElementById('codNome').value.trim();
+  const email    = document.getElementById('codEmail').value.trim();
+  const whatsEl  = document.getElementById('codWhatsapp');
+  const whatsapp = whatsEl ? whatsEl.value.trim() : '';
+  const emp      = document.getElementById('codEmpresa').value;
+  let codigo     = document.getElementById('codGerado').value.trim();
+  if(!codigo) { window.gerarCodigoPreview(); codigo = document.getElementById('codGerado').value; }
+  if(!nome)     { showToast('Informe o nome do destinatário.','error'); return; }
+  if(!email)    { showToast('E-mail é obrigatório.','error'); return; }
+  if(!whatsapp) { showToast('WhatsApp é obrigatório.','error'); return; }
+  try {
+    const linkTeste = gerarLinkTeste(codigo);
+    await addDoc(collection(db,'nself_codigos'),{
+      codigo, nomeDestinatario:nome, email, whatsapp,
+      empresa: emp==='pf' ? null : emp,
+      tipo: emp==='pf' ? 'PF' : 'B2B',
+      status: 'Pendente',
+      linkTeste,
+      criadoEm: serverTimestamp()
+    });
+    closeModal('modalNovoCodigo');
+    window.open(gerarLinkWhatsApp(whatsapp, nome, codigo), '_blank');
+    showToast(`Código ${codigo} gerado! Abrindo WhatsApp...`,'success');
+    if(window._state.profile==='admin') loadCodigos();
+  } catch(e) { showToast('Erro ao salvar código.','error'); }
+};
+
+// ── EDITAR CÓDIGO ──
+window.editarCodigo = function(id, nome, email, whatsapp, codigo, empresa) {
+  document.getElementById('editCodId').value            = id;
+  document.getElementById('editCodCodigo').value        = codigo;
+  document.getElementById('editCodNome').value          = nome;
+  document.getElementById('editCodEmail').value         = email;
+  document.getElementById('editCodWhatsapp').value      = whatsapp;
+  document.getElementById('editCodCodigoDisplay').value = codigo;
+  document.getElementById('editPreviewLink').textContent = gerarLinkTeste(codigo);
+  // Preencher empresa no select
+  const sel = document.getElementById('editCodEmpresa');
+  // Manter opção correta selecionada
+  [...sel.options].forEach(o => { o.selected = (o.value === (empresa||'pf')); });
+  openModal('modalEditarCodigo');
+};
+
+async function _salvarEdicaoBase() {
+  const id       = document.getElementById('editCodId').value;
+  const nome     = document.getElementById('editCodNome').value.trim();
+  const email    = document.getElementById('editCodEmail').value.trim();
+  const whatsapp = document.getElementById('editCodWhatsapp').value.trim();
+  const empresa  = document.getElementById('editCodEmpresa').value;
+  if(!nome || !email || !whatsapp) { showToast('Preencha todos os campos obrigatórios.','error'); return null; }
+  await updateDoc(doc(db,'nself_codigos',id), {
+    nomeDestinatario: nome, email, whatsapp,
+    empresa: empresa==='pf' ? null : empresa,
+  });
+  return { id, nome, email, whatsapp, empresa,
+    codigo: document.getElementById('editCodCodigo').value };
+}
+
+window.salvarEdicaoCodigo = async function() {
+  try {
+    const r = await _salvarEdicaoBase();
+    if(!r) return;
+    closeModal('modalEditarCodigo');
+    showToast('Dados atualizados!','success');
+    loadCodigos();
+  } catch(e) { showToast('Erro ao atualizar.','error'); }
+};
+
+window.salvarEdicaoEnviarWhatsApp = async function() {
+  try {
+    const r = await _salvarEdicaoBase();
+    if(!r) return;
+    closeModal('modalEditarCodigo');
+    showToast('Dados atualizados! Abrindo WhatsApp...','success');
+    loadCodigos();
+    window.open(gerarLinkWhatsApp(r.whatsapp, r.nome, r.codigo), '_blank');
+  } catch(e) { showToast('Erro ao atualizar.','error'); }
+};
+
+// ── EXCLUIR CÓDIGO ──
+window.excluirCodigo = async function(id, status, pdfPath) {
+  const msg = status==='Respondido'
+    ? 'Excluir este registro e deletar o PDF permanentemente?'
+    : 'Apagar este código pendente?';
+  if(!confirm(msg)) return;
+  try {
+    if(status==='Respondido' && pdfPath) {
+      try {
+        const { getStorage, ref, deleteObject } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
+        await deleteObject(ref(getStorage(), pdfPath));
+      } catch(_) {}
+    }
+    await deleteDoc(doc(db,'nself_codigos', id));
+    showToast('Registro excluído.','success');
+    loadCodigos();
+  } catch(e) { showToast('Erro ao excluir.','error'); }
+};
+
+// ── REVOGAR CÓDIGO ──
+window.revogarCodigo = async function(id) {
+  if(!confirm('Revogar este código?')) return;
+  try{
+    await updateDoc(doc(db,'nself_codigos',id),{status:'revogado'});
+    showToast('Código revogado.','success');
+    loadCodigos();
+  }catch(e){showToast('Erro.','error');}
+};
+window.salvarEmpresa = async function() {
+  const nome   = document.getElementById('empNome').value.trim();
+  const resp   = document.getElementById('empResponsavel').value.trim();
+  const email  = document.getElementById('empEmail').value.trim();
+  const senha  = document.getElementById('empSenha').value;
+  const cred   = parseInt(document.getElementById('empCreditos').value)||0;
+  if(!nome||!email||!senha){showToast('Preencha todos os campos obrigatórios.','error');return;}
+  try {
+    const userCred = await createUserWithEmailAndPassword(auth,email,senha);
+    await addDoc(collection(db,'nself_empresas'),{
+      nome,responsavel:resp,email,uid:userCred.user.uid,
+      creditos:cred,laudosGerados:0,ativo:true,criadoEm:serverTimestamp()
+    });
+    closeModal('modalNovaEmpresa');
+    showToast('Empresa cadastrada com sucesso!','success');
+    loadEmpresas();
+  } catch(e){
+    showToast(e.code==='auth/email-already-in-use'?'Este e-mail já está em uso.':'Erro ao salvar empresa.','error');
+  }
+};
+
+// ── SALVAR CÓDIGO ──
+window.salvarCodigo = async function() {
+  const nome  = document.getElementById('codNome').value.trim();
+  const email = document.getElementById('codEmail').value.trim();
+  const emp   = document.getElementById('codEmpresa').value;
+  let codigo  = document.getElementById('codGerado').value.trim();
+  if(!codigo) { gerarCodigoPreview(); codigo=document.getElementById('codGerado').value; }
+  if(!nome){showToast('Informe o nome do destinatário.','error');return;}
+  try {
+    await addDoc(collection(db,'nself_codigos'),{
+      codigo,nomeDestinatario:nome,email,empresa:emp==='pf'?null:emp,
+      tipo:emp==='pf'?'PF':'B2B',status:'disponivel',criadoEm:serverTimestamp()
+    });
+    closeModal('modalNovoCodigo');
+    showToast(`Código ${codigo} gerado!`,'success');
+    if(window._state.profile==='admin') loadCodigos();
+  } catch(e){showToast('Erro ao salvar código.','error');}
+};
+
+// ── NAVEGAÇÃO COM CARREGAMENTO ──
+const origNav = window.navigateTo;
+window.navigateTo = function(page) {
+  origNav(page);
+  if(page==='empresas') loadEmpresas();
+  if(page==='codigos')  { loadCodigos(); gerarCodigoPreview(); }
+  if(page==='laudos')   loadLaudos();
+};
+
+async function loadLaudos(){
+  const tbody = document.getElementById('laudosTable');
+  try {
+    const snap = await getDocs(collection(db,'nself_laudos'));
+    if(snap.empty){
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
+      return;
+    }
+    const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+    tbody.innerHTML = snap.docs.map(d => {
+      const l   = d.data();
+      const lid = d.id;
+      const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
+                  .map(s => NS[s]||s||'—').join(' · ');
+      // Estado do botão PDF
+      const btnPdf = l.pdfUrl
+        ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
+        : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
+      return `<tr>
+        <td>${l.nome||'—'}</td>
+        <td>${l.empresa||'PF'}</td>
+        <td>${l.tipoNome||l.tipo||'—'}</td>
+        <td>Asa ${l.asaDominante||l.asa||'—'}</td>
+        <td style="font-size:11px;">${sub}</td>
+        <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td id="pdfcell_${lid}">${btnPdf}</td>
+      </tr>`;
+    }).join('');
+  } catch(e){ console.warn(e); }
+}
+
+// Gerar PDF de um laudo legado ou sem URL — chama Cloud Function e atualiza tabela
+// Mapear chaves de subtipo salvas em qualquer formato para 'AP'|'1A1'|'SOC'
+function normalizeSubtipo(raw) {
+  if(!raw) return 'AP';
+  const m = {
+    'ap':'AP','autopreservação':'AP','autopreservacao':'AP',
+    '1a1':'1A1','1 a 1':'1A1','sex':'1A1',
+    'soc':'SOC','so':'SOC','social':'SOC',
+    'AP':'AP','1A1':'1A1','SOC':'SOC',
+  };
+  return m[raw.toString().toLowerCase()] || m[raw] || 'AP';
+}
+
+window.gerarPdfLaudo = async function(laudoId) {
+  const cell = document.getElementById(`pdfcell_${laudoId}`);
+  const setCell = (html) => { if(cell) cell.innerHTML = html; };
+
+  setCell(`<span style="font-size:12px;color:#888;">⏳ Gerando...</span>`);
+
+  try {
+    // 1. Buscar dados do laudo
+    const { getDoc: _getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await _getDoc(doc(db,'nself_laudos', laudoId));
+    if(!snap.exists()) throw new Error('Registro não encontrado no banco');
+    const l = snap.data();
+
+    // 2. Se já tem URL — baixar direto
+    if(l.pdfUrl) {
+      setCell(`<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
+      window.open(l.pdfUrl, '_blank');
+      return;
+    }
+
+    // 3. Sanitizar dados (blinda contra nulos de registros legados)
+    const tipo   = parseInt(l.tipo) || 1;
+    const asa    = parseInt(l.asaDominante || l.asa || l.asaDom) || (tipo===1?9:tipo-1);
+    const subDom = normalizeSubtipo(l.subtipoDominante   || l.subDom);
+    const subInt = normalizeSubtipo(l.subtipoIntermediario|| l.subInt);
+    const subRem = normalizeSubtipo(l.subtipoRemissivo   || l.subRem);
+    const nome   = (l.nome || 'Participante').trim();
+    const cargo  = (l.cargo || '').trim();
+
+    // Garantir que asa é adjacente ao tipo (fallback seguro)
+    const ASAS_VALIDAS = {1:[2,9],2:[1,3],3:[2,4],4:[3,5],5:[4,6],6:[5,7],7:[6,8],8:[7,9],9:[8,1]};
+    const asaFinal = ASAS_VALIDAS[tipo]?.includes(asa) ? asa : ASAS_VALIDAS[tipo][0];
+
+    // 4. Chamar Cloud Function
+    const CF = 'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarLaudoPDF';
+    let resp;
+    try {
+      resp = await fetch(CF, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ tipo, asa: asaFinal, subDom, subInt, subRem, nome, cargo, codigoId: l.codigoId||laudoId }),
+      });
+    } catch(netErr) {
+      // Cloud Function inacessível (não deployada ou CORS)
+      throw new Error(`Cloud Function indisponível. Deploy pendente no Firebase.\nDados: Tipo ${tipo}, Asa ${asaFinal}, ${subDom}/${subInt}/${subRem}`);
+    }
+
+    // 5. Tratar resposta HTTP
+    if(!resp.ok) {
+      let detalhe = '';
+      try { const r = await resp.json(); detalhe = r.error || r.trace || ''; } catch(_) {}
+      throw new Error(`Servidor retornou ${resp.status}${detalhe ? ': ' + detalhe.slice(0,120) : ''}`);
+    }
+
+    const data = await resp.json();
+    if(!data.url) throw new Error('Resposta sem URL de download');
+
+    // 6. Salvar URL no Firestore
+    await updateDoc(doc(db,'nself_laudos', laudoId), {
+      pdfUrl: data.url, pdfPath: data.path||'',
+      tipo, asaDominante: asaFinal, subtipoDominante: subDom,
+      subtipoIntermediario: subInt, subtipoRemissivo: subRem,
+      geradoEm: serverTimestamp(),
+    });
+
+    // 7. Atualizar célula e baixar
+    setCell(`<a href="${data.url}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
+    const a = document.createElement('a');
+    a.href=data.url; a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+    a.target='_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+  } catch(e) {
+    console.error('[gerarPdfLaudo]', e.message);
+    const msg = e.message.includes('Cloud Function indisponível')
+      ? 'PDF: aguardando deploy da Cloud Function'
+      : e.message.slice(0, 80);
+    setCell(`
+      <div style="font-size:11px;">
+        <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}')"
+          style="color:#c00;margin-bottom:4px;">⚠ Tentar novamente</button><br>
+        <span style="color:#999;" title="${e.message.replace(/"/g,"'")}">${msg}</span>
+      </div>`);
+  }
+};
+
+// ── LOGOUT ──
+window.doLogout = async function() {
+  try{ await signOut(auth); }catch(e){}
+  window._state = {profile:null,user:null,empresa:null,codigoAtivo:null};
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('adminPass').value='';
+  document.getElementById('rhEmail').value='';
+  document.getElementById('rhPass').value='';
+  setLoginProfile('admin');
+};
+
+// ── MODAL ──
+window.openModal = function(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='modalNovoCodigo') gerarCodigoPreview();
+};
+window.closeModal = function(id){document.getElementById(id).classList.remove('open');};
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+// ── TOAST ──
+window.showToast = function(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show'+(type?' '+type:'');
+  setTimeout(()=>t.className='',3000);
+};
+
+// ── SIDEBAR MOBILE ──
+window.toggleSidebar=function(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlayMobile').classList.toggle('open');
+};
+window.closeSidebar=function(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlayMobile').classList.remove('open');
+};
+
+// ── INIT ──
+window._state.profile = 'admin';
+gerarCodigoPreview();
+
+// Auto-detectar ?code= na URL (colaborador clicou no link)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const code   = params.get('code');
+  if(code) {
+    // Mostrar tela de colaborador com código pré-preenchido
+    window._state.profile = 'colaborador';
+    const el = document.getElementById('colabCode');
+    if(el) {
+      el.value = code.toUpperCase();
+      // Pequeno delay para DOM estar pronto
+      setTimeout(() => {
+        const tabColab = document.querySelector('[onclick*="colaborador"]');
+        if(tabColab) tabColab.click();
+        setTimeout(() => window.doLogin(), 300);
+      }, 400);
+    }
+  }
+})();
+</script>
+</body>
+</html>
