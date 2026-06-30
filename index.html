@@ -1964,9 +1964,10 @@ async function loadLaudos(){
       const lid = d.id;
       const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
                   .map(s => NS[s]||s||'—').join(' · ');
-      // Estado do botão PDF
+      // Estado do botão PDF — sempre oferece regenerar, mesmo com PDF existente
       const btnPdf = l.pdfUrl
-        ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`
+        ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+           <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`
         : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
       return `<tr>
         <td>${l.nome||'—'}</td>
@@ -1994,7 +1995,7 @@ function normalizeSubtipo(raw) {
   return m[raw.toString().toLowerCase()] || m[raw] || 'AP';
 }
 
-window.gerarPdfLaudo = async function(laudoId) {
+window.gerarPdfLaudo = async function(laudoId, forcar) {
   const cell = document.getElementById(`pdfcell_${laudoId}`);
   const setCell = (html) => { if(cell) cell.innerHTML = html; };
 
@@ -2007,9 +2008,10 @@ window.gerarPdfLaudo = async function(laudoId) {
     if(!snap.exists()) throw new Error('Registro não encontrado no banco');
     const l = snap.data();
 
-    // 2. Se já tem URL — baixar direto
-    if(l.pdfUrl) {
-      setCell(`<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
+    // 2. Se já tem URL e NÃO é regeneração forçada — baixar direto
+    if(l.pdfUrl && !forcar) {
+      setCell(`<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+                <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`);
       window.open(l.pdfUrl, '_blank');
       return;
     }
@@ -2060,7 +2062,8 @@ window.gerarPdfLaudo = async function(laudoId) {
     });
 
     // 7. Atualizar célula e baixar
-    setCell(`<a href="${data.url}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>`);
+    setCell(`<a href="${data.url}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+              <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`);
     const a = document.createElement('a');
     a.href=data.url; a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
     a.target='_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
