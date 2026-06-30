@@ -440,7 +440,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
             y1 = PH * (1 - i/n_steps)
             c.rect(0, y0, PW, y1 - y0, fill=1, stroke=0)
 
-        # Manchas orgânicas translúcidas (gradientes radiais simulados com círculos concêntricos)
+        # Manchas orgânicas translúcidas (gradientes radiales simulados com círculos concêntricos)
         def mancha(cx, cy, r_max, color, alpha_max, n=10):
             for k in range(n, 0, -1):
                 frac = k / n
@@ -890,7 +890,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
          'invisíveis, oferecendo a lucidez necessária para que você possa liderar a si mesmo '
          'com maestria, integridade e clareza de propósito.')
     P2_DESENV = ('Evoluir exige, fundamentalmente, aprender a tolerar o desconforto de se enxergar '
-         'sem máscaras. Quando tomamos consciência dos nossos automatismos, dos nossos filtros '
+         'sem masks. Quando tomamos consciência dos nossos automatismos, dos nossos filtros '
          'mentais e dos gatilhos que disparam as nossas reações automáticas de estresse, '
          'deixamos de ser reféns da nossa reatividade e passamos a habitar o lugar da escolha '
          'consciente. O autodesenvolvimento legítimo não anula as suas características natas; '
@@ -936,14 +936,31 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     if sec.get('INFOBOX_DESENVOLVIMENTO'):
         story.append(InfoBox(sec.get('INFOBOX_DESENVOLVIMENTO', '')))
 
-    # ══════════════════════════════════════════════════ RELACIONAMENTOS (Seção Nova)
+    # ══════════════════════════════════════════════════ RELACIONAMENTOS
     if sec.get('RELACIONAMENTOS'):
         story.append(PageBreak())
         story.append(KeepTogether([
             Paragraph('Seus Relacionamentos: Como Você Interage com Outros Perfis', sSecT),
             SecLine(), sp(0.15)
         ]))
-        story += pmulti(sec.get('RELACIONAMENTOS', ''))
+
+        def gerar_linhas_escrita(num_linhas=3):
+            rows = [['']] * num_linhas
+            t = Table(rows, colWidths=[TW], rowHeights=[18]*num_linhas)
+            t.setStyle(TableStyle([
+                ('LINEBELOW', (0,0), (-1,-1), 0.5, HexColor('#CCCCCC')),
+                ('TOPPADDING', (0,0), (-1,-1), 0),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+            ]))
+            return t
+
+        blocos_rel = pmulti(sec.get('RELACIONAMENTOS', ''))
+        for paragrafo in blocos_rel:
+            story.append(paragrafo)
+            if '✍️' in paragrafo.text:
+                story.append(sp(0.1))
+                story.append(gerar_linhas_escrita(3))
+                story.append(sp(0.2))
 
     # ══════════════════════════════════════════════════ FÁBULA
     fabula_txt = sec.get('FABULA', '')
