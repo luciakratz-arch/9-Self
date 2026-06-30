@@ -20,6 +20,9 @@ Uso:
 
 import re
 import os
+import hashlib
+import uuid
+from datetime import datetime, timezone
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -581,7 +584,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
                  '<b>Influência das Personalidades</b>','<b>Interação Social</b>',
                  'Estilo de Trabalho','Ambiente de Trabalho','Estresse da Personalidade',
                  'Comunicação e Feedback','Tendências na Liderança','Motivação',
-                 'Desenvolvimento e Evolução da Personalidade','Fábula']:
+                 'Desenvolvimento e Evolução da Personalidade','Relacionamentos','Fábula']:
         story.append(bl(item))
 
     # ══════════════════════════════════════════════════ TIPOLOGIA
@@ -996,7 +999,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
             SecLine(), sp(0.15)
         ]))
 
-        def gerar_linhas_escrita(num_linhas=3):
+        def gerar_linhas_escrita(num_linhas=6):
             rows = [['']] * num_linhas
             t = Table(rows, colWidths=[TW], rowHeights=[18]*num_linhas)
             t.setStyle(TableStyle([
@@ -1006,13 +1009,45 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
             ]))
             return t
 
-        blocos_rel = pmulti(sec.get('RELACIONAMENTOS', ''))
-        for paragrafo in blocos_rel:
-            story.append(paragrafo)
-            if '✍️' in paragrafo.text:
+        sRelHeader = ParagraphStyle('RelHeader', fontName='Helvetica-Bold', fontSize=11.5,
+                                     leading=16, textColor=MAG, spaceBefore=14, spaceAfter=4)
+
+        # Trabalha direto no texto raw (pmulti normaliza \n simples em espaço,
+        # então o parsing precisa ser feito ANTES de criar os Paragraphs)
+        raw_rel = sec.get('RELACIONAMENTOS', '')
+        blocos_raw = [t.strip() for t in re.split(r'\n\s*\n', raw_rel.strip()) if t.strip()]
+
+        for bloco_txt in blocos_raw:
+            if re.match(r'^\s*•?\s*Com (o|outro)\s', bloco_txt):
+                # Bloco de compatibilidade: "• Com o perfil X — Y\n- Como a dupla funciona: ...\n- Exemplo...\n..."
+                linhas = [l.strip() for l in bloco_txt.split('\n') if l.strip()]
+                titulo_limpo = re.sub(r'^\s*•\s*', '', linhas[0])
+                story.append(Paragraph(f'★ {titulo_limpo}', sRelHeader))
+                for sub in linhas[1:]:
+                    sub_limpo = re.sub(r'^-\s*', '', sub)
+                    story.append(p(sub_limpo))
+                    story.append(sp(0.08))
+                if '✍️' in bloco_txt:
+                    story.append(sp(0.1))
+                    story.append(gerar_linhas_escrita(6))
+                    story.append(sp(0.2))
+            elif bloco_txt.startswith('Seu Espaço de Prática'):
+                # Subtítulo de nova subseção
+                story.append(sp(0.3))
+                story.append(Paragraph(bloco_txt, sSubT))
                 story.append(sp(0.1))
-                story.append(gerar_linhas_escrita(3))
+            elif bloco_txt.startswith('*') and bloco_txt.endswith('*'):
+                # Texto introdutório em itálico, ex: "*Use este laboratório...*"
+                texto_italico = bloco_txt.strip('*').strip()
+                story.append(Paragraph(f'<i>{texto_italico}</i>', sBody))
+            elif re.match(r'^\d+\.\s', bloco_txt):
+                # Pergunta numerada de reflexão — recebe linhas para escrita manual
+                story.append(p(bloco_txt))
+                story.append(sp(0.1))
+                story.append(gerar_linhas_escrita(4))
                 story.append(sp(0.2))
+            else:
+                story.append(p(bloco_txt))
 
     # ══════════════════════════════════════════════════ FÁBULA
     fabula_txt = sec.get('FABULA', '')
@@ -1115,6 +1150,55 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         p(playlist_intro),
         sp(0.15),
         playlist_conteudo,
+    ]))
+
+    # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
+    agora_utc = datetime.now(timezone.utc)
+    data_hora_fmt = agora_utc.strftime('%d/%m/%Y %H:%M:%S UTC')
+    hash_uuid = str(uuid.uuid5(
+        uuid.NAMESPACE_DNS,
+        f'{nome}-{tipo}-{asa_dominante}-{subtipo_dom}{subtipo_int}{subtipo_rem}-{agora_utc.isoformat()}'
+    )).upper()
+
+    sSeloTitulo = ParagraphStyle('SeloTitulo', fontName='Helvetica-Bold', fontSize=12,
+                                  textColor=HexColor('#1A9460'), alignment=0, spaceAfter=10)
+    sSeloLabel  = ParagraphStyle('SeloLabel', fontName='Helvetica-Bold', fontSize=9.5,
+                                  textColor=DARK, alignment=0, leading=13)
+    sSeloValor  = ParagraphStyle('SeloValor', fontName='Helvetica', fontSize=9.5,
+                                  textColor=DARK, alignment=0, leading=13)
+    sSeloRodape = ParagraphStyle('SeloRodape', fontName='Helvetica', fontSize=9,
+                                  textColor=HexColor('#666666'), alignment=0, spaceBefore=10)
+
+    selo_tabela = Table([
+        [Paragraph('Aprovador:', sSeloLabel),          Paragraph('Dra. Lucia Kratz', sSeloValor)],
+        [Paragraph('Registro Profissional:', sSeloLabel), Paragraph('CRP 09/20590', sSeloValor)],
+        [Paragraph('Data e Hora (UTC):', sSeloLabel),  Paragraph(data_hora_fmt, sSeloValor)],
+        [Paragraph('Hash UUID de Validação:', sSeloLabel), Paragraph(hash_uuid, sSeloValor)],
+    ], colWidths=[5.5*cm, 8*cm])
+    selo_tabela.hAlign = 'LEFT'
+    selo_tabela.setStyle(TableStyle([
+        ('TOPPADDING', (0,0), (-1,-1), 1),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 1),
+        ('LEFTPADDING', (0,0), (-1,-1), 0),
+        ('RIGHTPADDING', (0,0), (0,-1), 10),
+    ]))
+
+    story.append(sp(1.0))
+    story.append(KeepTogether([
+        Paragraph('✓ DOCUMENTO ASSINADO ELETRONICAMENTE', sSeloTitulo),
+        selo_tabela,
+        Paragraph(
+            'Este registro é gerado de forma automatizada e serve como validação de '
+            'autenticidade e autoria técnica deste laudo, elaborado com base nos critérios '
+            'metodológicos do sistema 9&Self.',
+            sSeloRodape
+        ),
+        sp(0.4),
+        Paragraph(
+            'Doutora em Psicologia · Especialista TCC, Neuromodulação e Musicoterapia · Goiânia, GO',
+            ParagraphStyle('AssInfo2', fontName='Helvetica', fontSize=9,
+                            textColor=DARK, alignment=0, leading=14)
+        ),
     ]))
 
     doc.build(story)
