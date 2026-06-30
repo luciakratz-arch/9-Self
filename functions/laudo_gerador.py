@@ -27,7 +27,7 @@ from reportlab.lib.colors import HexColor, white
 from reportlab.platypus import (
     BaseDocTemplate, PageTemplate, Frame,
     Paragraph, Spacer, HRFlowable, Table, TableStyle,
-    PageBreak, NextPageTemplate, KeepTogether
+    PageBreak, NextPageTemplate, KeepTogether, Image
 )
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT, TA_JUSTIFY
@@ -36,6 +36,32 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 _FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
+_IMG_DIR  = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'imagens')
+
+def imagem_tipo(tipo, sufixo='', largura_cm=13):
+    """
+    Carrega imagens/0{tipo}{sufixo}.jpg de forma segura.
+    sufixo='' -> imagem principal (ex: 01.jpg)
+    sufixo='b' -> imagem secundária (ex: 01b.jpg)
+    Retorna None se o arquivo não existir (não quebra o PDF).
+    """
+    nome_arquivo = f'0{tipo}{sufixo}.jpg'
+    caminho = os.path.join(_IMG_DIR, nome_arquivo)
+    if not os.path.exists(caminho):
+        return None
+    try:
+        img = Image(caminho, width=largura_cm * cm, height=None)
+        # Mantém proporção: recalcula altura com base na largura real da imagem
+        from PIL import Image as PILImage
+        with PILImage.open(caminho) as pil_img:
+            ratio = pil_img.height / pil_img.width
+        img.drawHeight = largura_cm * cm * ratio
+        img.drawWidth  = largura_cm * cm
+        img.hAlign = 'CENTER'
+        return img
+    except Exception:
+        return None
+
 try:
     pdfmetrics.registerFont(TTFont('CormorantGaramond',
         os.path.join(_FONT_DIR, 'CormorantGaramond.ttf')))
@@ -591,6 +617,19 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     )
     story.append(InfoBox(AVISO_FILOSOFIA))
 
+    # ── IMAGEM: Dinâmica de Evolução/Involução do tipo ──
+    img_evolucao = imagem_tipo(tipo, sufixo='b')
+    if img_evolucao:
+        story.append(sp(0.3))
+        story.append(Paragraph(
+            f'A imagem abaixo representa visualmente o tipo <b>{nome_tipo}</b> e suas dinâmicas '
+            f'de evolução e involução — ou seja, os caminhos de crescimento e de estresse que '
+            f'esse perfil pode percorrer ao longo da vida.',
+            ParagraphStyle('ImgCaption', fontName='Helvetica', fontSize=10, leading=14,
+                            textColor=HexColor('#3A1F5C'), alignment=TA_JUSTIFY, spaceAfter=8)
+        ))
+        story.append(img_evolucao)
+
     pad_paras = pmulti(sec.get('PADRAO_INFANCIA', ''))
     story += subsection('Padrão na Infância', pad_paras[0])
     for paragrafo in pad_paras[1:]:
@@ -671,6 +710,19 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     ]))
     for linha in asa_niveis[1:]:
         story.append(p(linha))
+
+    # ── IMAGEM: Tipo com Asas ──
+    img_asas = imagem_tipo(tipo, sufixo='')
+    if img_asas:
+        story.append(sp(0.3))
+        story.append(Paragraph(
+            f'A imagem abaixo ilustra o tipo <b>{nome_tipo}</b> e suas asas — as influências '
+            f'dos tipos vizinhos que moldam a expressão da sua personalidade.',
+            ParagraphStyle('ImgCaption2', fontName='Helvetica', fontSize=10, leading=14,
+                            textColor=HexColor('#3A1F5C'), alignment=TA_JUSTIFY, spaceAfter=8)
+        ))
+        story.append(img_asas)
+        story.append(sp(0.3))
 
     story += subsection(
         f'Interação Social | {NOMES_SUBTIPO[subtipo_dom]} · {LABELS_SUBTIPO_LONGO[subtipo_int]} · '
