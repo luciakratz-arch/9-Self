@@ -584,7 +584,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         'Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um '
         'rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua '
         'autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se '
-        'fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento '
+        'fortalece com a terapia and a vivência. O laudo é apenas um recorte do seu momento '
         'presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, '
         'sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu '
         'processo e veja o laudo como um companheiro de caminhada.'
@@ -935,6 +935,15 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         story.append(sp(0.15))
     if sec.get('INFOBOX_DESENVOLVIMENTO'):
         story.append(InfoBox(sec.get('INFOBOX_DESENVOLVIMENTO', '')))
+
+    # ══════════════════════════════════════════════════ RELACIONAMENTOS (Seção Nova)
+    if sec.get('RELACIONAMENTOS'):
+        story.append(PageBreak())
+        story.append(KeepTogether([
+            Paragraph('Seus Relacionamentos: Como Você Interage com Outros Perfis', sSecT),
+            SecLine(), sp(0.15)
+        ]))
+        story += pmulti(sec.get('RELACIONAMENTOS', ''))
 
     # ══════════════════════════════════════════════════ FÁBULA
     fabula_txt = sec.get('FABULA', '')
