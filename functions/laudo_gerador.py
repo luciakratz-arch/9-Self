@@ -13,7 +13,7 @@ Uso:
         tipo=1, asa_dominante=2,
         subtipo_dom='AP', subtipo_int='1A1', subtipo_rem='SOC',
         nome='Fabiano de Sousa Vaz de Campos',
-        cargo='Diretor',
+        cargo='Diretor - CIRO',
         output_path='/home/claude/laudo_saida.pdf',
     )
 """
@@ -541,7 +541,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
           'Excelência, Prestativo e Relacional, Performance e Imagem, Autêntico e Profundo, Observador e '
           'Privacidade, Precavido e Questionador, Visionário e Otimista, Desafiador e Controlador, '
           'Harmônico e Diplomático.</b>'),
-        p('Um dos objetivos do 9&Self é oferecer demonstrações e argumentos que facilitem o caminho para '
+        p('Um dos objetivos do 9&Self é oferecer demonstrações e argumentos que facilitam o caminho para '
           'maior respeito e tolerância consigo mesmo e com os outros, auxiliando na apreciação de dons, '
           'talentos e competências. Compreender a própria tipologia de personalidade provoca uma '
           'transformação favorável na vida das pessoas em uma grande variedade de situações pessoais e profissionais.'),
@@ -549,7 +549,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
           'os indivíduos preferem observar o mundo e fazer julgamentos. As tipologias de personalidade '
           'são profundas e estruturantes no caráter de cada indivíduo. Não podemos alterar a base da '
           'nossa personalidade, mas podemos desenvolvê-la e ganhar maturidade.'),
-        p('O <b>9&Self</b> está organizado da seguinte forma:'),
+        p('O <b>9&Self</b> está organized da seguinte forma:'),
     ]
     for item in ['<b>Tipologia da Personalidade</b>','<b>Subtipo da Personalidade</b>',
                  '<b>Influência das Personalidades</b>','<b>Interação Social</b>',
@@ -769,6 +769,11 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
                 lid_block.append(p(texto))
     story.append(KeepTogether(lid_block))
 
+    # PREOCUPAÇÕES (Correção de Omissão do Sistema)
+    if sec.get('PREOCUPACOES'):
+        preocupacoes_itens = split_pipes(sec.get('PREOCUPACOES', ''))
+        story += subsection('Preocupações:', *[bl(item) for item in preocupacoes_itens])
+
     # MOTIVAÇÃO
     motivacao_itens = split_pipes(sec.get('MOTIVACAO', ''))
     story += subsection('Motivação:', *[bl(item) for item in motivacao_itens])
@@ -851,7 +856,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         SecLine(), sp(0.15),
         p(f'A personalidade é dinâmica e se move ao longo de <b>9 níveis de desenvolvimento e maturidade '
           f'individual</b>. Vale ressaltar que pressões e fatores externos podem alterar temporariamente '
-          f'esses níveis no tipo {nome_tipo}.'),
+          f'esse níveis no tipo {nome_tipo}.'),
         sp(0.2),
         Paragraph('a) Nível Saudável (Elevado)', sLvlG),
     ]
@@ -875,7 +880,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     # ══════════════════════════════════════════════════ DESENVOLVIMENTO (conceitual + específico)
     P1_DESENV = ('O verdadeiro processo de autodesenvolvimento não consiste em moldar uma nova '
-         'personalidade ou em tentar se encaixar em um ideal de perfeição inalcançável. '
+         'personalidade ou em tentar se encaixar in um ideal de perfeição inalcançável. '
          'Pelo contrário, trata-se de um profundo e corajoso movimento de desconstrução. '
          'A personalidade que manifestamos no dia a dia nada mais é do que uma armadura de '
          'sobrevivência, uma estratégia psíquica refinada que aprendemos a estruturar ainda '
@@ -1043,7 +1048,7 @@ if __name__ == '__main__':
         tipo=1, asa_dominante=2,
         subtipo_dom='AP', subtipo_int='1A1', subtipo_rem='SOC',
         nome='Fabiano de Sousa Vaz de Campos',
-        cargo='Diretor',
+        cargo='Diretor - CIRO',
         output_path='/home/claude/laudo_clean.pdf',
     )
     print('OK ->', out)
