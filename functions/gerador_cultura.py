@@ -212,7 +212,7 @@ def barra_podio(podio, contagem, total):
     sPct = ParagraphStyle('BPct', fontName='Helvetica', fontSize=8,
                            textColor=HexColor('#666'), alignment=TA_CENTER)
 
-    medalhas = ['🥇', '🥈', '🥉']
+    medalhas = ['1º', '2º', '3º']
     rows_header = []
     rows_nome   = []
     rows_pct    = []
@@ -247,18 +247,50 @@ def barra_podio(podio, contagem, total):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _capa_cb(canvas, doc):
-    canvas.saveState()
-    # Fundo degradê roxo
-    from reportlab.lib.colors import HexColor as HC
-    canvas.setFillColor(HC('#1A0030'))
-    canvas.rect(0, 0, PW, PH, fill=1, stroke=0)
-    canvas.setFillColor(HC('#3D0A5E'))
-    canvas.rect(0, PH * 0.4, PW, PH * 0.6, fill=1, stroke=0)
-    # Círculo decorativo
-    canvas.setFillColor(HC('#7B1D6B'))
-    canvas.setFillAlpha(0.3)
-    canvas.circle(PW * 0.88, PH * 0.78, 3.5 * cm, fill=1, stroke=0)
-    canvas.restoreState()
+    c = canvas
+    # ── Degradê diagonal igual ao laudo_gerador aprovado ──
+    c1 = HexColor('#26093F')
+    c2 = HexColor('#4D2971')
+    c3 = HexColor('#7B1D6B')
+    n_steps = 80
+    for i in range(n_steps):
+        t = i / (n_steps - 1)
+        if t < 0.5:
+            tt = t / 0.5
+            r = c1.red   + (c2.red   - c1.red)   * tt
+            g = c1.green + (c2.green - c1.green) * tt
+            b = c1.blue  + (c2.blue  - c1.blue)  * tt
+        else:
+            tt = (t - 0.5) / 0.5
+            r = c2.red   + (c3.red   - c2.red)   * tt
+            g = c2.green + (c3.green - c2.green) * tt
+            b = c2.blue  + (c3.blue  - c2.blue)  * tt
+        c.setFillColorRGB(r, g, b)
+        y0 = PH * (1 - (i+1)/n_steps)
+        y1 = PH * (1 - i/n_steps)
+        c.rect(0, y0, PW, y1 - y0, fill=1, stroke=0)
+
+    # ── Manchas orgânicas ──
+    def mancha(cx, cy, r_max, color, alpha_max, n=10):
+        for k in range(n, 0, -1):
+            frac = k / n
+            rad = r_max * frac
+            alpha = alpha_max * (1 - frac) ** 1.5
+            c.setFillColorRGB(color[0], color[1], color[2], alpha=alpha)
+            c.circle(cx, cy, rad, fill=1, stroke=0)
+
+    mancha(PW*0.92, PH*0.78, 7.5*cm, (0.85, 0.35, 0.75), 0.10)
+    mancha(PW*0.06, PH*0.35, 8.5*cm, (0.45, 0.20, 0.65), 0.08)
+    mancha(PW*0.85, PH*0.15, 5.5*cm, (1.0, 0.5, 0.85), 0.07)
+    mancha(PW*0.15, PH*0.85, 6*cm,   (0.35, 0.15, 0.55), 0.07)
+
+    # ── Rodapé ──
+    c.saveState()
+    c.setFont('Helvetica-Bold', 6.5)
+    c.setFillColorRGB(1, 1, 1, alpha=0.7)
+    c.drawCentredString(PW/2, 0.85*cm, 'RELATÓRIO DE FIT CULTURAL E PEOPLE ANALYTICS – 9&SELF')
+    c.drawCentredString(PW/2, 0.50*cm, 'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES · USO RESTRITO — CONFIDENCIAL')
+    c.restoreState()
 
 def _pagina_cb(canvas, doc):
     canvas.saveState()
@@ -347,39 +379,58 @@ def gerar_laudo_cultura(
     # CAPA
     # ══════════════════════════════════════════════════
     agora = datetime.now(timezone.utc)
-    mes_ano = agora.strftime('%B de %Y').capitalize()
+    meses_pt = {1:'Janeiro',2:'Fevereiro',3:'Março',4:'Abril',5:'Maio',6:'Junho',
+                7:'Julho',8:'Agosto',9:'Setembro',10:'Outubro',11:'Novembro',12:'Dezembro'}
+    mes_ano = f'{meses_pt[agora.month]} de {agora.year}'
     data_ref = data_referencia or agora.strftime('%d/%m/%Y')
 
+    LAVANDA_C = HexColor('#D9C7F5')
+    BRANCO_C  = HexColor('#FFFFFF')
+    CINZA_C   = HexColor('#E4D9F7')
+
     story += [
-        sp(3.5),
-        Paragraph('9&Self', ParagraphStyle('LogoCultura', fontName=LOGO_FONT,
-                   fontSize=56, textColor=LAVANDA, alignment=TA_CENTER)),
-        sp(0.4),
-        Paragraph('PEOPLE ANALYTICS & CULTURA ORGANIZACIONAL',
-                   ParagraphStyle('SubLogoCultura', fontName='Helvetica',
-                   fontSize=10, textColor=LAVANDA, alignment=TA_CENTER,
-                   letterSpacing=2)),
-        sp(2.0),
-        HRFlowable(width='55%', color=white, thickness=1.5, hAlign='CENTER'),
-        sp(0.5),
+        sp(3.6),
+        Paragraph('9&amp;Self',
+            ParagraphStyle('LogoC', fontName=LOGO_FONT, fontSize=50, leading=56,
+                           textColor=LAVANDA_C, alignment=TA_CENTER)),
+        sp(0.6),
+        Paragraph('People Analytics &amp; Cultura Organizacional',
+            ParagraphStyle('CTCultura', fontName='Helvetica-Bold', fontSize=18,
+                           textColor=BRANCO_C, alignment=TA_CENTER, spaceAfter=0)),
+        sp(1.2),
         Paragraph(empresa,
-                   ParagraphStyle('EmpresaNome', fontName=LOGO_FONT, fontSize=28,
-                   textColor=white, alignment=TA_CENTER)),
-        sp(0.3),
+            ParagraphStyle('EmpC', fontName=LOGO_FONT, fontSize=28, leading=34,
+                           textColor=LAVANDA_C, alignment=TA_CENTER)),
+        sp(0.6),
+        HRFlowable(width='55%', color=BRANCO_C, thickness=1.5, hAlign='CENTER'),
+        sp(0.6),
         Paragraph(mes_ano,
-                   ParagraphStyle('CapaData', fontName='Helvetica', fontSize=12,
-                   textColor=white, alignment=TA_CENTER)),
-        sp(1.5),
-        Paragraph(f'Tríade Dominante: <b>{nome_cultura}</b>',
-                   ParagraphStyle('CapaTriade', fontName='Helvetica', fontSize=11,
-                   textColor=LAVANDA, alignment=TA_CENTER)),
-        Paragraph(f'Total de colaboradores mapeados: {total_colaboradores}',
-                   ParagraphStyle('CapaTotal', fontName='Helvetica', fontSize=10,
-                   textColor=LAVANDA, alignment=TA_CENTER, spaceBefore=4)),
-        Paragraph(f'Acesso restrito · {solicitante} · Confidencial',
-                   ParagraphStyle('CapaAcesso', fontName='Helvetica', fontSize=9,
-                   textColor=HexColor('#E4D9F7'), alignment=TA_CENTER, spaceBefore=8)),
+            ParagraphStyle('DataC', fontName='Helvetica', fontSize=12,
+                           textColor=BRANCO_C, alignment=TA_CENTER)),
+        sp(1.8),
     ]
+
+    # Tabela capa — mesmo padrão do laudo individual
+    GLASS_BG = HexColor('#FFFFFF')
+    sRL = ParagraphStyle('CRL', fontName='Helvetica-Bold', fontSize=10.5, textColor=HexColor('#3A1F5C'))
+    sRV = ParagraphStyle('CRV', fontName='Helvetica', fontSize=10.5, textColor=HexColor('#3A1F5C'))
+    for lbl, val in [
+        ('Tríade:', nome_cultura),
+        ('Colaboradores mapeados:', str(total_colaboradores)),
+        ('Acesso:', f'Restrito · {solicitante} · Confidencial'),
+    ]:
+        t = Table([[
+            Paragraph(f'<b>{lbl}</b>', sRL),
+            Paragraph(val, sRV),
+        ]], colWidths=[5*cm, TW-5*cm])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,-1), GLASS_BG),
+            ('LINEBEFORE', (0,0), (0,-1), 3.5, MAG),
+            ('TOPPADDING', (0,0), (-1,-1), 9),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 9),
+            ('LEFTPADDING', (0,0), (-1,-1), 12),
+        ]))
+        story += [t, sp(0.15)]
 
     story.append(NextPageTemplate('corpo'))
     story.append(PageBreak())
@@ -422,48 +473,162 @@ def gerar_laudo_cultura(
     # ══════════════════════════════════════════════════
     # SEÇÕES DO ARQUIVO DE TRÍADE
     # ══════════════════════════════════════════════════
-    def renderizar_secao(chave_secao, titulo_secao):
+    def limpar_emoji(txt):
+        """Remove emojis que não renderizam em PDF ReportLab."""
+        return re.sub(r'[\U0001F300-\U0001FFFF✍️⚠️💥🔬📋🌡️🏗️🚀🎯🧠✏️📝]+', '', txt).strip()
+
+    def md_para_rl(txt):
+        """Converte markdown para ReportLab: **bold**, *italic*. Remove emojis problemáticos."""
+        txt = re.sub(r'[\U0001F300-\U0001FFFF✍️⚠️💥🔬📋🌡️🏗️🚀🎯🧠]+', '', txt)
+        txt = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', txt)
+        txt = re.sub(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)', r'<i>\1</i>', txt)
+        return txt.strip()
+
+    # Mapeamento de filtros de opção dinâmica
+    # Para seções de Instintos: só mostra o bloco que bate com instinto_maj
+    # Para seções de Asas: só mostra o bloco que bate com termometro
+    FILTRO_INSTINTO = {'AP': 'ap', '1A1': '1a1', 'SOC': 'soc'}
+    FILTRO_ASAS     = {'EXPRESSIVAS': 'ativas', 'RACIONAIS': 'recuadas'}
+
+    def opcao_ativa(linha, chave_secao):
+        """Retorna True se a linha de opção deve ser exibida conforme o resultado da empresa."""
+        l = linha.lower()
+        if 'instinto' in chave_secao.lower() or 'instintos' in chave_secao.lower():
+            chave = FILTRO_INSTINTO.get(instinto_maj, '')
+            # "• Opção AP:" ou "• Opção SOC:" ou "• Opção 1A1:"
+            match = re.match(r'^[•]?\s*opção\s+(\w+)\s*[:.]', l)
+            if match:
+                return match.group(1).lower() == chave
+        if 'asas' in chave_secao.lower():
+            chave = FILTRO_ASAS.get(termometro, '')
+            # "• Opção ASAS_RECUADAS:" ou "• Opção ASAS_ATIVAS:"
+            match = re.match(r'^[•]?\s*opção\s+asas_(\w+)\s*[:.]', l)
+            if match:
+                return match.group(1).lower() == chave
+        return None  # não é linha de opção, renderizar normalmente
+
+    def renderizar_secao(chave_secao, titulo_secao, page_break=True):
         conteudo = sec.get(chave_secao, '').strip()
         if not conteudo:
             return
-        story.append(PageBreak())
+        if page_break:
+            story.append(PageBreak())
+        else:
+            story.append(sp(0.5))
         story.append(sub(titulo_secao))
         story.append(hr())
         story.append(sp(0.1))
-        blocos = [b.strip() for b in re.split(r'\n\s*\n', conteudo) if b.strip()]
-        for bloco in blocos:
-            linhas = [l.strip() for l in bloco.split('\n') if l.strip()]
-            for linha in linhas:
-                if re.match(r'^>\s*[🚀⚠️🎯🧠💥🏗️📋🔬]+\s*\*\*', linha):
-                    txt = re.sub(r'^>\s*', '', linha)
-                    story.append(Paragraph(txt, ParagraphStyle('BlocoDestaque',
-                        fontName='Helvetica-Bold', fontSize=11, textColor=PURP,
-                        spaceBefore=10, spaceAfter=4, leading=16)))
-                elif re.match(r'^>\s*\*\s', linha):
-                    txt = re.sub(r'^>\s*\*\s*', '', linha)
-                    story.append(Paragraph(f'• {txt}', sBul))
-                elif re.match(r'^>\s*\*\*', linha):
-                    txt = re.sub(r'^>\s*', '', linha)
-                    story.append(Paragraph(txt, sBase))
-                elif linha.startswith('>'):
-                    txt = re.sub(r'^>\s*', '', linha)
-                    story.append(Paragraph(f'<i>{txt}</i>', sBase))
-                elif re.match(r'^\*\s', linha):
-                    txt = re.sub(r'^\*\s*', '', linha)
-                    story.append(Paragraph(f'• {txt}', sBul))
-                elif re.match(r'^\d+\.', linha):
-                    story.append(p(linha))
-                else:
-                    story.append(p(linha))
-                if '✍️' in linha:
-                    story.append(sp(0.1))
-                    story.append(linhas_escrita(5))
-                    story.append(sp(0.2))
+
+        # Para seções com opções dinâmicas, identifica qual bloco mostrar
+        eh_secao_opcoes = any(x in chave_secao.upper() for x in ['INSTINTO', 'ASAS'])
+        bloco_ativo = None   # None = fora de qualquer bloco de opção; True = dentro do bloco certo; False = bloco errado
+
+        sSubSecao = ParagraphStyle('SubSec', fontName='Helvetica-Bold', fontSize=11,
+                                    textColor=PURP, spaceBefore=14, spaceAfter=4, leading=15)
+        sRH = ParagraphStyle('RHItem', fontName='Helvetica-Bold', fontSize=10.5,
+                               textColor=PURP, spaceBefore=10, spaceAfter=3, leading=14)
+
+        linhas = [l.rstrip() for l in conteudo.split('\n')]
+        i = 0
+        while i < len(linhas):
+            linha = linhas[i].strip()
+            i += 1
+
+            if not linha:
+                continue
+            if re.match(r'^(NOME|COMPOSIÇÃO|COMPOSICAO):', linha):
+                continue
+            if re.match(r'^\[.+\]$', linha):
+                continue
+            # Ignorar separador "=== MATRIZ DO PLANO ===" que às vezes vaza
+            if re.match(r'^===', linha):
+                continue
+
+            # ── Detecção de bloco de opção dinâmica (Instinto / Asas) ──────────
+            if eh_secao_opcoes and re.match(r'^•?\s*opção\s+', linha.lower()):
+                resultado = opcao_ativa(linha, chave_secao)
+                if resultado is True:
+                    bloco_ativo = True
+                    # Renderiza o título da opção sem "Opção AP:" etc — usa subtítulo limpo
+                    txt = re.sub(r'^•?\s*Opção\s+\w+[:\s]*', '', linha, flags=re.IGNORECASE).strip()
+                    if txt:
+                        story.append(Paragraph(md_para_rl(txt), sSubSecao))
+                elif resultado is False:
+                    bloco_ativo = False
+                continue
+
+            # Pular conteúdo de blocos de opção não selecionados
+            if eh_secao_opcoes and bloco_ativo is False:
+                # Checar se chegamos num novo bloco de opção
+                if re.match(r'^•?\s*opção\s+', linha.lower()):
+                    pass  # será tratado na próxima iteração
+                continue
+
+            # ── Numeração como subtítulo: "1. IDENTIDADE DA..." ────────────────
+            if re.match(r'^\d+\.\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ\s]+$', linha):
+                story.append(sp(0.2))
+                story.append(Paragraph(linha, sSubSecao))
+                continue
+
+            # ── "> 🚀 **TÍTULO:**" — destaque com emoji (remove emoji, mantém texto) ──
+            if re.match(r'^>\s*[\U0001F300-\U0001FFFF⚠️💥🔬📋🌡️🏗️]+\s*\*\*', linha):
+                txt = re.sub(r'^>\s*', '', linha)
+                # Remove emojis que não renderizam em PDF
+                txt = re.sub(r'[\U0001F300-\U0001FFFF⚠️💥🔬📋🌡️🏗️]+\s*', '', txt)
+                txt = md_para_rl(txt)
+                story.append(Paragraph(txt, ParagraphStyle('DestaqIcon',
+                    fontName='Helvetica-Bold', fontSize=11, textColor=PURP,
+                    spaceBefore=12, spaceAfter=4, leading=16)))
+                continue
+
+            # ── "• CONTRATAÇÃO:" ou "• TREINAMENTO:" — itens de RH ──────────
+            if re.match(r'^•\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ\s\(\)]+:', linha) and not re.match(r'^•\s*opção', linha.lower()):
+                txt = md_para_rl(re.sub(r'^•\s*', '', linha))
+                story.append(Paragraph(txt, sRH))
+                continue
+
+            # ── "> * item" — bullet em bloco citado ─────────────────────────
+            if re.match(r'^>\s*\*\s', linha):
+                txt = md_para_rl(re.sub(r'^>\s*\*\s*', '', linha))
+                story.append(Paragraph(f'• {txt}', sBul))
+                if '✍️' in txt:
+                    story.append(sp(0.1)); story.append(linhas_escrita(5)); story.append(sp(0.2))
+                continue
+
+            # ── "> texto" — itálico/citação ──────────────────────────────────
+            if linha.startswith('>'):
+                txt = md_para_rl(re.sub(r'^>\s*', '', linha))
+                story.append(Paragraph(f'<i>{txt}</i>', sBase))
+                if '✍️' in txt:
+                    story.append(sp(0.1)); story.append(linhas_escrita(5)); story.append(sp(0.2))
+                continue
+
+            # ── "* item" ou "• item" — bullet simples ───────────────────────
+            if re.match(r'^[\*•]\s', linha):
+                txt = md_para_rl(re.sub(r'^[\*•]\s*', '', linha))
+                story.append(Paragraph(f'• {txt}', sBul))
+                if '✍️' in txt:
+                    story.append(sp(0.1)); story.append(linhas_escrita(5)); story.append(sp(0.2))
+                continue
+
+            # ── "1. texto" com conteúdo ─────────────────────────────────────
+            if re.match(r'^\d+\.\s+\S', linha) and not re.match(r'^\d+\.\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ\s]+$', linha):
+                txt = md_para_rl(linha)
+                story.append(p(txt))
+                if '✍️' in txt:
+                    story.append(sp(0.1)); story.append(linhas_escrita(5)); story.append(sp(0.2))
+                continue
+
+            # ── Texto normal ─────────────────────────────────────────────────
+            txt = md_para_rl(limpar_emoji(linha))
+            story.append(p(txt))
+            if '✍️' in txt:
+                story.append(sp(0.1)); story.append(linhas_escrita(5)); story.append(sp(0.2))
 
     prefixo = f'TRIADE_{num_triades}'
     renderizar_secao(f'{prefixo}_CORE',               'Identidade da Personalidade Coletiva')
-    renderizar_secao(f'{prefixo}_INSTINTOS',          'Dinâmica Espacial dos Instintos')
-    renderizar_secao(f'{prefixo}_ASAS',               'Termômetro de Conflito das Asas')
+    renderizar_secao(f'{prefixo}_INSTINTOS',          'Dinâmica Espacial dos Instintos', page_break=False)
+    renderizar_secao(f'{prefixo}_ASAS',               'Termômetro de Conflito das Asas', page_break=False)
     renderizar_secao(f'{prefixo}_ZONA_SOMBRA',        'Zona de Sombra e Gestão de Conflito')
     renderizar_secao(f'{prefixo}_GESTAO_RH',          'Diretrizes de Gestão de Pessoas')
     renderizar_secao(f'{prefixo}_AUDITORIA_INTERATIVA','Auditoria Cultural: Culture Gap e Plano de Ação')
@@ -496,10 +661,11 @@ def gerar_laudo_cultura(
     ], colWidths=[5.5*cm, 9*cm])
     selo_tabela.hAlign = 'LEFT'
     selo_tabela.setStyle(TableStyle([
-        ('TOPPADDING', (0,0), (-1,-1), 1),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 1),
+        ('TOPPADDING', (0,0), (-1,-1), 5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
         ('LEFTPADDING', (0,0), (-1,-1), 0),
         ('RIGHTPADDING', (0,0), (0,-1), 10),
+        ('LINEBELOW', (0,0), (-1,-2), 0.3, HexColor('#CCCCCC')),
     ]))
 
     story += [
