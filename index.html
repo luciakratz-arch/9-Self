@@ -526,6 +526,48 @@ tr:hover td{background:#FAFAFE;}
       <!-- ── PÁGINAS COLABORADOR ── -->
       <div class="page" id="page-colab-inicio" style="display:none;"></div>
 
+      <!-- ══════════════ CULTURA ORGANIZACIONAL ══════════════ -->
+      <div class="page" id="page-cultura">
+        <div style="padding:28px;">
+          <div class="page-title">Cultura Organizacional</div>
+          <div class="page-subtitle">People Analytics — Fit Cultural por Empresa · Acesso restrito</div>
+
+          <!-- Seletor de empresa -->
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:24px;flex-wrap:wrap;">
+            <select id="culturaEmpresaSel" style="flex:1;min-width:220px;padding:10px 14px;border-radius:8px;border:1px solid #ddd;font-size:14px;background:#fff;">
+              <option value="">Selecione uma empresa...</option>
+            </select>
+            <button class="btn btn-primary" onclick="gerarRelatorioCultura()" id="btnGerarCultura" style="white-space:nowrap;">
+              🧬 Gerar Relatório de Cultura
+            </button>
+          </div>
+
+          <!-- Pódio da empresa selecionada -->
+          <div id="culturaPodio" style="display:none;margin-bottom:24px;">
+            <div style="background:#f8f4ff;border:1px solid #e0d0f5;border-radius:12px;padding:20px;">
+              <div style="font-weight:700;color:#3A1F5C;margin-bottom:12px;font-size:14px;">📊 Pódio de Personalidades</div>
+              <div id="culturaPodioContent"></div>
+              <div style="margin-top:12px;display:flex;gap:24px;flex-wrap:wrap;">
+                <div><span style="font-size:12px;color:#888;">Instinto Majoritário:</span><br><span id="culturaInstinto" style="font-weight:600;color:#7B00C4;font-size:13px;"></span></div>
+                <div><span style="font-size:12px;color:#888;">Termômetro das Asas:</span><br><span id="culturaAsas" style="font-weight:600;color:#7B1D6B;font-size:13px;"></span></div>
+                <div><span style="font-size:12px;color:#888;">Total mapeado:</span><br><span id="culturaTotal" style="font-weight:600;color:#3A1F5C;font-size:13px;"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Histórico de relatórios gerados -->
+          <div style="font-weight:700;color:#3A1F5C;margin-bottom:10px;font-size:14px;">Relatórios Gerados</div>
+          <table class="data-table" style="width:100%;">
+            <thead><tr>
+              <th>Empresa</th><th>Tríade</th><th>Colaboradores</th><th>Gerado em</th><th>Relatório</th>
+            </tr></thead>
+            <tbody id="culturaHistTable">
+              <tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum relatório gerado ainda</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="page" id="page-colab-teste">
         <div style="padding:28px;">
           <div class="page-title">Avaliação de Personalidade</div>
@@ -800,11 +842,13 @@ const NAVS = {
     {icon:'🏢', label:'Empresas / RH', page:'empresas'},
     {icon:'🔑', label:'Códigos de Acesso', page:'codigos'},
     {icon:'📄', label:'Laudos', page:'laudos'},
+    {icon:'🧬', label:'Cultura Organizacional', page:'cultura'},
   ],
   rh: [
     {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
     {icon:'🔑', label:'Gerar Código', page:'codigos'},
     {icon:'📄', label:'Laudos', page:'laudos'},
+    {icon:'🧬', label:'Cultura Organizacional', page:'cultura'},
   ],
   colaborador: [
     {icon:'🧠', label:'Minha Avaliação', page:'colab-teste'},
@@ -832,11 +876,12 @@ window.navigateTo = function(page) {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   const labels = {
     'dashboard':'Painel Geral','empresas':'Empresas / RH','codigos':'Códigos',
-    'laudos':'Laudos','rh-dashboard':'Painel RH',
+    'laudos':'Laudos','rh-dashboard':'Painel RH','cultura':'Cultura Organizacional',
     'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
+  if(page==='cultura') loadCulturaPage();
 };
 
 // ── DASHBOARD ADMIN ──
@@ -2124,6 +2169,154 @@ window.closeSidebar=function(){
 // ── INIT ──
 window._state.profile = 'colaborador';
 gerarCodigoPreview();
+
+// ══════════════════════════════════════════════════════════
+// CULTURA ORGANIZACIONAL — People Analytics
+// ══════════════════════════════════════════════════════════
+const CF_CULTURA = 'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarLaudoCultura';
+
+const NOMES_TIPO_CULT = {1:'Perfeição e Excelência',2:'Prestativo e Relacional',3:'Performance e Imagem',
+  4:'Autêntico e Profundo',5:'Observador e Privacidade',6:'Precavido e Questionador',
+  7:'Visionário e Otimista',8:'Desafiador e Controlador',9:'Harmônico e Diplomático'};
+const NOMES_INST = {AP:'Autopreservação',SOC:'Social','1A1':'Um a Um'};
+
+async function loadCulturaPage() {
+  // Carregar empresas no select
+  try {
+    const { collection: col, getDocs: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await gd(col(db, 'empresas'));
+    const sel = document.getElementById('culturaEmpresaSel');
+    sel.innerHTML = '<option value="">Selecione uma empresa...</option>';
+    snap.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.id;
+      o.textContent = d.data().nome || d.id;
+      sel.appendChild(o);
+    });
+    sel.onchange = () => previewCultura(sel.value);
+    // Carregar histórico
+    loadCulturaHist();
+  } catch(e) { console.error('loadCulturaPage', e); }
+}
+
+async function previewCultura(empresaId) {
+  if(!empresaId) { document.getElementById('culturaPodio').style.display='none'; return; }
+  try {
+    const { collection: col, query, where, getDocs: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const empSnap = await gd(col(db,'empresas'));
+    let nomeEmp = '';
+    empSnap.forEach(d => { if(d.id===empresaId) nomeEmp = d.data().nome||''; });
+
+    const laudoSnap = await gd(query(col(db,'nself_laudos'), where('empresa','==',nomeEmp)));
+    const perfis = [];
+    laudoSnap.forEach(d => {
+      const l = d.data();
+      if(l.tipo) perfis.push({tipo:parseInt(l.tipo), asa:parseInt(l.asaDominante||l.asa||0), subtipo_dom: l.subtipoDominante||l.subtipo_dom||'AP'});
+    });
+
+    if(perfis.length < 3) {
+      document.getElementById('culturaPodio').style.display='none';
+      alert(`Esta empresa tem apenas ${perfis.length} perfil(is) mapeado(s). Mínimo: 3.`);
+      return;
+    }
+
+    // Calcular pódio localmente para preview
+    const contagem = {};
+    const instContagem = {};
+    let asasPares = 0;
+    perfis.forEach(p => {
+      contagem[p.tipo] = (contagem[p.tipo]||0)+1;
+      instContagem[p.subtipo_dom] = (instContagem[p.subtipo_dom]||0)+1;
+      if(p.asa%2===0) asasPares++;
+    });
+    const podio = Object.entries(contagem).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t])=>parseInt(t));
+    const instMaj = Object.entries(instContagem).sort((a,b)=>b[1]-a[1])[0][0];
+    const termometro = asasPares >= perfis.length/2 ? 'RACIONAIS' : 'EXPRESSIVAS';
+
+    // Exibir pódio
+    document.getElementById('culturaPodio').style.display='block';
+    const medalhas = ['🥇','🥈','🥉'];
+    document.getElementById('culturaPodioContent').innerHTML = podio.map((t,i)=>
+      `<span style="display:inline-block;margin-right:20px;font-size:13px;">
+        <b>${medalhas[i]}</b> ${NOMES_TIPO_CULT[t]||t}
+        <span style="color:#888;font-size:11px;">(${contagem[t]} col.)</span>
+      </span>`
+    ).join('');
+    document.getElementById('culturaInstinto').textContent = `${NOMES_INST[instMaj]||instMaj} (${instMaj})`;
+    document.getElementById('culturaAsas').textContent = termometro;
+    document.getElementById('culturaTotal').textContent = `${perfis.length} colaboradores`;
+  } catch(e) { console.error('previewCultura', e); }
+}
+
+window.gerarRelatorioCultura = async function() {
+  const empresaId = document.getElementById('culturaEmpresaSel').value;
+  if(!empresaId) { alert('Selecione uma empresa.'); return; }
+
+  const btn = document.getElementById('btnGerarCultura');
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+
+  try {
+    // Obter token Firebase do usuário atual
+    const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const authInst = getAuth();
+    const token = await authInst.currentUser?.getIdToken();
+
+    const resp = await fetch(CF_CULTURA, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token||'admin-bypass'}`
+      },
+      body: JSON.stringify({ empresaId })
+    });
+
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error||'Erro desconhecido');
+
+    btn.textContent = '✅ Gerado!';
+    setTimeout(()=>{ btn.disabled=false; btn.textContent='🧬 Gerar Relatório de Cultura'; }, 3000);
+
+    // Abrir PDF e recarregar histórico
+    window.open(data.url, '_blank');
+    loadCulturaHist();
+
+  } catch(e) {
+    alert('Erro ao gerar: ' + e.message);
+    btn.disabled=false;
+    btn.textContent='🧬 Gerar Relatório de Cultura';
+  }
+};
+
+async function loadCulturaHist() {
+  try {
+    const { collection: col, getDocs: gd, orderBy, query, limit } =
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+    const empSnap = await gd(col(db,'empresas'));
+    const tbody = document.getElementById('culturaHistTable');
+    const rows = [];
+
+    empSnap.forEach(d => {
+      const data = d.data();
+      if(data.laudoCulturaUrl) {
+        const dt = data.laudoCulturaGeradoEm?.toDate?.()?.toLocaleDateString('pt-BR') || '—';
+        rows.push(`<tr>
+          <td>${data.nome||'—'}</td>
+          <td style="font-size:12px;color:#7B00C4;">${data.triadeCultura||'—'}</td>
+          <td style="text-align:center;">${data.totalColaboradoresCultura||'—'}</td>
+          <td>${dt}</td>
+          <td><a href="${data.laudoCulturaUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>
+              <button class="btn btn-outline btn-sm" onclick="gerarRelatorioCultura()" title="Regenerar">🔄</button></td>
+        </tr>`);
+      }
+    });
+
+    tbody.innerHTML = rows.length
+      ? rows.join('')
+      : '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum relatório gerado ainda</td></tr>';
+  } catch(e) { console.error('loadCulturaHist', e); }
+}
 
 // Auto-detectar ?code= na URL (colaborador clicou no link)
 (function() {
