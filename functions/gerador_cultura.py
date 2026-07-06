@@ -152,9 +152,94 @@ def calcular_podio(perfis: list) -> dict:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def carregar_triades(num: str) -> dict:
-    """Lê banco_dados_cultura/triade_NN.txt e retorna dict de seções."""
-    path = os.path.join(_DB_DIR, f'triade_{num}.txt')
-    if not os.path.exists(path):
+    """Fallback: lê triade_NN.txt pelo número. Aceita variações de nome."""
+    candidatos = [
+        f'triade_{num}.txt', f'Triade_{num}.txt', f'Tríade_{num}.txt',
+        f'triade_{int(num):02d}.txt', f'Triade_{int(num):02d}.txt', f'Tríade_{int(num):02d}.txt',
+    ]
+    path = None
+    for nome in candidatos:
+        p = os.path.join(_DB_DIR, nome)
+        if os.path.exists(p):
+            path = p
+            break
+    if not path:
+        return {}
+    with open(path, encoding='utf-8') as f:
+        texto = f.read()
+    secoes = {}
+    partes = re.split(r'=== (\w+) ===', texto)
+    for i in range(1, len(partes), 2):
+        chave = partes[i].strip()
+        valor = partes[i+1].strip() if i+1 < len(partes) else ''
+        secoes[chave] = valor
+    return secoes
+
+
+def buscar_triades_por_composicao(tipos: list) -> tuple:
+    """Busca o arquivo de tríade pela linha COMPOSIÇÃO: X + Y + Z.
+    Retorna (num_arquivo, secoes) ou (None, {}) se não encontrar.
+    Ignora o número do arquivo — o critério é o texto da Composição.
+    """
+    nomes = sorted([NOMES_TIPO[t] for t in tipos])
+    
+    # Listar todos os arquivos do banco
+    if not os.path.exists(_DB_DIR):
+        return None, {}
+    
+    for nome_arquivo in os.listdir(_DB_DIR):
+        if not nome_arquivo.endswith('.txt'):
+            continue
+        path = os.path.join(_DB_DIR, nome_arquivo)
+        try:
+            with open(path, encoding='utf-8') as f:
+                texto = f.read()
+        except Exception:
+            continue
+        
+        # Buscar linha COMPOSIÇÃO: no arquivo
+        match = re.search(r'COMPOSIÇÃO:\s*(.+)', texto, re.IGNORECASE)
+        if not match:
+            continue
+        
+        composicao = match.group(1).strip()
+        # Separar por " + " e normalizar
+        partes = [p.strip() for p in composicao.split('+')]
+        partes_sorted = sorted(partes)
+        
+        if partes_sorted == nomes:
+            # Encontrou! Parsear as seções
+            secoes = {}
+            partes_secao = re.split(r'=== (\w+) ===', texto)
+            for i in range(1, len(partes_secao), 2):
+                chave = partes_secao[i].strip()
+                valor = partes_secao[i+1].strip() if i+1 < len(partes_secao) else ''
+                secoes[chave] = valor
+            # Extrair número do arquivo para referência
+            num_match = re.search(r'(\d+)', nome_arquivo)
+            num = num_match.group(1) if num_match else '00'
+            return num, secoes
+    
+    return None, {}
+    """Lê banco_dados_cultura/triade_NN.txt e retorna dict de seções.
+    Aceita variações: triade_01.txt, Tríade_01, Triade_01 etc.
+    """
+    # Tenta todas as variações de nome
+    candidatos = [
+        f'triade_{num}.txt',
+        f'Triade_{num}.txt',
+        f'Tríade_{num}.txt',
+        f'triade_{int(num):02d}.txt',
+        f'Triade_{int(num):02d}.txt',
+        f'Tríade_{int(num):02d}.txt',
+    ]
+    path = None
+    for nome in candidatos:
+        p = os.path.join(_DB_DIR, nome)
+        if os.path.exists(p):
+            path = p
+            break
+    if not path:
         return {}
     with open(path, encoding='utf-8') as f:
         texto = f.read()
@@ -347,13 +432,23 @@ def gerar_laudo_cultura(
     contagem      = dados['contagem_tipos']
     cont_inst     = dados['contagem_instintos']
 
-    # ── Carregar conteúdo da tríade ───────────────────────────────────────────
-    sec = carregar_triades(num_triades)
-    nome_cultura = sec.get(f'TRIADE_{num_triades}_CORE', '').split('\n')[0]
-    if 'NOME:' in nome_cultura:
-        nome_cultura = nome_cultura.replace('NOME:', '').strip()
+    # ── Carregar conteúdo da tríade por COMPOSIÇÃO ───────────────────────────
+    num_encontrado, sec = buscar_triades_por_composicao(podio[:3])
+    if not sec:
+        # Fallback: busca pelo número calculado
+        sec = carregar_triades(num_triades)
+        num_encontrado = num_triades
+    
+    num_ref = num_encontrado or num_triades
+
+    # Extrair nome da cultura do conteúdo do arquivo
+    core_txt = sec.get(f'TRIADE_{num_ref}_CORE', '') or next(
+        (v for k, v in sec.items() if 'CORE' in k), '')
+    nome_linha = core_txt.split('\n')[0] if core_txt else ''
+    if 'NOME:' in nome_linha:
+        nome_cultura = nome_linha.replace('NOME:', '').strip()
     else:
-        nome_cultura = f'Cultura Organizacional — Tríade {num_triades}'
+        nome_cultura = f'Cultura Organizacional — Tríade {num_ref}'
 
     # ── Documento ─────────────────────────────────────────────────────────────
     doc = BaseDocTemplate(
@@ -443,7 +538,7 @@ def gerar_laudo_cultura(
         hr(), sp(0.2),
         p(f'Análise baseada em <b>{total_colaboradores} colaboradores</b> mapeados '
           f'com referência em <b>{data_ref}</b>. A tríade dominante identificada é '
-          f'<b>{nome_cultura}</b> (Tríade {num_triades}).'),
+          f'<b>{nome_cultura}</b> (Tríade {num_ref}).'),
         sp(0.3),
         barra_podio(podio, contagem, total_colaboradores),
         sp(0.5),
@@ -625,7 +720,14 @@ def gerar_laudo_cultura(
             if '✍️' in txt:
                 story.append(sp(0.1)); story.append(linhas_escrita(5)); story.append(sp(0.2))
 
-    prefixo = f'TRIADE_{num_triades}'
+    # Descobrir o prefixo real das seções no arquivo (pode ser TRIADE_04, TRIADE_01 etc)
+    prefixo_real = None
+    for chave in sec.keys():
+        m = re.match(r'^(TRIADE_\d+)_CORE$', chave)
+        if m:
+            prefixo_real = m.group(1)
+            break
+    prefixo = prefixo_real or f'TRIADE_{num_ref}'
     renderizar_secao(f'{prefixo}_CORE',               'Identidade da Personalidade Coletiva')
     renderizar_secao(f'{prefixo}_INSTINTOS',          'Dinâmica Espacial dos Instintos', page_break=False)
     renderizar_secao(f'{prefixo}_ASAS',               'Termômetro de Conflito das Asas', page_break=False)
@@ -638,7 +740,7 @@ def gerar_laudo_cultura(
     # ══════════════════════════════════════════════════
     hash_uuid = str(uuid.uuid5(
         uuid.NAMESPACE_DNS,
-        f'{empresa}-{num_triades}-{instinto_maj}-{termometro}-{agora.isoformat()}'
+        f'{empresa}-{num_ref}-{instinto_maj}-{termometro}-{agora.isoformat()}'
     )).upper()
     data_hora_fmt = agora.strftime('%d/%m/%Y %H:%M:%S UTC')
 
