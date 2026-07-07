@@ -934,9 +934,8 @@ async function loadCodigos() {
       const statusCls = {'Pendente':'pill-gray','Respondido':'pill-blue','disponivel':'pill-green','revogado':'pill-red'};
       const link  = c.linkTeste || gerarLinkTeste(c.codigo||'');
       const pdf   = c.pdfPath || '';
-      const wbtn  = c.whatsapp
-        ? `<a href="${gerarLinkWhatsApp(c.whatsapp,c.nomeDestinatario||'',c.codigo)}" target="_blank" class="btn btn-outline btn-sm" title="Reenviar WhatsApp">💬</a>`
-        : '';
+      const wbtn  = `<button class="btn btn-outline btn-sm" title="Enviar por WhatsApp"
+        onclick="abrirModalWhatsApp('${d.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>`;
       return `<tr>
         <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
         <td>${c.nomeDestinatario||'—'}</td>
@@ -2124,6 +2123,32 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
           style="color:#c00;margin-bottom:4px;">⚠ Tentar novamente</button><br>
         <span style="color:#999;" title="${e.message.replace(/"/g,"'")}">${msg}</span>
       </div>`);
+  }
+};
+
+// ── WHATSAPP MODAL ──
+window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
+  const num = whatsappSalvo || '';
+  const msg = encodeURIComponent(
+    `Olá ${nome}! 🎉 Seu código de acesso ao 9&Self chegou!\n\n` +
+    `Código: *${codigo}*\n\n` +
+    `Acesse: https://luciakratz-arch.github.io/9-Self/index.html\n` +
+    `e insira seu código na aba *Usuário*.\n\n` +
+    `Dúvidas? Responda esta mensagem. 💜`
+  );
+  if(num) {
+    const numLimpo = num.replace(/\D/g,'');
+    window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
+  } else {
+    const novoNum = prompt(`Digite o WhatsApp de ${nome} (apenas números, com DDD):`);
+    if(novoNum) {
+      const numLimpo = novoNum.replace(/\D/g,'');
+      // Salvar no Firestore
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({doc, updateDoc}) => {
+        updateDoc(doc(db,'nself_codigos',id), {whatsapp: novoNum}).catch(()=>{});
+      });
+      window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
+    }
   }
 };
 
