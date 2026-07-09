@@ -27,6 +27,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.lib.colors import HexColor, white
 from reportlab.platypus import (
+    Image,
     BaseDocTemplate, PageTemplate, Frame,
     Paragraph, Spacer, HRFlowable, Table, TableStyle,
     PageBreak, NextPageTemplate, KeepTogether
@@ -690,6 +691,85 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     ]))
     for paragrafo in amb_paras[1:]:
         story.append(paragrafo)
+
+    # ══════════════════════════════════════════════════ DINÂMICA DO ENEAGRAMA
+    # Imagens: tipo_N.jpg (símbolo) e tipo_Nb.jpg (setas) na pasta raiz do repositório
+    _img_dir = os.path.dirname(os.path.abspath(__file__))
+    img_setas_path = os.path.join(_img_dir, f'{tipo:02d}b.jpg')
+
+    TEXTO_DINAMICA_P1 = (
+        'O Eneagrama não descreve um funcionamento psíquico estático ou uma estrutura rígida de '
+        'personalidade; ele é, fundamentalmente, um modelo dinâmico do comportamento humano. Isso '
+        'significa que nenhum indivíduo opera de forma isolada em seu tipo principal. Em resposta '
+        'às demandas do ambiente, às pressões cotidianas e ao nosso nível de presença consciente, '
+        'nossa personalidade transita por caminhos internos bem definidos, conhecidos como os eixos '
+        'de Estresse (Desintegração) e de Evolução (Integração), que são representados aqui pelas '
+        'setas na figura abaixo.'
+    )
+    TEXTO_DINAMICA_P2 = (
+        'Compreender essa mobilidade psicológica é fundamental para identificar tanto os nossos '
+        'gatilhos de sobrecarga quanto os nossos recursos latentes de desenvolvimento.'
+    )
+    TEXTO_ESTRESSE_P1 = (
+        '<b>O Mecanismo do Estresse (Desintegração)</b><br/><br/>'
+        'Quando somos submetidos a períodos de pressão prolongada, frustração ou quando as defesas '
+        'habituais da nossa personalidade esgotam sua eficácia, a psique ativa um movimento '
+        'automático de compensação: o ponto de estresse. Nesse estado de vulnerabilidade, o '
+        'indivíduo passa a manifestar os padrões mais reativos, defensivos e automatizados de uma '
+        'outra estrutura de personalidade. Esse movimento funciona como um alerta do organismo: a '
+        'estratégia atual faliu e a mente busca, de forma inconsciente, uma válvula de escape para '
+        'lidar com a tensão. Reconhecer esse padrão é o primeiro passo para interromper ciclos de '
+        'exaustão emocional.'
+    )
+    TEXTO_EVOLUCAO_P1 = (
+        '<b>O Caminho da Evolução (Integração)</b><br/><br/>'
+        'Em contrapartida, quando o indivíduo experimenta um estado de segurança interna, '
+        'autocompaixão e engajamento consciente em seu desenvolvimento pessoal, a psique se move '
+        'na direção da evolução. Este não é um movimento automático, mas sim uma escolha intencional '
+        'de amadurecimento. Ao trilhar esse caminho, a pessoa passa a assimilar e integrar as '
+        'qualidades mais saudáveis, as virtudes e a flexibilidade cognitiva de uma terceira '
+        'estrutura de personalidade. Representa a expansão da consciência, onde deixamos de apenas '
+        'reagir aos estímulos do ambiente e passamos a agir com maior resiliência, autonomia e '
+        'equilíbrio emocional.'
+    )
+    TEXTO_CONCLUSAO = (
+        'O processo de individuação e saúde mental, sob a ótica desta metodologia, não visa '
+        'eliminar o movimento de estresse — que é um mecanismo natural de defesa —, mas sim '
+        'desenvolver a autopercepção necessária para acolher o sinal de alerta e direcionar '
+        'conscientemente a energia psíquica rumo aos recursos de evolução e autorregulação.'
+    )
+
+    sTitDin = ParagraphStyle('TitDin', fontName='Helvetica-Bold', fontSize=13,
+                              leading=18, textColor=MAG, spaceAfter=6, spaceBefore=10,
+                              keepWithNext=True)
+
+    story.append(sp(0.3))
+    story.append(KeepTogether([
+        Paragraph('A Dinâmica do Eneagrama: Estresse e Evolução da Personalidade', sTitDin),
+        SecLine(), sp(0.2),
+        p(TEXTO_DINAMICA_P1),
+    ]))
+    story.append(sp(0.15))
+
+    # Imagem das setas do tipo
+    if os.path.exists(img_setas_path):
+        try:
+            img = Image(img_setas_path, width=10*cm, height=10*cm, kind='proportional')
+            img.hAlign = 'CENTER'
+            story.append(sp(0.2))
+            story.append(img)
+            story.append(sp(0.2))
+        except Exception:
+            pass
+
+    story.append(p(TEXTO_DINAMICA_P2))
+    story.append(sp(0.2))
+    story.append(p(TEXTO_ESTRESSE_P1))
+    story.append(sp(0.2))
+    story.append(p(TEXTO_EVOLUCAO_P1))
+    story.append(sp(0.2))
+    story.append(p(TEXTO_CONCLUSAO))
+    story.append(sp(0.3))
 
     # ESTRESSE — separa a citação entre aspas como QuoteBox
     estresse_txt = sec.get('ESTRESSE', '')
