@@ -1184,59 +1184,6 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         playlist_conteudo,
     ]))
 
-    # ══════════════════════════════════════════════════ ASSINATURA DIGITAL (mantida no fim)
-    # RELACIONAMENTOS foi movido para após Níveis de Saúde
-    rel_raw = sec.get('RELACIONAMENTOS', '').strip()
-    if rel_raw:
-        story.append(PageBreak())
-
-        sRelHeader = ParagraphStyle('RelHeader', fontName='Helvetica-Bold', fontSize=11,
-                                    leading=16, textColor=MAG, spaceAfter=4, spaceBefore=10,
-                                    keepWithNext=True)
-
-        def gerar_linhas_escrita(n=4):
-            rows = [['']] * n
-            t = Table(rows, colWidths=[TW], rowHeights=[18] * n)
-            t.setStyle(TableStyle([
-                ('LINEBELOW', (0, 0), (-1, -1), 0.5, HexColor('#CCCCCC')),
-                ('TOPPADDING', (0, 0), (-1, -1), 0),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-            ]))
-            return t
-
-        story.append(KeepTogether([
-            Paragraph('Relacionamentos Interpessoais', sSecT), SecLine(), sp(0.15),
-            p(f'Como o perfil <b>{nome_tipo}</b> se relaciona com cada um dos outros perfis do Eneagrama.'),
-        ]))
-        story.append(sp(0.2))
-
-        blocos_raw = [t.strip() for t in re.split(r'\n\s*\n', rel_raw) if t.strip()]
-        for bloco_txt in blocos_raw:
-            linhas = [l.strip() for l in bloco_txt.split('\n') if l.strip()]
-            if not linhas:
-                continue
-            primeira = linhas[0]
-            # Detecta cabeçalho de compatibilidade: "• Com o perfil X — Y"
-            if re.match(r'^\s*[•\-]?\s*Com o?\s', primeira, re.IGNORECASE) or '—' in primeira:
-                titulo_limpo = re.sub(r'^\s*[•]\s*', '', primeira)
-                story.append(Paragraph(f'★ {titulo_limpo}', sRelHeader))
-                tem_reflexao = False
-                for sub in linhas[1:]:
-                    sub_limpo = re.sub(r'^\s*[-–]\s*', '', sub)
-                    if '✍' in sub_limpo or 'eflexão' in sub_limpo:
-                        tem_reflexao = True
-                        story.append(p(sub_limpo.replace('✍️', '').strip()))
-                    else:
-                        story.append(p(sub_limpo))
-                    story.append(sp(0.05))
-                if tem_reflexao:
-                    story.append(sp(0.1))
-                    story.append(gerar_linhas_escrita(4))
-                    story.append(sp(0.2))
-            else:
-                story.append(p(bloco_txt))
-                story.append(sp(0.1))
-
     # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
     agora_utc = datetime.now(timezone.utc)
     data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
