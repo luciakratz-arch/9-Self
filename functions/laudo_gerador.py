@@ -20,6 +20,8 @@ Uso:
 
 import re
 import os
+import uuid
+from datetime import datetime, timezone
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -1032,6 +1034,113 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         p(playlist_intro),
         sp(0.15),
         playlist_conteudo,
+    ]))
+
+    # ══════════════════════════════════════════════════ RELACIONAMENTOS
+    rel_raw = sec.get('RELACIONAMENTOS', '').strip()
+    if rel_raw:
+        story.append(PageBreak())
+
+        sRelHeader = ParagraphStyle('RelHeader', fontName='Helvetica-Bold', fontSize=11,
+                                    leading=16, textColor=MAG, spaceAfter=4, spaceBefore=10,
+                                    keepWithNext=True)
+
+        def gerar_linhas_escrita(n=4):
+            rows = [['']] * n
+            t = Table(rows, colWidths=[TW], rowHeights=[18] * n)
+            t.setStyle(TableStyle([
+                ('LINEBELOW', (0, 0), (-1, -1), 0.5, HexColor('#CCCCCC')),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+            ]))
+            return t
+
+        story.append(KeepTogether([
+            Paragraph('Relacionamentos Interpessoais', sSecT), SecLine(), sp(0.15),
+            p(f'Como o perfil <b>{nome_tipo}</b> se relaciona com cada um dos outros perfis do Eneagrama.'),
+        ]))
+        story.append(sp(0.2))
+
+        blocos_raw = [t.strip() for t in re.split(r'\n\s*\n', rel_raw) if t.strip()]
+        for bloco_txt in blocos_raw:
+            linhas = [l.strip() for l in bloco_txt.split('\n') if l.strip()]
+            if not linhas:
+                continue
+            primeira = linhas[0]
+            # Detecta cabeçalho de compatibilidade: "• Com o perfil X — Y"
+            if re.match(r'^\s*[•\-]?\s*Com o?\s', primeira, re.IGNORECASE) or '—' in primeira:
+                titulo_limpo = re.sub(r'^\s*[•]\s*', '', primeira)
+                story.append(Paragraph(f'★ {titulo_limpo}', sRelHeader))
+                tem_reflexao = False
+                for sub in linhas[1:]:
+                    sub_limpo = re.sub(r'^\s*[-–]\s*', '', sub)
+                    if '✍' in sub_limpo or 'eflexão' in sub_limpo:
+                        tem_reflexao = True
+                        story.append(p(sub_limpo.replace('✍️', '').strip()))
+                    else:
+                        story.append(p(sub_limpo))
+                    story.append(sp(0.05))
+                if tem_reflexao:
+                    story.append(sp(0.1))
+                    story.append(gerar_linhas_escrita(4))
+                    story.append(sp(0.2))
+            else:
+                story.append(p(bloco_txt))
+                story.append(sp(0.1))
+
+    # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
+    agora_utc = datetime.now(timezone.utc)
+    data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
+    hash_doc = str(uuid.uuid5(
+        uuid.NAMESPACE_DNS,
+        f'{nome}-{tipo}-{asa_dominante}-{subtipo_dom}{subtipo_int}{subtipo_rem}-{agora_utc.isoformat()}'
+    )).upper()
+
+    sSeloTit  = ParagraphStyle('SeloTit',  fontName='Helvetica-Bold', fontSize=11,
+                                textColor=HexColor('#1A9460'), spaceAfter=8, keepWithNext=True)
+    sSeloLbl  = ParagraphStyle('SeloLbl',  fontName='Helvetica-Bold', fontSize=9,
+                                textColor=DARK, leading=15)
+    sSeloVal  = ParagraphStyle('SeloVal',  fontName='Helvetica',      fontSize=9,
+                                textColor=DARK, leading=15)
+    sSeloRod  = ParagraphStyle('SeloRod',  fontName='Helvetica',      fontSize=8,
+                                textColor=GMID, spaceBefore=6)
+
+    dados_selo = [
+        ['Aprovador:',        'Dra. Lúcia Kratz — CRP 09/20590'],
+        ['Instrumento:',      '9&Self — Perfil Comportamental por Eneagrama'],
+        ['Avaliado(a):',      f'{nome} — {cargo}' if cargo else nome],
+        ['Data de emissão:',  data_hora_fmt],
+        ['Código do documento:', hash_doc],
+    ]
+
+    linhas_selo = []
+    for lbl, val in dados_selo:
+        linhas_selo.append([Paragraph(lbl, sSeloLbl), Paragraph(val, sSeloVal)])
+
+    tabela_selo = Table(linhas_selo, colWidths=[4.2*cm, TW - 4.2*cm])
+    tabela_selo.setStyle(TableStyle([
+        ('VALIGN',        (0, 0), (-1, -1), 'TOP'),
+        ('TOPPADDING',    (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 8),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 8),
+        ('BACKGROUND',    (0, 0), (-1, -1), HexColor('#F0FAF4')),
+        ('LINEBEFORE',    (0, 0), (0, -1),  3, HexColor('#1A9460')),
+        ('LINEBELOW',     (0, -1), (-1, -1), 0.5, HexColor('#CCCCCC')),
+    ]))
+
+    story.append(PageBreak())
+    story.append(KeepTogether([
+        Paragraph('✅ Assinatura Digital', sSeloTit),
+        SecLine(), sp(0.2),
+        tabela_selo,
+        sp(0.15),
+        Paragraph(
+            'Este documento foi gerado eletronicamente pelo sistema 9&Self e possui validade '
+            'técnica e científica. O código acima identifica unicamente este laudo e pode ser '
+            'utilizado para verificação de autenticidade.',
+            sSeloRod
+        ),
     ]))
 
     doc.build(story)
