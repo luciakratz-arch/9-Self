@@ -1,6 +1,7 @@
 import os
 import json
 import tempfile
+import time
 from flask import Flask, request, jsonify
 from laudo_gerador import gerar_laudo
 from google.cloud import storage
@@ -34,7 +35,7 @@ def gerarLaudoPDF():
         )
 
         bucket = storage.Client().bucket(STORAGE_BUCKET.value)
-        blob = bucket.blob(f'laudos/{codigo_id or nome}/laudo_{tipo}_{asa}_{sub_dom}.pdf')
+        blob = bucket.blob(f'laudos/{codigo_id or nome}/laudo_{tipo}_{asa}_{sub_dom}_{int(time.time())}.pdf')
         blob.upload_from_filename(tmp_path, content_type='application/pdf')
         blob.make_public()
         
