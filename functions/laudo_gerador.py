@@ -374,14 +374,17 @@ class PlaylistBackPage(Flowable):
 
     def draw(self):
         c = self.canv
-        w, h = self._w, self._h
+        # ── Usar coordenadas absolutas da página inteira (ignora margens) ──
+        pw, ph = PW, PH
 
-        # ── Fundo degradê da marca (imita a capa) ──
-        from reportlab.lib.colors import HexColor as HC
-        steps = 60
+        # Salva estado e reseta transformação para origem da página
+        c.saveState()
+        c.resetTransforms()
+
+        # ── Fundo degradê da marca — cobre a página inteira ──
+        steps = 80
         for i in range(steps):
             t = i / steps
-            # interpola #0E0818 → #3D0A5E → #7B1D6B
             if t < 0.5:
                 t2 = t * 2
                 r = int(0x0E + (0x3D - 0x0E) * t2)
@@ -393,57 +396,65 @@ class PlaylistBackPage(Flowable):
                 g = int(0x0A + (0x1D - 0x0A) * t2)
                 b = int(0x5E + (0x6B - 0x5E) * t2)
             c.setFillColorRGB(r/255, g/255, b/255)
-            stripe_h = h / steps
-            c.rect(0, h - (i + 1) * stripe_h, w, stripe_h + 1, fill=1, stroke=0)
+            stripe_h = ph / steps
+            c.rect(0, ph - (i + 1) * stripe_h, pw, stripe_h + 1, fill=1, stroke=0)
 
         # ── Marca 9&Self centralizada ──
         c.setFillColorRGB(1, 1, 1)
         c.setFont(LOGO_FONT, 72)
-        c.drawCentredString(w / 2, h * 0.62, '9&Self')
+        c.drawCentredString(pw / 2, ph * 0.62, '9&Self')
 
         c.setFont('Helvetica', 13)
-        c.setFillColorRGB(0.77, 0.65, 0.91)   # lilás suave
-        c.drawCentredString(w / 2, h * 0.56, 'Perfil Comportamental por Eneagrama')
+        c.setFillColorRGB(0.77, 0.65, 0.91)
+        c.drawCentredString(pw / 2, ph * 0.555, 'Perfil Comportamental por Eneagrama')
 
         # ── QR Code ──
-        qr_size = 3.8 * cm
-        qr_x = w / 2 - qr_size / 2
-        qr_y = h * 0.28
+        qr_size = 4.0 * cm
+        qr_x = pw / 2 - qr_size / 2
+        qr_y = ph * 0.28
 
+        qr_ok = False
         if _QRCODE_OK:
             try:
-                qr = qrcode.QRCode(version=1, box_size=10, border=2,
-                                   error_correction=qrcode.constants.ERROR_CORRECT_M)
+                import qrcode as _qr
+                qr = _qr.QRCode(version=1, box_size=10, border=2,
+                                error_correction=_qr.constants.ERROR_CORRECT_M)
                 qr.add_data(self.URL_QR)
                 qr.make(fit=True)
-                img_pil = qr.make_image(fill_color='white', back_color='transparent')
+                # fill branco sobre fundo transparente — usa ImageReader do ReportLab
+                img_pil = qr.make_image(fill_color='#1A0A2E', back_color='white')
                 buf = io.BytesIO()
                 img_pil.save(buf, format='PNG')
                 buf.seek(0)
-                c.drawImage(buf, qr_x, qr_y, width=qr_size, height=qr_size,
-                            mask='auto', preserveAspectRatio=True)
-            except Exception:
-                # Fallback: quadrado branco com texto
-                c.setFillColorRGB(1, 1, 1)
-                c.roundRect(qr_x, qr_y, qr_size, qr_size, 4, fill=1, stroke=0)
-                c.setFillColorRGB(0.24, 0.04, 0.37)
-                c.setFont('Helvetica', 7)
-                c.drawCentredString(w / 2, qr_y + qr_size / 2 - 4, 'QR')
-        else:
-            # Sem biblioteca qrcode: quadrado branco decorativo
+                from reportlab.lib.utils import ImageReader
+                c.drawImage(ImageReader(buf), qr_x, qr_y,
+                            width=qr_size, height=qr_size, preserveAspectRatio=True)
+                qr_ok = True
+            except Exception as e:
+                pass
+
+        if not qr_ok:
+            # Fallback decorativo com URL
             c.setFillColorRGB(1, 1, 1)
-            c.roundRect(qr_x, qr_y, qr_size, qr_size, 4, fill=1, stroke=0)
+            c.roundRect(qr_x, qr_y, qr_size, qr_size, 6, fill=1, stroke=0)
+            c.setFillColorRGB(0.10, 0.04, 0.18)
+            c.setFont('Helvetica-Bold', 8)
+            c.drawCentredString(pw / 2, qr_y + qr_size * 0.58, 'Acesse pelo link:')
+            c.setFont('Helvetica', 6.5)
+            c.drawCentredString(pw / 2, qr_y + qr_size * 0.42, '9-Self/9self-landing.html')
 
         # ── Texto abaixo do QR ──
-        c.setFont('Helvetica', 8)
+        c.setFont('Helvetica', 8.5)
         c.setFillColorRGB(0.77, 0.65, 0.91)
-        c.drawCentredString(w / 2, qr_y - 0.45 * cm, 'Acesse o sistema 9&Self')
+        c.drawCentredString(pw / 2, qr_y - 0.5 * cm, 'Acesse o sistema 9&Self')
 
         # ── Rodapé ──
         c.setFont('Helvetica', 7.5)
         c.setFillColorRGB(0.6, 0.5, 0.75)
-        c.drawCentredString(w / 2, 0.9 * cm,
+        c.drawCentredString(pw / 2, 0.9 * cm,
             'Dra. Lúcia Kratz  ·  CRP 09/20590  ·  Psicóloga & Especialista em Personalidade')
+
+        c.restoreState()
 
 
 # ══════════════════════════════════════════════════════════════════════════
