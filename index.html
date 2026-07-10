@@ -509,6 +509,38 @@ tr:hover td{background:#FAFAFE;}
           </div>
 
           <div class="table-card">
+            <!-- FILTROS -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroNome" placeholder="🔍 Buscar por nome..." oninput="filtrarCodigos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroStatus" onchange="filtrarCodigos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os status</option>
+                <option value="disponivel">Disponível</option>
+                <option value="usado">Usado</option>
+                <option value="Pendente">Pendente</option>
+                <option value="revogado">Revogado</option>
+              </select>
+              <select id="filtroMes" onchange="filtrarCodigos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os meses</option>
+                <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+                <option value="03">Março</option><option value="04">Abril</option>
+                <option value="05">Maio</option><option value="06">Junho</option>
+                <option value="07">Julho</option><option value="08">Agosto</option>
+                <option value="09">Setembro</option><option value="10">Outubro</option>
+                <option value="11">Novembro</option><option value="12">Dezembro</option>
+              </select>
+              <select id="filtroOrdem" onchange="filtrarCodigos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="nome">A→Z Nome</option>
+                <option value="nome_desc">Z→A Nome</option>
+                <option value="data_desc">Mais recente</option>
+                <option value="data_asc">Mais antigo</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosCodigos()">✕ Limpar</button>
+            </div>
+            <div id="codigosCount" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
             <table>
               <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
               <tbody id="codigosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
@@ -517,7 +549,28 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
-      <!-- MODAL: Link de Cadastro Gerado -->
+      <!-- MODAL: Renovar Código -->
+      <div class="modal-overlay" id="modalRenovarCodigo">
+        <div class="modal">
+          <h3>🔄 Renovar Código</h3>
+          <p style="font-size:13px;color:#888;margin-bottom:16px;">
+            Gera um novo código para a mesma pessoa, mantendo o histórico do anterior.
+          </p>
+          <input type="hidden" id="renovarCodigoOrigId"/>
+          <div class="form-row">
+            <label>Pessoa</label>
+            <input type="text" id="renovarCodigoNome" readonly style="background:var(--light);"/>
+          </div>
+          <div class="form-row">
+            <label>Novo código gerado</label>
+            <input type="text" id="renovarCodigoNovo" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalRenovarCodigo')">Cancelar</button>
+            <button class="btn btn-primary" onclick="confirmarRenovarCodigo()">✅ Confirmar e Enviar WhatsApp</button>
+          </div>
+        </div>
+      </div>
       <div class="modal-overlay" id="modalLinkCadastro">
         <div class="modal">
           <h3>🔗 Link de Cadastro Gerado</h3>
@@ -1016,36 +1069,144 @@ async function loadEmpresas() {
 }
 
 // ── LOAD CÓDIGOS ──
+window._todosCodigos = [];
+
 async function loadCodigos() {
   const tbody = document.getElementById('codigosTable');
   try {
     const snap = await getDocs(collection(db,'nself_codigos'));
     if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr>';return;}
-    tbody.innerHTML = snap.docs.map(d=>{
-      const c = d.data();
-      const statusCls = {'Pendente':'pill-gray','Respondido':'pill-blue','disponivel':'pill-green','revogado':'pill-red'};
-      const link  = c.linkTeste || gerarLinkTeste(c.codigo||'');
-      const pdf   = c.pdfPath || '';
-      const wbtn  = `<button class="btn btn-outline btn-sm" title="Enviar por WhatsApp"
-        onclick="abrirModalWhatsApp('${d.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>`;
-      return `<tr>
-        <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
-        <td>${c.nomeDestinatario||'—'}</td>
-        <td>${c.empresa||'Pessoa Física'}</td>
-        <td style="font-size:11px;max-width:140px;word-break:break-all;">
-          <a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
-        <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-        <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
-        <td style="display:flex;gap:6px;align-items:center;">
-          ${wbtn}
-          <button class="btn btn-outline btn-sm" title="Editar e Reenviar"
-            onclick="editarCodigo('${d.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.email||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button>
-          <button class="btn btn-danger btn-sm" title="Excluir"
-            onclick="excluirCodigo('${d.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
-        </td></tr>`;
-    }).join('');
+    window._todosCodigos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    filtrarCodigos();
   } catch(e){console.warn(e);}
 }
+
+window.filtrarCodigos = function() {
+  const nome   = (document.getElementById('filtroNome')?.value||'').toLowerCase().trim();
+  const status = document.getElementById('filtroStatus')?.value||'';
+  const mes    = document.getElementById('filtroMes')?.value||'';
+  const ordem  = document.getElementById('filtroOrdem')?.value||'nome';
+  const tbody  = document.getElementById('codigosTable');
+  const count  = document.getElementById('codigosCount');
+
+  let lista = [...window._todosCodigos];
+
+  if(nome)   lista = lista.filter(c=>(c.nomeDestinatario||'').toLowerCase().includes(nome));
+  if(status) lista = lista.filter(c=>(c.status||'Pendente')===status);
+  if(mes)    lista = lista.filter(c=>{
+    const dt = c.criadoEm?.toDate?.();
+    return dt && String(dt.getMonth()+1).padStart(2,'0')===mes;
+  });
+
+  lista.sort((a,b)=>{
+    if(ordem==='nome')      return (a.nomeDestinatario||'').localeCompare(b.nomeDestinatario||'');
+    if(ordem==='nome_desc') return (b.nomeDestinatario||'').localeCompare(a.nomeDestinatario||'');
+    if(ordem==='data_desc') return (b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0);
+    if(ordem==='data_asc')  return (a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0);
+    return 0;
+  });
+
+  if(count) count.textContent = lista.length > 0 ? `${lista.length} código(s) encontrado(s)` : '';
+
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>';
+    return;
+  }
+
+  const statusCls = {'Pendente':'pill-gray','Respondido':'pill-blue','disponivel':'pill-green','revogado':'pill-red','usado':'pill-gray'};
+  tbody.innerHTML = lista.map(c=>{
+    const link  = c.linkTeste || gerarLinkTeste(c.codigo||'');
+    const pdf   = c.pdfPath || '';
+    const wbtn  = `<button class="btn btn-outline btn-sm" title="Enviar por WhatsApp"
+      onclick="abrirModalWhatsApp('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>`;
+    return `<tr>
+      <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
+      <td>${c.nomeDestinatario||'—'}</td>
+      <td>${c.empresa||'Pessoa Física'}</td>
+      <td style="font-size:11px;max-width:140px;word-break:break-all;">
+        <a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
+      <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+      <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+      <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        ${wbtn}
+        <button class="btn btn-outline btn-sm" title="Renovar Código"
+          onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>
+        <button class="btn btn-outline btn-sm" title="Editar e Reenviar"
+          onclick="editarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.email||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button>
+        <button class="btn btn-danger btn-sm" title="Excluir"
+          onclick="excluirCodigo('${c.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
+      </td></tr>`;
+  }).join('');
+};
+
+window.limparFiltrosCodigos = function() {
+  document.getElementById('filtroNome').value = '';
+  document.getElementById('filtroStatus').value = '';
+  document.getElementById('filtroMes').value = '';
+  document.getElementById('filtroOrdem').value = 'nome';
+  filtrarCodigos();
+};
+
+window.abrirRenovarCodigo = function(id, nome, whatsapp) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = ''; for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('renovarCodigoOrigId').value = id;
+  document.getElementById('renovarCodigoNome').value   = nome;
+  document.getElementById('renovarCodigoNovo').value   = c;
+  window._renovarWhatsapp = whatsapp;
+  window._renovarNome     = nome;
+  openModal('modalRenovarCodigo');
+};
+
+window.confirmarRenovarCodigo = async function() {
+  const origId   = document.getElementById('renovarCodigoOrigId').value;
+  const novoCod  = document.getElementById('renovarCodigoNovo').value;
+  const nome     = window._renovarNome || '';
+  const whatsapp = window._renovarWhatsapp || '';
+
+  try {
+    // Buscar dados do original
+    const orig = window._todosCodigos.find(c=>c.id===origId);
+    if(!orig) { showToast('Código original não encontrado.','error'); return; }
+
+    // Marcar original como revogado
+    await updateDoc(doc(db,'nself_codigos',origId), {status:'revogado', renovadoEm: serverTimestamp()});
+
+    // Criar novo código
+    const linkTeste = gerarLinkTeste(novoCod);
+    await addDoc(collection(db,'nself_codigos'), {
+      codigo: novoCod,
+      nomeDestinatario: orig.nomeDestinatario,
+      email: orig.email||'',
+      whatsapp: orig.whatsapp||'',
+      empresa: orig.empresa||null,
+      tipo: orig.tipo||'PF',
+      status: 'disponivel',
+      linkTeste,
+      renovadoDe: origId,
+      criadoEm: serverTimestamp()
+    });
+
+    closeModal('modalRenovarCodigo');
+    showToast(`Novo código ${novoCod} gerado!`, 'success');
+    loadCodigos();
+
+    // Enviar WhatsApp
+    if(whatsapp) {
+      const numLimpo = whatsapp.replace(/\D/g,'');
+      const msg = encodeURIComponent(
+        `Olá, ${nome}! 🔄 Seu código de acesso ao 9&Self foi renovado!\n\n`+
+        `Novo código: *${novoCod}*\n\n`+
+        `Acesse: ${linkTeste}\n\n`+
+        `Qualquer dúvida, estou à disposição. 💜`
+      );
+      window.open(`https://wa.me/55${numLimpo}?text=${msg}`,'_blank');
+    }
+  } catch(e) {
+    showToast('Erro ao renovar código.','error');
+    console.error(e);
+  }
+};
 
 // ── RH DASHBOARD ──
 async function loadRHDashboard() {
