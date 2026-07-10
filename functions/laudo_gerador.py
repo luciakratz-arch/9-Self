@@ -368,9 +368,7 @@ class PlaylistBackPage(Flowable):
         self.nome_tipo = nome_tipo
 
     def wrap(self, aw, ah):
-        self._w = aw
-        self._h = ah
-        return (aw, ah)
+        return (PW, PH)
 
     def draw(self):
         c = self.canv
@@ -1293,6 +1291,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     story.append(NextPageTemplate('Full'))
     story.append(PageBreak())
     story.append(PlaylistBackPage(nome_tipo))
+    story.append(PageBreak())
 
     # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
     story.append(NextPageTemplate('Inner'))
