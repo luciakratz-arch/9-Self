@@ -2166,7 +2166,7 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
     const asaFinal = ASAS_VALIDAS[tipo]?.includes(asa) ? asa : ASAS_VALIDAS[tipo][0];
 
     // 4. Chamar Cloud Function
-    const CF = 'https://gerar-laudo-pdf-gyyexf4eea-uc.a.run.app';
+    const CF = 'https://gerar-laudo-pdf-437375609844.us-central1.run.app';
     let resp;
     try {
       resp = await fetch(CF, {
