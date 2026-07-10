@@ -623,6 +623,43 @@ tr:hover td{background:#FAFAFE;}
           <div class="page-title">Laudos Gerados</div>
           <div class="page-subtitle">Histórico de todos os laudos do sistema</div>
           <div class="table-card" style="margin-top:16px;">
+            <!-- FILTROS LAUDOS -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroLaudoNome" placeholder="🔍 Buscar por nome..." oninput="filtrarLaudos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroLaudoTipo" onchange="filtrarLaudos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os tipos</option>
+                <option value="1">Tipo 1 — Perfeição e Excelência</option>
+                <option value="2">Tipo 2 — Prestativo e Relacional</option>
+                <option value="3">Tipo 3 — Performance e Imagem</option>
+                <option value="4">Tipo 4 — Autêntico e Profundo</option>
+                <option value="5">Tipo 5 — Observador e Privacidade</option>
+                <option value="6">Tipo 6 — Precavido e Questionador</option>
+                <option value="7">Tipo 7 — Visionário e Otimista</option>
+                <option value="8">Tipo 8 — Desafiador e Controlador</option>
+                <option value="9">Tipo 9 — Harmônico e Diplomático</option>
+              </select>
+              <select id="filtroLaudoMes" onchange="filtrarLaudos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os meses</option>
+                <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+                <option value="03">Março</option><option value="04">Abril</option>
+                <option value="05">Maio</option><option value="06">Junho</option>
+                <option value="07">Julho</option><option value="08">Agosto</option>
+                <option value="09">Setembro</option><option value="10">Outubro</option>
+                <option value="11">Novembro</option><option value="12">Dezembro</option>
+              </select>
+              <select id="filtroLaudoOrdem" onchange="filtrarLaudos()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="nome">A→Z Nome</option>
+                <option value="nome_desc">Z→A Nome</option>
+                <option value="data_desc">Mais recente</option>
+                <option value="data_asc">Mais antigo</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosLaudos()">✕ Limpar</button>
+            </div>
+            <div id="laudosCount" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
             <table>
               <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
               <tbody id="laudosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
@@ -2248,6 +2285,8 @@ window.navigateTo = function(page) {
   if(page==='laudos')   loadLaudos();
 };
 
+window._todosLaudos = [];
+
 async function loadLaudos(){
   const tbody = document.getElementById('laudosTable');
   try {
@@ -2256,29 +2295,72 @@ async function loadLaudos(){
       tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
       return;
     }
-    const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
-    tbody.innerHTML = snap.docs.map(d => {
-      const l   = d.data();
-      const lid = d.id;
-      const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
-                  .map(s => NS[s]||s||'—').join(' · ');
-      // Estado do botão PDF — sempre oferece regenerar, mesmo com PDF existente
-      const btnPdf = l.pdfUrl
-        ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
-           <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`
-        : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
-      return `<tr>
-        <td>${l.nome||'—'}</td>
-        <td>${l.empresa||'PF'}</td>
-        <td>${l.tipoNome||l.tipo||'—'}</td>
-        <td>Asa ${l.asaDominante||l.asa||'—'}</td>
-        <td style="font-size:11px;">${sub}</td>
-        <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-        <td id="pdfcell_${lid}">${btnPdf}</td>
-      </tr>`;
-    }).join('');
+    window._todosLaudos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    filtrarLaudos();
   } catch(e){ console.warn(e); }
 }
+
+window.filtrarLaudos = function() {
+  const nome  = (document.getElementById('filtroLaudoNome')?.value||'').toLowerCase().trim();
+  const tipo  = document.getElementById('filtroLaudoTipo')?.value||'';
+  const mes   = document.getElementById('filtroLaudoMes')?.value||'';
+  const ordem = document.getElementById('filtroLaudoOrdem')?.value||'nome';
+  const tbody = document.getElementById('laudosTable');
+  const count = document.getElementById('laudosCount');
+
+  const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+
+  let lista = [...window._todosLaudos];
+
+  if(nome) lista = lista.filter(l=>(l.nome||'').toLowerCase().includes(nome));
+  if(tipo) lista = lista.filter(l=>String(l.tipo||'')=== tipo);
+  if(mes)  lista = lista.filter(l=>{
+    const dt = l.criadoEm?.toDate?.();
+    return dt && String(dt.getMonth()+1).padStart(2,'0')===mes;
+  });
+
+  lista.sort((a,b)=>{
+    if(ordem==='nome')      return (a.nome||'').localeCompare(b.nome||'');
+    if(ordem==='nome_desc') return (b.nome||'').localeCompare(a.nome||'');
+    if(ordem==='data_desc') return (b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0);
+    if(ordem==='data_asc')  return (a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0);
+    return 0;
+  });
+
+  if(count) count.textContent = lista.length > 0 ? `${lista.length} laudo(s) encontrado(s)` : '';
+
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo encontrado</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = lista.map(l => {
+    const lid = l.id;
+    const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
+                .map(s => NS[s]||s||'—').join(' · ');
+    const btnPdf = l.pdfUrl
+      ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+         <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}', true)" title="Gerar nova versão">🔄</button>`
+      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
+    return `<tr>
+      <td>${l.nome||'—'}</td>
+      <td>${l.empresa||'PF'}</td>
+      <td>${l.tipoNome||l.tipo||'—'}</td>
+      <td>Asa ${l.asaDominante||l.asa||'—'}</td>
+      <td style="font-size:11px;">${sub}</td>
+      <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+      <td id="pdfcell_${lid}">${btnPdf}</td>
+    </tr>`;
+  }).join('');
+};
+
+window.limparFiltrosLaudos = function() {
+  document.getElementById('filtroLaudoNome').value  = '';
+  document.getElementById('filtroLaudoTipo').value  = '';
+  document.getElementById('filtroLaudoMes').value   = '';
+  document.getElementById('filtroLaudoOrdem').value = 'nome';
+  filtrarLaudos();
+};
 
 // Gerar PDF de um laudo legado ou sem URL — chama Cloud Function e atualiza tabela
 // Mapear chaves de subtipo salvas em qualquer formato para 'AP'|'1A1'|'SOC'
