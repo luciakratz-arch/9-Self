@@ -1102,7 +1102,13 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
             if not linhas:
                 continue
             primeira = linhas[0]
-            if re.match(r'^\s*[•\-]?\s*Com o?\s', primeira, re.IGNORECASE) or '—' in primeira:
+            # Detecta título "Como o perfil X Convive com Cada Personalidade:"
+            if re.match(r'^Como o perfil\b', primeira, re.IGNORECASE) and 'Convive' in primeira:
+                story.append(sp(0.2))
+                story.append(Paragraph(f'<b>{primeira}</b>', sBody))
+                story.append(sp(0.15))
+            # Detecta subtítulo de perfil: • Com... ou Com o... curto (não texto longo com —)
+            elif re.match(r'^\s*[•]\s*Com\s', primeira) or (re.match(r'^\s*Com o?\s', primeira, re.IGNORECASE) and len(primeira) < 120):
                 titulo_limpo = re.sub(r'^\s*[•]\s*', '', primeira)
                 story.append(Paragraph(f'★ {titulo_limpo}', sRelHeader))
                 tem_reflexao = False
