@@ -374,12 +374,7 @@ class PlaylistBackPage(Flowable):
 
     def draw(self):
         c = self.canv
-        # ── Usar coordenadas absolutas da página inteira (ignora margens) ──
         pw, ph = PW, PH
-
-        # Salva estado e reseta transformação para origem da página
-        c.saveState()
-        c.resetTransforms()
 
         # ── Fundo degradê da marca — cobre a página inteira ──
         steps = 80
@@ -408,33 +403,23 @@ class PlaylistBackPage(Flowable):
         c.setFillColorRGB(0.77, 0.65, 0.91)
         c.drawCentredString(pw / 2, ph * 0.555, 'Perfil Comportamental por Eneagrama')
 
-        # ── QR Code ──
+        # ── QR Code — arquivo estático ──
         qr_size = 4.0 * cm
         qr_x = pw / 2 - qr_size / 2
         qr_y = ph * 0.28
 
+        qr_path = os.path.join(os.path.dirname(__file__), 'qrcode_9self.png')
         qr_ok = False
-        if _QRCODE_OK:
+        if os.path.exists(qr_path):
             try:
-                import qrcode as _qr
-                qr = _qr.QRCode(version=1, box_size=10, border=2,
-                                error_correction=_qr.constants.ERROR_CORRECT_M)
-                qr.add_data(self.URL_QR)
-                qr.make(fit=True)
-                # fill branco sobre fundo transparente — usa ImageReader do ReportLab
-                img_pil = qr.make_image(fill_color='#1A0A2E', back_color='white')
-                buf = io.BytesIO()
-                img_pil.save(buf, format='PNG')
-                buf.seek(0)
                 from reportlab.lib.utils import ImageReader
-                c.drawImage(ImageReader(buf), qr_x, qr_y,
+                c.drawImage(ImageReader(qr_path), qr_x, qr_y,
                             width=qr_size, height=qr_size, preserveAspectRatio=True)
                 qr_ok = True
-            except Exception as e:
+            except Exception:
                 pass
 
         if not qr_ok:
-            # Fallback decorativo com URL
             c.setFillColorRGB(1, 1, 1)
             c.roundRect(qr_x, qr_y, qr_size, qr_size, 6, fill=1, stroke=0)
             c.setFillColorRGB(0.10, 0.04, 0.18)
@@ -453,8 +438,6 @@ class PlaylistBackPage(Flowable):
         c.setFillColorRGB(0.6, 0.5, 0.75)
         c.drawCentredString(pw / 2, 0.9 * cm,
             'Dra. Lúcia Kratz  ·  CRP 09/20590  ·  Psicóloga & Especialista em Personalidade')
-
-        c.restoreState()
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -591,7 +574,11 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     frame_inner = Frame(ML,MB,TW,PH-MB-2.2*cm,id='inner')
     pt_cover = PageTemplate(id='Cover',frames=[frame_cover],onPage=cover_cb)
     pt_inner = PageTemplate(id='Inner',frames=[frame_inner],onPage=inner_cb)
-    doc = BaseDocTemplate(output_path, pagesize=A4, pageTemplates=[pt_cover,pt_inner])
+    # Template sem margens para a página roxa da playlist
+    frame_full = Frame(0, 0, PW, PH, leftPadding=0, rightPadding=0,
+                       topPadding=0, bottomPadding=0, id='full')
+    pt_full  = PageTemplate(id='Full', frames=[frame_full])
+    doc = BaseDocTemplate(output_path, pagesize=A4, pageTemplates=[pt_cover,pt_inner,pt_full])
 
     story = []
 
@@ -1303,10 +1290,52 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     ]))
 
     # Página de fundo da Playlist (fundo da marca + QR Code)
+    story.append(NextPageTemplate('Full'))
     story.append(PageBreak())
     story.append(PlaylistBackPage(nome_tipo))
 
     # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
+    story.append(NextPageTemplate('Inner'))
+    story.append(PageBreak())
+    data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
+    hash_doc = str(uuid.uuid5(
+        uuid.NAMESPACE_DNS,
+        f'{nome}-{tipo}-{asa_dominante}-{subtipo_dom}{subtipo_int}{subtipo_rem}-{agora_utc.isoformat()}'
+    )).upper()
+
+    sSeloTit  = ParagraphStyle('SeloTit',  fontName='Helvetica-Bold', fontSize=11,
+                                textColor=HexColor('#1A9460'), spaceAfter=8, keepWithNext=True)
+    sSeloLbl  = ParagraphStyle('SeloLbl',  fontName='Helvetica-Bold', fontSize=9,
+                                textColor=DARK, leading=15)
+    sSeloVal  = ParagraphStyle('SeloVal',  fontName='Helvetica',      fontSize=9,
+                                textColor=DARK, leading=15)
+    sSeloRod  = ParagraphStyle('SeloRod',  fontName='Helvetica',      fontSize=8,
+                                textColor=GMID, spaceBefore=6)
+
+    dados_selo = [
+        ['Aprovador:',        'Dra. Lúcia Kratz — CRP 09/20590'],
+        ['Instrumento:',      '9&Self — Perfil Comportamental por Eneagrama'],
+        ['Avaliado(a):',      f'{nome} — {cargo}' if cargo else nome],
+        ['Data de emissão:',  data_hora_fmt],
+        ['Código do documento:', hash_doc],
+    ]
+
+    linhas_selo = []
+    for lbl, val in dados_selo:
+        linhas_selo.append([Paragraph(lbl, sSeloLbl), Paragraph(val, sSeloVal)])
+
+    tabela_selo = Table(linhas_selo, colWidths=[4.2*cm, TW - 4.2*cm])
+    tabela_selo.setStyle(TableStyle([
+        ('VALIGN',        (0, 0), (-1, -1), 'TOP'),
+        ('TOPPADDING',    (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING',   (0, 0), (-1, -1), 8),
+        ('RIGHTPADDING',  (0, 0), (-1, -1), 8),
+        ('BACKGROUND',    (0, 0), (-1, -1), HexColor('#F0FAF4')),
+        ('LINEBEFORE',    (0, 0), (0, -1),  3, HexColor('#1A9460')),
+        ('LINEBELOW',     (0, -1), (-1, -1), 0.5, HexColor('#CCCCCC')),
+    ]))
+
     agora_utc = datetime.now(timezone.utc)
     data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
     hash_doc = str(uuid.uuid5(
@@ -1347,7 +1376,6 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         ('LINEBELOW',     (0, -1), (-1, -1), 0.5, HexColor('#CCCCCC')),
     ]))
 
-    story.append(PageBreak())
     story.append(KeepTogether([
         Paragraph('✅ Assinatura Digital', sSeloTit),
         SecLine(), sp(0.2),
