@@ -1298,41 +1298,6 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     story.append(NextPageTemplate('Inner'))
     story.append(PageBreak())
     agora_utc = datetime.now(timezone.utc)
-
-    sSeloTit  = ParagraphStyle('SeloTit',  fontName='Helvetica-Bold', fontSize=11,
-                                textColor=HexColor('#1A9460'), spaceAfter=8, keepWithNext=True)
-    sSeloLbl  = ParagraphStyle('SeloLbl',  fontName='Helvetica-Bold', fontSize=9,
-                                textColor=DARK, leading=15)
-    sSeloVal  = ParagraphStyle('SeloVal',  fontName='Helvetica',      fontSize=9,
-                                textColor=DARK, leading=15)
-    sSeloRod  = ParagraphStyle('SeloRod',  fontName='Helvetica',      fontSize=8,
-                                textColor=GMID, spaceBefore=6)
-
-    dados_selo = [
-        ['Aprovador:',        'Dra. Lúcia Kratz — CRP 09/20590'],
-        ['Instrumento:',      '9&Self — Perfil Comportamental por Eneagrama'],
-        ['Avaliado(a):',      f'{nome} — {cargo}' if cargo else nome],
-        ['Data de emissão:',  data_hora_fmt],
-        ['Código do documento:', hash_doc],
-    ]
-
-    linhas_selo = []
-    for lbl, val in dados_selo:
-        linhas_selo.append([Paragraph(lbl, sSeloLbl), Paragraph(val, sSeloVal)])
-
-    tabela_selo = Table(linhas_selo, colWidths=[4.2*cm, TW - 4.2*cm])
-    tabela_selo.setStyle(TableStyle([
-        ('VALIGN',        (0, 0), (-1, -1), 'TOP'),
-        ('TOPPADDING',    (0, 0), (-1, -1), 2),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
-        ('LEFTPADDING',   (0, 0), (-1, -1), 8),
-        ('RIGHTPADDING',  (0, 0), (-1, -1), 8),
-        ('BACKGROUND',    (0, 0), (-1, -1), HexColor('#F0FAF4')),
-        ('LINEBEFORE',    (0, 0), (0, -1),  3, HexColor('#1A9460')),
-        ('LINEBELOW',     (0, -1), (-1, -1), 0.5, HexColor('#CCCCCC')),
-    ]))
-
-    agora_utc = datetime.now(timezone.utc)
     data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
     hash_doc = str(uuid.uuid5(
         uuid.NAMESPACE_DNS,
