@@ -359,83 +359,79 @@ class FableBox(Flowable):
 # ══════════════════════════════════════════════════════════════════════════
 # PÁGINA DE FUNDO — PLAYLIST (cor da capa + QR Code)
 # ══════════════════════════════════════════════════════════════════════════
-class PlaylistBackPage(Flowable):
-    """Página inteira com fundo degradê da marca, QR Code e texto de rodapé."""
-    URL_QR = 'https://luciakratz-arch.github.io/9-Self/9self-landing.html'
+def _draw_playlist_back(canvas, doc):
+    """Callback onPage para o template Full — desenha página roxa com QR Code."""
+    pw, ph = PW, PH
+    steps = 80
+    for i in range(steps):
+        t = i / steps
+        if t < 0.5:
+            t2 = t * 2
+            r = int(0x0E + (0x3D - 0x0E) * t2)
+            g = int(0x08 + (0x0A - 0x08) * t2)
+            b = int(0x18 + (0x5E - 0x18) * t2)
+        else:
+            t2 = (t - 0.5) * 2
+            r = int(0x3D + (0x7B - 0x3D) * t2)
+            g = int(0x0A + (0x1D - 0x0A) * t2)
+            b = int(0x5E + (0x6B - 0x5E) * t2)
+        canvas.setFillColorRGB(r/255, g/255, b/255)
+        stripe_h = ph / steps
+        canvas.rect(0, ph - (i + 1) * stripe_h, pw, stripe_h + 1, fill=1, stroke=0)
 
+    canvas.setFillColorRGB(1, 1, 1)
+    canvas.setFont(LOGO_FONT, 72)
+    canvas.drawCentredString(pw / 2, ph * 0.62, '9&Self')
+
+    canvas.setFont('Helvetica', 13)
+    canvas.setFillColorRGB(0.77, 0.65, 0.91)
+    canvas.drawCentredString(pw / 2, ph * 0.555, 'Perfil Comportamental por Eneagrama')
+
+    qr_size = 4.0 * cm
+    qr_x = pw / 2 - qr_size / 2
+    qr_y = ph * 0.28
+
+    qr_path = os.path.join(os.path.dirname(__file__), 'qrcode_9self.png')
+    qr_ok = False
+    if os.path.exists(qr_path):
+        try:
+            from reportlab.lib.utils import ImageReader
+            canvas.drawImage(ImageReader(qr_path), qr_x, qr_y,
+                        width=qr_size, height=qr_size, preserveAspectRatio=True)
+            qr_ok = True
+        except Exception:
+            pass
+
+    if not qr_ok:
+        canvas.setFillColorRGB(1, 1, 1)
+        canvas.roundRect(qr_x, qr_y, qr_size, qr_size, 6, fill=1, stroke=0)
+        canvas.setFillColorRGB(0.10, 0.04, 0.18)
+        canvas.setFont('Helvetica-Bold', 8)
+        canvas.drawCentredString(pw / 2, qr_y + qr_size * 0.58, 'Acesse pelo link:')
+        canvas.setFont('Helvetica', 6.5)
+        canvas.drawCentredString(pw / 2, qr_y + qr_size * 0.42, '9-Self/9self-landing.html')
+
+    canvas.setFont('Helvetica', 8.5)
+    canvas.setFillColorRGB(0.77, 0.65, 0.91)
+    canvas.drawCentredString(pw / 2, qr_y - 0.5 * cm, 'Acesse o sistema 9&Self')
+
+    canvas.setFont('Helvetica', 7.5)
+    canvas.setFillColorRGB(0.6, 0.5, 0.75)
+    canvas.drawCentredString(pw / 2, 0.9 * cm,
+        'Dra. Lúcia Kratz  ·  CRP 09/20590  ·  Psicóloga & Especialista em Personalidade')
+
+
+class PlaylistBackPage(Flowable):
+    """Flowable vazio — apenas força uma página no template Full."""
     def __init__(self, nome_tipo):
         super().__init__()
         self.nome_tipo = nome_tipo
 
     def wrap(self, aw, ah):
-        return (PW, PH)
+        return (0, 0)
 
     def draw(self):
-        c = self.canv
-        pw, ph = PW, PH
-
-        # ── Fundo degradê da marca — cobre a página inteira ──
-        steps = 80
-        for i in range(steps):
-            t = i / steps
-            if t < 0.5:
-                t2 = t * 2
-                r = int(0x0E + (0x3D - 0x0E) * t2)
-                g = int(0x08 + (0x0A - 0x08) * t2)
-                b = int(0x18 + (0x5E - 0x18) * t2)
-            else:
-                t2 = (t - 0.5) * 2
-                r = int(0x3D + (0x7B - 0x3D) * t2)
-                g = int(0x0A + (0x1D - 0x0A) * t2)
-                b = int(0x5E + (0x6B - 0x5E) * t2)
-            c.setFillColorRGB(r/255, g/255, b/255)
-            stripe_h = ph / steps
-            c.rect(0, ph - (i + 1) * stripe_h, pw, stripe_h + 1, fill=1, stroke=0)
-
-        # ── Marca 9&Self centralizada ──
-        c.setFillColorRGB(1, 1, 1)
-        c.setFont(LOGO_FONT, 72)
-        c.drawCentredString(pw / 2, ph * 0.62, '9&Self')
-
-        c.setFont('Helvetica', 13)
-        c.setFillColorRGB(0.77, 0.65, 0.91)
-        c.drawCentredString(pw / 2, ph * 0.555, 'Perfil Comportamental por Eneagrama')
-
-        # ── QR Code — arquivo estático ──
-        qr_size = 4.0 * cm
-        qr_x = pw / 2 - qr_size / 2
-        qr_y = ph * 0.28
-
-        qr_path = os.path.join(os.path.dirname(__file__), 'qrcode_9self.png')
-        qr_ok = False
-        if os.path.exists(qr_path):
-            try:
-                from reportlab.lib.utils import ImageReader
-                c.drawImage(ImageReader(qr_path), qr_x, qr_y,
-                            width=qr_size, height=qr_size, preserveAspectRatio=True)
-                qr_ok = True
-            except Exception:
-                pass
-
-        if not qr_ok:
-            c.setFillColorRGB(1, 1, 1)
-            c.roundRect(qr_x, qr_y, qr_size, qr_size, 6, fill=1, stroke=0)
-            c.setFillColorRGB(0.10, 0.04, 0.18)
-            c.setFont('Helvetica-Bold', 8)
-            c.drawCentredString(pw / 2, qr_y + qr_size * 0.58, 'Acesse pelo link:')
-            c.setFont('Helvetica', 6.5)
-            c.drawCentredString(pw / 2, qr_y + qr_size * 0.42, '9-Self/9self-landing.html')
-
-        # ── Texto abaixo do QR ──
-        c.setFont('Helvetica', 8.5)
-        c.setFillColorRGB(0.77, 0.65, 0.91)
-        c.drawCentredString(pw / 2, qr_y - 0.5 * cm, 'Acesse o sistema 9&Self')
-
-        # ── Rodapé ──
-        c.setFont('Helvetica', 7.5)
-        c.setFillColorRGB(0.6, 0.5, 0.75)
-        c.drawCentredString(pw / 2, 0.9 * cm,
-            'Dra. Lúcia Kratz  ·  CRP 09/20590  ·  Psicóloga & Especialista em Personalidade')
+        pass
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -575,7 +571,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     # Template sem margens para a página roxa da playlist
     frame_full = Frame(0, 0, PW, PH, leftPadding=0, rightPadding=0,
                        topPadding=0, bottomPadding=0, id='full')
-    pt_full  = PageTemplate(id='Full', frames=[frame_full])
+    pt_full  = PageTemplate(id='Full', frames=[frame_full], onPage=_draw_playlist_back)
     doc = BaseDocTemplate(output_path, pagesize=A4, pageTemplates=[pt_cover,pt_inner,pt_full])
 
     story = []
@@ -1291,7 +1287,6 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     story.append(NextPageTemplate('Full'))
     story.append(PageBreak())
     story.append(PlaylistBackPage(nome_tipo))
-    story.append(PageBreak())
 
     # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
     story.append(NextPageTemplate('Inner'))
