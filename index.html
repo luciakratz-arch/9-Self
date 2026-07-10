@@ -475,18 +475,92 @@ tr:hover td{background:#FAFAFE;}
 
       <div class="page" id="page-codigos">
         <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
             <div>
               <div class="page-title">Códigos de Acesso</div>
               <div class="page-subtitle">Gere e gerencie códigos únicos por pessoa</div>
             </div>
-            <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao()" style="border-color:rgba(123,0,196,0.5);color:#7B00C4;">
+                🔗 Gerar Link de Cadastro
+              </button>
+              <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+            </div>
           </div>
+
+          <!-- SOLICITAÇÕES PENDENTES -->
+          <div id="solicitacoesSection" style="margin-bottom:28px;display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-weight:700;color:#3A1F5C;font-size:14px;">📥 Solicitações de Cadastro Pendentes</div>
+              <button class="btn btn-outline btn-sm" onclick="loadSolicitacoes()">↻ Atualizar</button>
+            </div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Como conheceu</th><th>O que busca</th><th>Data</th><th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="solicitacoesTable">
+                  <tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma solicitação pendente</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <div class="table-card">
             <table>
               <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
               <tbody id="codigosTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: Link de Cadastro Gerado -->
+      <div class="modal-overlay" id="modalLinkCadastro">
+        <div class="modal">
+          <h3>🔗 Link de Cadastro Gerado</h3>
+          <p style="font-size:13px;color:#888;margin-bottom:16px;">
+            Compartilhe este link com a pessoa. Após o preenchimento, a solicitação aparecerá na tabela acima para você converter em código.
+          </p>
+          <div style="background:#F0F7FF;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+            <div style="font-size:11px;color:#888;margin-bottom:6px;">Link de Cadastro:</div>
+            <div id="linkCadastroGerado" style="font-size:12px;color:#7B1D6B;word-break:break-all;font-weight:500;"></div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="copiarLinkCadastro()">📋 Copiar Link</button>
+            <button class="btn btn-primary" onclick="enviarLinkCadastroWhatsApp()">💬 Enviar por WhatsApp</button>
+            <button class="btn btn-outline" onclick="closeModal('modalLinkCadastro')">Fechar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: Converter Solicitação em Código -->
+      <div class="modal-overlay" id="modalConverterSolicitacao">
+        <div class="modal">
+          <h3>Converter Solicitação em Código</h3>
+          <input type="hidden" id="convSolId"/>
+          <div style="background:#F0F7FF;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;">
+            <strong id="convSolNome">—</strong><br>
+            <span id="convSolEmail" style="color:#888;font-size:12px;">—</span>
+          </div>
+          <div class="form-row">
+            <label>Código gerado</label>
+            <input type="text" id="convCodigo" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
+          </div>
+          <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
+            🔗 Link do teste: <span id="convPreviewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+          </div>
+          <div class="form-row">
+            <label>Empresa (opcional)</label>
+            <select id="convEmpresa">
+              <option value="pf">— Pessoa Física (direto)</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalConverterSolicitacao')">Cancelar</button>
+            <button class="btn btn-primary" onclick="converterEmCodigo()">✅ Liberar Código e Enviar WhatsApp</button>
           </div>
         </div>
       </div>
@@ -1990,7 +2064,7 @@ const origNav = window.navigateTo;
 window.navigateTo = function(page) {
   origNav(page);
   if(page==='empresas') loadEmpresas();
-  if(page==='codigos')  { loadCodigos(); gerarCodigoPreview(); }
+  if(page==='codigos')  { loadCodigos(); gerarCodigoPreview(); loadSolicitacoes(); document.getElementById('solicitacoesSection').style.display='block'; }
   if(page==='laudos')   loadLaudos();
 };
 
@@ -2149,6 +2223,166 @@ window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
       });
       window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
     }
+  }
+};
+
+// ══════════════════════════════════════════
+// SOLICITAÇÕES DE CADASTRO (LINK GRATUITO)
+// ══════════════════════════════════════════
+
+const BASE_CADASTRO = 'https://luciakratz.github.io/app-eneagrama/cadastro.html';
+let _linkSolicitacaoAtual = '';
+
+function gerarTokenUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+window.gerarLinkSolicitacao = async function() {
+  try {
+    const token = gerarTokenUUID();
+    await addDoc(collection(db, 'nself_solicitacoes'), {
+      token,
+      status: 'aguardando',
+      criadoEm: serverTimestamp(),
+      dados: null
+    });
+    const link = `${BASE_CADASTRO}?token=${token}`;
+    _linkSolicitacaoAtual = link;
+    document.getElementById('linkCadastroGerado').textContent = link;
+    openModal('modalLinkCadastro');
+    document.getElementById('solicitacoesSection').style.display = 'block';
+    loadSolicitacoes();
+    showToast('Link de cadastro gerado!', 'success');
+  } catch(e) {
+    showToast('Erro ao gerar link. Tente novamente.', 'error');
+    console.error(e);
+  }
+};
+
+window.copiarLinkCadastro = function() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(_linkSolicitacaoAtual).then(() => showToast('Link copiado!', 'success'));
+  } else {
+    const el = document.createElement('textarea');
+    el.value = _linkSolicitacaoAtual;
+    document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+    showToast('Link copiado!', 'success');
+  }
+};
+
+window.enviarLinkCadastroWhatsApp = function() {
+  const num = prompt('Digite o WhatsApp da pessoa (com DDD, apenas números):');
+  if (!num) return;
+  const numLimpo = num.replace(/\D/g, '');
+  const msg = encodeURIComponent(
+    `Olá! 🌟 A Dra. Lúcia Kratz convidou você para preencher seu cadastro no 9&Self.\n\n` +
+    `Acesse o link exclusivo abaixo para solicitar seu código de avaliação:\n` +
+    `${_linkSolicitacaoAtual}\n\n` +
+    `O preenchimento leva menos de 2 minutos. 💜`
+  );
+  window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
+};
+
+window.loadSolicitacoes = async function() {
+  const tbody = document.getElementById('solicitacoesTable');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px;">Carregando...</td></tr>';
+  try {
+    const q    = query(collection(db, 'nself_solicitacoes'), where('status', '==', 'preenchido'));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma solicitação pendente de conversão</td></tr>';
+      return;
+    }
+    tbody.innerHTML = snap.docs.map(d => {
+      const s  = d.data();
+      const dd = s.dados || {};
+      const dt = s.preenchidoEm?.toDate?.()?.toLocaleDateString('pt-BR') || '—';
+      const necessidade = (dd.necessidade || '—');
+      const necessidadeTrunc = necessidade.length > 80 ? necessidade.slice(0,80) + '…' : necessidade;
+      return `<tr>
+        <td><strong>${dd.nome || '—'}</strong></td>
+        <td style="font-size:12px;">${dd.email || '—'}</td>
+        <td style="font-size:12px;">${dd.whatsapp || '—'}</td>
+        <td style="font-size:11px;">${dd.comoConheceu || '—'}</td>
+        <td style="font-size:11px;max-width:160px;white-space:normal;" title="${necessidade}">${necessidadeTrunc}</td>
+        <td style="font-size:12px;">${dt}</td>
+        <td>
+          <button class="btn btn-primary btn-sm"
+            onclick="abrirConverterSolicitacao('${d.id}','${(dd.nome||'').replace(/'/g,"\\'")}','${(dd.email||'').replace(/'/g,"\\'")}','${(dd.whatsapp||'').replace(/'/g,"\\'")}')">
+            ✅ Converter
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#c00;padding:24px;">Erro ao carregar solicitações.</td></tr>';
+    console.error(e);
+  }
+};
+
+window.abrirConverterSolicitacao = function(solId, nome, email, whatsapp) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = ''; for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
+  document.getElementById('convSolId').value         = solId;
+  document.getElementById('convSolNome').textContent  = nome;
+  document.getElementById('convSolEmail').textContent = email;
+  document.getElementById('convCodigo').value         = c;
+  document.getElementById('convPreviewLink').textContent = gerarLinkTeste(c);
+  window._convWhatsapp = whatsapp;
+  window._convNome     = nome;
+  window._convEmail    = email;
+  openModal('modalConverterSolicitacao');
+};
+
+window.converterEmCodigo = async function() {
+  const solId    = document.getElementById('convSolId').value;
+  const codigo   = document.getElementById('convCodigo').value;
+  const empresa  = document.getElementById('convEmpresa').value;
+  const nome     = window._convNome     || '';
+  const email    = window._convEmail    || '';
+  const whatsapp = window._convWhatsapp || '';
+  if (!codigo || !nome) { showToast('Dados incompletos.', 'error'); return; }
+  try {
+    const linkTeste = gerarLinkTeste(codigo);
+    await addDoc(collection(db, 'nself_codigos'), {
+      codigo,
+      nomeDestinatario: nome,
+      email,
+      whatsapp,
+      empresa: empresa === 'pf' ? null : empresa,
+      tipo: empresa === 'pf' ? 'PF' : 'B2B',
+      status: 'Pendente',
+      linkTeste,
+      origemSolicitacao: solId,
+      criadoEm: serverTimestamp()
+    });
+    await updateDoc(doc(db, 'nself_solicitacoes', solId), {
+      status: 'convertido',
+      convertidoEm: serverTimestamp(),
+      codigoGerado: codigo
+    });
+    closeModal('modalConverterSolicitacao');
+    showToast(`Código ${codigo} gerado! Abrindo WhatsApp...`, 'success');
+    loadCodigos();
+    loadSolicitacoes();
+    if (whatsapp) {
+      const numLimpo = whatsapp.replace(/\D/g, '');
+      const msg = encodeURIComponent(
+        `Olá, ${nome}! 🎉 Seu código de acesso ao 9&Self foi liberado!\n\n` +
+        `Código: *${codigo}*\n\n` +
+        `Acesse o link abaixo e insira o código na aba *Usuário*:\n` +
+        `${linkTeste}\n\n` +
+        `Qualquer dúvida, estou à disposição. 💜`
+      );
+      window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
+    }
+  } catch(e) {
+    showToast('Erro ao converter solicitação.', 'error');
+    console.error(e);
   }
 };
 
