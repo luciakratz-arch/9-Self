@@ -1825,7 +1825,8 @@ async function salvarResultadoFinal() {
 
   // ── GERAR LAUDO MANUAL (botão Gerar/Regenerar) ──
   window.gerarLaudoManual = async function() {
-    window._state.laudoUrl = null; // limpa cache para forçar geração nova
+    window._state.laudoUrl   = null; // limpa cache para forçar geração nova
+    window._state.laudoDocId = null; // impede busca do PDF antigo no Firestore
     const btnG = document.getElementById('btnGerarLaudo');
     btnG.disabled = true; btnG.textContent = '⏳ Gerando...';
     await window.baixarLaudo();
