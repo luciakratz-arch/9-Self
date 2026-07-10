@@ -817,6 +817,24 @@ tr:hover td{background:#FAFAFE;}
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- MINI-MODAL: digitar WhatsApp -->
+<div class="modal-overlay" id="modalWhatsAppInput" style="z-index:9999;">
+  <div class="modal" style="max-width:380px;">
+    <h3 id="modalWaTitle">Enviar por WhatsApp</h3>
+    <p id="modalWaDesc" style="font-size:13px;color:#888;margin-bottom:16px;"></p>
+    <div class="form-row">
+      <label>WhatsApp (com DDD)</label>
+      <input type="tel" id="modalWaInput" placeholder="(11) 99999-9999"
+        style="font-size:15px;letter-spacing:1px;"
+        onkeydown="if(event.key==='Enter') confirmarWhatsAppInput()"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalWhatsAppInput')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarWhatsAppInput()">💬 Abrir WhatsApp</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -2202,7 +2220,7 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
 
 // ── WHATSAPP MODAL ──
 window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
-  const num = whatsappSalvo || '';
+  const num = (whatsappSalvo || '').trim();
   const msg = encodeURIComponent(
     `Olá ${nome}! 🎉 Seu código de acesso ao 9&Self chegou!\n\n` +
     `Código: *${codigo}*\n\n` +
@@ -2214,15 +2232,17 @@ window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
     const numLimpo = num.replace(/\D/g,'');
     window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
   } else {
-    const novoNum = prompt(`Digite o WhatsApp de ${nome} (apenas números, com DDD):`);
-    if(novoNum) {
-      const numLimpo = novoNum.replace(/\D/g,'');
-      // Salvar no Firestore
-      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({doc, updateDoc}) => {
-        updateDoc(doc(db,'nself_codigos',id), {whatsapp: novoNum}).catch(()=>{});
-      });
+    // Abrir mini-modal para digitar/colar número
+    document.getElementById('modalWaTitle').textContent = `WhatsApp de ${nome}`;
+    document.getElementById('modalWaDesc').textContent  = 'Digite ou cole o número com DDD. Após confirmar, o WhatsApp abrirá com a mensagem pronta.';
+    document.getElementById('modalWaInput').value = '';
+    window._waCallback = function(numero) {
+      const numLimpo = numero.replace(/\D/g,'');
+      updateDoc(doc(db,'nself_codigos',id), {whatsapp: numero}).catch(()=>{});
       window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
-    }
+    };
+    openModal('modalWhatsAppInput');
+    setTimeout(() => document.getElementById('modalWaInput').focus(), 100);
   }
 };
 
@@ -2274,17 +2294,32 @@ window.copiarLinkCadastro = function() {
 };
 
 window.enviarLinkCadastroWhatsApp = function() {
-  const num = prompt('Digite o WhatsApp da pessoa (com DDD, apenas números):');
-  if (!num) return;
-  const numLimpo = num.replace(/\D/g, '');
-  const msg = encodeURIComponent(
-    `Olá! 🌟 A Dra. Lúcia Kratz convidou você para preencher seu cadastro no 9&Self.\n\n` +
-    `Acesse o link exclusivo abaixo para solicitar seu código de avaliação:\n` +
-    `${_linkSolicitacaoAtual}\n\n` +
-    `O preenchimento leva menos de 2 minutos. 💜`
-  );
-  window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
+  document.getElementById('modalWaTitle').textContent = 'Enviar Link de Cadastro';
+  document.getElementById('modalWaDesc').textContent  = 'Digite ou cole o WhatsApp da pessoa com DDD. O link de cadastro será enviado automaticamente.';
+  document.getElementById('modalWaInput').value = '';
+  window._waCallback = function(numero) {
+    const numLimpo = numero.replace(/\D/g, '');
+    const msg = encodeURIComponent(
+      `Olá! 🌟 A Dra. Lúcia Kratz convidou você para preencher seu cadastro no 9&Self.\n\n` +
+      `Acesse o link exclusivo abaixo para solicitar seu código de avaliação:\n` +
+      `${_linkSolicitacaoAtual}\n\n` +
+      `O preenchimento leva menos de 2 minutos. 💜`
+    );
+    window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
+  };
+  openModal('modalWhatsAppInput');
+  setTimeout(() => document.getElementById('modalWaInput').focus(), 100);
 };
+
+// Função chamada pelo botão do mini-modal
+window.confirmarWhatsAppInput = function() {
+  const numero = document.getElementById('modalWaInput').value.trim();
+  if (!numero) { document.getElementById('modalWaInput').focus(); return; }
+  closeModal('modalWhatsAppInput');
+  if (window._waCallback) { window._waCallback(numero); window._waCallback = null; }
+};
+
+
 
 window.loadSolicitacoes = async function() {
   const tbody = document.getElementById('solicitacoesTable');
