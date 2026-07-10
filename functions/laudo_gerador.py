@@ -1283,11 +1283,8 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         playlist_conteudo,
     ]))
 
-    # Página de fundo da Playlist (fundo da marca + QR Code)
-    story.append(NextPageTemplate('Full'))
+    # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
     story.append(PageBreak())
-    story.append(NextPageTemplate('Inner'))
-    story.append(PlaylistBackPage(nome_tipo))
     agora_utc = datetime.now(timezone.utc)
     data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
     hash_doc = str(uuid.uuid5(
@@ -1340,6 +1337,11 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
             sSeloRod
         ),
     ]))
+
+    # Última página — fundo da marca com QR Code
+    story.append(NextPageTemplate('Full'))
+    story.append(PageBreak())
+    story.append(Spacer(PW, PH))
 
     doc.build(story)
     return output_path
