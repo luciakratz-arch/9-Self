@@ -37,6 +37,12 @@ from reportlab.lib.enums import TA_RIGHT, TA_JUSTIFY
 from reportlab.platypus.flowables import Flowable
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+import io
+try:
+    import qrcode
+    _QRCODE_OK = True
+except ImportError:
+    _QRCODE_OK = False
 
 _FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
 try:
@@ -348,6 +354,96 @@ class FableBox(Flowable):
             _, ah = ap.wrap(w - 2 * self._PAD, 9999)
             y -= ah + 4
             ap.drawOn(c, self._PAD, y)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# PÁGINA DE FUNDO — PLAYLIST (cor da capa + QR Code)
+# ══════════════════════════════════════════════════════════════════════════
+class PlaylistBackPage(Flowable):
+    """Página inteira com fundo degradê da marca, QR Code e texto de rodapé."""
+    URL_QR = 'https://luciakratz-arch.github.io/9-Self/9self-landing.html'
+
+    def __init__(self, nome_tipo):
+        super().__init__()
+        self.nome_tipo = nome_tipo
+
+    def wrap(self, aw, ah):
+        self._w = aw
+        self._h = ah
+        return (aw, ah)
+
+    def draw(self):
+        c = self.canv
+        w, h = self._w, self._h
+
+        # ── Fundo degradê da marca (imita a capa) ──
+        from reportlab.lib.colors import HexColor as HC
+        steps = 60
+        for i in range(steps):
+            t = i / steps
+            # interpola #0E0818 → #3D0A5E → #7B1D6B
+            if t < 0.5:
+                t2 = t * 2
+                r = int(0x0E + (0x3D - 0x0E) * t2)
+                g = int(0x08 + (0x0A - 0x08) * t2)
+                b = int(0x18 + (0x5E - 0x18) * t2)
+            else:
+                t2 = (t - 0.5) * 2
+                r = int(0x3D + (0x7B - 0x3D) * t2)
+                g = int(0x0A + (0x1D - 0x0A) * t2)
+                b = int(0x5E + (0x6B - 0x5E) * t2)
+            c.setFillColorRGB(r/255, g/255, b/255)
+            stripe_h = h / steps
+            c.rect(0, h - (i + 1) * stripe_h, w, stripe_h + 1, fill=1, stroke=0)
+
+        # ── Marca 9&Self centralizada ──
+        c.setFillColorRGB(1, 1, 1)
+        c.setFont(LOGO_FONT, 72)
+        c.drawCentredString(w / 2, h * 0.62, '9&Self')
+
+        c.setFont('Helvetica', 13)
+        c.setFillColorRGB(0.77, 0.65, 0.91)   # lilás suave
+        c.drawCentredString(w / 2, h * 0.56, 'Perfil Comportamental por Eneagrama')
+
+        # ── QR Code ──
+        qr_size = 3.8 * cm
+        qr_x = w / 2 - qr_size / 2
+        qr_y = h * 0.28
+
+        if _QRCODE_OK:
+            try:
+                qr = qrcode.QRCode(version=1, box_size=10, border=2,
+                                   error_correction=qrcode.constants.ERROR_CORRECT_M)
+                qr.add_data(self.URL_QR)
+                qr.make(fit=True)
+                img_pil = qr.make_image(fill_color='white', back_color='transparent')
+                buf = io.BytesIO()
+                img_pil.save(buf, format='PNG')
+                buf.seek(0)
+                c.drawImage(buf, qr_x, qr_y, width=qr_size, height=qr_size,
+                            mask='auto', preserveAspectRatio=True)
+            except Exception:
+                # Fallback: quadrado branco com texto
+                c.setFillColorRGB(1, 1, 1)
+                c.roundRect(qr_x, qr_y, qr_size, qr_size, 4, fill=1, stroke=0)
+                c.setFillColorRGB(0.24, 0.04, 0.37)
+                c.setFont('Helvetica', 7)
+                c.drawCentredString(w / 2, qr_y + qr_size / 2 - 4, 'QR')
+        else:
+            # Sem biblioteca qrcode: quadrado branco decorativo
+            c.setFillColorRGB(1, 1, 1)
+            c.roundRect(qr_x, qr_y, qr_size, qr_size, 4, fill=1, stroke=0)
+
+        # ── Texto abaixo do QR ──
+        c.setFont('Helvetica', 8)
+        c.setFillColorRGB(0.77, 0.65, 0.91)
+        c.drawCentredString(w / 2, qr_y - 0.45 * cm, 'Acesse o sistema 9&Self')
+
+        # ── Rodapé ──
+        c.setFont('Helvetica', 7.5)
+        c.setFillColorRGB(0.6, 0.5, 0.75)
+        c.drawCentredString(w / 2, 0.9 * cm,
+            'Dra. Lúcia Kratz  ·  CRP 09/20590  ·  Psicóloga & Especialista em Personalidade')
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -1195,6 +1291,10 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         playlist_conteudo,
     ]))
 
+    # Página de fundo da Playlist (fundo da marca + QR Code)
+    story.append(PageBreak())
+    story.append(PlaylistBackPage(nome_tipo))
+
     # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
     agora_utc = datetime.now(timezone.utc)
     data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
@@ -1227,8 +1327,8 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     tabela_selo = Table(linhas_selo, colWidths=[4.2*cm, TW - 4.2*cm])
     tabela_selo.setStyle(TableStyle([
         ('VALIGN',        (0, 0), (-1, -1), 'TOP'),
-        ('TOPPADDING',    (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('TOPPADDING',    (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
         ('LEFTPADDING',   (0, 0), (-1, -1), 8),
         ('RIGHTPADDING',  (0, 0), (-1, -1), 8),
         ('BACKGROUND',    (0, 0), (-1, -1), HexColor('#F0FAF4')),
