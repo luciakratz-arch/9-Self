@@ -1297,11 +1297,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     # ══════════════════════════════════════════════════ ASSINATURA DIGITAL
     story.append(NextPageTemplate('Inner'))
     story.append(PageBreak())
-    data_hora_fmt = agora_utc.strftime('%d/%m/%Y às %H:%M:%S UTC')
-    hash_doc = str(uuid.uuid5(
-        uuid.NAMESPACE_DNS,
-        f'{nome}-{tipo}-{asa_dominante}-{subtipo_dom}{subtipo_int}{subtipo_rem}-{agora_utc.isoformat()}'
-    )).upper()
+    agora_utc = datetime.now(timezone.utc)
 
     sSeloTit  = ParagraphStyle('SeloTit',  fontName='Helvetica-Bold', fontSize=11,
                                 textColor=HexColor('#1A9460'), spaceAfter=8, keepWithNext=True)
