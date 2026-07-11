@@ -361,6 +361,7 @@ tr:hover td{background:#FAFAFE;}
 
     <div class="login-tabs">
       <button class="login-tab" onclick="setLoginProfile('admin')">Admin</button>
+      <button class="login-tab" onclick="setLoginProfile('parceiro')">Parceiro</button>
       <button class="login-tab" onclick="setLoginProfile('rh')">RH / Empresa</button>
       <button class="login-tab active" onclick="setLoginProfile('colaborador')">Usuário</button>
     </div>
@@ -380,6 +381,17 @@ tr:hover td{background:#FAFAFE;}
       <div class="login-field">
         <label>Senha</label>
         <input type="password" id="rhPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+    </div>
+
+    <div id="loginParceiro" style="display:none;">
+      <div class="login-field">
+        <label>E-mail</label>
+        <input type="email" id="parceiroEmail" placeholder="parceiro@email.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="login-field">
+        <label>Senha</label>
+        <input type="password" id="parceiroPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
       </div>
     </div>
 
@@ -957,10 +969,11 @@ window._state = {
 // ── PERFIL DE LOGIN ──
 window.setLoginProfile = function(p) {
   window._state.profile = p;
-  document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',['admin','rh','colaborador'][i]===p));
-  document.getElementById('loginAdmin').style.display = p==='admin'?'block':'none';
-  document.getElementById('loginRH').style.display = p==='rh'?'block':'none';
-  document.getElementById('loginColab').style.display = p==='colaborador'?'block':'none';
+  document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',['admin','parceiro','rh','colaborador'][i]===p));
+  document.getElementById('loginAdmin').style.display    = p==='admin'?'block':'none';
+  document.getElementById('loginRH').style.display      = p==='rh'?'block':'none';
+  document.getElementById('loginParceiro').style.display = p==='parceiro'?'block':'none';
+  document.getElementById('loginColab').style.display   = p==='colaborador'?'block':'none';
   document.getElementById('loginError').textContent='';
 };
 
@@ -990,8 +1003,22 @@ window.doLogin = async function() {
       } else {
         err.textContent='Empresa não encontrada. Contate o administrador.';
       }
+    } else if(p==='parceiro') {
+      const email = document.getElementById('parceiroEmail').value;
+      const pass  = document.getElementById('parceiroPass').value;
+      const cred  = await signInWithEmailAndPassword(auth, email, pass);
+      // busca dados do parceiro no Firestore
+      const q    = query(collection(db,'nself_parceiros'), where('email','==',email));
+      const snap = await getDocs(q);
+      if(!snap.empty) {
+        const par = snap.docs[0].data();
+        window._state.parceiro = {id:snap.docs[0].id,...par};
+        enterApp('parceiro', par.nome, 'Parceiro');
+      } else {
+        err.textContent='Parceiro não encontrado. Contate a administradora.';
+        await auth.signOut();
+      }
     } else {
-      // colaborador — valida código
       await validarCodigo();
       btn.textContent='Entrar'; btn.disabled=false;
       return;
