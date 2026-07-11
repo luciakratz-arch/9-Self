@@ -2444,7 +2444,22 @@ window._todosLaudos = [];
 async function loadLaudos(){
   const tbody = document.getElementById('laudosTable');
   try {
-    const snap = await getDocs(collection(db,'nself_laudos'));
+    let snap;
+    const profile = window._state.profile;
+    if(profile === 'rh' && window._state.empresa?.id && window._state.empresa.id !== 'teste') {
+      snap = await getDocs(query(collection(db,'nself_laudos'), where('empresa','==',window._state.empresa.id)));
+    } else if(profile === 'rh') {
+      snap = await getDocs(query(collection(db,'nself_laudos'), where('empresa','==',window._state.empresa?.nome||'Empresa Teste')));
+    } else if(profile === 'parceiro' && window._state.parceiro?.id && window._state.parceiro.id !== 'teste') {
+      snap = await getDocs(query(collection(db,'nself_laudos'), where('parceiroId','==',window._state.parceiro.id)));
+    } else if(profile === 'parceiro') {
+      // conta de teste — mostrar vazio
+      window._todosLaudos = [];
+      filtrarLaudos();
+      return;
+    } else {
+      snap = await getDocs(collection(db,'nself_laudos'));
+    }
     if(snap.empty){
       tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
       return;
