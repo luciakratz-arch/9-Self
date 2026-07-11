@@ -989,34 +989,49 @@ window.doLogin = async function() {
       const pass = document.getElementById('adminPass').value;
       if(pass==='1234') { enterApp('admin','Lucia Kratz','Administradora'); }
       else { err.textContent='Senha incorreta.'; }
-    } else if(p==='rh') {
-      const email = document.getElementById('rhEmail').value;
-      const pass  = document.getElementById('rhPass').value;
-      const cred = await signInWithEmailAndPassword(auth, email, pass);
-      // busca dados da empresa no Firestore
-      const q = query(collection(db,'nself_empresas'), where('email','==',email));
-      const snap = await getDocs(q);
-      if(!snap.empty) {
-        const emp = snap.docs[0].data();
-        window._state.empresa = {id:snap.docs[0].id,...emp};
-        enterApp('rh', emp.responsavel, emp.nome);
-      } else {
-        err.textContent='Empresa não encontrada. Contate o administrador.';
-      }
     } else if(p==='parceiro') {
       const email = document.getElementById('parceiroEmail').value;
       const pass  = document.getElementById('parceiroPass').value;
-      const cred  = await signInWithEmailAndPassword(auth, email, pass);
-      // busca dados do parceiro no Firestore
-      const q    = query(collection(db,'nself_parceiros'), where('email','==',email));
-      const snap = await getDocs(q);
-      if(!snap.empty) {
-        const par = snap.docs[0].data();
-        window._state.parceiro = {id:snap.docs[0].id,...par};
-        enterApp('parceiro', par.nome, 'Parceiro');
+      if(email==='parceiro@9self.com' && pass==='9self2025') {
+        window._state.parceiro = {id:'teste', nome:'Parceiro Teste', email};
+        enterApp('parceiro','Parceiro Teste','Parceiro');
       } else {
-        err.textContent='Parceiro não encontrado. Contate a administradora.';
-        await auth.signOut();
+        try {
+          await signInWithEmailAndPassword(auth, email, pass);
+          const q    = query(collection(db,'nself_parceiros'), where('email','==',email));
+          const snap = await getDocs(q);
+          if(!snap.empty) {
+            const par = snap.docs[0].data();
+            window._state.parceiro = {id:snap.docs[0].id,...par};
+            enterApp('parceiro', par.nome, 'Parceiro');
+          } else {
+            err.textContent='Parceiro não encontrado. Contate a administradora.';
+          }
+        } catch(e) {
+          err.textContent = e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Erro ao entrar.';
+        }
+      }
+    } else if(p==='rh') {
+      const email = document.getElementById('rhEmail').value;
+      const pass  = document.getElementById('rhPass').value;
+      if(email==='rh@9self.com' && pass==='9self2025') {
+        window._state.empresa = {id:'teste', responsavel:'RH Teste', nome:'Empresa Teste'};
+        enterApp('rh','RH Teste','RH / Empresa');
+      } else {
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, pass);
+          const q    = query(collection(db,'nself_empresas'), where('email','==',email));
+          const snap = await getDocs(q);
+          if(!snap.empty) {
+            const emp = snap.docs[0].data();
+            window._state.empresa = {id:snap.docs[0].id,...emp};
+            enterApp('rh', emp.responsavel, emp.nome);
+          } else {
+            err.textContent='Empresa não encontrada. Contate o administrador.';
+          }
+        } catch(e) {
+          err.textContent = e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Erro ao entrar.';
+        }
       }
     } else {
       await validarCodigo();
