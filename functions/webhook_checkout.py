@@ -12,14 +12,14 @@ import urllib.parse
 import firebase_admin
 from firebase_admin import firestore
 from firebase_functions import https_fn
-from firebase_functions.params import StringParam
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app()
 
 db = firestore.client()
 
-MP_TOKEN   = StringParam("MP_TOKEN")
+from params_config import GMAIL_PASS, MP_TOKEN
+GMAIL_USER = "luciakratz@gmail.com"
 APP_URL    = "https://luciakratz-arch.github.io/9-Self/index.html"
 
 # Tabela de lotes
