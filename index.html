@@ -798,6 +798,99 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+      <!-- ══ PARCEIRO: Dashboard ══ -->
+      <div class="page" id="page-parceiro-dashboard">
+        <div style="padding:28px;">
+          <div class="page-title">Meu Painel</div>
+          <div class="page-subtitle">Bem-vindo ao seu espaço de gestão 9&Self</div>
+          <div id="parceiroDashCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;"></div>
+          <div style="margin-top:32px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Últimos códigos gerados</div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Criado em</th><th>Status</th></tr></thead>
+                <tbody id="parceiroUltCodigos"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px;">Nenhum código gerado ainda</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIRO: Empresas ══ -->
+      <div class="page" id="page-parceiro-empresas">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div><div class="page-title">Minhas Empresas</div><div class="page-subtitle">Organize seus clientes empresariais</div></div>
+            <button class="btn btn-primary" onclick="openModal('modalParceiroNovaEmpresa')">＋ Nova Empresa</button>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead><tr><th>Empresa</th><th>Responsável</th><th>WhatsApp</th><th>Criada em</th><th></th></tr></thead>
+              <tbody id="parceiroEmpresasTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIRO: Gerar Código ══ -->
+      <div class="page" id="page-parceiro-codigos">
+        <div style="padding:28px;">
+          <div class="page-title">Gerar Código</div>
+          <div class="page-subtitle">Cada código consome 1 crédito do seu saldo</div>
+          <div style="max-width:520px;margin-top:24px;">
+            <div id="parceiroCreditosAviso" style="background:#F0FAF4;border:1px solid #1A9460;border-radius:12px;padding:14px 18px;font-size:13px;color:#1A9460;font-weight:600;margin-bottom:20px;"></div>
+            <div class="form-row"><label>Nome do destinatário *</label><input type="text" id="parceiroNomeCod" placeholder="Nome completo"/></div>
+            <div class="form-row"><label>E-mail</label><input type="email" id="parceiroEmailCod" placeholder="email@exemplo.com"/></div>
+            <div class="form-row"><label>WhatsApp</label><input type="tel" id="parceiroWhatsappCod" placeholder="(62) 9 9999-0000"/></div>
+            <div class="form-row"><label>Empresa (opcional)</label><select id="parceiroEmpresaCod"><option value="">— Pessoa Física</option></select></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="parceiroGerarCodigo()">🔑 Gerar Código (−1 crédito)</button>
+            <div id="parceiroCodResult" style="margin-top:16px;display:none;background:#F0F7FF;border-radius:10px;padding:16px;">
+              <div style="font-size:12px;color:#888;margin-bottom:6px;">Código gerado:</div>
+              <div id="parceiroCodValor" style="font-size:28px;font-weight:700;letter-spacing:4px;color:#3A1F5C;"></div>
+              <div style="margin-top:10px;display:flex;gap:8px;">
+                <button class="btn btn-outline btn-sm" onclick="parceiroCopiarCodigo()">📋 Copiar</button>
+                <button class="btn btn-primary btn-sm" onclick="parceiroWhatsappCodigo()">💬 WhatsApp</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIRO: Laudos ══ -->
+      <div class="page" id="page-parceiro-laudos">
+        <div style="padding:28px;">
+          <div class="page-title">Meus Laudos</div>
+          <div class="page-subtitle">Laudos gerados pelos seus clientes</div>
+          <div class="table-card" style="margin-top:20px;">
+            <table>
+              <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+              <tbody id="parceiroLaudosTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIRO: Créditos ══ -->
+      <div class="page" id="page-parceiro-creditos">
+        <div style="padding:28px;">
+          <div class="page-title">Meus Créditos</div>
+          <div class="page-subtitle">Saldo e histórico de uso</div>
+          <div id="parceiroCreditosCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;margin-bottom:28px;"></div>
+          <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Histórico de uso</div>
+          <div class="table-card" style="margin-top:0;">
+            <table>
+              <thead><tr><th>Data</th><th>Destinatário</th><th>Código</th><th>Créditos</th></tr></thead>
+              <tbody id="parceiroCreditosTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhuma movimentação</td></tr></tbody>
+            </table>
+          </div>
+          <div style="margin-top:24px;background:linear-gradient(135deg,rgba(123,0,196,.08),rgba(155,37,137,.08));border:1px solid rgba(123,0,196,.2);border-radius:14px;padding:20px;">
+            <div style="font-weight:700;color:#3A1F5C;margin-bottom:8px;">💳 Comprar mais créditos</div>
+            <p style="font-size:13px;color:#666;margin-bottom:14px;">Os créditos são adicionados automaticamente após a confirmação do pagamento.</p>
+            <a href="https://wa.me/5562991546757?text=Olá+Dra.+Lúcia!+Sou+parceiro+e+gostaria+de+comprar+mais+créditos." target="_blank" class="btn btn-primary" style="display:inline-block;">💬 Solicitar via WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main -->
   </div><!-- /app-layout -->
   <footer class="app-footer">
@@ -805,8 +898,6 @@ tr:hover td{background:#FAFAFE;}
     <span>Desenvolvido por <strong>Dra. Lucia Kratz</strong> · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade 🦋</span>
   </footer>
 </div>
-
-<!-- ══════════════════ MODAIS ══════════════════ -->
 
 <!-- Modal Nova Empresa -->
 <div class="modal-overlay" id="modalNovaEmpresa">
@@ -933,119 +1024,6 @@ tr:hover td{background:#FAFAFE;}
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modalWhatsAppInput')">Cancelar</button>
       <button class="btn btn-primary" onclick="confirmarWhatsAppInput()">💬 Abrir WhatsApp</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════ PARCEIRO — PÁGINAS ══════════════════ -->
-
-<!-- PARCEIRO: Dashboard -->
-<div class="page" id="page-parceiro-dashboard">
-  <div style="padding:28px;">
-    <div class="page-title">Meu Painel</div>
-    <div class="page-subtitle">Bem-vindo ao seu espaço de gestão 9&Self</div>
-    <div id="parceiroDashCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;"></div>
-    <div style="margin-top:32px;">
-      <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Últimos códigos gerados</div>
-      <div class="table-card" style="margin-top:0;">
-        <table>
-          <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Criado em</th><th>Status</th></tr></thead>
-          <tbody id="parceiroUltCodigos"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px;">Nenhum código gerado ainda</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PARCEIRO: Empresas -->
-<div class="page" id="page-parceiro-empresas">
-  <div style="padding:28px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-      <div>
-        <div class="page-title">Minhas Empresas</div>
-        <div class="page-subtitle">Organize seus clientes empresariais</div>
-      </div>
-      <button class="btn btn-primary" onclick="openModal('modalParceiroNovaEmpresa')">＋ Nova Empresa</button>
-    </div>
-    <div class="table-card">
-      <table>
-        <thead><tr><th>Empresa</th><th>Responsável</th><th>WhatsApp</th><th>Códigos</th><th>Criada em</th><th></th></tr></thead>
-        <tbody id="parceiroEmpresasTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- PARCEIRO: Gerar Código -->
-<div class="page" id="page-parceiro-codigos">
-  <div style="padding:28px;">
-    <div class="page-title">Gerar Código</div>
-    <div class="page-subtitle">Cada código consome 1 crédito do seu saldo</div>
-    <div style="max-width:520px;margin-top:24px;">
-      <div id="parceiroCreditosAviso" style="background:#F0FAF4;border:1px solid #1A9460;border-radius:12px;padding:14px 18px;font-size:13px;color:#1A9460;font-weight:600;margin-bottom:20px;"></div>
-      <div class="form-row"><label>Nome do destinatário *</label><input type="text" id="parceiroNomeCod" placeholder="Nome completo"/></div>
-      <div class="form-row"><label>E-mail</label><input type="email" id="parceiroEmailCod" placeholder="email@exemplo.com"/></div>
-      <div class="form-row"><label>WhatsApp</label><input type="tel" id="parceiroWhatsappCod" placeholder="(62) 9 9999-0000"/></div>
-      <div class="form-row"><label>Empresa (opcional)</label><select id="parceiroEmpresaCod"><option value="">— Pessoa Física</option></select></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="parceiroGerarCodigo()">🔑 Gerar Código (−1 crédito)</button>
-      <div id="parceiroCodResult" style="margin-top:16px;display:none;background:#F0F7FF;border-radius:10px;padding:16px;">
-        <div style="font-size:12px;color:#888;margin-bottom:6px;">Código gerado:</div>
-        <div id="parceiroCodValor" style="font-size:28px;font-weight:700;letter-spacing:4px;color:#3A1F5C;"></div>
-        <div style="margin-top:10px;display:flex;gap:8px;">
-          <button class="btn btn-outline btn-sm" onclick="parceiroCopiarCodigo()">📋 Copiar</button>
-          <button class="btn btn-primary btn-sm" onclick="parceiroWhatsappCodigo()">💬 WhatsApp</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PARCEIRO: Laudos -->
-<div class="page" id="page-parceiro-laudos">
-  <div style="padding:28px;">
-    <div class="page-title">Meus Laudos</div>
-    <div class="page-subtitle">Laudos gerados pelos seus clientes</div>
-    <div class="table-card" style="margin-top:20px;">
-      <table>
-        <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
-        <tbody id="parceiroLaudosTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- PARCEIRO: Créditos -->
-<div class="page" id="page-parceiro-creditos">
-  <div style="padding:28px;">
-    <div class="page-title">Meus Créditos</div>
-    <div class="page-subtitle">Saldo e histórico de uso</div>
-    <div id="parceiroCreditosCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;margin-bottom:28px;"></div>
-    <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Histórico de uso</div>
-    <div class="table-card" style="margin-top:0;">
-      <table>
-        <thead><tr><th>Data</th><th>Destinatário</th><th>Código</th><th>Créditos</th></tr></thead>
-        <tbody id="parceiroCreditosTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhuma movimentação</td></tr></tbody>
-      </table>
-    </div>
-    <div style="margin-top:24px;background:linear-gradient(135deg,rgba(123,0,196,.08),rgba(155,37,137,.08));border:1px solid rgba(123,0,196,.2);border-radius:14px;padding:20px;">
-      <div style="font-weight:700;color:#3A1F5C;margin-bottom:8px;">💳 Comprar mais créditos</div>
-      <p style="font-size:13px;color:#666;margin-bottom:14px;">Os créditos são adicionados automaticamente após a confirmação do pagamento.</p>
-      <a href="https://wa.me/5562991546757?text=Olá+Dra.+Lúcia!+Sou+parceiro+e+gostaria+de+comprar+mais+créditos." target="_blank" class="btn btn-primary" style="display:inline-block;">💬 Solicitar via WhatsApp</a>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: Nova Empresa Parceiro -->
-<div class="modal-overlay" id="modalParceiroNovaEmpresa">
-  <div class="modal">
-    <h3>Nova Empresa</h3>
-    <div class="form-row"><label>Nome da empresa *</label><input type="text" id="parceiroEmpNome" placeholder="Razão Social"/></div>
-    <div class="form-row"><label>Responsável *</label><input type="text" id="parceiroEmpResp" placeholder="Nome do responsável"/></div>
-    <div class="form-row"><label>E-mail</label><input type="email" id="parceiroEmpEmail" placeholder="rh@empresa.com"/></div>
-    <div class="form-row"><label>WhatsApp</label><input type="tel" id="parceiroEmpWhats" placeholder="(62) 9 9999-0000"/></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('modalParceiroNovaEmpresa')">Cancelar</button>
-      <button class="btn btn-primary" onclick="parceiroSalvarEmpresa()">Salvar</button>
     </div>
   </div>
 </div>
