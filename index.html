@@ -199,6 +199,12 @@ tr:hover td{background:#FAFAFE;}
 
 /* STATUS PILLS */
 .pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.lote-card{background:#fff;border:1.5px solid #E2D9EF;border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:4px;transition:border-color .2s;}
+.lote-card:hover{border-color:#7B00C4;}
+.lote-card.destaque{border-color:#7B00C4;background:linear-gradient(135deg,rgba(123,0,196,.04),rgba(155,37,137,.04));}
+.lote-qtd{font-weight:700;font-size:15px;color:#3A1F5C;}
+.lote-unit{font-size:12px;color:#888;}
+.lote-total{font-size:16px;font-weight:700;color:#7B00C4;margin:4px 0 10px;}
 .pill-green{background:#e6f9f0;color:#1a9460;}
 .pill-yellow{background:#fff8e1;color:#b8860b;}
 .pill-red{background:#ffeaea;color:#c0392b;}
@@ -883,10 +889,50 @@ tr:hover td{background:#FAFAFE;}
               <tbody id="parceiroCreditosTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhuma movimentação</td></tr></tbody>
             </table>
           </div>
-          <div style="margin-top:24px;background:linear-gradient(135deg,rgba(123,0,196,.08),rgba(155,37,137,.08));border:1px solid rgba(123,0,196,.2);border-radius:14px;padding:20px;">
-            <div style="font-weight:700;color:#3A1F5C;margin-bottom:8px;">💳 Comprar mais créditos</div>
-            <p style="font-size:13px;color:#666;margin-bottom:14px;">Os créditos são adicionados automaticamente após a confirmação do pagamento.</p>
-            <a href="https://wa.me/5562991546757?text=Olá+Dra.+Lúcia!+Sou+parceiro+e+gostaria+de+comprar+mais+créditos." target="_blank" class="btn btn-primary" style="display:inline-block;">💬 Solicitar via WhatsApp</a>
+          <div style="margin-top:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:15px;margin-bottom:4px;">💳 Comprar créditos</div>
+            <div style="font-size:13px;color:#888;margin-bottom:16px;">Escolha o lote. O pagamento é processado pelo Mercado Pago e os créditos são adicionados automaticamente.</div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;">
+              <div class="lote-card" data-ref="lote_rep_10"  data-qtd="10"  data-unit="40.00"  data-total="400.00">
+                <div class="lote-qtd">10 créditos</div>
+                <div class="lote-unit">R$ 40,00/crédito</div>
+                <div class="lote-total">R$ 400,00</div>
+                <button class="btn btn-outline btn-sm" onclick="parceiroComprarCreditos('lote_rep_10',10,400.00)">Comprar</button>
+              </div>
+              <div class="lote-card" data-ref="lote_rep_50"  data-qtd="50"  data-unit="32.00"  data-total="1600.00">
+                <div class="lote-qtd">50 créditos</div>
+                <div class="lote-unit">R$ 32,00/crédito</div>
+                <div class="lote-total">R$ 1.600,00</div>
+                <button class="btn btn-outline btn-sm" onclick="parceiroComprarCreditos('lote_rep_50',50,1600.00)">Comprar</button>
+              </div>
+              <div class="lote-card" data-ref="lote_rep_100" data-qtd="100" data-unit="26.00"  data-total="2600.00">
+                <div class="lote-qtd">100 créditos</div>
+                <div class="lote-unit">R$ 26,00/crédito</div>
+                <div class="lote-total">R$ 2.600,00</div>
+                <button class="btn btn-outline btn-sm" onclick="parceiroComprarCreditos('lote_rep_100',100,2600.00)">Comprar</button>
+              </div>
+              <div class="lote-card" data-ref="lote_rep_200" data-qtd="200" data-unit="22.00"  data-total="4400.00">
+                <div class="lote-qtd">200 créditos</div>
+                <div class="lote-unit">R$ 22,00/crédito</div>
+                <div class="lote-total">R$ 4.400,00</div>
+                <button class="btn btn-outline btn-sm" onclick="parceiroComprarCreditos('lote_rep_200',200,4400.00)">Comprar</button>
+              </div>
+              <div class="lote-card" data-ref="lote_rep_300" data-qtd="300" data-unit="19.00"  data-total="5700.00">
+                <div class="lote-qtd">300 créditos</div>
+                <div class="lote-unit">R$ 19,00/crédito</div>
+                <div class="lote-total">R$ 5.700,00</div>
+                <button class="btn btn-outline btn-sm" onclick="parceiroComprarCreditos('lote_rep_300',300,5700.00)">Comprar</button>
+              </div>
+              <div class="lote-card destaque" data-ref="lote_rep_500" data-qtd="500" data-unit="15.90"  data-total="7950.00">
+                <div style="font-size:10px;color:#7B00C4;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
+                <div class="lote-qtd">500 créditos</div>
+                <div class="lote-unit">R$ 15,90/crédito</div>
+                <div class="lote-total">R$ 7.950,00</div>
+                <button class="btn btn-primary btn-sm" onclick="parceiroComprarCreditos('lote_rep_500',500,7950.00)">Comprar</button>
+              </div>
+            </div>
+            <div id="loteStatus" style="font-size:13px;color:#888;min-height:18px;text-align:center;"></div>
           </div>
         </div>
       </div>
@@ -3005,6 +3051,33 @@ window.loadParceiroCreditosPage = async function() {
       </tr>`;
     }).join('');
   } catch(e){ console.warn('ParceiroCred:',e); }
+};
+
+window.parceiroComprarCreditos = async function(ref, qtd, total) {
+  const statusEl = document.getElementById('loteStatus');
+  statusEl.textContent = '⏳ Gerando link de pagamento...';
+  const email = window._state.parceiro?.email || '';
+  const nome  = window._state.parceiro?.nome  || 'Parceiro';
+  try {
+    const resp = await fetch(
+      'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarCheckoutCreditos',
+      {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ref, email, nome})
+      }
+    );
+    const data = await resp.json();
+    if(data.url) {
+      statusEl.textContent = '';
+      window.open(data.url, '_blank');
+    } else {
+      statusEl.textContent = '❌ Erro ao gerar link. Tente novamente.';
+    }
+  } catch(e) {
+    statusEl.textContent = '❌ Erro de conexão. Tente novamente.';
+    console.error(e);
+  }
 };
 
 // ── LOGOUT ──
