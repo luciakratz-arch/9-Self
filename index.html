@@ -3060,7 +3060,7 @@ window.parceiroComprarCreditos = async function(ref, qtd, total) {
   const nome  = window._state.parceiro?.nome  || 'Parceiro';
   try {
     const resp = await fetch(
-      'https://us-central1-entrevista-inicial.cloudfunctions.net/gerarCheckoutCreditos',
+      'https://gerar-laudo-pdf-437375609844.us-central1.run.app/checkout',
       {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
