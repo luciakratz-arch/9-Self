@@ -937,6 +937,119 @@ tr:hover td{background:#FAFAFE;}
   </div>
 </div>
 
+<!-- ══════════════════ PARCEIRO — PÁGINAS ══════════════════ -->
+
+<!-- PARCEIRO: Dashboard -->
+<div class="page" id="page-parceiro-dashboard">
+  <div style="padding:28px;">
+    <div class="page-title">Meu Painel</div>
+    <div class="page-subtitle">Bem-vindo ao seu espaço de gestão 9&Self</div>
+    <div id="parceiroDashCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;"></div>
+    <div style="margin-top:32px;">
+      <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Últimos códigos gerados</div>
+      <div class="table-card" style="margin-top:0;">
+        <table>
+          <thead><tr><th>Código</th><th>Destinatário</th><th>Empresa</th><th>Criado em</th><th>Status</th></tr></thead>
+          <tbody id="parceiroUltCodigos"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px;">Nenhum código gerado ainda</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PARCEIRO: Empresas -->
+<div class="page" id="page-parceiro-empresas">
+  <div style="padding:28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div>
+        <div class="page-title">Minhas Empresas</div>
+        <div class="page-subtitle">Organize seus clientes empresariais</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modalParceiroNovaEmpresa')">＋ Nova Empresa</button>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>Empresa</th><th>Responsável</th><th>WhatsApp</th><th>Códigos</th><th>Criada em</th><th></th></tr></thead>
+        <tbody id="parceiroEmpresasTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PARCEIRO: Gerar Código -->
+<div class="page" id="page-parceiro-codigos">
+  <div style="padding:28px;">
+    <div class="page-title">Gerar Código</div>
+    <div class="page-subtitle">Cada código consome 1 crédito do seu saldo</div>
+    <div style="max-width:520px;margin-top:24px;">
+      <div id="parceiroCreditosAviso" style="background:#F0FAF4;border:1px solid #1A9460;border-radius:12px;padding:14px 18px;font-size:13px;color:#1A9460;font-weight:600;margin-bottom:20px;"></div>
+      <div class="form-row"><label>Nome do destinatário *</label><input type="text" id="parceiroNomeCod" placeholder="Nome completo"/></div>
+      <div class="form-row"><label>E-mail</label><input type="email" id="parceiroEmailCod" placeholder="email@exemplo.com"/></div>
+      <div class="form-row"><label>WhatsApp</label><input type="tel" id="parceiroWhatsappCod" placeholder="(62) 9 9999-0000"/></div>
+      <div class="form-row"><label>Empresa (opcional)</label><select id="parceiroEmpresaCod"><option value="">— Pessoa Física</option></select></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="parceiroGerarCodigo()">🔑 Gerar Código (−1 crédito)</button>
+      <div id="parceiroCodResult" style="margin-top:16px;display:none;background:#F0F7FF;border-radius:10px;padding:16px;">
+        <div style="font-size:12px;color:#888;margin-bottom:6px;">Código gerado:</div>
+        <div id="parceiroCodValor" style="font-size:28px;font-weight:700;letter-spacing:4px;color:#3A1F5C;"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="parceiroCopiarCodigo()">📋 Copiar</button>
+          <button class="btn btn-primary btn-sm" onclick="parceiroWhatsappCodigo()">💬 WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PARCEIRO: Laudos -->
+<div class="page" id="page-parceiro-laudos">
+  <div style="padding:28px;">
+    <div class="page-title">Meus Laudos</div>
+    <div class="page-subtitle">Laudos gerados pelos seus clientes</div>
+    <div class="table-card" style="margin-top:20px;">
+      <table>
+        <thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+        <tbody id="parceiroLaudosTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PARCEIRO: Créditos -->
+<div class="page" id="page-parceiro-creditos">
+  <div style="padding:28px;">
+    <div class="page-title">Meus Créditos</div>
+    <div class="page-subtitle">Saldo e histórico de uso</div>
+    <div id="parceiroCreditosCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;margin-bottom:28px;"></div>
+    <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Histórico de uso</div>
+    <div class="table-card" style="margin-top:0;">
+      <table>
+        <thead><tr><th>Data</th><th>Destinatário</th><th>Código</th><th>Créditos</th></tr></thead>
+        <tbody id="parceiroCreditosTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhuma movimentação</td></tr></tbody>
+      </table>
+    </div>
+    <div style="margin-top:24px;background:linear-gradient(135deg,rgba(123,0,196,.08),rgba(155,37,137,.08));border:1px solid rgba(123,0,196,.2);border-radius:14px;padding:20px;">
+      <div style="font-weight:700;color:#3A1F5C;margin-bottom:8px;">💳 Comprar mais créditos</div>
+      <p style="font-size:13px;color:#666;margin-bottom:14px;">Os créditos são adicionados automaticamente após a confirmação do pagamento.</p>
+      <a href="https://wa.me/5562991546757?text=Olá+Dra.+Lúcia!+Sou+parceiro+e+gostaria+de+comprar+mais+créditos." target="_blank" class="btn btn-primary" style="display:inline-block;">💬 Solicitar via WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nova Empresa Parceiro -->
+<div class="modal-overlay" id="modalParceiroNovaEmpresa">
+  <div class="modal">
+    <h3>Nova Empresa</h3>
+    <div class="form-row"><label>Nome da empresa *</label><input type="text" id="parceiroEmpNome" placeholder="Razão Social"/></div>
+    <div class="form-row"><label>Responsável *</label><input type="text" id="parceiroEmpResp" placeholder="Nome do responsável"/></div>
+    <div class="form-row"><label>E-mail</label><input type="email" id="parceiroEmpEmail" placeholder="rh@empresa.com"/></div>
+    <div class="form-row"><label>WhatsApp</label><input type="tel" id="parceiroEmpWhats" placeholder="(62) 9 9999-0000"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalParceiroNovaEmpresa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="parceiroSalvarEmpresa()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1054,9 +1167,10 @@ function enterApp(profile, name, role) {
   badge.textContent = role;
   badge.className = 'badge badge-'+profile;
   buildSidebar(profile);
-  navigateTo(profile==='admin'?'dashboard':profile==='rh'?'rh-dashboard':'colab-inicio');
+  navigateTo(profile==='admin'?'dashboard':profile==='rh'?'rh-dashboard':profile==='parceiro'?'parceiro-dashboard':'colab-inicio');
   if(profile==='admin') loadDashboard();
   if(profile==='rh') loadRHDashboard();
+  if(profile==='parceiro') loadParceiroDashboard();
 }
 
 // ── SIDEBAR ──
@@ -1073,6 +1187,13 @@ const NAVS = {
     {icon:'🔑', label:'Gerar Código', page:'codigos'},
     {icon:'📄', label:'Laudos', page:'laudos'},
     {icon:'🧬', label:'Cultura Organizacional', page:'cultura'},
+  ],
+  parceiro: [
+    {icon:'📊', label:'Meu Painel', page:'parceiro-dashboard'},
+    {icon:'🏢', label:'Minhas Empresas', page:'parceiro-empresas'},
+    {icon:'🔑', label:'Gerar Código', page:'parceiro-codigos'},
+    {icon:'📄', label:'Meus Laudos', page:'parceiro-laudos'},
+    {icon:'💳', label:'Meus Créditos', page:'parceiro-creditos'},
   ],
   colaborador: [
     {icon:'🧠', label:'Minha Avaliação', page:'colab-teste'},
@@ -1101,11 +1222,24 @@ window.navigateTo = function(page) {
   const labels = {
     'dashboard':'Painel Geral','empresas':'Empresas / RH','codigos':'Códigos',
     'laudos':'Laudos','rh-dashboard':'Painel RH','cultura':'Cultura Organizacional',
-    'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo'
+    'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo',
+    'parceiro-dashboard':'Meu Painel','parceiro-empresas':'Minhas Empresas',
+    'parceiro-codigos':'Gerar Código','parceiro-laudos':'Meus Laudos',
+    'parceiro-creditos':'Meus Créditos'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
   if(page==='cultura') loadCulturaPage();
+  if(page==='parceiro-dashboard') loadParceiroDashboard();
+  if(page==='parceiro-empresas')  loadParceiroEmpresas();
+  if(page==='parceiro-laudos')    loadParceiroLaudos();
+  if(page==='parceiro-creditos')  loadParceiroCreditosPage();
+  if(page==='parceiro-codigos')   {
+    const creditos = window._state.parceiro?.creditos ?? 0;
+    const aviso = document.getElementById('parceiroCreditosAviso');
+    if(aviso) aviso.textContent = `Saldo atual: ${creditos} crédito(s) disponível(is)`;
+    loadParceiroEmpresas();
+  }
 };
 
 // ── DASHBOARD ADMIN ──
@@ -2705,6 +2839,179 @@ window.converterEmCodigo = async function() {
     showToast('Erro ao converter solicitação.', 'error');
     console.error(e);
   }
+};
+
+// ══════════════════════════════════════════
+// PARCEIRO — FUNÇÕES
+// ══════════════════════════════════════════
+
+window.loadParceiroDashboard = async function() {
+  const parId = window._state.parceiro?.id || 'teste';
+  try {
+    const [codSnap, laudoSnap, parSnap] = await Promise.all([
+      getDocs(query(collection(db,'nself_codigos'), where('parceiroId','==',parId))),
+      getDocs(query(collection(db,'nself_laudos'),  where('parceiroId','==',parId))),
+      getDocs(query(collection(db,'nself_parceiros'), where('__name__','==',parId))),
+    ]);
+    const creditos = window._state.parceiro?.creditos ?? 0;
+    document.getElementById('parceiroDashCards').innerHTML = `
+      <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${creditos}</div><div class="sc-sub">disponíveis</div></div>
+      <div class="stat-card"><div class="sc-label">Códigos</div><div class="sc-value">${codSnap.size}</div><div class="sc-sub">gerados</div></div>
+      <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${laudoSnap.size}</div><div class="sc-sub">dos seus clientes</div></div>
+      <div class="stat-card"><div class="sc-label">Usados</div><div class="sc-value">${codSnap.docs.filter(d=>d.data().status==='usado').length}</div><div class="sc-sub">avaliações realizadas</div></div>
+    `;
+    // Últimos códigos
+    const tbody = document.getElementById('parceiroUltCodigos');
+    const ultimos = codSnap.docs.slice(-5).reverse();
+    if(!ultimos.length) return;
+    const statusCls = {'disponivel':'pill-green','usado':'pill-gray','Pendente':'pill-gray'};
+    tbody.innerHTML = ultimos.map(d => {
+      const c = d.data();
+      return `<tr>
+        <td><strong style="letter-spacing:2px;">${c.codigo}</strong></td>
+        <td>${c.nomeDestinatario||'—'}</td>
+        <td>${c.empresa||'Pessoa Física'}</td>
+        <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+      </tr>`;
+    }).join('');
+  } catch(e){ console.warn('ParceiroDash:',e); }
+};
+
+window.loadParceiroEmpresas = async function() {
+  const parId = window._state.parceiro?.id || 'teste';
+  const tbody = document.getElementById('parceiroEmpresasTable');
+  try {
+    const snap = await getDocs(query(collection(db,'nself_parceiro_empresas'), where('parceiroId','==',parId)));
+    if(snap.empty){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr>'; return; }
+    tbody.innerHTML = snap.docs.map(d=>{
+      const e = d.data();
+      return `<tr>
+        <td><strong>${e.nome||'—'}</strong></td>
+        <td>${e.responsavel||'—'}</td>
+        <td>${e.whatsapp||'—'}</td>
+        <td>${e.totalCodigos||0}</td>
+        <td>${e.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="parceiroExcluirEmpresa('${d.id}')">🗑</button></td>
+      </tr>`;
+    }).join('');
+    // Popular select de empresas no gerar código
+    const sel = document.getElementById('parceiroEmpresaCod');
+    sel.innerHTML = '<option value="">— Pessoa Física</option>';
+    snap.docs.forEach(d=>{ const e=d.data(); sel.innerHTML+=`<option value="${d.id}">${e.nome}</option>`; });
+  } catch(e){ console.warn('ParceiroEmpresas:',e); }
+};
+
+window.parceiroSalvarEmpresa = async function() {
+  const parId = window._state.parceiro?.id || 'teste';
+  const nome  = document.getElementById('parceiroEmpNome').value.trim();
+  const resp  = document.getElementById('parceiroEmpResp').value.trim();
+  const email = document.getElementById('parceiroEmpEmail').value.trim();
+  const whats = document.getElementById('parceiroEmpWhats').value.trim();
+  if(!nome||!resp){ showToast('Preencha nome e responsável.','error'); return; }
+  try {
+    await addDoc(collection(db,'nself_parceiro_empresas'), {
+      parceiroId:parId, nome, responsavel:resp, email, whatsapp:whats,
+      totalCodigos:0, criadoEm:serverTimestamp()
+    });
+    closeModal('modalParceiroNovaEmpresa');
+    showToast('Empresa salva!','success');
+    loadParceiroEmpresas();
+  } catch(e){ showToast('Erro ao salvar.','error'); }
+};
+
+window.parceiroExcluirEmpresa = async function(id) {
+  if(!confirm('Excluir esta empresa?')) return;
+  await deleteDoc(doc(db,'nself_parceiro_empresas',id));
+  showToast('Empresa removida.','success');
+  loadParceiroEmpresas();
+};
+
+window.parceiroGerarCodigo = async function() {
+  const parId   = window._state.parceiro?.id || 'teste';
+  const nome    = document.getElementById('parceiroNomeCod').value.trim();
+  const email   = document.getElementById('parceiroEmailCod').value.trim();
+  const whats   = document.getElementById('parceiroWhatsappCod').value.trim();
+  const empId   = document.getElementById('parceiroEmpresaCod').value;
+  const creditos = window._state.parceiro?.creditos ?? 999;
+  if(!nome){ showToast('Informe o nome do destinatário.','error'); return; }
+  if(creditos < 1){ showToast('Saldo insuficiente. Compre mais créditos.','error'); return; }
+  try {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let c = ''; for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+    const linkTeste = gerarLinkTeste(c);
+    await addDoc(collection(db,'nself_codigos'), {
+      codigo:c, nomeDestinatario:nome, email, whatsapp:whats,
+      empresa: empId||null, parceiroId:parId,
+      tipo:'PF', status:'Pendente', linkTeste,
+      criadoEm:serverTimestamp()
+    });
+    // Debitar crédito
+    if(parId!=='teste') {
+      const parDoc = doc(db,'nself_parceiros',parId);
+      await updateDoc(parDoc, {creditos: (creditos-1)});
+      if(window._state.parceiro) window._state.parceiro.creditos = creditos-1;
+    }
+    document.getElementById('parceiroCodValor').textContent = c;
+    document.getElementById('parceiroCodResult').style.display = 'block';
+    window._ultimoCodParceiro = {c, nome, whats, link:linkTeste};
+    document.getElementById('parceiroCreditosAviso').textContent = `✅ Código gerado! Saldo restante: ${creditos-1} crédito(s)`;
+    showToast(`Código ${c} gerado!`,'success');
+  } catch(e){ showToast('Erro ao gerar código.','error'); console.error(e); }
+};
+
+window.parceiroCopiarCodigo = function() {
+  const c = window._ultimoCodParceiro?.c||'';
+  navigator.clipboard?.writeText(c).then(()=>showToast('Código copiado!','success'));
+};
+
+window.parceiroWhatsappCodigo = function() {
+  const d = window._ultimoCodParceiro||{};
+  if(!d.whats){ showToast('WhatsApp não informado.','error'); return; }
+  const num = d.whats.replace(/\D/g,'');
+  const msg = encodeURIComponent(`Olá, ${d.nome}! 🎉 Seu código de acesso ao 9&Self foi gerado!\n\nCódigo: *${d.c}*\n\nAcesse: ${d.link}\n\nQualquer dúvida, estou à disposição. 💜`);
+  window.open(`https://wa.me/55${num}?text=${msg}`,'_blank');
+};
+
+window.loadParceiroLaudos = async function() {
+  const parId = window._state.parceiro?.id || 'teste';
+  const tbody = document.getElementById('parceiroLaudosTable');
+  try {
+    const snap = await getDocs(query(collection(db,'nself_laudos'), where('parceiroId','==',parId)));
+    if(snap.empty){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>'; return; }
+    tbody.innerHTML = snap.docs.map(d=>{
+      const l = d.data();
+      return `<tr>
+        <td>${l.nome||'—'}</td>
+        <td>${l.empresa||'PF'}</td>
+        <td>${l.tipoNome||l.tipo||'—'}</td>
+        <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td>${l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:'—'}</td>
+      </tr>`;
+    }).join('');
+  } catch(e){ console.warn('ParceiroLaudos:',e); }
+};
+
+window.loadParceiroCreditosPage = async function() {
+  const parId   = window._state.parceiro?.id || 'teste';
+  const creditos = window._state.parceiro?.creditos ?? 0;
+  document.getElementById('parceiroCreditosCards').innerHTML = `
+    <div class="stat-card"><div class="sc-label">Saldo atual</div><div class="sc-value">${creditos}</div><div class="sc-sub">créditos disponíveis</div></div>
+  `;
+  try {
+    const snap = await getDocs(query(collection(db,'nself_codigos'), where('parceiroId','==',parId)));
+    const tbody = document.getElementById('parceiroCreditosTable');
+    if(snap.empty){ tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhuma movimentação</td></tr>'; return; }
+    tbody.innerHTML = snap.docs.reverse().map(d=>{
+      const c = d.data();
+      return `<tr>
+        <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td>${c.nomeDestinatario||'—'}</td>
+        <td><strong style="letter-spacing:2px;">${c.codigo}</strong></td>
+        <td style="color:#c00;">−1</td>
+      </tr>`;
+    }).join('');
+  } catch(e){ console.warn('ParceiroCred:',e); }
 };
 
 // ── LOGOUT ──
