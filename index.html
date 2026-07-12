@@ -486,9 +486,81 @@ tr:hover td{background:#FAFAFE;}
             </div>
           </div>
           <div class="table-card">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroEmpresaNome" placeholder="🔍 Buscar empresa..." oninput="filtrarEmpresas()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroEmpresaStatus" onchange="filtrarEmpresas()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os status</option>
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+              </select>
+              <select id="filtroEmpresaOrdem" onchange="filtrarEmpresas()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="nome">A→Z Nome</option>
+                <option value="nome_desc">Z→A Nome</option>
+                <option value="creditos">Mais créditos</option>
+                <option value="laudos">Mais laudos</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosEmpresas()">✕ Limpar</button>
+            </div>
+            <div id="empresasCount" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
             <table>
-              <thead><tr><th>Empresa</th><th>Responsável</th><th>E-mail</th><th>Créditos</th><th>Laudos Gerados</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th>Empresa</th><th>Responsável</th><th>E-mail</th><th>Créditos</th><th>Laudos</th><th>Status</th><th></th></tr></thead>
               <tbody id="empresasTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ EMPRESA DETALHE ══ -->
+      <div class="page" id="page-empresa-detalhe">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+            <button class="btn btn-outline btn-sm" onclick="navigateTo('empresas')">← Voltar</button>
+            <div>
+              <div class="page-title" id="detalheEmpresaNome">—</div>
+              <div class="page-subtitle" id="detalheEmpresaInfo">—</div>
+            </div>
+          </div>
+
+          <!-- Cards resumo -->
+          <div id="detalheEmpresaCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px;"></div>
+
+          <!-- Laudos da empresa -->
+          <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📄 Laudos dos Colaboradores</div>
+          <div class="table-card" style="margin-top:0;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroDetalheNome" placeholder="🔍 Buscar colaborador..." oninput="filtrarLaudosEmpresa()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroDetalheTipo" onchange="filtrarLaudosEmpresa()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os tipos</option>
+                <option value="1">Tipo 1</option><option value="2">Tipo 2</option><option value="3">Tipo 3</option>
+                <option value="4">Tipo 4</option><option value="5">Tipo 5</option><option value="6">Tipo 6</option>
+                <option value="7">Tipo 7</option><option value="8">Tipo 8</option><option value="9">Tipo 9</option>
+              </select>
+              <select id="filtroDetalheMes" onchange="filtrarLaudosEmpresa()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os meses</option>
+                <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+                <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+                <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+                <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+              </select>
+              <select id="filtroDetalheOrdem" onchange="filtrarLaudosEmpresa()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="nome">A→Z Nome</option>
+                <option value="nome_desc">Z→A Nome</option>
+                <option value="data_desc">Mais recente</option>
+                <option value="data_asc">Mais antigo</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosDetalhe()">✕ Limpar</button>
+            </div>
+            <div id="detalheLaudosCount" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
+            <table>
+              <thead><tr><th>Nome</th><th>Tipo</th><th>Asa</th><th>Subtipo</th><th>Data</th><th>Laudo</th></tr></thead>
+              <tbody id="detalheLaudosTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -1468,7 +1540,8 @@ window.navigateTo = function(page) {
     'parceiro-creditos':'Meus Créditos',
     'rh-creditos':'Meus Créditos',
     'pf-devolutiva':'PF com Devolutiva',
-    'pf-standard':'PF sem Devolutiva'
+    'pf-standard':'PF sem Devolutiva',
+    'empresa-detalhe':'Detalhes da Empresa'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
@@ -1507,25 +1580,134 @@ async function loadDashboard() {
 }
 
 // ── LOAD EMPRESAS ──
+window._todasEmpresas = [];
+
 async function loadEmpresas() {
   const tbody = document.getElementById('empresasTable');
   try {
     const snap = await getDocs(collection(db,'nself_empresas'));
     if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa cadastrada</td></tr>';return;}
-    tbody.innerHTML = snap.docs.map(d=>{
-      const e=d.data();
-      return `<tr>
-        <td><strong>${e.nome}</strong></td>
-        <td>${e.responsavel}</td>
-        <td>${e.email}</td>
-        <td><strong>${e.creditos||0}</strong></td>
-        <td>${e.laudosGerados||0}</td>
-        <td><span class="pill ${e.ativo?'pill-green':'pill-gray'}">${e.ativo?'Ativo':'Inativo'}</span></td>
-        <td><button class="btn btn-outline btn-sm">Ver</button></td>
-      </tr>`;
-    }).join('');
+    window._todasEmpresas = snap.docs.map(d=>({id:d.id,...d.data()}));
+    filtrarEmpresas();
   } catch(e){console.warn(e);}
 }
+
+window.filtrarEmpresas = function() {
+  const nome   = (document.getElementById('filtroEmpresaNome')?.value||'').toLowerCase().trim();
+  const status = document.getElementById('filtroEmpresaStatus')?.value||'';
+  const ordem  = document.getElementById('filtroEmpresaOrdem')?.value||'nome';
+  const tbody  = document.getElementById('empresasTable');
+  const count  = document.getElementById('empresasCount');
+
+  let lista = [...window._todasEmpresas];
+  if(nome)   lista = lista.filter(e=>(e.nome||'').toLowerCase().includes(nome));
+  if(status) lista = lista.filter(e=> status==='ativo' ? e.ativo : !e.ativo);
+  lista.sort((a,b)=>{
+    if(ordem==='nome')      return (a.nome||'').localeCompare(b.nome||'');
+    if(ordem==='nome_desc') return (b.nome||'').localeCompare(a.nome||'');
+    if(ordem==='creditos')  return (b.creditos||0)-(a.creditos||0);
+    if(ordem==='laudos')    return (b.laudosGerados||0)-(a.laudosGerados||0);
+    return 0;
+  });
+
+  if(count) count.textContent = lista.length ? `${lista.length} empresa(s)` : '';
+
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma empresa encontrada</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map(e => `<tr>
+    <td><strong>${e.nome||'—'}</strong></td>
+    <td>${e.responsavel||'—'}</td>
+    <td>${e.email||'—'}</td>
+    <td><strong>${e.creditos||0}</strong></td>
+    <td>${e.laudosGerados||0}</td>
+    <td><span class="pill ${e.ativo?'pill-green':'pill-gray'}">${e.ativo?'Ativo':'Inativo'}</span></td>
+    <td><button class="btn btn-teal btn-sm" onclick="abrirDetalheEmpresa('${e.id}','${(e.nome||'').replace(/'/g,"\\'")}','${(e.responsavel||'').replace(/'/g,"\\'")}','${e.email||''}',${e.creditos||0},${e.laudosGerados||0})">👁 Ver</button></td>
+  </tr>`).join('');
+};
+
+window.limparFiltrosEmpresas = function() {
+  document.getElementById('filtroEmpresaNome').value   = '';
+  document.getElementById('filtroEmpresaStatus').value = '';
+  document.getElementById('filtroEmpresaOrdem').value  = 'nome';
+  filtrarEmpresas();
+};
+
+window._empresaDetalhe = {};
+window._laudosEmpresa  = [];
+
+window.abrirDetalheEmpresa = async function(id, nome, responsavel, email, creditos, laudos) {
+  window._empresaDetalhe = {id, nome, responsavel, email, creditos, laudos};
+  document.getElementById('detalheEmpresaNome').textContent = nome;
+  document.getElementById('detalheEmpresaInfo').textContent = `${responsavel} · ${email}`;
+  document.getElementById('detalheEmpresaCards').innerHTML = `
+    <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${creditos}</div><div class="sc-sub">disponíveis</div></div>
+    <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${laudos}</div><div class="sc-sub">gerados</div></div>
+  `;
+  navigateTo('empresa-detalhe');
+
+  // Carregar laudos
+  const tbody = document.getElementById('detalheLaudosTable');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px;">Carregando...</td></tr>';
+  try {
+    const snap = await getDocs(query(collection(db,'nself_laudos'), where('empresa','==',id)));
+    const snap2 = await getDocs(query(collection(db,'nself_laudos'), where('empresa','==',nome)));
+    const ids = new Set();
+    window._laudosEmpresa = [];
+    [...snap.docs, ...snap2.docs].forEach(d => {
+      if(!ids.has(d.id)){ ids.add(d.id); window._laudosEmpresa.push({id:d.id,...d.data()}); }
+    });
+    filtrarLaudosEmpresa();
+  } catch(e) { console.warn(e); }
+};
+
+window.filtrarLaudosEmpresa = function() {
+  const nome  = (document.getElementById('filtroDetalheNome')?.value||'').toLowerCase().trim();
+  const tipo  = document.getElementById('filtroDetalheTipo')?.value||'';
+  const mes   = document.getElementById('filtroDetalheMes')?.value||'';
+  const ordem = document.getElementById('filtroDetalheOrdem')?.value||'nome';
+  const tbody = document.getElementById('detalheLaudosTable');
+  const count = document.getElementById('detalheLaudosCount');
+
+  const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+  let lista = [...window._laudosEmpresa];
+  if(nome) lista = lista.filter(l=>(l.nome||'').toLowerCase().includes(nome));
+  if(tipo) lista = lista.filter(l=>String(l.tipo||'')===tipo);
+  if(mes)  lista = lista.filter(l=>{ const dt=l.criadoEm?.toDate?.(); return dt&&String(dt.getMonth()+1).padStart(2,'0')===mes; });
+  lista.sort((a,b)=>{
+    if(ordem==='nome')      return (a.nome||'').localeCompare(b.nome||'');
+    if(ordem==='nome_desc') return (b.nome||'').localeCompare(a.nome||'');
+    if(ordem==='data_desc') return (b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0);
+    if(ordem==='data_asc')  return (a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0);
+    return 0;
+  });
+
+  if(count) count.textContent = lista.length ? `${lista.length} laudo(s)` : '';
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo encontrado</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map(l => {
+    const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo].map(s=>NS[s]||s||'—').join(' · ');
+    return `<tr>
+      <td>${l.nome||'—'}</td>
+      <td>${l.tipoNome||l.tipo||'—'}</td>
+      <td>Asa ${l.asaDominante||'—'}</td>
+      <td style="font-size:11px;">${sub}</td>
+      <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+      <td>${l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:'—'}</td>
+    </tr>`;
+  }).join('');
+};
+
+window.limparFiltrosDetalhe = function() {
+  document.getElementById('filtroDetalheNome').value  = '';
+  document.getElementById('filtroDetalheTipo').value  = '';
+  document.getElementById('filtroDetalheMes').value   = '';
+  document.getElementById('filtroDetalheOrdem').value = 'nome';
+  filtrarLaudosEmpresa();
+};
 
 // ── LOAD CÓDIGOS ──
 window._todosCodigos = [];
