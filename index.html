@@ -1768,63 +1768,7 @@ async function loadCodigos() {
   } catch(e){console.warn(e);}
 }
 
-window.filtrarCodigos = function() {
-  const nome   = (document.getElementById('filtroNome')?.value||'').toLowerCase().trim();
-  const status = document.getElementById('filtroStatus')?.value||'';
-  const mes    = document.getElementById('filtroMes')?.value||'';
-  const ordem  = document.getElementById('filtroOrdem')?.value||'nome';
-  const tbody  = document.getElementById('codigosTable');
-  const count  = document.getElementById('codigosCount');
-
-  let lista = [...window._todosCodigos];
-
-  if(nome)   lista = lista.filter(c=>(c.nomeDestinatario||'').toLowerCase().includes(nome));
-  if(status) lista = lista.filter(c=>(c.status||'Pendente')===status);
-  if(mes)    lista = lista.filter(c=>{
-    const dt = c.criadoEm?.toDate?.();
-    return dt && String(dt.getMonth()+1).padStart(2,'0')===mes;
-  });
-
-  lista.sort((a,b)=>{
-    if(ordem==='nome')      return (a.nomeDestinatario||'').localeCompare(b.nomeDestinatario||'');
-    if(ordem==='nome_desc') return (b.nomeDestinatario||'').localeCompare(a.nomeDestinatario||'');
-    if(ordem==='data_desc') return (b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0);
-    if(ordem==='data_asc')  return (a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0);
-    return 0;
-  });
-
-  if(count) count.textContent = lista.length > 0 ? `${lista.length} código(s) encontrado(s)` : '';
-
-  if(!lista.length){
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>';
-    return;
-  }
-
-  const statusCls = {'Pendente':'pill-gray','Respondido':'pill-blue','disponivel':'pill-green','revogado':'pill-red','usado':'pill-gray'};
-  tbody.innerHTML = lista.map(c=>{
-    const link  = c.linkTeste || gerarLinkTeste(c.codigo||'');
-    const pdf   = c.pdfPath || '';
-    const wbtn  = `<button class="btn btn-outline btn-sm" title="Enviar por WhatsApp"
-      onclick="abrirModalWhatsApp('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>`;
-    return `<tr>
-      <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
-      <td>${c.nomeDestinatario||'—'}</td>
-      <td>${c.empresa||'Pessoa Física'}</td>
-      <td style="font-size:11px;max-width:140px;word-break:break-all;">
-        <a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
-      <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-      <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
-      <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-        ${wbtn}
-        <button class="btn btn-outline btn-sm" title="Renovar Código"
-          onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>
-        <button class="btn btn-outline btn-sm" title="Editar e Reenviar"
-          onclick="editarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.email||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button>
-        <button class="btn btn-danger btn-sm" title="Excluir"
-          onclick="excluirCodigo('${c.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
-      </td></tr>`;
-  }).join('');
-};
+// filtrarCodigos — definida mais abaixo com suporte a tipo PF
 
 window.limparFiltrosCodigos = function() {
   document.getElementById('filtroNome').value = '';
@@ -3593,14 +3537,6 @@ window.rhComprarCreditos = async function(ref, qtd, total) {
 
 window._codsPF = {};
 
-window.loadPFDevolutiva = async function() {
-  await _loadPFPage('pf_dev');
-};
-
-window.loadPFStandard = async function() {
-  await _loadPFPage('pf_std');
-};
-
 async function _loadPFPage(tipo) {
   const suffix    = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
   const codTable  = document.getElementById(`cod${suffix}Table`);
@@ -3694,12 +3630,11 @@ function _renderCodPF(tipo) {
       <td style="display:flex;gap:6px;">
         <button class="btn btn-outline btn-sm" onclick="abrirModalWhatsApp('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>
         <button class="btn btn-outline btn-sm" onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCodigo('${c.id}','${c.status||'Pendente'}','')">🗑</button>
       </td>
     </tr>`;
   }).join('') : '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>';
 }
-
-window.filtrarLaudosPF = function(tipo) { _renderLaudosPF(tipo); };
 
 window.limparFiltrosLaudosPF = function(tipo) {
   const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
@@ -3746,8 +3681,9 @@ window.limparFiltrosCodPF = function(tipo) { limparFiltrosPF(tipo); };
 
 window.loadPFDevolutiva = async function() { await _loadPFPage('pf_dev'); };
 window.loadPFStandard   = async function() { await _loadPFPage('pf_std'); };
+
+window.filtrarCodigos = function(tipo) {
   if(tipo) { _renderCodPF(tipo); return; }
-  // fallback para aba admin geral (codigos)
   const nome   = (document.getElementById('filtroNome')?.value||'').toLowerCase().trim();
   const status = document.getElementById('filtroStatus')?.value||'';
   const mes    = document.getElementById('filtroMes')?.value||'';
