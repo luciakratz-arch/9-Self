@@ -3388,25 +3388,44 @@ async function _loadPFPage(tipo) {
   const solTbl    = document.getElementById(`solicitacoes${suffix}Table`);
 
   try {
-    // Códigos
-    const codSnap = await getDocs(query(collection(db,'nself_codigos'), where('tipoPF','==',tipo)));
-    window._codsPF[tipo] = codSnap.docs.map(d=>({id:d.id,...d.data()}));
+    // Códigos — pf_std inclui também os sem tipoPF (registros antigos)
+    let codDocs = [];
+    if(tipo === 'pf_std') {
+      const [snap1, snap2] = await Promise.all([
+        getDocs(query(collection(db,'nself_codigos'), where('tipoPF','==','pf_std'))),
+        getDocs(query(collection(db,'nself_codigos'), where('empresa','==',null)))
+      ]);
+      // Mescla sem duplicar
+      const ids = new Set();
+      [...snap1.docs, ...snap2.docs].forEach(d => { if(!ids.has(d.id)){ ids.add(d.id); codDocs.push({id:d.id,...d.data()}); } });
+      // Filtra só PF sem tipoPF ou com pf_std (exclui empresas e pf_dev)
+      codDocs = codDocs.filter(c => !c.tipoPF || c.tipoPF === 'pf_std');
+    } else {
+      const snap = await getDocs(query(collection(db,'nself_codigos'), where('tipoPF','==',tipo)));
+      codDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    }
+    window._codsPF[tipo] = codDocs;
     _renderCodPF(tipo);
 
-    // Laudos
-    const laudoSnap = await getDocs(query(collection(db,'nself_laudos'), where('tipoPF','==',tipo)));
-    if(laudoSnap.empty) {
+    // Laudos — pf_std inclui também os sem tipoPF
+    let laudoDocs = [];
+    if(tipo === 'pf_std') {
+      const snapAll = await getDocs(collection(db,'nself_laudos'));
+      laudoDocs = snapAll.docs.map(d=>({id:d.id,...d.data()})).filter(l => !l.tipoPF || l.tipoPF === 'pf_std');
+    } else {
+      const snap = await getDocs(query(collection(db,'nself_laudos'), where('tipoPF','==',tipo)));
+      laudoDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    }
+
+    if(!laudoDocs.length) {
       laudosTbl.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
     } else {
-      laudosTbl.innerHTML = laudoSnap.docs.map(d => {
-        const l = d.data();
-        return `<tr>
-          <td>${l.nome||'—'}</td>
-          <td>${l.tipoNome||l.tipo||'—'}</td>
-          <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-          <td>${l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:'—'}</td>
-        </tr>`;
-      }).join('');
+      laudosTbl.innerHTML = laudoDocs.map(l => `<tr>
+        <td>${l.nome||'—'}</td>
+        <td>${l.tipoNome||l.tipo||'—'}</td>
+        <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td>${l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:'—'}</td>
+      </tr>`).join('');
     }
 
     // Solicitações pendentes
