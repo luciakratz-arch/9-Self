@@ -1149,6 +1149,27 @@ tr:hover td{background:#FAFAFE;}
           <div style="margin-top:24px;">
             <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📄 Laudos</div>
             <div class="table-card" style="margin-top:0;">
+              <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+                <input type="text" id="filtroLaudoPFDevNome" placeholder="🔍 Buscar..." oninput="filtrarLaudosPF('pf_dev')"
+                  style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:120px;"/>
+                <select id="filtroLaudoPFDevTipo" onchange="filtrarLaudosPF('pf_dev')"
+                  style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                  <option value="">Todos os tipos</option>
+                  <option value="1">Tipo 1</option><option value="2">Tipo 2</option><option value="3">Tipo 3</option>
+                  <option value="4">Tipo 4</option><option value="5">Tipo 5</option><option value="6">Tipo 6</option>
+                  <option value="7">Tipo 7</option><option value="8">Tipo 8</option><option value="9">Tipo 9</option>
+                </select>
+                <select id="filtroLaudoPFDevMes" onchange="filtrarLaudosPF('pf_dev')"
+                  style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                  <option value="">Todos os meses</option>
+                  <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+                  <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+                  <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+                  <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="limparFiltrosLaudosPF('pf_dev')">✕</button>
+              </div>
+              <div id="countLaudosPFDev" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
               <table>
                 <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
                 <tbody id="laudosPFDevTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
@@ -1157,8 +1178,6 @@ tr:hover td{background:#FAFAFE;}
           </div>
         </div>
       </div>
-
-      <!-- ══ PF SEM DEVOLUTIVA ══ -->
       <div class="page" id="page-pf-standard">
         <div style="padding:28px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
@@ -1216,6 +1235,27 @@ tr:hover td{background:#FAFAFE;}
           <div style="margin-top:24px;">
             <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📄 Laudos</div>
             <div class="table-card" style="margin-top:0;">
+              <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+                <input type="text" id="filtroLaudoPFStdNome" placeholder="🔍 Buscar..." oninput="filtrarLaudosPF('pf_std')"
+                  style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:120px;"/>
+                <select id="filtroLaudoPFStdTipo" onchange="filtrarLaudosPF('pf_std')"
+                  style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                  <option value="">Todos os tipos</option>
+                  <option value="1">Tipo 1</option><option value="2">Tipo 2</option><option value="3">Tipo 3</option>
+                  <option value="4">Tipo 4</option><option value="5">Tipo 5</option><option value="6">Tipo 6</option>
+                  <option value="7">Tipo 7</option><option value="8">Tipo 8</option><option value="9">Tipo 9</option>
+                </select>
+                <select id="filtroLaudoPFStdMes" onchange="filtrarLaudosPF('pf_std')"
+                  style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                  <option value="">Todos os meses</option>
+                  <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+                  <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+                  <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+                  <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="limparFiltrosLaudosPF('pf_std')">✕</button>
+              </div>
+              <div id="countLaudosPFStd" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
               <table>
                 <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
                 <tbody id="laudosPFStdTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
@@ -1224,8 +1264,6 @@ tr:hover td{background:#FAFAFE;}
           </div>
         </div>
       </div>
-
-    </div><!-- /main -->
   </div><!-- /app-layout -->
   <footer class="app-footer">
     <img src="Logo%20Dra.%20Lucia%20Kratz%20Transparente.png" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
@@ -3600,14 +3638,10 @@ async function _loadPFPage(tipo) {
     }
 
     if(!laudoDocs.length) {
-      laudosTbl.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
+      laudosTbl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
     } else {
-      laudosTbl.innerHTML = laudoDocs.map(l => `<tr>
-        <td>${l.nome||'—'}</td>
-        <td>${l.tipoNome||l.tipo||'—'}</td>
-        <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-        <td>${l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:'—'}</td>
-      </tr>`).join('');
+      window[`_laudosPF_${tipo}`] = laudoDocs;
+      _renderLaudosPF(tipo);
     }
 
     // Solicitações pendentes
@@ -3665,7 +3699,53 @@ function _renderCodPF(tipo) {
   }).join('') : '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>';
 }
 
-window.filtrarCodigos = function(tipo) {
+window.filtrarLaudosPF = function(tipo) { _renderLaudosPF(tipo); };
+
+window.limparFiltrosLaudosPF = function(tipo) {
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  document.getElementById(`filtroLaudo${suffix}Nome`)?.value && (document.getElementById(`filtroLaudo${suffix}Nome`).value = '');
+  document.getElementById(`filtroLaudo${suffix}Tipo`)?.value && (document.getElementById(`filtroLaudo${suffix}Tipo`).value = '');
+  document.getElementById(`filtroLaudo${suffix}Mes`)?.value  && (document.getElementById(`filtroLaudo${suffix}Mes`).value  = '');
+  _renderLaudosPF(tipo);
+};
+
+function _renderLaudosPF(tipo) {
+  const suffix  = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  const tbody   = document.getElementById(`laudos${suffix}Table`);
+  const count   = document.getElementById(`countLaudos${suffix}`);
+  const nome    = (document.getElementById(`filtroLaudo${suffix}Nome`)?.value||'').toLowerCase().trim();
+  const tipoF   = document.getElementById(`filtroLaudo${suffix}Tipo`)?.value||'';
+  const mes     = document.getElementById(`filtroLaudo${suffix}Mes`)?.value||'';
+
+  let lista = [...(window[`_laudosPF_${tipo}`]||[])];
+  if(nome)  lista = lista.filter(l=>(l.nome||'').toLowerCase().includes(nome));
+  if(tipoF) lista = lista.filter(l=>String(l.tipo||'')===tipoF);
+  if(mes)   lista = lista.filter(l=>{ const dt=l.criadoEm?.toDate?.(); return dt&&String(dt.getMonth()+1).padStart(2,'0')===mes; });
+  lista.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+
+  if(count) count.textContent = lista.length ? `${lista.length} laudo(s)` : '';
+  if(!lista.length){ tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo encontrado</td></tr>`; return; }
+
+  tbody.innerHTML = lista.map(l => {
+    const btnPdf = l.pdfUrl
+      ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+         <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}', true)" title="Regenerar">🔄</button>`
+      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')" title="Gerar PDF">🔄 Gerar</button>`;
+    return `<tr>
+      <td>${l.nome||'—'}</td>
+      <td>${l.tipoNome||l.tipo||'—'}</td>
+      <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+      <td>${btnPdf}</td>
+    </tr>`;
+  }).join('');
+}
+
+window.filtrarLaudosPF = function(tipo) { _renderLaudosPF(tipo); };
+
+window.limparFiltrosCodPF = function(tipo) { limparFiltrosPF(tipo); };
+
+window.loadPFDevolutiva = async function() { await _loadPFPage('pf_dev'); };
+window.loadPFStandard   = async function() { await _loadPFPage('pf_std'); };
   if(tipo) { _renderCodPF(tipo); return; }
   // fallback para aba admin geral (codigos)
   const nome   = (document.getElementById('filtroNome')?.value||'').toLowerCase().trim();
