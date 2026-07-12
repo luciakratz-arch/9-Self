@@ -481,6 +481,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('empresa')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
               <button class="btn btn-outline" onclick="navigateTo('cultura')" style="border-color:rgba(26,155,96,.5);color:#1A9460;">🧬 Cultura Organizacional</button>
               <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
             </div>
@@ -3115,12 +3116,13 @@ function gerarTokenUUID() {
   });
 }
 
-window.gerarLinkSolicitacao = async function() {
+window.gerarLinkSolicitacao = async function(tipo) {
   try {
     const token = gerarTokenUUID();
     await addDoc(collection(db, 'nself_solicitacoes'), {
       token,
       status: 'aguardando',
+      tipoPF: tipo || 'pf_std',
       criadoEm: serverTimestamp(),
       dados: null
     });
