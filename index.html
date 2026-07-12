@@ -937,10 +937,54 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+      <!-- ══ RH: Créditos ══ -->
+      <div class="page" id="page-rh-creditos">
+        <div style="padding:28px;">
+          <div class="page-title">Meus Créditos</div>
+          <div class="page-subtitle">Adquira créditos para liberar avaliações aos seus colaboradores</div>
+          <div id="rhCreditosCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;margin-bottom:28px;"></div>
+          <div style="font-size:13px;color:#888;margin-bottom:16px;">Escolha o pacote. O pagamento é processado pelo Mercado Pago e os créditos são adicionados automaticamente.</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;">
+            <div class="lote-card" onclick="">
+              <div class="lote-qtd">5 créditos</div>
+              <div class="lote-unit">R$ 247,00/crédito</div>
+              <div class="lote-total">R$ 1.235,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_5',5,1235.00)">Comprar</button>
+            </div>
+            <div class="lote-card">
+              <div class="lote-qtd">10 créditos</div>
+              <div class="lote-unit">R$ 247,00/crédito</div>
+              <div class="lote-total">R$ 2.470,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_10',10,2470.00)">Comprar</button>
+            </div>
+            <div class="lote-card">
+              <div class="lote-qtd">20 créditos</div>
+              <div class="lote-unit">R$ 230,00/crédito</div>
+              <div class="lote-total">R$ 4.600,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_20',20,4600.00)">Comprar</button>
+            </div>
+            <div class="lote-card">
+              <div class="lote-qtd">50 créditos</div>
+              <div class="lote-unit">R$ 210,00/crédito</div>
+              <div class="lote-total">R$ 10.500,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_50',50,10500.00)">Comprar</button>
+            </div>
+            <div class="lote-card destaque">
+              <div style="font-size:10px;color:#7B00C4;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
+              <div class="lote-qtd">100 créditos</div>
+              <div class="lote-unit">R$ 190,00/crédito</div>
+              <div class="lote-total">R$ 19.000,00</div>
+              <button class="btn btn-primary btn-sm" onclick="rhComprarCreditos('lote_rh_100',100,19000.00)">Comprar</button>
+            </div>
+          </div>
+          <div id="rhLoteStatus" style="font-size:13px;color:#888;min-height:18px;text-align:center;"></div>
+        </div>
+      </div>
+
     </div><!-- /main -->
   </div><!-- /app-layout -->
   <footer class="app-footer">
-    <img src="dra%20luciakratz%20transparente.png" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
+    <img src="Logo%20Dra.%20Lucia%20Kratz%20Transparente.png" alt="Dra. Lucia Kratz" style="height:36px;object-fit:contain;opacity:0.9;"/>
     <span>Desenvolvido por <strong>Dra. Lucia Kratz</strong> · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade 🦋</span>
   </footer>
 </div>
@@ -1210,6 +1254,7 @@ const NAVS = {
     {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
     {icon:'🔑', label:'Gerar Código', page:'codigos'},
     {icon:'📄', label:'Laudos', page:'laudos'},
+    {icon:'💳', label:'Meus Créditos', page:'rh-creditos'},
     {icon:'🧬', label:'Cultura Organizacional', page:'cultura'},
   ],
   parceiro: [
@@ -1249,7 +1294,8 @@ window.navigateTo = function(page) {
     'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo',
     'parceiro-dashboard':'Meu Painel','parceiro-empresas':'Minhas Empresas',
     'parceiro-codigos':'Gerar Código','parceiro-laudos':'Meus Laudos',
-    'parceiro-creditos':'Meus Créditos'
+    'parceiro-creditos':'Meus Créditos',
+    'rh-creditos':'Meus Créditos'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
@@ -1258,6 +1304,7 @@ window.navigateTo = function(page) {
   if(page==='parceiro-empresas')  loadParceiroEmpresas();
   if(page==='parceiro-laudos')    loadParceiroLaudos();
   if(page==='parceiro-creditos')  loadParceiroCreditosPage();
+  if(page==='rh-creditos')        loadRHCreditosPage();
   if(page==='parceiro-codigos')   {
     const creditos = window._state.parceiro?.creditos ?? 0;
     const aviso = document.getElementById('parceiroCreditosAviso');
@@ -1311,7 +1358,15 @@ window._todosCodigos = [];
 async function loadCodigos() {
   const tbody = document.getElementById('codigosTable');
   try {
-    const snap = await getDocs(collection(db,'nself_codigos'));
+    let snap;
+    const profile = window._state.profile;
+    if(profile === 'rh' && window._state.empresa?.id && window._state.empresa.id !== 'teste') {
+      snap = await getDocs(query(collection(db,'nself_codigos'), where('empresa','==',window._state.empresa.id)));
+    } else if(profile === 'rh') {
+      snap = await getDocs(query(collection(db,'nself_codigos'), where('empresa','==',window._state.empresa?.nome||'Empresa Teste')));
+    } else {
+      snap = await getDocs(collection(db,'nself_codigos'));
+    }
     if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr>';return;}
     window._todosCodigos = snap.docs.map(d=>({id:d.id,...d.data()}));
     filtrarCodigos();
@@ -3058,6 +3113,41 @@ window.parceiroComprarCreditos = async function(ref, qtd, total) {
   statusEl.textContent = '⏳ Gerando link de pagamento...';
   const email = window._state.parceiro?.email || '';
   const nome  = window._state.parceiro?.nome  || 'Parceiro';
+  try {
+    const resp = await fetch(
+      'https://gerar-laudo-pdf-437375609844.us-central1.run.app/checkout',
+      {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ref, email, nome})
+      }
+    );
+    const data = await resp.json();
+    if(data.url) {
+      statusEl.textContent = '';
+      window.open(data.url, '_blank');
+    } else {
+      statusEl.textContent = '❌ Erro ao gerar link. Tente novamente.';
+    }
+  } catch(e) {
+    statusEl.textContent = '❌ Erro de conexão. Tente novamente.';
+    console.error(e);
+  }
+};
+
+window.loadRHCreditosPage = async function() {
+  const empId = window._state.empresa?.id || 'teste';
+  const creditos = window._state.empresa?.creditos ?? 0;
+  document.getElementById('rhCreditosCards').innerHTML = `
+    <div class="stat-card"><div class="sc-label">Saldo atual</div><div class="sc-value">${creditos}</div><div class="sc-sub">créditos disponíveis</div></div>
+  `;
+};
+
+window.rhComprarCreditos = async function(ref, qtd, total) {
+  const statusEl = document.getElementById('rhLoteStatus');
+  statusEl.textContent = '⏳ Gerando link de pagamento...';
+  const email = window._state.empresa?.email || '';
+  const nome  = window._state.empresa?.responsavel || window._state.empresa?.nome || 'RH';
   try {
     const resp = await fetch(
       'https://gerar-laudo-pdf-437375609844.us-central1.run.app/checkout',
