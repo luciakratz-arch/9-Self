@@ -810,7 +810,42 @@ tr:hover td{background:#FAFAFE;}
           <div class="page-title">Meu Painel</div>
           <div class="page-subtitle">Bem-vindo ao seu espaço de gestão 9&Self</div>
           <div id="parceiroDashCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;"></div>
-          <div style="margin-top:32px;">
+
+          <!-- SIMULADOR -->
+          <div style="margin-top:32px;background:linear-gradient(135deg,rgba(123,0,196,.06),rgba(155,37,137,.06));border:1px solid rgba(123,0,196,.15);border-radius:16px;padding:28px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:15px;margin-bottom:4px;">📈 Simulador de Ganhos</div>
+            <div style="font-size:13px;color:#888;margin-bottom:20px;">Calcule sua margem antes de definir o preço ao cliente.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+              <div>
+                <div style="font-size:11px;color:#7B00C4;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Créditos por mês</div>
+                <div id="simPainelCreditos" style="font-size:24px;font-weight:700;color:#3A1F5C;margin-bottom:6px;">50</div>
+                <input type="range" id="sliderPainelCreditos" min="1" max="500" value="50" style="width:100%;accent-color:#7B00C4;" oninput="calcSimPainel()"/>
+              </div>
+              <div>
+                <div style="font-size:11px;color:#7B00C4;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Preço ao cliente (R$)</div>
+                <div id="simPainelPreco" style="font-size:24px;font-weight:700;color:#3A1F5C;margin-bottom:6px;">R$ 247</div>
+                <input type="range" id="sliderPainelPreco" min="97" max="597" value="247" step="10" style="width:100%;accent-color:#7B00C4;" oninput="calcSimPainel()"/>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px;">
+              <div style="background:#fff;border:1px solid #E2D9EF;border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Seu custo</div>
+                <div id="simPainelCusto" style="font-size:20px;font-weight:700;color:#3A1F5C;">—</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E2D9EF;border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Receita bruta</div>
+                <div id="simPainelReceita" style="font-size:20px;font-weight:700;color:#3A1F5C;">—</div>
+              </div>
+              <div style="background:linear-gradient(135deg,rgba(123,0,196,.1),rgba(155,37,137,.08));border:1px solid rgba(123,0,196,.3);border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:10px;color:#7B00C4;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:4px;">Sua margem</div>
+                <div id="simPainelMargem" style="font-size:20px;font-weight:700;color:#7B00C4;">—</div>
+                <div id="simPainelPct" style="font-size:11px;color:#9B2589;margin-top:2px;">—</div>
+              </div>
+            </div>
+            <div id="simPainelFaixa" style="font-size:11px;color:#aaa;margin-top:12px;text-align:center;"></div>
+          </div>
+
+          <div style="margin-top:28px;">
             <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Últimos códigos gerados</div>
             <div class="table-card" style="margin-top:0;">
               <table>
@@ -1300,7 +1335,7 @@ window.navigateTo = function(page) {
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
   if(page==='cultura') loadCulturaPage();
-  if(page==='parceiro-dashboard') loadParceiroDashboard();
+  if(page==='parceiro-dashboard') { loadParceiroDashboard(); setTimeout(calcSimPainel, 100); }
   if(page==='parceiro-empresas')  loadParceiroEmpresas();
   if(page==='parceiro-laudos')    loadParceiroLaudos();
   if(page==='parceiro-creditos')  loadParceiroCreditosPage();
@@ -3133,6 +3168,28 @@ window.parceiroComprarCreditos = async function(ref, qtd, total) {
     statusEl.textContent = '❌ Erro de conexão. Tente novamente.';
     console.error(e);
   }
+};
+
+window.calcSimPainel = function() {
+  const FAIXAS = [
+    {min:1,max:10,preco:40},{min:11,max:50,preco:32},{min:51,max:100,preco:26},
+    {min:101,max:200,preco:22},{min:201,max:300,preco:19},{min:301,max:999,preco:15.90}
+  ];
+  const qtd   = parseInt(document.getElementById('sliderPainelCreditos')?.value||50);
+  const preco = parseInt(document.getElementById('sliderPainelPreco')?.value||247);
+  const faixa = FAIXAS.find(f=>qtd>=f.min&&qtd<=f.max)||FAIXAS[FAIXAS.length-1];
+  const custo   = qtd * faixa.preco;
+  const receita = qtd * preco;
+  const margem  = receita - custo;
+  const pct     = ((margem/receita)*100).toFixed(0);
+  const fmt = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('simPainelCreditos').textContent = qtd + ' crédito' + (qtd>1?'s':'');
+  document.getElementById('simPainelPreco').textContent    = fmt(preco);
+  document.getElementById('simPainelCusto').textContent    = fmt(custo);
+  document.getElementById('simPainelReceita').textContent  = fmt(receita);
+  document.getElementById('simPainelMargem').textContent   = fmt(margem);
+  document.getElementById('simPainelPct').textContent      = pct+'% de margem';
+  document.getElementById('simPainelFaixa').textContent    = `Faixa: ${qtd} × R$ ${faixa.preco.toFixed(2).replace('.',',')} = custo ${fmt(custo)}`;
 };
 
 window.loadRHCreditosPage = async function() {
