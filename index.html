@@ -475,12 +475,15 @@ tr:hover td{background:#FAFAFE;}
 
       <div class="page" id="page-empresas">
         <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
             <div>
               <div class="page-title">Empresas / RH</div>
               <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
             </div>
-            <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="navigateTo('cultura')" style="border-color:rgba(26,155,96,.5);color:#1A9460;">🧬 Cultura Organizacional</button>
+              <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
+            </div>
           </div>
           <div class="table-card">
             <table>
@@ -1016,6 +1019,140 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+      <!-- ══ PF COM DEVOLUTIVA ══ -->
+      <div class="page" id="page-pf-devolutiva">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div class="page-title">PF com Devolutiva</div>
+              <div class="page-subtitle">Laudo + Sessão de 1h — R$ 597 · Gerenciamento de clientes diretos com devolutiva clínica</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('pf_dev')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-primary" onclick="abrirModalNovoCodigoPF('pf_dev')">＋ Gerar Código</button>
+            </div>
+          </div>
+
+          <!-- Solicitações pendentes -->
+          <div id="solicitacoesPFDevSection" style="margin-bottom:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:10px;">📥 Solicitações Pendentes</div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Data</th><th>Ações</th></tr></thead>
+                <tbody id="solicitacoesPFDevTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">Nenhuma solicitação pendente</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Filtros e tabela de códigos -->
+          <div class="table-card">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroPFDevNome" placeholder="🔍 Buscar por nome..." oninput="filtrarCodigos('pf_dev')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroPFDevStatus" onchange="filtrarCodigos('pf_dev')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os status</option>
+                <option value="disponivel">Disponível</option>
+                <option value="usado">Usado</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+              <select id="filtroPFDevMes" onchange="filtrarCodigos('pf_dev')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os meses</option>
+                <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+                <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+                <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+                <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosPF('pf_dev')">✕ Limpar</button>
+            </div>
+            <div id="countPFDev" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
+            <table>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <tbody id="codPFDevTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
+            </table>
+          </div>
+
+          <!-- Laudos -->
+          <div style="margin-top:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📄 Laudos</div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+                <tbody id="laudosPFDevTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PF SEM DEVOLUTIVA ══ -->
+      <div class="page" id="page-pf-standard">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div class="page-title">PF sem Devolutiva</div>
+              <div class="page-subtitle">Laudo Automatizado — R$ 297 · Acesso por código, laudo gerado automaticamente</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('pf_std')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-primary" onclick="abrirModalNovoCodigoPF('pf_std')">＋ Gerar Código</button>
+            </div>
+          </div>
+
+          <!-- Solicitações pendentes -->
+          <div id="solicitacoesPFStdSection" style="margin-bottom:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:10px;">📥 Solicitações Pendentes</div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Data</th><th>Ações</th></tr></thead>
+                <tbody id="solicitacoesPFStdTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">Nenhuma solicitação pendente</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Filtros e tabela de códigos -->
+          <div class="table-card">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroPFStdNome" placeholder="🔍 Buscar por nome..." oninput="filtrarCodigos('pf_std')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroPFStdStatus" onchange="filtrarCodigos('pf_std')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os status</option>
+                <option value="disponivel">Disponível</option>
+                <option value="usado">Usado</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+              <select id="filtroPFStdMes" onchange="filtrarCodigos('pf_std')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os meses</option>
+                <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+                <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+                <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+                <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosPF('pf_std')">✕ Limpar</button>
+            </div>
+            <div id="countPFStd" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
+            <table>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <tbody id="codPFStdTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
+            </table>
+          </div>
+
+          <!-- Laudos -->
+          <div style="margin-top:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📄 Laudos</div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+                <tbody id="laudosPFStdTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main -->
   </div><!-- /app-layout -->
   <footer class="app-footer">
@@ -1281,9 +1418,8 @@ const NAVS = {
   admin: [
     {icon:'📊', label:'Painel', page:'dashboard'},
     {icon:'🏢', label:'Empresas / RH', page:'empresas'},
-    {icon:'🔑', label:'Códigos de Acesso', page:'codigos'},
-    {icon:'📄', label:'Laudos', page:'laudos'},
-    {icon:'🧬', label:'Cultura Organizacional', page:'cultura'},
+    {icon:'👤', label:'PF com Devolutiva', page:'pf-devolutiva'},
+    {icon:'🎫', label:'PF sem Devolutiva', page:'pf-standard'},
   ],
   rh: [
     {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
@@ -1330,11 +1466,15 @@ window.navigateTo = function(page) {
     'parceiro-dashboard':'Meu Painel','parceiro-empresas':'Minhas Empresas',
     'parceiro-codigos':'Gerar Código','parceiro-laudos':'Meus Laudos',
     'parceiro-creditos':'Meus Créditos',
-    'rh-creditos':'Meus Créditos'
+    'rh-creditos':'Meus Créditos',
+    'pf-devolutiva':'PF com Devolutiva',
+    'pf-standard':'PF sem Devolutiva'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
-  if(page==='cultura') loadCulturaPage();
+  if(page==='cultura')        loadCulturaPage();
+  if(page==='pf-devolutiva')  loadPFDevolutiva();
+  if(page==='pf-standard')    loadPFStandard();
   if(page==='parceiro-dashboard') { loadParceiroDashboard(); setTimeout(calcSimPainel, 100); }
   if(page==='parceiro-empresas')  loadParceiroEmpresas();
   if(page==='parceiro-laudos')    loadParceiroLaudos();
@@ -3225,6 +3365,164 @@ window.rhComprarCreditos = async function(ref, qtd, total) {
     statusEl.textContent = '❌ Erro de conexão. Tente novamente.';
     console.error(e);
   }
+};
+
+// ══════════════════════════════════════════
+// PF COM E SEM DEVOLUTIVA
+// ══════════════════════════════════════════
+
+window._codsPF = {};
+
+window.loadPFDevolutiva = async function() {
+  await _loadPFPage('pf_dev');
+};
+
+window.loadPFStandard = async function() {
+  await _loadPFPage('pf_std');
+};
+
+async function _loadPFPage(tipo) {
+  const suffix    = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  const codTable  = document.getElementById(`cod${suffix}Table`);
+  const laudosTbl = document.getElementById(`laudos${suffix}Table`);
+  const solTbl    = document.getElementById(`solicitacoes${suffix}Table`);
+
+  try {
+    // Códigos
+    const codSnap = await getDocs(query(collection(db,'nself_codigos'), where('tipoPF','==',tipo)));
+    window._codsPF[tipo] = codSnap.docs.map(d=>({id:d.id,...d.data()}));
+    _renderCodPF(tipo);
+
+    // Laudos
+    const laudoSnap = await getDocs(query(collection(db,'nself_laudos'), where('tipoPF','==',tipo)));
+    if(laudoSnap.empty) {
+      laudosTbl.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr>';
+    } else {
+      laudosTbl.innerHTML = laudoSnap.docs.map(d => {
+        const l = d.data();
+        return `<tr>
+          <td>${l.nome||'—'}</td>
+          <td>${l.tipoNome||l.tipo||'—'}</td>
+          <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+          <td>${l.pdfUrl?`<a href="${l.pdfUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>`:'—'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Solicitações pendentes
+    const solSnap = await getDocs(query(collection(db,'nself_solicitacoes'), where('status','==','preenchido'), where('tipoPF','==',tipo)));
+    if(solSnap.empty) {
+      solTbl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">Nenhuma solicitação pendente</td></tr>';
+    } else {
+      solTbl.innerHTML = solSnap.docs.map(d => {
+        const s = d.data(); const dd = s.dados||{};
+        return `<tr>
+          <td>${dd.nome||'—'}</td>
+          <td>${dd.email||'—'}</td>
+          <td>${dd.whatsapp||'—'}</td>
+          <td>${s.preenchidoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+          <td><button class="btn btn-primary btn-sm" onclick="abrirConverterSolicitacaoPF('${d.id}','${(dd.nome||'').replace(/'/g,"\\'")}','${(dd.email||'').replace(/'/g,"\\'")}','${(dd.whatsapp||'').replace(/'/g,"\\'")}','${tipo}')">✅ Converter</button></td>
+        </tr>`;
+      }).join('');
+    }
+  } catch(e) { console.warn('loadPF:', e); }
+}
+
+function _renderCodPF(tipo) {
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  const tbody  = document.getElementById(`cod${suffix}Table`);
+  const count  = document.getElementById(`count${suffix}`);
+  const nome   = (document.getElementById(`filtro${suffix}Nome`)?.value||'').toLowerCase();
+  const status = document.getElementById(`filtro${suffix}Status`)?.value||'';
+  const mes    = document.getElementById(`filtro${suffix}Mes`)?.value||'';
+
+  let lista = [...(window._codsPF[tipo]||[])];
+  if(nome)   lista = lista.filter(c=>(c.nomeDestinatario||'').toLowerCase().includes(nome));
+  if(status) lista = lista.filter(c=>(c.status||'Pendente')===status);
+  if(mes)    lista = lista.filter(c=>{
+    const dt = c.criadoEm?.toDate?.();
+    return dt && String(dt.getMonth()+1).padStart(2,'0')===mes;
+  });
+  lista.sort((a,b)=>(a.nomeDestinatario||'').localeCompare(b.nomeDestinatario||''));
+
+  if(count) count.textContent = lista.length ? `${lista.length} código(s)` : '';
+
+  const statusCls = {'disponivel':'pill-green','usado':'pill-gray','Pendente':'pill-gray','revogado':'pill-red'};
+  tbody.innerHTML = lista.length ? lista.map(c => {
+    const link = c.linkTeste || gerarLinkTeste(c.codigo||'');
+    return `<tr>
+      <td><strong style="letter-spacing:2px;">${c.codigo}</strong></td>
+      <td>${c.nomeDestinatario||'—'}</td>
+      <td style="font-size:11px;"><a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
+      <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+      <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="abrirModalWhatsApp('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>
+        <button class="btn btn-outline btn-sm" onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>
+      </td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>';
+}
+
+window.filtrarCodigos = function(tipo) {
+  if(tipo) { _renderCodPF(tipo); return; }
+  // fallback para aba admin geral (codigos)
+  const nome   = (document.getElementById('filtroNome')?.value||'').toLowerCase().trim();
+  const status = document.getElementById('filtroStatus')?.value||'';
+  const mes    = document.getElementById('filtroMes')?.value||'';
+  const ordem  = document.getElementById('filtroOrdem')?.value||'nome';
+  const tbody  = document.getElementById('codigosTable');
+  const count  = document.getElementById('codigosCount');
+  let lista = [...(window._todosCodigos||[])];
+  if(nome)   lista = lista.filter(c=>(c.nomeDestinatario||'').toLowerCase().includes(nome));
+  if(status) lista = lista.filter(c=>(c.status||'Pendente')===status);
+  if(mes)    lista = lista.filter(c=>{ const dt=c.criadoEm?.toDate?.(); return dt&&String(dt.getMonth()+1).padStart(2,'0')===mes; });
+  lista.sort((a,b)=>{
+    if(ordem==='nome') return (a.nomeDestinatario||'').localeCompare(b.nomeDestinatario||'');
+    if(ordem==='nome_desc') return (b.nomeDestinatario||'').localeCompare(a.nomeDestinatario||'');
+    if(ordem==='data_desc') return (b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0);
+    if(ordem==='data_asc')  return (a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0);
+    return 0;
+  });
+  if(count) count.textContent = lista.length ? `${lista.length} código(s)` : '';
+  if(!lista.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>'; return; }
+  const statusCls={'Pendente':'pill-gray','disponivel':'pill-green','revogado':'pill-red','usado':'pill-gray'};
+  tbody.innerHTML=lista.map(c=>{
+    const link=c.linkTeste||gerarLinkTeste(c.codigo||'');
+    const pdf=c.pdfPath||'';
+    const wbtn=`<button class="btn btn-outline btn-sm" onclick="abrirModalWhatsApp('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>`;
+    return `<tr>
+      <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
+      <td>${c.nomeDestinatario||'—'}</td>
+      <td>${c.empresa||'Pessoa Física'}</td>
+      <td style="font-size:11px;max-width:140px;word-break:break-all;"><a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
+      <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+      <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+      <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        ${wbtn}
+        <button class="btn btn-outline btn-sm" onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>
+        <button class="btn btn-outline btn-sm" onclick="editarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.email||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCodigo('${c.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
+      </td></tr>`;
+  }).join('');
+};
+
+window.limparFiltrosPF = function(tipo) {
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  document.getElementById(`filtro${suffix}Nome`).value   = '';
+  document.getElementById(`filtro${suffix}Status`).value = '';
+  document.getElementById(`filtro${suffix}Mes`).value    = '';
+  _renderCodPF(tipo);
+};
+
+window.abrirModalNovoCodigoPF = function(tipo) {
+  window._pfTipoAtual = tipo;
+  openModal('modalNovoCodigo');
+};
+
+window.abrirConverterSolicitacaoPF = function(solId, nome, email, whatsapp, tipo) {
+  window._pfTipoAtual = tipo;
+  abrirConverterSolicitacao(solId, nome, email, whatsapp);
 };
 
 // ── LOGOUT ──
