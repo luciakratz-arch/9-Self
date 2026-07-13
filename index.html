@@ -1618,6 +1618,147 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+      <!-- ══ PARCEIRO: PF com Devolutiva ══ -->
+      <div class="page" id="page-parceiro-pf-dev">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div class="page-title">PF com Devolutiva</div>
+              <div class="page-subtitle">Laudo + Sessão — Gerencie seus clientes individuais premium</div>
+            </div>
+            <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_dev')">🔑 Gerar Código</button>
+          </div>
+          <div class="table-card">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroParcPFDevNome" placeholder="🔍 Buscar..." oninput="filtrarCodParceiroPF('pf_dev')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroParcPFDevStatus" onchange="filtrarCodParceiroPF('pf_dev')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os status</option>
+                <option value="disponivel">Disponível</option>
+                <option value="usado">Usado</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosCodParceiroPF('pf_dev')">✕</button>
+            </div>
+            <div id="countParcPFDev" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
+            <table>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <tbody id="codParcPFDevTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum código</td></tr></tbody>
+            </table>
+          </div>
+          <div style="margin-top:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📄 Laudos</div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+                <tbody id="laudosParcPFDevTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIRO: PF sem Devolutiva ══ -->
+      <div class="page" id="page-parceiro-pf-std">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div class="page-title">PF sem Devolutiva</div>
+              <div class="page-subtitle">Laudo Automatizado — Gerencie seus clientes individuais padrão</div>
+            </div>
+            <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_std')">🔑 Gerar Código</button>
+          </div>
+          <div class="table-card">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroParcPFStdNome" placeholder="🔍 Buscar..." oninput="filtrarCodParceiroPF('pf_std')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroParcPFStdStatus" onchange="filtrarCodParceiroPF('pf_std')"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os status</option>
+                <option value="disponivel">Disponível</option>
+                <option value="usado">Usado</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="limparFiltrosCodParceiroPF('pf_std')">✕</button>
+            </div>
+            <div id="countParcPFStd" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
+            <table>
+              <thead><tr><th>Código</th><th>Destinatário</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <tbody id="codParcPFStdTable"><tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum código</td></tr></tbody>
+            </table>
+          </div>
+          <div style="margin-top:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📄 Laudos</div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+                <tbody id="laudosParcPFStdTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIRO: Financeiro ══ -->
+      <div class="page" id="page-parceiro-financeiro">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div class="page-title">Meu Financeiro</div>
+              <div class="page-subtitle">Receitas estimadas com base no preço sugerido de R$247/pessoa</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <select id="parcFinAno" onchange="loadParceiroFinanceiro()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+              </select>
+              <select id="parcFinMes" onchange="loadParceiroFinanceiro()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os meses</option>
+                <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+                <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+                <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+                <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Cards -->
+          <div id="parcFinCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px;"></div>
+
+          <!-- Tabela de códigos usados -->
+          <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Avaliações realizadas</div>
+          <div class="table-card" style="margin-top:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Cliente</th>
+                  <th>Canal</th>
+                  <th>Preço sugerido</th>
+                  <th>Custo (crédito)</th>
+                  <th>Margem est.</th>
+                </tr>
+              </thead>
+              <tbody id="parcFinTable">
+                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Compras de créditos -->
+          <div style="margin-top:24px;font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">💳 Créditos comprados de mim</div>
+          <div class="table-card" style="margin-top:0;">
+            <table>
+              <thead><tr><th>Data</th><th>Lote</th><th>Créditos</th><th>Valor pago</th><th>Preço/crédito</th></tr></thead>
+              <tbody id="parcFinComprasTable">
+                <tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhuma compra</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main -->
   </div><!-- /app-layout -->
   <footer class="app-footer">
@@ -1958,8 +2099,9 @@ const NAVS = {
   parceiro: [
     {icon:'📊', label:'Meu Painel', page:'parceiro-dashboard'},
     {icon:'🏢', label:'Minhas Empresas', page:'parceiro-empresas'},
-    {icon:'🔑', label:'Gerar Código', page:'parceiro-codigos'},
-    {icon:'📄', label:'Meus Laudos', page:'parceiro-laudos'},
+    {icon:'👤', label:'PF com Devolutiva', page:'parceiro-pf-dev'},
+    {icon:'🎫', label:'PF sem Devolutiva', page:'parceiro-pf-std'},
+    {icon:'💰', label:'Financeiro', page:'parceiro-financeiro'},
     {icon:'💳', label:'Meus Créditos', page:'parceiro-creditos'},
   ],
   colaborador: [
@@ -1991,6 +2133,8 @@ window.navigateTo = function(page) {
     'laudos':'Laudos','rh-dashboard':'Painel RH','cultura':'Cultura Organizacional',
     'colab-inicio':'Início','colab-teste':'Avaliação','colab-resultado':'Meu Laudo',
     'parceiro-dashboard':'Meu Painel','parceiro-empresas':'Minhas Empresas',
+    'parceiro-pf-dev':'PF com Devolutiva','parceiro-pf-std':'PF sem Devolutiva',
+    'parceiro-financeiro':'Meu Financeiro',
     'parceiro-codigos':'Gerar Código','parceiro-laudos':'Meus Laudos',
     'parceiro-creditos':'Meus Créditos',
     'rh-creditos':'Meus Créditos',
@@ -2010,6 +2154,9 @@ window.navigateTo = function(page) {
   if(page==='pf-standard')    loadPFStandard();
   if(page==='parceiro-dashboard') { loadParceiroDashboard(); setTimeout(calcSimPainel, 100); }
   if(page==='parceiro-empresas')  loadParceiroEmpresas();
+  if(page==='parceiro-pf-dev')    loadParceiroPF('pf_dev');
+  if(page==='parceiro-pf-std')    loadParceiroPF('pf_std');
+  if(page==='parceiro-financeiro') loadParceiroFinanceiro();
   if(page==='parceiro-laudos')    loadParceiroLaudos();
   if(page==='parceiro-creditos')  loadParceiroCreditosPage();
   if(page==='rh-creditos')        loadRHCreditosPage();
@@ -4829,6 +4976,200 @@ window.salvarCreditosGratuitosParceiro = async function() {
       <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${window._parceiroAdminAtual.creditos}</div><div class="sc-sub">disponíveis</div></div>
     `;
   } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+};
+
+// ══════════════════════════════════════════
+// PARCEIRO — PF COM/SEM DEVOLUTIVA
+// ══════════════════════════════════════════
+window._codsParcPF = {};
+window._laudosParcPF = {};
+
+window.loadParceiroPF = async function(tipo) {
+  const parId  = window._state.parceiro?.id || 'teste';
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  const codTbl  = document.getElementById(`codParcPF${suffix}Table`);
+  const laudoTbl = document.getElementById(`laudosParcPF${suffix}Table`);
+
+  try {
+    // Códigos deste parceiro e tipo
+    const snap = await getDocs(query(collection(db,'nself_codigos'),
+      where('parceiroId','==',parId), where('tipoPF','==',tipo)));
+    window._codsParcPF[tipo] = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderCodParceiroPF(tipo);
+
+    // Laudos
+    const laudoSnap = await getDocs(query(collection(db,'nself_laudos'),
+      where('parceiroId','==',parId), where('tipoPF','==',tipo)));
+    window._laudosParcPF[tipo] = laudoSnap.docs.map(d=>({id:d.id,...d.data()}));
+    if(!laudoSnap.size) {
+      laudoTbl.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo</td></tr>';
+    } else {
+      laudoTbl.innerHTML = window._laudosParcPF[tipo].map(l => {
+        const btnPdf = l.pdfUrl
+          ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>`
+          : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')">🔄 Gerar</button>`;
+        return `<tr>
+          <td>${l.nome||'—'}</td>
+          <td>${l.tipoNome||l.tipo||'—'}</td>
+          <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+          <td id="pdfcell_${l.id}">${btnPdf}</td>
+        </tr>`;
+      }).join('');
+    }
+  } catch(e) { console.warn('loadParceiroPF:', e); }
+};
+
+function renderCodParceiroPF(tipo) {
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  const tbody  = document.getElementById(`codParcPF${suffix}Table`);
+  const count  = document.getElementById(`countParcPF${suffix}`);
+  const nome   = (document.getElementById(`filtroParcPF${suffix}Nome`)?.value||'').toLowerCase();
+  const status = document.getElementById(`filtroParcPF${suffix}Status`)?.value||'';
+
+  let lista = [...(window._codsParcPF[tipo]||[])];
+  if(nome)   lista = lista.filter(c=>(c.nomeDestinatario||'').toLowerCase().includes(nome));
+  if(status) lista = lista.filter(c=>(c.status||'Pendente')===status);
+  lista.sort((a,b)=>(a.nomeDestinatario||'').localeCompare(b.nomeDestinatario||''));
+
+  if(count) count.textContent = lista.length ? `${lista.length} código(s)` : '';
+  const statusCls = {'disponivel':'pill-green','usado':'pill-gray','Pendente':'pill-gray','revogado':'pill-red'};
+  tbody.innerHTML = lista.length ? lista.map(c => `<tr>
+    <td><strong style="letter-spacing:2px;">${c.codigo}</strong></td>
+    <td>${c.nomeDestinatario||'—'}</td>
+    <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+    <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+    <td style="display:flex;gap:6px;">
+      <button class="btn btn-outline btn-sm" onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'") }','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>
+    </td>
+  </tr>`).join('') : `<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>`;
+}
+
+window.filtrarCodParceiroPF  = function(tipo) { renderCodParceiroPF(tipo); };
+window.limparFiltrosCodParceiroPF = function(tipo) {
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  document.getElementById(`filtroParcPF${suffix}Nome`).value = '';
+  document.getElementById(`filtroParcPF${suffix}Status`).value = '';
+  renderCodParceiroPF(tipo);
+};
+
+window.abrirGerarCodigoParceiroPF = function(tipo) {
+  window._pfTipoAtual = tipo;
+  window._state.parceiroGeraTipo = tipo;
+  const creditos = window._state.parceiro?.creditos ?? 0;
+  const aviso = document.getElementById('parceiroCreditosAviso');
+  if(aviso) aviso.textContent = `Saldo: ${creditos} crédito(s) disponível(is)`;
+  document.getElementById('parceiroNomeCod').value = '';
+  document.getElementById('parceiroEmailCod').value = '';
+  document.getElementById('parceiroWhatsappCod').value = '';
+  if(creditos < 1) { showToast('Saldo insuficiente. Compre mais créditos.','error'); return; }
+  openModal('modalGerarCodigoParceiro');
+};
+
+// ══════════════════════════════════════════
+// PARCEIRO — FINANCEIRO
+// ══════════════════════════════════════════
+window.loadParceiroFinanceiro = async function() {
+  const parId = window._state.parceiro?.id || 'teste';
+  const ano   = document.getElementById('parcFinAno')?.value || '2026';
+  const mes   = document.getElementById('parcFinMes')?.value || '';
+  const fmt   = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Preços sugeridos por tipo
+  const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 247 };
+
+  // Custo por faixa (baseado no saldo atual)
+  const creditos = window._state.parceiro?.creditos || 0;
+  const FAIXAS = [{max:10,preco:40},{max:50,preco:32},{max:100,preco:26},{max:200,preco:22},{max:300,preco:19},{max:999,preco:15.90}];
+  const custoUnit = FAIXAS.find(f => creditos <= f.max)?.preco || 15.90;
+
+  try {
+    // Códigos usados (avaliações realizadas)
+    const codSnap = await getDocs(query(collection(db,'nself_codigos'),
+      where('parceiroId','==',parId), where('status','==','usado')));
+
+    let usados = codSnap.docs.map(d=>({id:d.id,...d.data()})).filter(c => {
+      const dt = c.criadoEm?.toDate?.();
+      if(!dt) return false;
+      if(String(dt.getFullYear()) !== ano) return false;
+      if(mes && String(dt.getMonth()+1).padStart(2,'0') !== mes) return false;
+      return true;
+    });
+
+    // Compras de créditos
+    const compSnap = await getDocs(query(collection(db,'nself_creditos_log'),
+      where('representanteId','==',parId)));
+    let compras = compSnap.docs.map(d=>({id:d.id,...d.data()})).filter(c => {
+      const dt = c.criadoEm?.toDate?.();
+      return dt && String(dt.getFullYear()) === ano;
+    });
+
+    // Calcular totais
+    const totalUsados = usados.length;
+    const receitaEst  = usados.reduce((s,c) => s + (PRECO_SUGERIDO[c.tipoPF||'pf_std']||247), 0);
+    const custoTotal  = compras.reduce((s,c) => s + Number(c.valorPago||0), 0);
+    const margemEst   = receitaEst - custoTotal;
+
+    // Cards
+    document.getElementById('parcFinCards').innerHTML = `
+      <div class="stat-card" style="border-top:3px solid #1A9460;">
+        <div class="sc-label">Avaliações realizadas</div>
+        <div class="sc-value">${totalUsados}</div>
+        <div class="sc-sub">no período</div>
+      </div>
+      <div class="stat-card" style="border-top:3px solid #7B00C4;">
+        <div class="sc-label">Receita estimada</div>
+        <div class="sc-value" style="font-size:24px;">${fmt(receitaEst)}</div>
+        <div class="sc-sub">pelo preço sugerido</div>
+      </div>
+      <div class="stat-card" style="border-top:3px solid #c0392b;">
+        <div class="sc-label">Custo (pago a 9&Self)</div>
+        <div class="sc-value" style="font-size:24px;color:#c0392b;">${fmt(custoTotal)}</div>
+        <div class="sc-sub">total de créditos</div>
+      </div>
+      <div class="stat-card" style="border-top:3px solid #1A9460;">
+        <div class="sc-label">Margem estimada</div>
+        <div class="sc-value" style="font-size:24px;color:#1A9460;">${fmt(margemEst)}</div>
+        <div class="sc-sub">receita − custo</div>
+      </div>
+    `;
+
+    // Tabela avaliações
+    const tbody = document.getElementById('parcFinTable');
+    if(!usados.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação no período</td></tr>';
+    } else {
+      const canal = {pf_dev:'👤 PF Devolutiva', pf_std:'🎫 PF Padrão', empresa:'🏢 Empresa'};
+      tbody.innerHTML = usados.map(c => {
+        const preco = PRECO_SUGERIDO[c.tipoPF||'pf_std']||247;
+        const margem = preco - custoUnit;
+        return `<tr>
+          <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+          <td>${c.nomeDestinatario||'—'}</td>
+          <td>${canal[c.tipoPF||'pf_std']||'—'}</td>
+          <td style="color:#7B00C4;font-weight:600;">${fmt(preco)}</td>
+          <td style="color:#c0392b;">${fmt(custoUnit)}</td>
+          <td style="color:#1A9460;font-weight:600;">${fmt(margem)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Tabela compras
+    const compTbody = document.getElementById('parcFinComprasTable');
+    if(!compras.length) {
+      compTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhuma compra</td></tr>';
+    } else {
+      compTbody.innerHTML = compras.sort((a,b)=>(b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0)).map(c => {
+        const pu = c.creditos > 0 ? Number(c.valorPago||0)/c.creditos : 0;
+        return `<tr>
+          <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+          <td style="font-size:11px;">${c.externalRef||c.motivo||'—'}</td>
+          <td>${c.creditos||0}</td>
+          <td style="color:#1A9460;font-weight:600;">${fmt(c.valorPago)}</td>
+          <td style="font-size:12px;">${fmt(pu)}/crédito</td>
+        </tr>`;
+      }).join('');
+    }
+  } catch(e) { console.warn('ParceiroFin:', e); }
 };
 
 // ── LOGOUT ──
