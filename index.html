@@ -1348,6 +1348,62 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+      <!-- MODAL: Editar Empresa -->
+      <div class="modal-overlay" id="modalEditarEmpresa">
+        <div class="modal">
+          <h3>✏️ Editar Empresa</h3>
+          <input type="hidden" id="editEmpId"/>
+          <div class="form-row"><label>Nome da Empresa *</label><input type="text" id="editEmpNome"/></div>
+          <div class="form-row"><label>Responsável RH</label><input type="text" id="editEmpResp"/></div>
+          <div class="form-row"><label>WhatsApp</label><input type="tel" id="editEmpWhats"/></div>
+          <div class="form-row"><label>Nº de colaboradores</label><input type="number" id="editEmpColab" min="1"/></div>
+          <div class="form-row">
+            <label>Status</label>
+            <select id="editEmpAtivo">
+              <option value="true">Ativo</option>
+              <option value="false">Inativo</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalEditarEmpresa')">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarEdicaoEmpresa()">Salvar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: Editar Parceiro -->
+      <div class="modal-overlay" id="modalEditarParceiro">
+        <div class="modal">
+          <h3>✏️ Editar Parceiro</h3>
+          <input type="hidden" id="editParcId"/>
+          <div class="form-row"><label>Nome *</label><input type="text" id="editParcNome"/></div>
+          <div class="form-row"><label>WhatsApp</label><input type="tel" id="editParcWhats"/></div>
+          <div class="form-row">
+            <label>Área de atuação</label>
+            <select id="editParcArea">
+              <option>Psicologia Clínica</option>
+              <option>Psicologia Organizacional</option>
+              <option>Coaching e Mentoria</option>
+              <option>Consultoria de RH</option>
+              <option>Educação e Treinamento</option>
+              <option>Terapia e Desenvolvimento Humano</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Status</label>
+            <select id="editParcAtivo">
+              <option value="true">Ativo</option>
+              <option value="false">Inativo</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalEditarParceiro')">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarEdicaoParceiro()">Salvar</button>
+          </div>
+        </div>
+      </div>
+
       <!-- MODAL: Novo Parceiro -->
       <div class="modal-overlay" id="modalNovoParceiro">
         <div class="modal">
@@ -1773,12 +1829,14 @@ window.doLogin = async function() {
       } else {
         try {
           const cred = await signInWithEmailAndPassword(auth, email, pass);
-          const q    = query(collection(db,'nself_empresas'), where('email','==',email));
-          const snap = await getDocs(q);
+          const uid  = cred.user.uid;
+          // Busca por email OU por uid (compatível com cadastros antigos)
+          let snap = await getDocs(query(collection(db,'nself_empresas'), where('email','==',email)));
+          if(snap.empty) snap = await getDocs(query(collection(db,'nself_empresas'), where('uid','==',uid)));
           if(!snap.empty) {
             const emp = snap.docs[0].data();
             window._state.empresa = {id:snap.docs[0].id,...emp};
-            enterApp('rh', emp.responsavel, emp.nome);
+            enterApp('rh', emp.responsavel||emp.nome, emp.nome);
           } else {
             err.textContent='Empresa não encontrada. Contate o administrador.';
           }
@@ -1958,7 +2016,7 @@ window.filtrarEmpresas = function() {
     <td><strong>${e.creditos||0}</strong></td>
     <td>${e.laudosGerados||0}</td>
     <td><span class="pill ${e.ativo?'pill-green':'pill-gray'}">${e.ativo?'Ativo':'Inativo'}</span></td>
-    <td><button class="btn btn-teal btn-sm" onclick="abrirDetalheEmpresa('${e.id}','${(e.nome||'').replace(/'/g,"\\'")}','${(e.responsavel||'').replace(/'/g,"\\'")}','${e.email||''}',${e.creditos||0},${e.laudosGerados||0})">👁 Ver</button></td>
+    <td style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheEmpresa('${e.id}','${(e.nome||'').replace(/'/g,"\\'")}','${(e.responsavel||'').replace(/'/g,"\\'")}','${e.email||''}',${e.creditos||0},${e.laudosGerados||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarEmpresa('${e.id}')">✏️</button></td>
   </tr>`).join('');
 };
 
@@ -4291,6 +4349,72 @@ window.excluirDespesa = async function(id) {
   loadFinanceiro();
 };
 
+window.abrirEditarEmpresa = async function(id) {
+  try {
+    const { getDoc: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await gd(doc(db,'nself_empresas',id));
+    if(!snap.exists()) { showToast('Empresa não encontrada.','error'); return; }
+    const e = snap.data();
+    document.getElementById('editEmpId').value    = id;
+    document.getElementById('editEmpNome').value  = e.nome||'';
+    document.getElementById('editEmpResp').value  = e.responsavel||'';
+    document.getElementById('editEmpWhats').value = e.whatsapp||'';
+    document.getElementById('editEmpColab').value = e.colaboradores||'';
+    document.getElementById('editEmpAtivo').value = String(e.ativo !== false);
+    openModal('modalEditarEmpresa');
+  } catch(e) { showToast('Erro ao carregar.','error'); }
+};
+
+window.salvarEdicaoEmpresa = async function() {
+  const id   = document.getElementById('editEmpId').value;
+  const nome = document.getElementById('editEmpNome').value.trim();
+  if(!nome) { showToast('Nome obrigatório.','error'); return; }
+  try {
+    await updateDoc(doc(db,'nself_empresas',id), {
+      nome,
+      responsavel: document.getElementById('editEmpResp').value.trim(),
+      whatsapp:    document.getElementById('editEmpWhats').value.trim(),
+      colaboradores: parseInt(document.getElementById('editEmpColab').value)||0,
+      ativo: document.getElementById('editEmpAtivo').value === 'true',
+    });
+    closeModal('modalEditarEmpresa');
+    showToast('Empresa atualizada!','success');
+    loadEmpresas();
+  } catch(e) { showToast('Erro: '+e.message,'error'); }
+};
+
+window.abrirEditarParceiro = async function(id) {
+  try {
+    const { getDoc: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await gd(doc(db,'nself_parceiros',id));
+    if(!snap.exists()) { showToast('Parceiro não encontrado.','error'); return; }
+    const p = snap.data();
+    document.getElementById('editParcId').value    = id;
+    document.getElementById('editParcNome').value  = p.nome||'';
+    document.getElementById('editParcWhats').value = p.whatsapp||'';
+    document.getElementById('editParcArea').value  = p.area||'';
+    document.getElementById('editParcAtivo').value = String(p.ativo !== false);
+    openModal('modalEditarParceiro');
+  } catch(e) { showToast('Erro ao carregar.','error'); }
+};
+
+window.salvarEdicaoParceiro = async function() {
+  const id   = document.getElementById('editParcId').value;
+  const nome = document.getElementById('editParcNome').value.trim();
+  if(!nome) { showToast('Nome obrigatório.','error'); return; }
+  try {
+    await updateDoc(doc(db,'nself_parceiros',id), {
+      nome,
+      whatsapp: document.getElementById('editParcWhats').value.trim(),
+      area:     document.getElementById('editParcArea').value,
+      ativo:    document.getElementById('editParcAtivo').value === 'true',
+    });
+    closeModal('modalEditarParceiro');
+    showToast('Parceiro atualizado!','success');
+    loadParceirosAdmin();
+  } catch(e) { showToast('Erro: '+e.message,'error'); }
+};
+
 window.salvarNovoParceiro = async function() {
   const nome         = document.getElementById('parcNome').value.trim();
   const email        = document.getElementById('parcEmail').value.trim();
@@ -4455,7 +4579,7 @@ window.filtrarParceiros = function() {
       : `<span class="pill pill-green">✅ Aprovado</span>`;
     const acoes = isPendente
       ? `<button class="btn btn-primary btn-sm" onclick="aprovarParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}')">✅ Aprovar</button>`
-      : `<button class="btn btn-teal btn-sm" onclick="abrirDetalheParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}','${p.area||''}',${p.creditos||0})">👁 Ver</button>`;
+      : `<div style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}','${p.area||''}',${p.creditos||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarParceiro('${p.id}')">✏️</button></div>`;
     return `<tr>
       <td><strong>${p.nome||'—'}</strong></td>
       <td style="font-size:12px;">${p.email||'—'}</td>
