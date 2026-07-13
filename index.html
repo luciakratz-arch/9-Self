@@ -1355,8 +1355,22 @@ tr:hover td{background:#FAFAFE;}
           <input type="hidden" id="editEmpId"/>
           <div class="form-row"><label>Nome da Empresa *</label><input type="text" id="editEmpNome"/></div>
           <div class="form-row"><label>Responsável RH</label><input type="text" id="editEmpResp"/></div>
+          <div class="form-row"><label>E-mail de acesso</label><input type="email" id="editEmpEmail"/></div>
           <div class="form-row"><label>WhatsApp</label><input type="tel" id="editEmpWhats"/></div>
           <div class="form-row"><label>Nº de colaboradores</label><input type="number" id="editEmpColab" min="1"/></div>
+          <div class="form-row">
+            <label>Como conheceu o 9&Self?</label>
+            <select id="editEmpComoConheceu">
+              <option value="">Selecione...</option>
+              <option>Indicação de parceiro</option>
+              <option>Redes sociais</option>
+              <option>Google / Pesquisa</option>
+              <option>LinkedIn</option>
+              <option>Evento ou palestra</option>
+              <option>Indicação de colega</option>
+              <option>Outro</option>
+            </select>
+          </div>
           <div class="form-row">
             <label>Status</label>
             <select id="editEmpAtivo">
@@ -1377,7 +1391,9 @@ tr:hover td{background:#FAFAFE;}
           <h3>✏️ Editar Parceiro</h3>
           <input type="hidden" id="editParcId"/>
           <div class="form-row"><label>Nome *</label><input type="text" id="editParcNome"/></div>
+          <div class="form-row"><label>E-mail</label><input type="email" id="editParcEmail"/></div>
           <div class="form-row"><label>WhatsApp</label><input type="tel" id="editParcWhats"/></div>
+          <div class="form-row"><label>Nº de clientes ativos</label><input type="number" id="editParcColab" min="1"/></div>
           <div class="form-row">
             <label>Área de atuação</label>
             <select id="editParcArea">
@@ -1412,6 +1428,7 @@ tr:hover td{background:#FAFAFE;}
           <div class="form-row"><label>E-mail de acesso *</label><input type="email" id="parcEmail" placeholder="parceiro@email.com" autocomplete="username"/></div>
           <div class="form-row"><label>Senha de acesso *</label><input type="password" id="parcSenha" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/></div>
           <div class="form-row"><label>WhatsApp</label><input type="tel" id="parcWhatsapp" placeholder="(62) 9 9999-0000"/></div>
+          <div class="form-row"><label>Nº de clientes ativos</label><input type="number" id="parcColaboradores" placeholder="Ex: 20" min="1"/></div>
           <div class="form-row">
             <label>Área de atuação</label>
             <select id="parcArea">
@@ -1437,7 +1454,6 @@ tr:hover td{background:#FAFAFE;}
               <option>Outro</option>
             </select>
           </div>
-          <div class="form-row"><label>Créditos iniciais</label><input type="number" id="parcCreditos" placeholder="0" min="0" value="0"/></div>
           <div class="modal-actions">
             <button class="btn btn-outline" onclick="closeModal('modalNovoParceiro')">Cancelar</button>
             <button class="btn btn-primary" onclick="salvarNovoParceiro()">Salvar</button>
@@ -2016,7 +2032,7 @@ window.filtrarEmpresas = function() {
     <td><strong>${e.creditos||0}</strong></td>
     <td>${e.laudosGerados||0}</td>
     <td><span class="pill ${e.ativo?'pill-green':'pill-gray'}">${e.ativo?'Ativo':'Inativo'}</span></td>
-    <td style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheEmpresa('${e.id}','${(e.nome||'').replace(/'/g,"\\'")}','${(e.responsavel||'').replace(/'/g,"\\'")}','${e.email||''}',${e.creditos||0},${e.laudosGerados||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarEmpresa('${e.id}')">✏️</button></td>
+    <td style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheEmpresa('${e.id}','${(e.nome||'').replace(/'/g,"\\'")}','${(e.responsavel||'').replace(/'/g,"\\'")}','${e.email||''}',${e.creditos||0},${e.laudosGerados||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarEmpresa('${e.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="excluirEmpresa('${e.id}','${(e.nome||'').replace(/'/g,\"\\\'\")}')">🗑</button></td>
   </tr>`).join('');
 };
 
@@ -4349,20 +4365,40 @@ window.excluirDespesa = async function(id) {
   loadFinanceiro();
 };
 
+window.excluirEmpresa = async function(id, nome) {
+  if(!confirm(`Excluir a empresa "${nome}"? Esta ação não pode ser desfeita.`)) return;
+  try {
+    await deleteDoc(doc(db,'nself_empresas',id));
+    showToast('Empresa removida.','success');
+    loadEmpresas();
+  } catch(e){ showToast('Erro: '+e.message,'error'); }
+};
+
+window.excluirParceiro = async function(id, nome) {
+  if(!confirm(`Excluir o parceiro "${nome}"? Esta ação não pode ser desfeita.`)) return;
+  try {
+    await deleteDoc(doc(db,'nself_parceiros',id));
+    showToast('Parceiro removido.','success');
+    loadParceirosAdmin();
+  } catch(e){ showToast('Erro: '+e.message,'error'); }
+};
+
 window.abrirEditarEmpresa = async function(id) {
   try {
     const { getDoc: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await gd(doc(db,'nself_empresas',id));
     if(!snap.exists()) { showToast('Empresa não encontrada.','error'); return; }
     const e = snap.data();
-    document.getElementById('editEmpId').value    = id;
-    document.getElementById('editEmpNome').value  = e.nome||'';
-    document.getElementById('editEmpResp').value  = e.responsavel||'';
-    document.getElementById('editEmpWhats').value = e.whatsapp||'';
-    document.getElementById('editEmpColab').value = e.colaboradores||'';
-    document.getElementById('editEmpAtivo').value = String(e.ativo !== false);
+    document.getElementById('editEmpId').value           = id;
+    document.getElementById('editEmpNome').value         = e.nome||'';
+    document.getElementById('editEmpResp').value         = e.responsavel||'';
+    document.getElementById('editEmpEmail').value        = e.email||'';
+    document.getElementById('editEmpWhats').value        = e.whatsapp||'';
+    document.getElementById('editEmpColab').value        = e.colaboradores||'';
+    document.getElementById('editEmpComoConheceu').value = e.comoConheceu||'';
+    document.getElementById('editEmpAtivo').value        = String(e.ativo !== false);
     openModal('modalEditarEmpresa');
-  } catch(e) { showToast('Erro ao carregar.','error'); }
+  } catch(e) { showToast('Erro ao carregar.','error'); console.error(e); }
 };
 
 window.salvarEdicaoEmpresa = async function() {
@@ -4372,10 +4408,12 @@ window.salvarEdicaoEmpresa = async function() {
   try {
     await updateDoc(doc(db,'nself_empresas',id), {
       nome,
-      responsavel: document.getElementById('editEmpResp').value.trim(),
-      whatsapp:    document.getElementById('editEmpWhats').value.trim(),
-      colaboradores: parseInt(document.getElementById('editEmpColab').value)||0,
-      ativo: document.getElementById('editEmpAtivo').value === 'true',
+      responsavel:    document.getElementById('editEmpResp').value.trim(),
+      email:          document.getElementById('editEmpEmail').value.trim(),
+      whatsapp:       document.getElementById('editEmpWhats').value.trim(),
+      colaboradores:  parseInt(document.getElementById('editEmpColab').value)||0,
+      comoConheceu:   document.getElementById('editEmpComoConheceu').value,
+      ativo:          document.getElementById('editEmpAtivo').value === 'true',
     });
     closeModal('modalEditarEmpresa');
     showToast('Empresa atualizada!','success');
@@ -4391,11 +4429,13 @@ window.abrirEditarParceiro = async function(id) {
     const p = snap.data();
     document.getElementById('editParcId').value    = id;
     document.getElementById('editParcNome').value  = p.nome||'';
+    document.getElementById('editParcEmail').value = p.email||'';
     document.getElementById('editParcWhats').value = p.whatsapp||'';
+    document.getElementById('editParcColab').value = p.colaboradores||'';
     document.getElementById('editParcArea').value  = p.area||'';
     document.getElementById('editParcAtivo').value = String(p.ativo !== false);
     openModal('modalEditarParceiro');
-  } catch(e) { showToast('Erro ao carregar.','error'); }
+  } catch(e) { showToast('Erro ao carregar.','error'); console.error(e); }
 };
 
 window.salvarEdicaoParceiro = async function() {
@@ -4405,9 +4445,11 @@ window.salvarEdicaoParceiro = async function() {
   try {
     await updateDoc(doc(db,'nself_parceiros',id), {
       nome,
-      whatsapp: document.getElementById('editParcWhats').value.trim(),
-      area:     document.getElementById('editParcArea').value,
-      ativo:    document.getElementById('editParcAtivo').value === 'true',
+      email:          document.getElementById('editParcEmail').value.trim(),
+      whatsapp:       document.getElementById('editParcWhats').value.trim(),
+      colaboradores:  parseInt(document.getElementById('editParcColab').value)||0,
+      area:           document.getElementById('editParcArea').value,
+      ativo:          document.getElementById('editParcAtivo').value === 'true',
     });
     closeModal('modalEditarParceiro');
     showToast('Parceiro atualizado!','success');
@@ -4420,9 +4462,9 @@ window.salvarNovoParceiro = async function() {
   const email        = document.getElementById('parcEmail').value.trim();
   const senha        = document.getElementById('parcSenha').value;
   const whatsapp     = document.getElementById('parcWhatsapp').value.trim();
+  const colaboradores = parseInt(document.getElementById('parcColaboradores').value)||0;
   const area         = document.getElementById('parcArea').value;
   const comoConheceu = document.getElementById('parcComoConheceu').value;
-  const creditos     = parseInt(document.getElementById('parcCreditos').value)||0;
   if(!nome||!email||!senha){ showToast('Preencha nome, e-mail e senha.','error'); return; }
   try {
     let uid = '';
@@ -4435,15 +4477,8 @@ window.salvarNovoParceiro = async function() {
     }
     await addDoc(collection(db,'nself_parceiros'), {
       nome, email, uid, whatsapp, area, comoConheceu,
-      creditos, ativo: true, criadoEm: serverTimestamp()
+      colaboradores, creditos: 0, ativo: true, criadoEm: serverTimestamp()
     });
-    if(creditos > 0) {
-      await addDoc(collection(db,'nself_creditos_log'), {
-        tipo:'gratuito', origem:'admin', representanteNome:nome,
-        creditos, valorPago:0, motivo:'Créditos iniciais',
-        criadoEm: serverTimestamp()
-      });
-    }
     closeModal('modalNovoParceiro');
     showToast('Parceiro cadastrado!','success');
     loadParceirosAdmin();
@@ -4579,7 +4614,7 @@ window.filtrarParceiros = function() {
       : `<span class="pill pill-green">✅ Aprovado</span>`;
     const acoes = isPendente
       ? `<button class="btn btn-primary btn-sm" onclick="aprovarParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}')">✅ Aprovar</button>`
-      : `<div style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}','${p.area||''}',${p.creditos||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarParceiro('${p.id}')">✏️</button></div>`;
+      : `<div style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}','${p.area||''}',${p.creditos||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarParceiro('${p.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="excluirParceiro('${p.id}','${(p.nome||'').replace(/'/g,\"\\\'\")}')">🗑</button></div>`;
     return `<tr>
       <td><strong>${p.nome||'—'}</strong></td>
       <td style="font-size:12px;">${p.email||'—'}</td>
