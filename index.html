@@ -377,6 +377,9 @@ tr:hover td{background:#FAFAFE;}
         <label>Senha de Acesso</label>
         <input type="password" id="adminPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
       </div>
+      <div style="text-align:right;margin-top:6px;">
+        <a href="#" onclick="abrirRecuperarSenha('admin');return false;" style="font-size:12px;color:#7B00C4;">Esqueceu a senha?</a>
+      </div>
     </div>
 
     <div id="loginRH" style="display:none;">
@@ -388,6 +391,9 @@ tr:hover td{background:#FAFAFE;}
         <label>Senha</label>
         <input type="password" id="rhPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
       </div>
+      <div style="text-align:right;margin-top:6px;">
+        <a href="#" onclick="abrirRecuperarSenha('rh');return false;" style="font-size:12px;color:#7B00C4;">Esqueceu a senha?</a>
+      </div>
     </div>
 
     <div id="loginParceiro" style="display:none;">
@@ -398,6 +404,9 @@ tr:hover td{background:#FAFAFE;}
       <div class="login-field">
         <label>Senha</label>
         <input type="password" id="parceiroPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div style="text-align:right;margin-top:6px;">
+        <a href="#" onclick="abrirRecuperarSenha('parceiro');return false;" style="font-size:12px;color:#7B00C4;">Esqueceu a senha?</a>
       </div>
     </div>
 
@@ -438,6 +447,7 @@ tr:hover td{background:#FAFAFE;}
       </div>
       <nav class="sidebar-nav" id="sideNav"></nav>
       <div class="sidebar-footer">
+        <button class="btn btn-outline btn-sm" onclick="openModal('modalTrocarSenha')" style="font-size:11px;margin-bottom:6px;width:100%;">🔒 Trocar Senha</button>
         <button class="logout-btn" onclick="doLogout()">↩ Sair</button>
       </div>
     </aside>
@@ -1616,6 +1626,47 @@ tr:hover td{background:#FAFAFE;}
   </footer>
 </div>
 
+<!-- MODAL: Recuperar Senha -->
+<div class="modal-overlay" id="modalRecuperarSenha">
+  <div class="modal">
+    <h3>🔑 Recuperar Senha</h3>
+    <p style="font-size:13px;color:#888;margin-bottom:16px;">Informe seu e-mail e enviaremos um link para redefinir sua senha.</p>
+    <div class="form-row">
+      <label>E-mail *</label>
+      <input type="email" id="recuperarEmail" placeholder="seu@email.com" autocomplete="email"/>
+    </div>
+    <div id="recuperarMsg" style="font-size:13px;min-height:18px;margin-top:8px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalRecuperarSenha')">Cancelar</button>
+      <button class="btn btn-primary" onclick="enviarRecuperacaoSenha()">📧 Enviar link</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Trocar Senha -->
+<div class="modal-overlay" id="modalTrocarSenha">
+  <div class="modal">
+    <h3>🔒 Trocar Senha</h3>
+    <div class="form-row">
+      <label>Senha atual *</label>
+      <input type="password" id="senhaAtual" placeholder="••••••••"/>
+    </div>
+    <div class="form-row">
+      <label>Nova senha *</label>
+      <input type="password" id="senhaNova" placeholder="Mínimo 6 caracteres"/>
+    </div>
+    <div class="form-row">
+      <label>Confirmar nova senha *</label>
+      <input type="password" id="senhaNovaConf" placeholder="Repita a nova senha"/>
+    </div>
+    <div id="trocarSenhaMsg" style="font-size:13px;min-height:18px;margin-top:8px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalTrocarSenha')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarTrocarSenha()">✅ Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Nova Empresa -->
 <div class="modal-overlay" id="modalNovaEmpresa">
   <div class="modal">
@@ -1767,7 +1818,7 @@ tr:hover td{background:#FAFAFE;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -4781,6 +4832,69 @@ window.salvarCreditosGratuitosParceiro = async function() {
 };
 
 // ── LOGOUT ──
+// ── RECUPERAR / TROCAR SENHA ──
+window.abrirRecuperarSenha = function(perfil) {
+  const emailField = perfil === 'rh' ? 'rhEmail' : perfil === 'parceiro' ? 'parceiroEmail' : '';
+  const emailVal = emailField ? (document.getElementById(emailField)?.value || '') : 'luciakratz@gmail.com';
+  document.getElementById('recuperarEmail').value = emailVal;
+  document.getElementById('recuperarMsg').textContent = '';
+  openModal('modalRecuperarSenha');
+};
+
+window.enviarRecuperacaoSenha = async function() {
+  const email = document.getElementById('recuperarEmail').value.trim();
+  const msg   = document.getElementById('recuperarMsg');
+  if(!email) { msg.textContent = 'Informe o e-mail.'; msg.style.color = '#c00'; return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    msg.textContent = '✅ Link enviado! Verifique sua caixa de entrada.';
+    msg.style.color = '#1A9460';
+    setTimeout(() => closeModal('modalRecuperarSenha'), 3000);
+  } catch(e) {
+    if(e.code === 'auth/user-not-found') {
+      msg.textContent = 'E-mail não encontrado.';
+    } else {
+      msg.textContent = 'Erro: ' + e.message;
+    }
+    msg.style.color = '#c00';
+  }
+};
+
+window.confirmarTrocarSenha = async function() {
+  const atual = document.getElementById('senhaAtual').value;
+  const nova  = document.getElementById('senhaNova').value;
+  const conf  = document.getElementById('senhaNovaConf').value;
+  const msg   = document.getElementById('trocarSenhaMsg');
+  msg.textContent = '';
+
+  if(!atual || !nova || !conf) { msg.textContent = 'Preencha todos os campos.'; msg.style.color='#c00'; return; }
+  if(nova.length < 6) { msg.textContent = 'Nova senha deve ter mínimo 6 caracteres.'; msg.style.color='#c00'; return; }
+  if(nova !== conf) { msg.textContent = 'As senhas não coincidem.'; msg.style.color='#c00'; return; }
+
+  const user = auth.currentUser;
+  if(!user || !user.email) { msg.textContent = 'Usuário não autenticado.'; msg.style.color='#c00'; return; }
+
+  try {
+    // Reautenticar antes de trocar senha
+    const credential = EmailAuthProvider.credential(user.email, atual);
+    await reauthenticateWithCredential(user, credential);
+    await updatePassword(user, nova);
+    msg.textContent = '✅ Senha alterada com sucesso!';
+    msg.style.color = '#1A9460';
+    document.getElementById('senhaAtual').value = '';
+    document.getElementById('senhaNova').value = '';
+    document.getElementById('senhaNovaConf').value = '';
+    setTimeout(() => closeModal('modalTrocarSenha'), 2000);
+  } catch(e) {
+    if(e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+      msg.textContent = 'Senha atual incorreta.';
+    } else {
+      msg.textContent = 'Erro: ' + e.message;
+    }
+    msg.style.color = '#c00';
+  }
+};
+
 window.doLogout = async function() {
   try{ await signOut(auth); }catch(e){}
   window._state = {profile:null,user:null,empresa:null,codigoAtivo:null};
