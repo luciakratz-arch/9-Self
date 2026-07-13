@@ -1266,6 +1266,119 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
+      <!-- ══ FINANCEIRO ══ -->
+      <div class="page" id="page-financeiro">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div class="page-title">Financeiro</div>
+              <div class="page-subtitle">Receitas reais integradas com Mercado Pago · Atualização automática</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <select id="finFiltroAno" onchange="loadFinanceiro()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+              </select>
+              <select id="finFiltroMes" onchange="loadFinanceiro()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os meses</option>
+                <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+                <option value="03">Março</option><option value="04">Abril</option>
+                <option value="05">Maio</option><option value="06">Junho</option>
+                <option value="07">Julho</option><option value="08">Agosto</option>
+                <option value="09">Setembro</option><option value="10">Outubro</option>
+                <option value="11">Novembro</option><option value="12">Dezembro</option>
+              </select>
+              <select id="finFiltroCanal" onchange="renderFinanceiro()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="">Todos os canais</option>
+                <option value="parceiro">Parceiros</option>
+                <option value="rh">RH / Empresas</option>
+                <option value="pf">Pessoa Física</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="abrirModalDespesa()">＋ Despesa</button>
+            </div>
+          </div>
+
+          <!-- CARDS RESUMO -->
+          <div id="finCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px;"></div>
+
+          <!-- GRÁFICO MENSAL -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:24px;">
+            <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:16px;">📈 Receita por mês</div>
+            <div id="finGrafico" style="display:flex;align-items:flex-end;gap:6px;height:120px;"></div>
+            <div id="finGraficoLabels" style="display:flex;gap:6px;margin-top:6px;"></div>
+          </div>
+
+          <!-- TABELA RECEITAS -->
+          <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">💳 Receitas — Pagamentos Mercado Pago</div>
+          <div class="table-card" style="margin-top:0;margin-bottom:24px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Canal</th>
+                  <th>Parceiro / Empresa</th>
+                  <th>Lote</th>
+                  <th>Créditos</th>
+                  <th>Valor pago</th>
+                  <th>Custo unitário</th>
+                  <th>Margem</th>
+                </tr>
+              </thead>
+              <tbody id="finReceitasTable">
+                <tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TABELA DESPESAS -->
+          <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📤 Despesas (lançamentos manuais)</div>
+          <div class="table-card" style="margin-top:0;">
+            <table>
+              <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th></th></tr></thead>
+              <tbody id="finDespesasTable">
+                <tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhuma despesa lançada</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: Nova Despesa -->
+      <div class="modal-overlay" id="modalDespesa">
+        <div class="modal">
+          <h3>➕ Lançar Despesa</h3>
+          <div class="form-row">
+            <label>Descrição *</label>
+            <input type="text" id="despesaDesc" placeholder="Ex: Hospedagem Cloud, Domínio..."/>
+          </div>
+          <div class="form-row">
+            <label>Categoria</label>
+            <select id="despesaCat">
+              <option value="infraestrutura">Infraestrutura / Cloud</option>
+              <option value="marketing">Marketing</option>
+              <option value="ferramentas">Ferramentas / Software</option>
+              <option value="impostos">Impostos / Taxas</option>
+              <option value="outros">Outros</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Valor (R$) *</label>
+            <input type="number" id="despesaValor" placeholder="0,00" step="0.01" min="0"/>
+          </div>
+          <div class="form-row">
+            <label>Data</label>
+            <input type="date" id="despesaData"/>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalDespesa')">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarDespesa()">Salvar</button>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main -->
   </div><!-- /app-layout -->
   <footer class="app-footer">
@@ -1533,6 +1646,7 @@ const NAVS = {
     {icon:'🏢', label:'Empresas / RH', page:'empresas'},
     {icon:'👤', label:'PF com Devolutiva', page:'pf-devolutiva'},
     {icon:'🎫', label:'PF sem Devolutiva', page:'pf-standard'},
+    {icon:'💰', label:'Financeiro', page:'financeiro'},
   ],
   rh: [
     {icon:'📊', label:'Meu Painel', page:'rh-dashboard'},
@@ -1582,12 +1696,13 @@ window.navigateTo = function(page) {
     'rh-creditos':'Meus Créditos',
     'pf-devolutiva':'PF com Devolutiva',
     'pf-standard':'PF sem Devolutiva',
-    'empresa-detalhe':'Detalhes da Empresa'
+    'empresa-detalhe':'Detalhes da Empresa',
+    'financeiro':'Financeiro'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
   if(page==='cultura')        loadCulturaPage();
-  if(page==='pf-devolutiva')  loadPFDevolutiva();
+  if(page==='financeiro')     loadFinanceiro();
   if(page==='pf-standard')    loadPFStandard();
   if(page==='parceiro-dashboard') { loadParceiroDashboard(); setTimeout(calcSimPainel, 100); }
   if(page==='parceiro-empresas')  loadParceiroEmpresas();
@@ -3744,6 +3859,244 @@ window.abrirModalNovoCodigoPF = function(tipo) {
 window.abrirConverterSolicitacaoPF = function(solId, nome, email, whatsapp, tipo) {
   window._pfTipoAtual = tipo;
   abrirConverterSolicitacao(solId, nome, email, whatsapp);
+};
+
+// ══════════════════════════════════════════
+// FINANCEIRO
+// ══════════════════════════════════════════
+
+const PRECOS_PUBLICO = {
+  'pf_std': 297.00,   // PF sem devolutiva
+  'pf_dev': 597.00,   // PF com devolutiva
+  'empresa': 247.00,  // RH por licença
+};
+
+const CANAL_LABELS = {
+  'lote_rep': 'Parceiro',
+  'lote_rh':  'RH / Empresa',
+  'lote_pf':  'Pessoa Física',
+};
+
+window._finDados = { receitas: [], despesas: [] };
+
+window.loadFinanceiro = async function() {
+  const ano = document.getElementById('finFiltroAno')?.value || '2026';
+  const mes = document.getElementById('finFiltroMes')?.value || '';
+
+  document.getElementById('finReceitasTable').innerHTML =
+    '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:16px;">Carregando...</td></tr>';
+
+  try {
+    // Carregar receitas do Firestore
+    const snap = await getDocs(collection(db, 'nself_creditos_log'));
+    let receitas = snap.docs.map(d => ({id: d.id, ...d.data()}));
+
+    // Filtrar por ano
+    receitas = receitas.filter(r => {
+      const dt = r.criadoEm?.toDate?.();
+      return dt && String(dt.getFullYear()) === ano;
+    });
+
+    // Filtrar por mês se selecionado
+    if(mes) {
+      receitas = receitas.filter(r => {
+        const dt = r.criadoEm?.toDate?.();
+        return dt && String(dt.getMonth()+1).padStart(2,'0') === mes;
+      });
+    }
+
+    // Carregar despesas
+    const despSnap = await getDocs(collection(db, 'nself_despesas'));
+    let despesas = despSnap.docs.map(d => ({id: d.id, ...d.data()}));
+    despesas = despesas.filter(r => {
+      const dt = r.data ? new Date(r.data) : r.criadoEm?.toDate?.();
+      return dt && String(dt.getFullYear()) === ano;
+    });
+    if(mes) {
+      despesas = despesas.filter(r => {
+        const dt = r.data ? new Date(r.data) : r.criadoEm?.toDate?.();
+        return dt && String(dt.getMonth()+1).padStart(2,'0') === mes;
+      });
+    }
+
+    window._finDados = { receitas, despesas };
+    renderFinanceiro();
+  } catch(e) {
+    console.warn('Financeiro:', e);
+    document.getElementById('finReceitasTable').innerHTML =
+      '<tr><td colspan="8" style="text-align:center;color:#c00;padding:16px;">Erro ao carregar dados.</td></tr>';
+  }
+};
+
+window.renderFinanceiro = function() {
+  const canal   = document.getElementById('finFiltroCanal')?.value || '';
+  const { receitas, despesas } = window._finDados;
+  const fmt = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  const LOTES_INFO = {
+    'lote_rep_1':   {creditos:1,   preco:40.00, canal:'parceiro'},
+    'lote_rep_10':  {creditos:10,  preco:40.00, canal:'parceiro'},
+    'lote_rep_50':  {creditos:50,  preco:32.00, canal:'parceiro'},
+    'lote_rep_51':  {creditos:51,  preco:32.00, canal:'parceiro'},
+    'lote_rep_100': {creditos:100, preco:32.00, canal:'parceiro'},
+    'lote_rep_101': {creditos:101, preco:26.00, canal:'parceiro'},
+    'lote_rep_150': {creditos:150, preco:26.00, canal:'parceiro'},
+    'lote_rep_200': {creditos:200, preco:22.00, canal:'parceiro'},
+    'lote_rep_300': {creditos:300, preco:19.00, canal:'parceiro'},
+    'lote_rep_500': {creditos:500, preco:15.90, canal:'parceiro'},
+    'lote_rh_5':    {creditos:5,   preco:247.00, canal:'rh'},
+    'lote_rh_10':   {creditos:10,  preco:247.00, canal:'rh'},
+    'lote_rh_20':   {creditos:20,  preco:230.00, canal:'rh'},
+    'lote_rh_50':   {creditos:50,  preco:210.00, canal:'rh'},
+    'lote_rh_100':  {creditos:100, preco:190.00, canal:'rh'},
+  };
+
+  // Enriquecer receitas
+  let lista = receitas.map(r => {
+    const ref   = r.externalRef || '';
+    const info  = LOTES_INFO[ref] || {};
+    const canalR = ref.startsWith('lote_rep') ? 'parceiro' : ref.startsWith('lote_rh') ? 'rh' : 'pf';
+    const valorPago = Number(r.valorPago || 0);
+    const creditos  = info.creditos || r.creditos || 0;
+    const precoUnit = creditos > 0 ? valorPago / creditos : 0;
+    return {...r, canalR, valorPago, creditos, precoUnit};
+  });
+
+  // Filtrar por canal
+  if(canal) lista = lista.filter(r => r.canalR === canal);
+
+  // Ordenar por data desc
+  lista.sort((a,b) => (b.criadoEm?.toMillis?.()??0) - (a.criadoEm?.toMillis?.()??0));
+
+  // Totais
+  const totalReceita  = lista.reduce((s,r) => s + r.valorPago, 0);
+  const totalDespesas = despesas.reduce((s,d) => s + Number(d.valor||0), 0);
+  const lucroLiquido  = totalReceita - totalDespesas;
+  const totalCreditos = lista.reduce((s,r) => s + r.creditos, 0);
+
+  // Por canal
+  const porCanal = {
+    parceiro: lista.filter(r=>r.canalR==='parceiro').reduce((s,r)=>s+r.valorPago,0),
+    rh:       lista.filter(r=>r.canalR==='rh').reduce((s,r)=>s+r.valorPago,0),
+    pf:       lista.filter(r=>r.canalR==='pf').reduce((s,r)=>s+r.valorPago,0),
+  };
+
+  // Cards
+  document.getElementById('finCards').innerHTML = `
+    <div class="stat-card" style="border-top:3px solid #1A9460;">
+      <div class="sc-label">Receita Total</div>
+      <div class="sc-value" style="font-size:28px;">${fmt(totalReceita)}</div>
+      <div class="sc-sub">${lista.length} pagamento(s)</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid #7B00C4;">
+      <div class="sc-label">Parceiros</div>
+      <div class="sc-value" style="font-size:28px;">${fmt(porCanal.parceiro)}</div>
+      <div class="sc-sub">créditos atacado</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid #1A9BAF;">
+      <div class="sc-label">RH / Empresas</div>
+      <div class="sc-value" style="font-size:28px;">${fmt(porCanal.rh)}</div>
+      <div class="sc-sub">pacotes corporativos</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid #9B2589;">
+      <div class="sc-label">Pessoa Física</div>
+      <div class="sc-value" style="font-size:28px;">${fmt(porCanal.pf)}</div>
+      <div class="sc-sub">vendas diretas</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid #c0392b;">
+      <div class="sc-label">Despesas</div>
+      <div class="sc-value" style="font-size:28px;color:#c0392b;">${fmt(totalDespesas)}</div>
+      <div class="sc-sub">${despesas.length} lançamento(s)</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${lucroLiquido>=0?'#1A9460':'#c0392b'};">
+      <div class="sc-label">Lucro Líquido</div>
+      <div class="sc-value" style="font-size:28px;color:${lucroLiquido>=0?'#1A9460':'#c0392b'};">${fmt(lucroLiquido)}</div>
+      <div class="sc-sub">${totalCreditos} créditos vendidos</div>
+    </div>
+  `;
+
+  // Gráfico mensal (barras simples)
+  const porMes = {};
+  receitas.forEach(r => {
+    const dt = r.criadoEm?.toDate?.();
+    if(!dt) return;
+    const m = String(dt.getMonth()+1).padStart(2,'0');
+    porMes[m] = (porMes[m]||0) + Number(r.valorPago||0);
+  });
+  const meses = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const nomesMes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const maxVal = Math.max(...meses.map(m=>porMes[m]||0), 1);
+  document.getElementById('finGrafico').innerHTML = meses.map((m,i) => {
+    const val = porMes[m]||0;
+    const h = Math.max(4, Math.round((val/maxVal)*110));
+    const ativo = document.getElementById('finFiltroMes')?.value === m;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;" onclick="document.getElementById('finFiltroMes').value='${m}';loadFinanceiro();">
+      <div style="font-size:9px;color:#888;">${val>0?'R$'+Math.round(val/1000)+'k':''}</div>
+      <div style="width:100%;height:${h}px;background:${ativo?'#7B00C4':val>0?'#C4A6E8':'#E2D9EF'};border-radius:4px 4px 0 0;transition:all .2s;"></div>
+    </div>`;
+  }).join('');
+  document.getElementById('finGraficoLabels').innerHTML = nomesMes.map((n,i) =>
+    `<div style="flex:1;text-align:center;font-size:9px;color:#aaa;">${n}</div>`
+  ).join('');
+
+  // Tabela receitas
+  const canalLabel = {parceiro:'🤝 Parceiro', rh:'🏢 RH', pf:'👤 PF'};
+  document.getElementById('finReceitasTable').innerHTML = lista.length ? lista.map(r => {
+    const dt  = r.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR') || '—';
+    const margem = r.canalR === 'parceiro'
+      ? `<span style="color:#888;font-size:11px;">Atacado</span>`
+      : `<span style="color:#1A9460;">${fmt(r.valorPago - (r.creditos * (r.canalR==='rh'?r.precoUnit:r.precoUnit)))}</span>`;
+    return `<tr>
+      <td>${dt}</td>
+      <td>${canalLabel[r.canalR]||'—'}</td>
+      <td style="font-size:12px;">${r.representanteId||r.empresaId||'Direto'}</td>
+      <td style="font-size:11px;">${r.externalRef||'—'}</td>
+      <td style="text-align:center;"><strong>${r.creditos}</strong></td>
+      <td><strong style="color:#1A9460;">${fmt(r.valorPago)}</strong></td>
+      <td style="font-size:12px;">${fmt(r.precoUnit)}/crédito</td>
+      <td>${margem}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">Nenhuma receita no período</td></tr>';
+
+  // Tabela despesas
+  const catLabel = {infraestrutura:'☁️ Infra', marketing:'📣 Marketing', ferramentas:'🔧 Ferramentas', impostos:'📋 Impostos', outros:'📦 Outros'};
+  const despFiltradas = despesas.slice().sort((a,b)=>new Date(b.data||0)-new Date(a.data||0));
+  document.getElementById('finDespesasTable').innerHTML = despFiltradas.length ? despFiltradas.map(d => `<tr>
+    <td>${d.data||'—'}</td>
+    <td>${d.descricao||'—'}</td>
+    <td>${catLabel[d.categoria]||d.categoria||'—'}</td>
+    <td><strong style="color:#c0392b;">${fmt(d.valor)}</strong></td>
+    <td><button class="btn btn-danger btn-sm" onclick="excluirDespesa('${d.id}')">🗑</button></td>
+  </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhuma despesa lançada</td></tr>';
+};
+
+window.abrirModalDespesa = function() {
+  document.getElementById('despesaData').value = new Date().toISOString().split('T')[0];
+  openModal('modalDespesa');
+};
+
+window.salvarDespesa = async function() {
+  const desc  = document.getElementById('despesaDesc').value.trim();
+  const valor = parseFloat(document.getElementById('despesaValor').value);
+  const cat   = document.getElementById('despesaCat').value;
+  const data  = document.getElementById('despesaData').value;
+  if(!desc || !valor) { showToast('Preencha descrição e valor.', 'error'); return; }
+  try {
+    await addDoc(collection(db, 'nself_despesas'), {
+      descricao: desc, valor, categoria: cat, data,
+      criadoEm: serverTimestamp()
+    });
+    closeModal('modalDespesa');
+    showToast('Despesa lançada!', 'success');
+    loadFinanceiro();
+  } catch(e) { showToast('Erro ao salvar.', 'error'); }
+};
+
+window.excluirDespesa = async function(id) {
+  if(!confirm('Excluir esta despesa?')) return;
+  await deleteDoc(doc(db, 'nself_despesas', id));
+  showToast('Despesa removida.', 'success');
+  loadFinanceiro();
 };
 
 // ── LOGOUT ──
