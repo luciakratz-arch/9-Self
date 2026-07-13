@@ -156,6 +156,13 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
         reps = db.collection('representantes') \
             .where('email', '==', email).get()
 
+        # Buscar também em nself_parceiros (novo sistema)
+        parceiros_novos = db.collection('nself_parceiros') \
+            .where('email', '==', email).get()
+
+        representante_id = ''
+        empresa_id = ''
+
         if len(reps) == 0:
             # Criar registro de representante se não existir
             novo_rep = {
@@ -173,6 +180,7 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
             # Adicionar créditos atomicamente ao representante existente
             rep_doc = reps[0]
             rep_ref = rep_doc.reference
+            representante_id = rep_doc.id
             saldo_anterior = rep_doc.to_dict().get('creditos', 0)
             saldo_atual = saldo_anterior + creditos
             nome = rep_doc.to_dict().get('nome', 'Representante')
@@ -180,6 +188,26 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
                 'creditos': firestore.Increment(creditos),
                 'ultimaRecarga': firestore.SERVER_TIMESTAMP,
             })
+
+        # Atualizar também nself_parceiros se existir
+        if len(parceiros_novos) > 0:
+            parc_doc = parceiros_novos[0]
+            representante_id = parc_doc.id
+            parc_doc.reference.update({
+                'creditos': firestore.Increment(creditos),
+                'ultimaRecarga': firestore.SERVER_TIMESTAMP,
+            })
+
+        # Identificar se é lote de empresa (RH)
+        if external_ref and external_ref.startswith('lote_rh_'):
+            rh_docs = db.collection('nself_empresas') \
+                .where('email', '==', email).get()
+            if len(rh_docs) > 0:
+                empresa_id = rh_docs[0].id
+                rh_docs[0].reference.update({
+                    'creditos': firestore.Increment(creditos),
+                    'ultimaRecarga': firestore.SERVER_TIMESTAMP,
+                })
 
         # Registrar log da transação
         db.collection('nself_creditos_log').add({
@@ -191,6 +219,8 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
             'externalRef': external_ref,
             'tituloItem': titulo_item,
             'valorPago': payment.get('transaction_amount', 0),
+            'representanteId': representante_id,
+            'empresaId': empresa_id,
             'criadoEm': firestore.SERVER_TIMESTAMP,
         })
 
