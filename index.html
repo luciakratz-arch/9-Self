@@ -3220,17 +3220,14 @@ window.salvarEmpresa = async function() {
   const comoConheceu = document.getElementById('empComoConheceu').value;
   const whatsapp     = document.getElementById('empWhatsapp').value.trim();
   if(!nome||!email||!senha){showToast('Preencha nome, e-mail e senha.','error');return;}
+  if(senha.length < 6){showToast('Senha deve ter mínimo 6 caracteres.','error');return;}
   try {
+    // Criar usuário no Firebase Auth PRIMEIRO
     let uid = '';
-    try {
-      const userCred = await createUserWithEmailAndPassword(auth, email, senha);
-      uid = userCred.user.uid;
-    } catch(authErr) {
-      if(authErr.code === 'auth/email-already-in-use') {
-        showToast('E-mail já cadastrado.', 'error'); return;
-      }
-      console.warn('Auth warning:', authErr.message);
-    }
+    const userCred = await createUserWithEmailAndPassword(auth, email, senha);
+    uid = userCred.user.uid;
+    
+    // Só salva no Firestore se Auth funcionou
     await addDoc(collection(db,'nself_empresas'),{
       nome, responsavel:resp, email, uid, whatsapp,
       colaboradores, comoConheceu,
@@ -3241,7 +3238,15 @@ window.salvarEmpresa = async function() {
     loadEmpresas();
   } catch(e) {
     console.error('salvarEmpresa:', e);
-    showToast('Erro: ' + (e.message||e.code||'verifique o console.'), 'error');
+    if(e.code==='auth/email-already-in-use') {
+      showToast('Este e-mail já está cadastrado no sistema.','error');
+    } else if(e.code==='auth/weak-password') {
+      showToast('Senha muito fraca. Use mínimo 6 caracteres.','error');
+    } else if(e.code==='auth/invalid-email') {
+      showToast('E-mail inválido.','error');
+    } else {
+      showToast('Erro: '+(e.message||e.code),'error');
+    }
   }
 };
 
@@ -4530,15 +4535,10 @@ window.salvarNovoParceiro = async function() {
   const area         = document.getElementById('parcArea').value;
   const comoConheceu = document.getElementById('parcComoConheceu').value;
   if(!nome||!email||!senha){ showToast('Preencha nome, e-mail e senha.','error'); return; }
+  if(senha.length < 6){ showToast('Senha deve ter mínimo 6 caracteres.','error'); return; }
   try {
-    let uid = '';
-    try {
-      const cred = await createUserWithEmailAndPassword(auth, email, senha);
-      uid = cred.user.uid;
-    } catch(authErr) {
-      if(authErr.code==='auth/email-already-in-use'){ showToast('E-mail já cadastrado.','error'); return; }
-      console.warn('Auth:', authErr.message);
-    }
+    const cred = await createUserWithEmailAndPassword(auth, email, senha);
+    const uid = cred.user.uid;
     await addDoc(collection(db,'nself_parceiros'), {
       nome, email, uid, whatsapp, area, comoConheceu,
       colaboradores, creditos: 0, ativo: true, criadoEm: serverTimestamp()
@@ -4548,7 +4548,13 @@ window.salvarNovoParceiro = async function() {
     loadParceirosAdmin();
   } catch(e) {
     console.error(e);
-    showToast('Erro: '+(e.message||e.code),'error');
+    if(e.code==='auth/email-already-in-use') {
+      showToast('Este e-mail já está cadastrado no sistema.','error');
+    } else if(e.code==='auth/weak-password') {
+      showToast('Senha muito fraca. Use mínimo 6 caracteres.','error');
+    } else {
+      showToast('Erro: '+(e.message||e.code),'error');
+    }
   }
 };
 
