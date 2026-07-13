@@ -948,9 +948,9 @@ tr:hover td{background:#FAFAFE;}
       <!-- ══ PARCEIRO: Empresas ══ -->
       <div class="page" id="page-parceiro-empresas">
         <div style="padding:28px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
             <div><div class="page-title">Minhas Empresas</div><div class="page-subtitle">Organize seus clientes empresariais</div></div>
-            <button class="btn btn-primary" onclick="openModal('modalParceiroNovaEmpresa')">＋ Nova Empresa</button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('empresa')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button><button class="btn btn-primary" onclick="openModal('modalParceiroNovaEmpresa')">＋ Nova Empresa</button></div>
           </div>
           <div class="table-card">
             <table>
@@ -1626,7 +1626,10 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-title">PF com Devolutiva</div>
               <div class="page-subtitle">Laudo + Sessão — Gerencie seus clientes individuais premium</div>
             </div>
-            <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_dev')">🔑 Gerar Código</button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('pf_dev')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_dev')">🔑 Gerar Código</button>
+            </div>
           </div>
           <div class="table-card">
             <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
@@ -1666,7 +1669,10 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-title">PF sem Devolutiva</div>
               <div class="page-subtitle">Laudo Automatizado — Gerencie seus clientes individuais padrão</div>
             </div>
-            <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_std')">🔑 Gerar Código</button>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('pf_std')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_std')">🔑 Gerar Código</button>
+            </div>
           </div>
           <div class="table-card">
             <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
@@ -5170,6 +5176,26 @@ window.loadParceiroFinanceiro = async function() {
       }).join('');
     }
   } catch(e) { console.warn('ParceiroFin:', e); }
+};
+
+window.gerarLinkSolicitacaoParceiro = async function(tipo) {
+  try {
+    const token = gerarTokenUUID();
+    const parId = window._state.parceiro?.id || '';
+    await addDoc(collection(db, 'nself_solicitacoes'), {
+      token, status: 'aguardando',
+      tipoPF: tipo, parceiroId: parId,
+      criadoEm: serverTimestamp(), dados: null
+    });
+    const link = `${BASE_CADASTRO}?token=${token}`;
+    _linkSolicitacaoAtual = link;
+    document.getElementById('linkCadastroGerado').textContent = link;
+    openModal('modalLinkCadastro');
+    showToast('Link gerado!', 'success');
+  } catch(e) {
+    showToast('Erro ao gerar link.', 'error');
+    console.error(e);
+  }
 };
 
 // ── LOGOUT ──
