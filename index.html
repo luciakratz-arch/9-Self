@@ -517,12 +517,14 @@ tr:hover td{background:#FAFAFE;}
       <!-- ══ EMPRESA DETALHE ══ -->
       <div class="page" id="page-empresa-detalhe">
         <div style="padding:28px;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
             <button class="btn btn-outline btn-sm" onclick="navigateTo('empresas')">← Voltar</button>
-            <div>
+            <div style="flex:1;">
               <div class="page-title" id="detalheEmpresaNome">—</div>
               <div class="page-subtitle" id="detalheEmpresaInfo">—</div>
             </div>
+            <button class="btn btn-outline" onclick="abrirCreditosGratuitos()" style="border-color:rgba(26,155,96,.5);color:#1A9460;">🎁 Adicionar Créditos</button>
+            <button class="btn btn-primary" onclick="abrirGerarCodigoEmpresa()">🔑 Gerar Código</button>
           </div>
 
           <!-- Cards resumo -->
@@ -1346,7 +1348,120 @@ tr:hover td{background:#FAFAFE;}
         </div>
       </div>
 
-      <!-- MODAL: Nova Despesa -->
+      <!-- MODAL: Créditos Gratuitos -->
+      <div class="modal-overlay" id="modalCreditosGratuitos">
+        <div class="modal">
+          <h3>🎁 Adicionar Créditos Gratuitos</h3>
+          <p style="font-size:13px;color:#888;margin-bottom:16px;">Adicione créditos sem custo para esta empresa. Ficará registrado como doação.</p>
+          <div class="form-row">
+            <label>Quantidade de créditos *</label>
+            <input type="number" id="creditosGratuitosQtd" placeholder="Ex: 10" min="1"/>
+          </div>
+          <div class="form-row">
+            <label>Motivo</label>
+            <input type="text" id="creditosGratuitosMotivo" placeholder="Ex: Teste piloto, cortesia..."/>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalCreditosGratuitos')">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarCreditosGratuitos()">✅ Confirmar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: Gerar Código para Empresa -->
+      <div class="modal-overlay" id="modalGerarCodigoEmpresa">
+        <div class="modal">
+          <h3>🔑 Gerar Código para Colaborador</h3>
+          <div id="empresaSaldoAviso" style="background:#F0FAF4;border:1px solid #1A9460;border-radius:10px;padding:10px 14px;font-size:13px;color:#1A9460;font-weight:600;margin-bottom:16px;"></div>
+          <div class="form-row">
+            <label>Nome do colaborador *</label>
+            <input type="text" id="codEmpNome" placeholder="Nome completo"/>
+          </div>
+          <div class="form-row">
+            <label>E-mail</label>
+            <input type="email" id="codEmpEmail" placeholder="colaborador@empresa.com"/>
+          </div>
+          <div class="form-row">
+            <label>WhatsApp</label>
+            <input type="tel" id="codEmpWhatsapp" placeholder="(62) 9 9999-0000"/>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalGerarCodigoEmpresa')">Cancelar</button>
+            <button class="btn btn-primary" onclick="confirmarGerarCodigoEmpresa()">🔑 Gerar (−1 crédito)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIROS (Admin) ══ -->
+      <div class="page" id="page-parceiros-admin">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div class="page-title">Parceiros</div>
+              <div class="page-subtitle">Gerencie os parceiros credenciados e seus saldos</div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
+              <input type="text" id="filtroParcNome" placeholder="🔍 Buscar parceiro..." oninput="filtrarParceiros()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;flex:1;min-width:160px;"/>
+              <select id="filtroParcOrdem" onchange="filtrarParceiros()"
+                style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
+                <option value="nome">A→Z Nome</option>
+                <option value="creditos">Mais créditos</option>
+                <option value="data">Mais recente</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="loadParceirosAdmin()">↻ Atualizar</button>
+            </div>
+            <div id="parceirosAdminCount" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
+            <table>
+              <thead><tr><th>Parceiro</th><th>E-mail</th><th>Área</th><th>Créditos</th><th>Solicitação</th><th>Status</th><th></th></tr></thead>
+              <tbody id="parceirosAdminTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum parceiro cadastrado</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PARCEIRO DETALHE (Admin) ══ -->
+      <div class="page" id="page-parceiro-admin-detalhe">
+        <div style="padding:28px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" onclick="navigateTo('parceiros-admin')">← Voltar</button>
+            <div style="flex:1;">
+              <div class="page-title" id="parceiroAdminNome">—</div>
+              <div class="page-subtitle" id="parceiroAdminInfo">—</div>
+            </div>
+            <button class="btn btn-outline" onclick="abrirCreditosGratuitosParceiro()" style="border-color:rgba(26,155,96,.5);color:#1A9460;">🎁 Adicionar Créditos</button>
+          </div>
+          <div id="parceiroAdminCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px;"></div>
+          <div style="font-weight:700;color:#3A1F5C;font-size:14px;margin-bottom:12px;">📋 Histórico de créditos</div>
+          <div class="table-card" style="margin-top:0;">
+            <table>
+              <thead><tr><th>Data</th><th>Lote</th><th>Créditos</th><th>Valor pago</th></tr></thead>
+              <tbody id="parceiroAdminHistTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhuma movimentação</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: Créditos Gratuitos Parceiro -->
+      <div class="modal-overlay" id="modalCreditosGratuitosParceiro">
+        <div class="modal">
+          <h3>🎁 Adicionar Créditos ao Parceiro</h3>
+          <div class="form-row">
+            <label>Quantidade *</label>
+            <input type="number" id="creditosParcQtd" placeholder="Ex: 10" min="1"/>
+          </div>
+          <div class="form-row">
+            <label>Motivo</label>
+            <input type="text" id="creditosParcMotivo" placeholder="Ex: Bônus, cortesia..."/>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modalCreditosGratuitosParceiro')">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarCreditosGratuitosParceiro()">✅ Confirmar</button>
+          </div>
+        </div>
+      </div>
       <div class="modal-overlay" id="modalDespesa">
         <div class="modal">
           <h3>➕ Lançar Despesa</h3>
@@ -1392,24 +1507,41 @@ tr:hover td{background:#FAFAFE;}
   <div class="modal">
     <h3>Nova Empresa / RH</h3>
     <div class="form-row">
-      <label>Nome da Empresa</label>
+      <label>Nome da Empresa *</label>
       <input type="text" id="empNome" placeholder="Ex: Empresa Ltda"/>
     </div>
     <div class="form-row">
-      <label>Responsável RH</label>
+      <label>Responsável RH *</label>
       <input type="text" id="empResponsavel" placeholder="Nome completo"/>
     </div>
     <div class="form-row">
-      <label>E-mail de acesso</label>
-      <input type="email" id="empEmail" placeholder="rh@empresa.com"/>
+      <label>E-mail de acesso *</label>
+      <input type="email" id="empEmail" placeholder="rh@empresa.com" autocomplete="username"/>
     </div>
     <div class="form-row">
-      <label>Senha de acesso</label>
-      <input type="password" id="empSenha" placeholder="Mínimo 6 caracteres"/>
+      <label>Senha de acesso *</label>
+      <input type="password" id="empSenha" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/>
     </div>
     <div class="form-row">
-      <label>Créditos iniciais</label>
-      <input type="number" id="empCreditos" placeholder="0" min="0"/>
+      <label>Nº de colaboradores</label>
+      <input type="number" id="empColaboradores" placeholder="Ex: 50" min="1"/>
+    </div>
+    <div class="form-row">
+      <label>Como conheceu o 9&Self?</label>
+      <select id="empComoConheceu">
+        <option value="">Selecione...</option>
+        <option>Indicação de parceiro</option>
+        <option>Redes sociais</option>
+        <option>Google / Pesquisa</option>
+        <option>LinkedIn</option>
+        <option>Evento ou palestra</option>
+        <option>Indicação de colega</option>
+        <option>Outro</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>WhatsApp</label>
+      <input type="tel" id="empWhatsapp" placeholder="(62) 9 9999-0000"/>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modalNovaEmpresa')">Cancelar</button>
@@ -1519,7 +1651,7 @@ tr:hover td{background:#FAFAFE;}
 <!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp }
+import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -1644,6 +1776,7 @@ const NAVS = {
   admin: [
     {icon:'📊', label:'Painel', page:'dashboard'},
     {icon:'🏢', label:'Empresas / RH', page:'empresas'},
+    {icon:'🤝', label:'Parceiros', page:'parceiros-admin'},
     {icon:'👤', label:'PF com Devolutiva', page:'pf-devolutiva'},
     {icon:'🎫', label:'PF sem Devolutiva', page:'pf-standard'},
     {icon:'💰', label:'Financeiro', page:'financeiro'},
@@ -1697,12 +1830,16 @@ window.navigateTo = function(page) {
     'pf-devolutiva':'PF com Devolutiva',
     'pf-standard':'PF sem Devolutiva',
     'empresa-detalhe':'Detalhes da Empresa',
+    'parceiros-admin':'Parceiros',
+    'parceiro-admin-detalhe':'Detalhes do Parceiro',
     'financeiro':'Financeiro'
   };
   document.getElementById('topbarTitle').textContent = labels[page]||'';
   closeSidebar();
   if(page==='cultura')        loadCulturaPage();
-  if(page==='financeiro')     loadFinanceiro();
+  if(page==='financeiro')          loadFinanceiro();
+  if(page==='parceiros-admin')     loadParceirosAdmin();
+  if(page==='parceiro-admin-detalhe') { /* carregado por abrirDetalheParceiro */ }
   if(page==='pf-standard')    loadPFStandard();
   if(page==='parceiro-dashboard') { loadParceiroDashboard(); setTimeout(calcSimPainel, 100); }
   if(page==='parceiro-empresas')  loadParceiroEmpresas();
@@ -2949,12 +3086,14 @@ window.revogarCodigo = async function(id) {
   }catch(e){showToast('Erro.','error');}
 };
 window.salvarEmpresa = async function() {
-  const nome   = document.getElementById('empNome').value.trim();
-  const resp   = document.getElementById('empResponsavel').value.trim();
-  const email  = document.getElementById('empEmail').value.trim();
-  const senha  = document.getElementById('empSenha').value;
-  const cred   = parseInt(document.getElementById('empCreditos').value)||0;
-  if(!nome||!email||!senha){showToast('Preencha todos os campos obrigatórios.','error');return;}
+  const nome         = document.getElementById('empNome').value.trim();
+  const resp         = document.getElementById('empResponsavel').value.trim();
+  const email        = document.getElementById('empEmail').value.trim();
+  const senha        = document.getElementById('empSenha').value;
+  const colaboradores = parseInt(document.getElementById('empColaboradores').value)||0;
+  const comoConheceu = document.getElementById('empComoConheceu').value;
+  const whatsapp     = document.getElementById('empWhatsapp').value.trim();
+  if(!nome||!email||!senha){showToast('Preencha nome, e-mail e senha.','error');return;}
   try {
     let uid = '';
     try {
@@ -2962,22 +3101,21 @@ window.salvarEmpresa = async function() {
       uid = userCred.user.uid;
     } catch(authErr) {
       if(authErr.code === 'auth/email-already-in-use') {
-        showToast('E-mail já cadastrado no Firebase Auth.', 'error');
-        return;
+        showToast('E-mail já cadastrado.', 'error'); return;
       }
-      // Outro erro de auth — salva mesmo assim sem uid
       console.warn('Auth warning:', authErr.message);
     }
     await addDoc(collection(db,'nself_empresas'),{
-      nome, responsavel:resp, email, uid,
-      creditos:cred, laudosGerados:0, ativo:true, criadoEm:serverTimestamp()
+      nome, responsavel:resp, email, uid, whatsapp,
+      colaboradores, comoConheceu,
+      creditos:0, laudosGerados:0, ativo:true, criadoEm:serverTimestamp()
     });
     closeModal('modalNovaEmpresa');
-    showToast('Empresa cadastrada com sucesso!','success');
+    showToast('Empresa cadastrada!','success');
     loadEmpresas();
   } catch(e) {
     console.error('salvarEmpresa:', e);
-    showToast('Erro ao salvar: ' + (e.message||e.code||'verifique o console.'), 'error');
+    showToast('Erro: ' + (e.message||e.code||'verifique o console.'), 'error');
   }
 };
 
@@ -4109,6 +4247,223 @@ window.excluirDespesa = async function(id) {
   await deleteDoc(doc(db, 'nself_despesas', id));
   showToast('Despesa removida.', 'success');
   loadFinanceiro();
+};
+
+// ══════════════════════════════════════════
+// CRÉDITOS GRATUITOS — EMPRESA
+// ══════════════════════════════════════════
+window.abrirCreditosGratuitos = function() {
+  document.getElementById('creditosGratuitosQtd').value = '';
+  document.getElementById('creditosGratuitosMotivo').value = '';
+  openModal('modalCreditosGratuitos');
+};
+
+window.salvarCreditosGratuitos = async function() {
+  const qtd    = parseInt(document.getElementById('creditosGratuitosQtd').value)||0;
+  const motivo = document.getElementById('creditosGratuitosMotivo').value.trim();
+  if(!qtd || qtd < 1) { showToast('Informe a quantidade.', 'error'); return; }
+  const empId = window._empresaDetalhe?.id;
+  if(!empId) { showToast('Empresa não identificada.', 'error'); return; }
+  try {
+    await updateDoc(doc(db,'nself_empresas', empId), {
+      creditos: increment(qtd)
+    });
+    await addDoc(collection(db,'nself_creditos_log'), {
+      tipo: 'gratuito', origem: 'admin',
+      empresaId: empId, empresaNome: window._empresaDetalhe?.nome,
+      creditos: qtd, valorPago: 0,
+      motivo: motivo || 'Créditos gratuitos',
+      criadoEm: serverTimestamp()
+    });
+    closeModal('modalCreditosGratuitos');
+    showToast(`${qtd} créditos adicionados!`, 'success');
+    // Atualizar card
+    window._empresaDetalhe.creditos = (window._empresaDetalhe.creditos||0) + qtd;
+    document.getElementById('detalheEmpresaCards').innerHTML = `
+      <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${window._empresaDetalhe.creditos}</div><div class="sc-sub">disponíveis</div></div>
+      <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${window._empresaDetalhe.laudos||0}</div><div class="sc-sub">gerados</div></div>
+    `;
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); console.error(e); }
+};
+
+// ══════════════════════════════════════════
+// GERAR CÓDIGO PARA EMPRESA
+// ══════════════════════════════════════════
+window.abrirGerarCodigoEmpresa = function() {
+  const creditos = window._empresaDetalhe?.creditos || 0;
+  document.getElementById('empresaSaldoAviso').textContent = `Saldo: ${creditos} crédito(s) disponível(is)`;
+  document.getElementById('codEmpNome').value = '';
+  document.getElementById('codEmpEmail').value = '';
+  document.getElementById('codEmpWhatsapp').value = '';
+  if(creditos < 1) { showToast('Saldo insuficiente. Adicione créditos primeiro.', 'error'); return; }
+  openModal('modalGerarCodigoEmpresa');
+};
+
+window.confirmarGerarCodigoEmpresa = async function() {
+  const nome    = document.getElementById('codEmpNome').value.trim();
+  const email   = document.getElementById('codEmpEmail').value.trim();
+  const whatsapp = document.getElementById('codEmpWhatsapp').value.trim();
+  const empId   = window._empresaDetalhe?.id;
+  const empNome = window._empresaDetalhe?.nome;
+  const creditos = window._empresaDetalhe?.creditos || 0;
+  if(!nome) { showToast('Informe o nome do colaborador.', 'error'); return; }
+  if(creditos < 1) { showToast('Saldo insuficiente.', 'error'); return; }
+  try {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let c = ''; for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+    const link = gerarLinkTeste(c);
+    await addDoc(collection(db,'nself_codigos'), {
+      codigo: c, nomeDestinatario: nome, email, whatsapp,
+      empresa: empId, empresaNome: empNome,
+      tipo: 'B2B', status: 'disponivel', linkTeste: link,
+      criadoEm: serverTimestamp()
+    });
+    await updateDoc(doc(db,'nself_empresas', empId), { creditos: increment(-1) });
+    window._empresaDetalhe.creditos = creditos - 1;
+    closeModal('modalGerarCodigoEmpresa');
+    showToast(`Código ${c} gerado!`, 'success');
+    if(whatsapp) {
+      const num = whatsapp.replace(/\D/g,'');
+      const msg = encodeURIComponent(`Olá, ${nome}! 🎉 Seu código de acesso ao 9&Self foi gerado!\n\nCódigo: *${c}*\n\nAcesse: ${link}\n\n💜`);
+      window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+    }
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); console.error(e); }
+};
+
+// ══════════════════════════════════════════
+// PARCEIROS — PAINEL ADMIN
+// ══════════════════════════════════════════
+window._todosParceirosAdmin = [];
+
+window.loadParceirosAdmin = async function() {
+  const tbody = document.getElementById('parceirosAdminTable');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px;">Carregando...</td></tr>';
+  try {
+    // Parceiros aprovados
+    const snap1 = await getDocs(collection(db,'nself_parceiros'));
+    // Solicitações pendentes
+    const snap2 = await getDocs(query(collection(db,'nself_parceiros_solicitacoes'), where('status','==','pendente')));
+    const aprovados = snap1.docs.map(d=>({id:d.id, tipo:'aprovado', ...d.data()}));
+    const pendentes = snap2.docs.map(d=>({id:d.id, tipo:'pendente', ...d.data()}));
+    window._todosParceirosAdmin = [...aprovados, ...pendentes];
+    filtrarParceiros();
+  } catch(e) { console.warn(e); }
+};
+
+window.filtrarParceiros = function() {
+  const nome  = (document.getElementById('filtroParcNome')?.value||'').toLowerCase();
+  const ordem = document.getElementById('filtroParcOrdem')?.value||'nome';
+  const tbody = document.getElementById('parceirosAdminTable');
+  const count = document.getElementById('parceirosAdminCount');
+
+  let lista = [...window._todosParceirosAdmin];
+  if(nome) lista = lista.filter(p=>(p.nome||'').toLowerCase().includes(nome));
+  lista.sort((a,b)=>{
+    if(ordem==='nome')    return (a.nome||'').localeCompare(b.nome||'');
+    if(ordem==='creditos') return (b.creditos||0)-(a.creditos||0);
+    if(ordem==='data')    return (b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0);
+    return 0;
+  });
+
+  if(count) count.textContent = lista.length ? `${lista.length} parceiro(s)` : '';
+  if(!lista.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum parceiro encontrado</td></tr>'; return; }
+
+  tbody.innerHTML = lista.map(p => {
+    const isPendente = p.tipo === 'pendente';
+    const statusPill = isPendente
+      ? `<span class="pill pill-yellow">⏳ Pendente</span>`
+      : `<span class="pill pill-green">✅ Aprovado</span>`;
+    const acoes = isPendente
+      ? `<button class="btn btn-primary btn-sm" onclick="aprovarParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}')">✅ Aprovar</button>`
+      : `<button class="btn btn-teal btn-sm" onclick="abrirDetalheParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}','${p.area||''}',${p.creditos||0})">👁 Ver</button>`;
+    return `<tr>
+      <td><strong>${p.nome||'—'}</strong></td>
+      <td style="font-size:12px;">${p.email||'—'}</td>
+      <td style="font-size:12px;">${p.area||'—'}</td>
+      <td><strong>${p.creditos||0}</strong></td>
+      <td style="font-size:12px;">${p.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+      <td>${statusPill}</td>
+      <td>${acoes}</td>
+    </tr>`;
+  }).join('');
+};
+
+window.aprovarParceiro = async function(solId, nome, email) {
+  const senha = prompt(`Defina uma senha para ${nome}:`);
+  if(!senha || senha.length < 6) { showToast('Senha deve ter mínimo 6 caracteres.', 'error'); return; }
+  try {
+    let uid = '';
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, senha);
+      uid = cred.user.uid;
+    } catch(e) { console.warn('Auth:', e.message); }
+
+    const parRef = await addDoc(collection(db,'nself_parceiros'), {
+      nome, email, uid, creditos: 0,
+      criadoEm: serverTimestamp(), ativo: true
+    });
+    await updateDoc(doc(db,'nself_parceiros_solicitacoes', solId), {
+      status: 'aprovado', aprovadoEm: serverTimestamp(), parceiroId: parRef.id
+    });
+    showToast(`${nome} aprovado!`, 'success');
+    loadParceirosAdmin();
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+};
+
+window.abrirDetalheParceiro = async function(id, nome, email, area, creditos) {
+  window._parceiroAdminAtual = {id, nome, email, area, creditos};
+  document.getElementById('parceiroAdminNome').textContent = nome;
+  document.getElementById('parceiroAdminInfo').textContent = `${area} · ${email}`;
+  document.getElementById('parceiroAdminCards').innerHTML = `
+    <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${creditos}</div><div class="sc-sub">disponíveis</div></div>
+  `;
+  navigateTo('parceiro-admin-detalhe');
+  // Histórico de compras
+  try {
+    const snap = await getDocs(query(collection(db,'nself_creditos_log'), where('representanteId','==',id)));
+    const tbody = document.getElementById('parceiroAdminHistTable');
+    if(snap.empty){ tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhuma movimentação</td></tr>'; return; }
+    tbody.innerHTML = snap.docs.map(d=>{
+      const r = d.data();
+      return `<tr>
+        <td>${r.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td style="font-size:12px;">${r.externalRef||r.motivo||'—'}</td>
+        <td>${r.creditos||0}</td>
+        <td style="color:#1A9460;font-weight:600;">R$ ${Number(r.valorPago||0).toFixed(2).replace('.',',')}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.warn(e); }
+};
+
+window.abrirCreditosGratuitosParceiro = function() {
+  document.getElementById('creditosParcQtd').value = '';
+  document.getElementById('creditosParcMotivo').value = '';
+  openModal('modalCreditosGratuitosParceiro');
+};
+
+window.salvarCreditosGratuitosParceiro = async function() {
+  const qtd    = parseInt(document.getElementById('creditosParcQtd').value)||0;
+  const motivo = document.getElementById('creditosParcMotivo').value.trim();
+  if(!qtd || qtd < 1) { showToast('Informe a quantidade.', 'error'); return; }
+  const parId  = window._parceiroAdminAtual?.id;
+  const parNome = window._parceiroAdminAtual?.nome;
+  if(!parId) { showToast('Parceiro não identificado.', 'error'); return; }
+  try {
+    await updateDoc(doc(db,'nself_parceiros', parId), { creditos: increment(qtd) });
+    await addDoc(collection(db,'nself_creditos_log'), {
+      tipo: 'gratuito', origem: 'admin',
+      representanteId: parId, representanteNome: parNome,
+      creditos: qtd, valorPago: 0,
+      motivo: motivo || 'Créditos gratuitos',
+      criadoEm: serverTimestamp()
+    });
+    closeModal('modalCreditosGratuitosParceiro');
+    showToast(`${qtd} créditos adicionados ao parceiro!`, 'success');
+    window._parceiroAdminAtual.creditos = (window._parceiroAdminAtual.creditos||0) + qtd;
+    document.getElementById('parceiroAdminCards').innerHTML = `
+      <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${window._parceiroAdminAtual.creditos}</div><div class="sc-sub">disponíveis</div></div>
+    `;
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
 };
 
 // ── LOGOUT ──
