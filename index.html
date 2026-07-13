@@ -2032,7 +2032,17 @@ window.filtrarEmpresas = function() {
     <td><strong>${e.creditos||0}</strong></td>
     <td>${e.laudosGerados||0}</td>
     <td><span class="pill ${e.ativo?'pill-green':'pill-gray'}">${e.ativo?'Ativo':'Inativo'}</span></td>
-    <td style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheEmpresa('${e.id}','${(e.nome||'').replace(/'/g,"\\'")}','${(e.responsavel||'').replace(/'/g,"\\'")}','${e.email||''}',${e.creditos||0},${e.laudosGerados||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarEmpresa('${e.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="excluirEmpresa('${e.id}','${(e.nome||'').replace(/'/g,\"\\\'\")}')">🗑</button></td>
+    <td style="display:flex;gap:6px;">
+      <button class="btn btn-outline btn-sm" onclick="abrirModalWhatsAppEmpresa(this)" data-id="${e.id}" data-nome="${e.nome||''}" data-wpp="${e.whatsapp||''}">💬</button>
+    <td style="display:flex;gap:6px;">
+      <button class="btn btn-outline btn-sm" onclick="abrirModalWhatsAppEmpresa(this)" data-id="${e.id}" data-nome="${e.nome||''}" data-wpp="${e.whatsapp||''}">💬</button>
+      <button class="btn btn-teal btn-sm" onclick="verEmpresa(this)" data-id="${e.id}" data-nome="${e.nome||''}" data-resp="${e.responsavel||''}" data-email="${e.email||''}" data-cred="${e.creditos||0}" data-laudos="${e.laudosGerados||0}">👁 Ver</button>
+      <button class="btn btn-outline btn-sm" onclick="editarEmpresaBtn(this)" data-id="${e.id}">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="excluirEmpresaBtn(this)" data-id="${e.id}" data-nome="${e.nome||''}">🗑</button>
+    </td>
+      <button class="btn btn-outline btn-sm" onclick="abrirEditarEmpresa('${e.id}')">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="excluirEmpresaBtn(this)" data-id="${e.id}" data-nome="${e.nome||''}">🗑</button>
+    </td>
   </tr>`).join('');
 };
 
@@ -4365,6 +4375,60 @@ window.excluirDespesa = async function(id) {
   loadFinanceiro();
 };
 
+window.abrirModalWhatsAppEmpresa = function(btn) {
+  const id       = btn.dataset.id;
+  const nome     = btn.dataset.nome;
+  const whatsapp = btn.dataset.wpp;
+  if(whatsapp) {
+    const num = whatsapp.replace(/\D/g,'');
+    const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+    window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+  } else {
+    document.getElementById('modalWaTitle').textContent = `WhatsApp — ${nome}`;
+    document.getElementById('modalWaDesc').textContent  = 'Digite o WhatsApp da empresa.';
+    document.getElementById('modalWaInput').value = '';
+    window._waCallback = function(numero) {
+      const num = numero.replace(/\D/g,'');
+      updateDoc(doc(db,'nself_empresas',id), {whatsapp: numero}).catch(()=>{});
+      const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+      window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+    };
+    openModal('modalWhatsAppInput');
+    setTimeout(() => document.getElementById('modalWaInput').focus(), 100);
+  }
+};
+
+window.verEmpresa = function(btn) {
+  abrirDetalheEmpresa(btn.dataset.id, btn.dataset.nome, btn.dataset.resp, btn.dataset.email, Number(btn.dataset.cred), Number(btn.dataset.laudos));
+};
+window.editarEmpresaBtn = function(btn) { abrirEditarEmpresa(btn.dataset.id); };
+window.excluirEmpresaBtn = function(btn) { excluirEmpresa(btn.dataset.id, btn.dataset.nome); };
+window.verParceiro = function(btn) {
+  abrirDetalheParceiro(btn.dataset.id, btn.dataset.nome, btn.dataset.email, btn.dataset.area, Number(btn.dataset.cred));
+};
+window.editarParceiroBtn = function(btn) { abrirEditarParceiro(btn.dataset.id); };
+window.excluirParceiroBtn = function(btn) { excluirParceiro(btn.dataset.id, btn.dataset.nome); };
+window.abrirModalWhatsAppParceiro = function(btn) {
+  const id = btn.dataset.id, nome = btn.dataset.nome, whatsapp = btn.dataset.wpp;
+  if(whatsapp) {
+    const num = whatsapp.replace(/\D/g,'');
+    const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+    window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+  } else {
+    document.getElementById('modalWaTitle').textContent = `WhatsApp — ${nome}`;
+    document.getElementById('modalWaDesc').textContent  = 'Digite o WhatsApp do parceiro.';
+    document.getElementById('modalWaInput').value = '';
+    window._waCallback = function(numero) {
+      updateDoc(doc(db,'nself_parceiros',id), {whatsapp: numero}).catch(()=>{});
+      const num = numero.replace(/\D/g,'');
+      const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+      window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+    };
+    openModal('modalWhatsAppInput');
+    setTimeout(() => document.getElementById('modalWaInput').focus(), 100);
+  }
+};
+
 window.excluirEmpresa = async function(id, nome) {
   if(!confirm(`Excluir a empresa "${nome}"? Esta ação não pode ser desfeita.`)) return;
   try {
@@ -4614,7 +4678,12 @@ window.filtrarParceiros = function() {
       : `<span class="pill pill-green">✅ Aprovado</span>`;
     const acoes = isPendente
       ? `<button class="btn btn-primary btn-sm" onclick="aprovarParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}')">✅ Aprovar</button>`
-      : `<div style="display:flex;gap:6px;"><button class="btn btn-teal btn-sm" onclick="abrirDetalheParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}','${p.area||''}',${p.creditos||0})">👁 Ver</button><button class="btn btn-outline btn-sm" onclick="abrirEditarParceiro('${p.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="excluirParceiro('${p.id}','${(p.nome||'').replace(/'/g,\"\\\'\")}')">🗑</button></div>`;
+      : `<div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="abrirModalWhatsAppParceiro(this)" data-id="${p.id}" data-nome="${p.nome||''}" data-wpp="${p.whatsapp||''}">💬</button>
+        <button class="btn btn-teal btn-sm" onclick="verParceiro(this)" data-id="${p.id}" data-nome="${p.nome||''}" data-email="${p.email||''}" data-area="${p.area||''}" data-cred="${p.creditos||0}">👁 Ver</button>
+        <button class="btn btn-outline btn-sm" onclick="editarParceiroBtn(this)" data-id="${p.id}">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirParceiroBtn(this)" data-id="${p.id}" data-nome="${p.nome||''}">🗑</button>
+      </div>`;
     return `<tr>
       <td><strong>${p.nome||'—'}</strong></td>
       <td style="font-size:12px;">${p.email||'—'}</td>
