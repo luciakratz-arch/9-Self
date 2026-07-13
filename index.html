@@ -2956,16 +2956,28 @@ window.salvarEmpresa = async function() {
   const cred   = parseInt(document.getElementById('empCreditos').value)||0;
   if(!nome||!email||!senha){showToast('Preencha todos os campos obrigatórios.','error');return;}
   try {
-    const userCred = await createUserWithEmailAndPassword(auth,email,senha);
+    let uid = '';
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, senha);
+      uid = userCred.user.uid;
+    } catch(authErr) {
+      if(authErr.code === 'auth/email-already-in-use') {
+        showToast('E-mail já cadastrado no Firebase Auth.', 'error');
+        return;
+      }
+      // Outro erro de auth — salva mesmo assim sem uid
+      console.warn('Auth warning:', authErr.message);
+    }
     await addDoc(collection(db,'nself_empresas'),{
-      nome,responsavel:resp,email,uid:userCred.user.uid,
-      creditos:cred,laudosGerados:0,ativo:true,criadoEm:serverTimestamp()
+      nome, responsavel:resp, email, uid,
+      creditos:cred, laudosGerados:0, ativo:true, criadoEm:serverTimestamp()
     });
     closeModal('modalNovaEmpresa');
     showToast('Empresa cadastrada com sucesso!','success');
     loadEmpresas();
-  } catch(e){
-    showToast(e.code==='auth/email-already-in-use'?'Este e-mail já está em uso.':'Erro ao salvar empresa.','error');
+  } catch(e) {
+    console.error('salvarEmpresa:', e);
+    showToast('Erro ao salvar: ' + (e.message||e.code||'verifique o console.'), 'error');
   }
 };
 
