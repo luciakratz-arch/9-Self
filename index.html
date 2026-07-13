@@ -3216,7 +3216,7 @@ window.filtrarLaudos = function() {
     const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
                 .map(s => NS[s]||s||'—').join(' · ');
     const btnPdf = l.pdfUrl
-      ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+      ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
          <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}', true)" title="Gerar nova versão">🔄</button>`
       : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
     return `<tr>
@@ -3267,7 +3267,7 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
 
     // 2. Se já tem URL e NÃO é regeneração forçada — baixar direto
     if(l.pdfUrl && !forcar) {
-      setCell(`<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+      setCell(`<a href="${l.pdfUrl}" target="_blank" download="${(nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
                 <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`);
       window.open(l.pdfUrl, '_blank');
       return;
@@ -3319,7 +3319,7 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
     });
 
     // 7. Atualizar célula e baixar
-    setCell(`<a href="${data.url}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+    setCell(`<a href="${data.url}" target="_blank" download="${nome.replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
               <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`);
     const a = document.createElement('a');
     a.href=data.url; a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
@@ -3932,14 +3932,14 @@ function _renderLaudosPF(tipo) {
 
   tbody.innerHTML = lista.map(l => {
     const btnPdf = l.pdfUrl
-      ? `<a href="${l.pdfUrl}" target="_blank" download class="btn btn-teal btn-sm">⬇ PDF</a>
+      ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
          <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}', true)" title="Regenerar">🔄</button>`
       : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')" title="Gerar PDF">🔄 Gerar</button>`;
     return `<tr>
       <td>${l.nome||'—'}</td>
       <td>${l.tipoNome||l.tipo||'—'}</td>
       <td>${l.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-      <td>${btnPdf}</td>
+      <td id="pdfcell_${l.id}">${btnPdf}</td>
     </tr>`;
   }).join('');
 }
