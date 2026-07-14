@@ -4376,17 +4376,25 @@ window.loadFinanceiro = async function() {
     '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:16px;">Carregando...</td></tr>';
 
   try {
-    // Carregar receitas do Firestore
+    // Carregar nomes de parceiros e empresas para lookup
+    const [parcSnap, empSnap] = await Promise.all([
+      getDocs(collection(db,'nself_parceiros')),
+      getDocs(collection(db,'nself_empresas')),
+    ]);
+    const nomeParceiro = {};
+    parcSnap.docs.forEach(d => { nomeParceiro[d.id] = d.data().nome||d.data().email||d.id; });
+    const nomeEmpresa = {};
+    empSnap.docs.forEach(d => { nomeEmpresa[d.id] = d.data().nome||d.data().email||d.id; });
+
+    // Carregar receitas
     const snap = await getDocs(collection(db, 'nself_creditos_log'));
     let receitas = snap.docs.map(d => ({id: d.id, ...d.data()}));
 
-    // Filtrar por ano
     receitas = receitas.filter(r => {
       const dt = r.criadoEm?.toDate?.();
       return dt && String(dt.getFullYear()) === ano;
     });
 
-    // Filtrar por mês se selecionado
     if(mes) {
       receitas = receitas.filter(r => {
         const dt = r.criadoEm?.toDate?.();
@@ -4408,7 +4416,7 @@ window.loadFinanceiro = async function() {
       });
     }
 
-    window._finDados = { receitas, despesas };
+    window._finDados = { receitas, despesas, nomeParceiro, nomeEmpresa };
     renderFinanceiro();
   } catch(e) {
     console.warn('Financeiro:', e);
@@ -4419,7 +4427,7 @@ window.loadFinanceiro = async function() {
 
 window.renderFinanceiro = function() {
   const canal   = document.getElementById('finFiltroCanal')?.value || '';
-  const { receitas, despesas } = window._finDados;
+  const { receitas, despesas, nomeParceiro={}, nomeEmpresa={} } = window._finDados;
   const fmt = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 
   const LOTES_INFO = {
@@ -4538,7 +4546,11 @@ window.renderFinanceiro = function() {
     return `<tr>
       <td>${dt}</td>
       <td>${canalLabel[r.canalR]||'—'}</td>
-      <td style="font-size:12px;">${r.representanteId||r.empresaId||'Direto'}</td>
+      <td style="font-size:12px;">${
+        r.representanteId ? (nomeParceiro[r.representanteId]||r.nome||'Parceiro') :
+        r.empresaId ? (nomeEmpresa[r.empresaId]||r.nome||'Empresa') :
+        r.nome||'Direto'
+      }</td>
       <td style="font-size:11px;">${r.externalRef||'—'}</td>
       <td style="text-align:center;"><strong>${r.creditos}</strong></td>
       <td><strong style="color:#1A9460;">${fmt(r.valorPago)}</strong></td>
