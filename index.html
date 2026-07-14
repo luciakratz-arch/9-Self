@@ -470,6 +470,21 @@ tr:hover td{background:#FAFAFE;}
           <div class="page-title">Painel Geral</div>
           <div class="page-subtitle">Visão consolidada do sistema 9&amp;Self</div>
           <div class="cards-grid" id="dashCards"></div>
+
+          <!-- SOLICITAÇÕES PENDENTES -->
+          <div id="adminSolicitacoesSection" style="margin-bottom:24px;display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-weight:700;color:#3A1F5C;font-size:14px;">📥 Solicitações de Cadastro Pendentes</div>
+              <button class="btn btn-outline btn-sm" onclick="loadAdminSolicitacoes()">↻ Atualizar</button>
+            </div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Tipo</th><th>Origem</th><th>Data</th><th>Ações</th></tr></thead>
+                <tbody id="adminSolicitacoesTable"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px;">Nenhuma pendente</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
           <div class="table-card">
             <div class="table-header">
               <h3>Últimas Avaliações</h3>
@@ -898,6 +913,20 @@ tr:hover td{background:#FAFAFE;}
           <div class="page-title">Meu Painel</div>
           <div class="page-subtitle">Bem-vindo ao seu espaço de gestão 9&Self</div>
           <div id="parceiroDashCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;"></div>
+
+          <!-- SOLICITAÇÕES PENDENTES DO PARCEIRO -->
+          <div id="parcSolicitacoesSection" style="margin:24px 0;display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-weight:700;color:#3A1F5C;font-size:14px;">📥 Solicitações Pendentes dos seus Clientes</div>
+              <button class="btn btn-outline btn-sm" onclick="loadParcSolicitacoes()">↻ Atualizar</button>
+            </div>
+            <div class="table-card" style="margin-top:0;">
+              <table>
+                <thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Tipo</th><th>Data</th><th>Status</th></tr></thead>
+                <tbody id="parcSolicitacoesTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:16px;">Nenhuma pendente</td></tr></tbody>
+              </table>
+            </div>
+          </div>
 
           <!-- SIMULADOR -->
           <div style="margin-top:32px;background:linear-gradient(135deg,rgba(123,0,196,.06),rgba(155,37,137,.06));border:1px solid rgba(123,0,196,.15);border-radius:16px;padding:28px;">
@@ -1741,6 +1770,7 @@ tr:hover td{background:#FAFAFE;}
                   <th>Data</th>
                   <th>Cliente</th>
                   <th>Canal</th>
+                  <th>Empresa</th>
                   <th>Preço sugerido</th>
                   <th>Custo (crédito)</th>
                   <th>Margem est.</th>
@@ -2080,9 +2110,9 @@ function enterApp(profile, name, role) {
   badge.className = 'badge badge-'+profile;
   buildSidebar(profile);
   navigateTo(profile==='admin'?'dashboard':profile==='rh'?'rh-dashboard':profile==='parceiro'?'parceiro-dashboard':'colab-inicio');
-  if(profile==='admin') loadDashboard();
+  if(profile==='admin') { loadDashboard(); loadAdminSolicitacoes(); }
   if(profile==='rh') loadRHDashboard();
-  if(profile==='parceiro') loadParceiroDashboard();
+  if(profile==='parceiro') { loadParceiroDashboard(); loadParcSolicitacoes(); }
 }
 
 // ── SIDEBAR ──
@@ -5098,16 +5128,17 @@ window.loadParceiroFinanceiro = async function() {
   const mes   = document.getElementById('parcFinMes')?.value || '';
   const fmt   = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  // Preços sugeridos por tipo
   const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 247 };
-
-  // Custo por faixa (baseado no saldo atual)
   const creditos = window._state.parceiro?.creditos || 0;
   const FAIXAS = [{max:10,preco:40},{max:50,preco:32},{max:100,preco:26},{max:200,preco:22},{max:300,preco:19},{max:999,preco:15.90}];
   const custoUnit = FAIXAS.find(f => creditos <= f.max)?.preco || 15.90;
 
   try {
-    // Códigos usados (avaliações realizadas)
+    // Carregar nomes das empresas do parceiro
+    const empSnap = await getDocs(query(collection(db,'nself_parceiro_empresas'), where('parceiroId','==',parId)));
+    const nomeEmpParceiro = {};
+    empSnap.docs.forEach(d => { nomeEmpParceiro[d.id] = d.data().nome||'—'; });
+
     const codSnap = await getDocs(query(collection(db,'nself_codigos'),
       where('parceiroId','==',parId), where('status','==','usado')));
 
@@ -5119,7 +5150,6 @@ window.loadParceiroFinanceiro = async function() {
       return true;
     });
 
-    // Compras de créditos
     const compSnap = await getDocs(query(collection(db,'nself_creditos_log'),
       where('representanteId','==',parId)));
     let compras = compSnap.docs.map(d=>({id:d.id,...d.data()})).filter(c => {
@@ -5127,13 +5157,11 @@ window.loadParceiroFinanceiro = async function() {
       return dt && String(dt.getFullYear()) === ano;
     });
 
-    // Calcular totais
     const totalUsados = usados.length;
     const receitaEst  = usados.reduce((s,c) => s + (PRECO_SUGERIDO[c.tipoPF||'pf_std']||247), 0);
     const custoTotal  = compras.reduce((s,c) => s + Number(c.valorPago||0), 0);
     const margemEst   = receitaEst - custoTotal;
 
-    // Cards
     document.getElementById('parcFinCards').innerHTML = `
       <div class="stat-card" style="border-top:3px solid #1A9460;">
         <div class="sc-label">Avaliações realizadas</div>
@@ -5157,42 +5185,36 @@ window.loadParceiroFinanceiro = async function() {
       </div>
     `;
 
-    // Tabela avaliações
     const tbody = document.getElementById('parcFinTable');
-    if(!usados.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação no período</td></tr>';
-    } else {
-      const canal = {pf_dev:'👤 PF Devolutiva', pf_std:'🎫 PF Padrão', empresa:'🏢 Empresa'};
-      tbody.innerHTML = usados.map(c => {
-        const preco = PRECO_SUGERIDO[c.tipoPF||'pf_std']||247;
-        const margem = preco - custoUnit;
-        return `<tr>
-          <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-          <td>${c.nomeDestinatario||'—'}</td>
-          <td>${canal[c.tipoPF||'pf_std']||'—'}</td>
-          <td style="color:#7B00C4;font-weight:600;">${fmt(preco)}</td>
-          <td style="color:#c0392b;">${fmt(custoUnit)}</td>
-          <td style="color:#1A9460;font-weight:600;">${fmt(margem)}</td>
-        </tr>`;
-      }).join('');
-    }
+    const canal = {pf_dev:'👤 PF Devolutiva', pf_std:'🎫 PF Padrão', empresa:'🏢 Empresa'};
+    tbody.innerHTML = usados.length ? usados.map(c => {
+      const preco = PRECO_SUGERIDO[c.tipoPF||'pf_std']||247;
+      const margem = preco - custoUnit;
+      // Mostrar nome da empresa se for B2B
+      const empresaNome = c.empresa ? (nomeEmpParceiro[c.empresa]||c.empresaNome||c.empresa) : '—';
+      return `<tr>
+        <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td>${c.nomeDestinatario||'—'}</td>
+        <td>${canal[c.tipoPF||'pf_std']||'—'}</td>
+        <td style="font-size:11px;color:#888;">${empresaNome}</td>
+        <td style="color:#7B00C4;font-weight:600;">${fmt(preco)}</td>
+        <td style="color:#c0392b;">${fmt(custoUnit)}</td>
+        <td style="color:#1A9460;font-weight:600;">${fmt(margem)}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhuma avaliação no período</td></tr>';
 
-    // Tabela compras
     const compTbody = document.getElementById('parcFinComprasTable');
-    if(!compras.length) {
-      compTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhuma compra</td></tr>';
-    } else {
-      compTbody.innerHTML = compras.sort((a,b)=>(b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0)).map(c => {
-        const pu = c.creditos > 0 ? Number(c.valorPago||0)/c.creditos : 0;
-        return `<tr>
-          <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-          <td style="font-size:11px;">${c.externalRef||c.motivo||'—'}</td>
-          <td>${c.creditos||0}</td>
-          <td style="color:#1A9460;font-weight:600;">${fmt(c.valorPago)}</td>
-          <td style="font-size:12px;">${fmt(pu)}/crédito</td>
-        </tr>`;
-      }).join('');
-    }
+    compTbody.innerHTML = compras.length ? compras.sort((a,b)=>(b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0)).map(c => {
+      const pu = c.creditos > 0 ? Number(c.valorPago||0)/c.creditos : 0;
+      return `<tr>
+        <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td style="font-size:11px;">${c.externalRef||c.motivo||'—'}</td>
+        <td>${c.creditos||0}</td>
+        <td style="color:#1A9460;font-weight:600;">${fmt(c.valorPago)}</td>
+        <td style="font-size:12px;">${fmt(pu)}/crédito</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhuma compra</td></tr>';
+
   } catch(e) { console.warn('ParceiroFin:', e); }
 };
 
@@ -5274,6 +5296,116 @@ window.gerarLinkSolicitacaoParceiro = async function(tipo) {
     showToast('Erro ao gerar link.', 'error');
     console.error(e);
   }
+};
+
+// ══════════════════════════════════════════
+// SOLICITAÇÕES PENDENTES
+// ══════════════════════════════════════════
+
+const TIPO_LABEL = {
+  pf_dev: '👤 PF Devolutiva', pf_std: '🎫 PF Padrão',
+  empresa: '🏢 Empresa', parceiro: '🤝 Parceiro'
+};
+
+window.loadAdminSolicitacoes = async function() {
+  const tbody  = document.getElementById('adminSolicitacoesTable');
+  const section = document.getElementById('adminSolicitacoesSection');
+  try {
+    // Buscar parceiros para mostrar origem
+    const parcSnap = await getDocs(collection(db,'nself_parceiros'));
+    const nomeParceiro = {};
+    parcSnap.docs.forEach(d => { nomeParceiro[d.id] = d.data().nome||d.data().email||'Parceiro'; });
+
+    const snap = await getDocs(query(
+      collection(db,'nself_solicitacoes'),
+      where('status','==','preenchido')
+    ));
+
+    if(snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px;">Nenhuma pendente</td></tr>';
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    tbody.innerHTML = snap.docs.map(d => {
+      const s = d.data();
+      const dd = s.dados||{};
+      const origem = s.parceiroId ? `Via ${nomeParceiro[s.parceiroId]||'Parceiro'}` : 'Direto';
+      return `<tr>
+        <td><strong>${dd.nome||'—'}</strong></td>
+        <td style="font-size:12px;">${dd.email||'—'}</td>
+        <td>${dd.whatsapp||'—'}</td>
+        <td>${TIPO_LABEL[s.tipoPF||'pf_std']||s.tipoPF||'—'}</td>
+        <td style="font-size:12px;">${origem}</td>
+        <td>${s.preenchidoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-primary btn-sm" onclick="adminConverterSolicitacao('${d.id}','${(dd.nome||'').replace(/'/g,"\\'")}','${(dd.email||'').replace(/'/g,"\\'")}','${(dd.whatsapp||'').replace(/'/g,"\\'")}','${s.tipoPF||'pf_std'}')">✅ Converter</button>
+          <button class="btn btn-outline btn-sm" onclick="adminRejeitarSolicitacao('${d.id}')">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.warn('AdminSolicitacoes:', e); }
+};
+
+window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, tipo) {
+  try {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let c = ''; for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+    const link = gerarLinkTeste(c);
+    await addDoc(collection(db,'nself_codigos'), {
+      codigo:c, nomeDestinatario:nome, email, whatsapp,
+      tipoPF:tipo, status:'disponivel', linkTeste:link,
+      convertidoDe:solId, criadoEm:serverTimestamp()
+    });
+    await updateDoc(doc(db,'nself_solicitacoes',solId), {
+      status:'convertido', convertidoEm:serverTimestamp(), codigo:c
+    });
+    showToast(`Código ${c} gerado para ${nome}!`, 'success');
+    if(whatsapp) {
+      const num = whatsapp.replace(/\D/g,'');
+      const msg = encodeURIComponent(`Olá, ${nome}! 🎉 Seu código de acesso ao 9&Self:\n\nCódigo: *${c}*\n\nAcesse: ${link}\n\n💜 Dra. Lúcia Kratz`);
+      window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+    }
+    loadAdminSolicitacoes();
+  } catch(e) { showToast('Erro: '+e.message,'error'); }
+};
+
+window.adminRejeitarSolicitacao = async function(solId) {
+  if(!confirm('Rejeitar esta solicitação?')) return;
+  await updateDoc(doc(db,'nself_solicitacoes',solId), {status:'rejeitado'});
+  showToast('Solicitação rejeitada.','success');
+  loadAdminSolicitacoes();
+};
+
+window.loadParcSolicitacoes = async function() {
+  const parId  = window._state.parceiro?.id||'';
+  if(!parId || parId==='teste') return;
+  const tbody  = document.getElementById('parcSolicitacoesTable');
+  const section = document.getElementById('parcSolicitacoesSection');
+  try {
+    const snap = await getDocs(query(
+      collection(db,'nself_solicitacoes'),
+      where('parceiroId','==',parId),
+      where('status','in',['preenchido','convertido'])
+    ));
+    if(snap.empty) { section.style.display='none'; return; }
+    section.style.display = 'block';
+    tbody.innerHTML = snap.docs.map(d => {
+      const s = d.data(); const dd = s.dados||{};
+      const statusLabel = s.status==='convertido'
+        ? `<span class="pill pill-green">✅ Convertido (${s.codigo||''})</span>`
+        : `<span class="pill pill-yellow">⏳ Aguardando aprovação</span>`;
+      return `<tr>
+        <td><strong>${dd.nome||'—'}</strong></td>
+        <td style="font-size:12px;">${dd.email||'—'}</td>
+        <td>${dd.whatsapp||'—'}</td>
+        <td>${TIPO_LABEL[s.tipoPF||'pf_std']||'—'}</td>
+        <td>${s.preenchidoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
+        <td>${statusLabel}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.warn('ParcSolicitacoes:', e); }
 };
 
 // ── LOGOUT ──
