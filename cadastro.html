@@ -1,467 +1,183 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>9&Self — Solicitar Acesso</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --ink:    #0E0818;
-  --deep:   #180A2E;
-  --plum:   #3D0A5E;
-  --violet: #7B00C4;
-  --lilac:  #C4A6E8;
-  --mist:   #EDE8F7;
-  --rose:   #9B2589;
-  --cream:  #FAF8FF;
-  --teal:   #1A9BAF;
-  --mag:    #7B1D6B;
-}
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: linear-gradient(150deg, #0E0818 0%, #1A0A2E 30%, #3D0A5E 65%, #7B1D6B 100%);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 40px 20px 60px;
-  color: #fff;
-  -webkit-font-smoothing: antialiased;
+import os
+import json
+import tempfile
+import urllib.request
+from flask import Flask, request, jsonify
+from laudo_gerador import gerar_laudo
+from google.cloud import storage
+from params_config import STORAGE_BUCKET, MP_TOKEN
+
+app = Flask(__name__)
+
+CORS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
 }
 
-/* ── MARCA ── */
-.brand {
-  text-align: center;
-  margin-bottom: 36px;
-}
-.brand-number {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 56px;
-  font-weight: 300;
-  background: linear-gradient(135deg, #E8B4F8, #7DEBF7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-  letter-spacing: -2px;
-}
-.brand-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 14px;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 6px;
-  margin-top: 4px;
-}
-.brand-tagline {
-  font-size: 13px;
-  color: rgba(196,166,232,0.7);
-  margin-top: 10px;
-  font-style: italic;
-  font-family: 'Cormorant Garamond', serif;
+APP_URL = 'https://luciakratz-arch.github.io/9-Self/index.html'
+
+LOTES = {
+    "lote_rep_10":  {"creditos": 10,  "total": 400.00},
+    "lote_rep_50":  {"creditos": 50,  "total": 1600.00},
+    "lote_rep_100": {"creditos": 100, "total": 2600.00},
+    "lote_rep_200": {"creditos": 200, "total": 4400.00},
+    "lote_rep_300": {"creditos": 300, "total": 5700.00},
+    "lote_rep_500": {"creditos": 500, "total": 7950.00},
+    "lote_rh_5":    {"creditos": 5,   "total": 1235.00},
+    "lote_rh_10":   {"creditos": 10,  "total": 2470.00},
+    "lote_rh_20":   {"creditos": 20,  "total": 4600.00},
+    "lote_rh_50":   {"creditos": 50,  "total": 10500.00},
+    "lote_rh_100":  {"creditos": 100, "total": 19000.00},
 }
 
-/* ── CARD ── */
-.card {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.13);
-  border-radius: 24px;
-  padding: 44px 40px;
-  width: 100%;
-  max-width: 520px;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.4);
-}
+@app.route('/', methods=['POST', 'OPTIONS'])
+def gerarLaudoPDF():
+    if request.method == 'OPTIONS':
+        return '', 204, CORS_HEADERS
+    try:
+        body      = request.get_json(silent=True) or {}
+        tipo      = int(body.get('tipo', 1))
+        asa       = int(body.get('asa', 2))
+        sub_dom   = body.get('subDom', 'AP')
+        sub_int   = body.get('subInt', '1A1')
+        sub_rem   = body.get('subRem', 'SOC')
+        nome      = body.get('nome', 'Avaliado')
+        cargo     = body.get('cargo', '')
+        codigo_id = body.get('codigoId', '')
 
-.card-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 6px;
-}
-.card-subtitle {
-  font-size: 13px;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 28px;
-  line-height: 1.6;
-}
+        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
+            tmp_path = tmp.name
 
-/* ── FORM ── */
-.field {
-  margin-bottom: 18px;
-}
-.field label {
-  display: block;
-  font-size: 11px;
-  color: rgba(255,255,255,0.55);
-  margin-bottom: 7px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-.field input,
-.field select,
-.field textarea {
-  width: 100%;
-  padding: 13px 16px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 11px;
-  color: #fff;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color .2s;
-  resize: vertical;
-}
-.field input::placeholder,
-.field textarea::placeholder {
-  color: rgba(255,255,255,0.28);
-}
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
-  border-color: rgba(123,0,196,0.7);
-  background: rgba(255,255,255,0.10);
-}
-.field select {
-  cursor: pointer;
-}
-.field select option {
-  background: #1A0A2E;
-  color: #fff;
-}
-.field textarea {
-  min-height: 90px;
-}
+        gerar_laudo(
+            tipo=tipo, asa_dominante=asa,
+            subtipo_dom=sub_dom, subtipo_int=sub_int, subtipo_rem=sub_rem,
+            nome=nome, cargo=cargo, output_path=tmp_path,
+        )
 
-/* ── BOTÃO ── */
-.btn-submit {
-  width: 100%;
-  padding: 15px;
-  border: none;
-  border-radius: 13px;
-  background: linear-gradient(135deg, #7B00C4, #9B2589);
-  color: #fff;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .2s;
-  margin-top: 8px;
-  box-shadow: 0 0 30px rgba(123,0,196,0.4);
-  letter-spacing: 0.3px;
-}
-.btn-submit:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 50px rgba(123,0,196,0.6);
-}
-.btn-submit:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
-}
+        import time
+        bucket = storage.Client().bucket(STORAGE_BUCKET.value)
+        blob = bucket.blob(f'laudos/{codigo_id or nome}/laudo_{tipo}_{asa}_{sub_dom}_{int(time.time())}.pdf')
+        blob.upload_from_filename(tmp_path, content_type='application/pdf')
+        blob.make_public()
+        os.unlink(tmp_path)
+        return jsonify({'url': blob.public_url}), 200, CORS_HEADERS
 
-/* ── STATES ── */
-#formError {
-  color: #FF8FA3;
-  font-size: 13px;
-  text-align: center;
-  margin-top: 12px;
-  min-height: 18px;
-}
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500, CORS_HEADERS
 
-/* ── TELA DE SUCESSO ── */
-#successScreen {
-  display: none;
-  text-align: center;
-  animation: fadeIn .5s ease;
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.success-icon {
-  font-size: 60px;
-  margin-bottom: 20px;
-  display: block;
-}
-.success-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-.success-msg {
-  font-size: 14px;
-  color: rgba(255,255,255,0.65);
-  line-height: 1.7;
-  margin-bottom: 24px;
-}
-.success-badge {
-  display: inline-block;
-  background: rgba(123,0,196,0.25);
-  border: 1px solid rgba(196,166,232,0.4);
-  border-radius: 100px;
-  padding: 8px 20px;
-  font-size: 12px;
-  color: #C4A6E8;
-  letter-spacing: 1px;
-}
+@app.route('/checkout', methods=['POST', 'OPTIONS'])
+def gerarCheckout():
+    if request.method == 'OPTIONS':
+        return '', 204, CORS_HEADERS
+    try:
+        body  = request.get_json(silent=True) or {}
+        ref   = body.get('ref', '')
+        email = body.get('email', '')
+        nome  = body.get('nome', 'Parceiro')
 
-/* ── TELA DE ERRO (token inválido) ── */
-#errorScreen {
-  display: none;
-  text-align: center;
-}
-.error-icon { font-size: 52px; margin-bottom: 16px; display: block; }
-.error-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
-  margin-bottom: 10px;
-}
-.error-msg { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+        lote = LOTES.get(ref)
+        if not lote:
+            return jsonify({'error': 'Lote inválido'}), 400, CORS_HEADERS
 
-/* ── LOADING ── */
-#loadingScreen {
-  text-align: center;
-  padding: 40px;
-}
-.spinner {
-  width: 40px; height: 40px;
-  border: 3px solid rgba(255,255,255,0.1);
-  border-top-color: #7B00C4;
-  border-radius: 50%;
-  animation: spin .8s linear infinite;
-  margin: 0 auto 16px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+        preference = {
+            "items": [{
+                "title": f"9&Self — {lote['creditos']} créditos",
+                "quantity": 1,
+                "unit_price": lote['total'],
+                "currency_id": "BRL",
+            }],
+            "payer": {"email": email, "name": nome},
+            "external_reference": ref,
+            "back_urls": {
+                "success": APP_URL + "?pagamento=sucesso",
+                "failure": APP_URL + "?pagamento=erro",
+                "pending": APP_URL + "?pagamento=pendente",
+            },
+            "auto_return": "approved",
+            "notification_url": "https://us-central1-entrevista-inicial.cloudfunctions.net/webhookCreditos",
+        }
 
-/* ── DIVISOR ── */
-.divider {
-  height: 1px;
-  background: rgba(255,255,255,0.08);
-  margin: 24px 0;
-}
+        req_mp = urllib.request.Request(
+            "https://api.mercadopago.com/checkout/preferences",
+            data=json.dumps(preference).encode('utf-8'),
+            headers={
+                "Authorization": f"Bearer {MP_TOKEN.value}",
+                "Content-Type": "application/json",
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(req_mp) as resp:
+            result = json.loads(resp.read())
 
-/* ── NOTICE ── */
-.notice {
-  background: rgba(123,0,196,0.12);
-  border: 1px solid rgba(196,166,232,0.2);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 12px;
-  color: rgba(196,166,232,0.75);
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
+        return jsonify({'url': result.get('init_point', '')}), 200, CORS_HEADERS
 
-/* ── FOOTER ── */
-.page-footer {
-  margin-top: 32px;
-  text-align: center;
-  font-size: 11px;
-  color: rgba(255,255,255,0.25);
-  letter-spacing: 0.5px;
-}
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500, CORS_HEADERS
 
-@media(max-width: 560px) {
-  .card { padding: 32px 24px; }
-  body { padding: 28px 16px 48px; }
-}
-</style>
-</head>
-<body>
 
-<div class="brand">
-  <div class="brand-number">9&amp;Self</div>
-  <div class="brand-name">SELF</div>
-  <div class="brand-tagline">Mapeamento de Perfil pelo Eneagrama</div>
-</div>
+@app.route('/notificar-solicitacao', methods=['POST','OPTIONS'])
+def notificarSolicitacao():
+    if request.method=='OPTIONS': return '',204,CORS_HEADERS
+    try:
+        import smtplib, os
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
 
-<div class="card">
+        body   = request.get_json(silent=True) or {}
+        nome   = body.get('nome','—')
+        email  = body.get('email','—')
+        wpp    = body.get('whatsapp','—')
+        tipo   = body.get('tipo','—')
+        origem = body.get('origem','Direto')
 
-  <!-- LOADING -->
-  <div id="loadingScreen">
-    <div class="spinner"></div>
-    <p style="color:rgba(255,255,255,0.4);font-size:13px;">Verificando seu link...</p>
-  </div>
+        TIPO_LABEL = {
+            'pf_dev':'PF com Devolutiva (R$597)',
+            'pf_std':'PF sem Devolutiva (R$297)',
+            'empresa':'Empresa / RH',
+            'parceiro':'Solicitação de Parceiro'
+        }
 
-  <!-- FORM -->
-  <div id="formScreen" style="display:none;">
-    <div class="card-title">Solicitar Acesso</div>
-    <div class="card-subtitle">Preencha os dados abaixo para que a Dra. Lúcia Kratz possa liberar o seu código de acesso personalizado.</div>
+        gmail_user = 'luciakratz@gmail.com'
+        gmail_pass = os.environ.get('GMAIL_PASS','')
+        if not gmail_pass:
+            return jsonify({'ok':False,'msg':'GMAIL_PASS não configurado'}), 200, CORS_HEADERS
 
-    <div class="notice">
-      🔒 Seus dados são tratados com total sigilo clínico, nos termos do CFP e da LGPD.
-    </div>
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f'[9&Self] Nova solicitação — {nome}'
+        msg['From']    = f'"9&Self Sistema" <{gmail_user}>'
+        msg['To']      = gmail_user
 
-    <div class="field">
-      <label>Nome completo *</label>
-      <input type="text" id="fNome" placeholder="Seu nome completo"/>
-    </div>
-    <div class="field">
-      <label>E-mail *</label>
-      <input type="email" id="fEmail" placeholder="seu@email.com"/>
-    </div>
-    <div class="field">
-      <label>WhatsApp *</label>
-      <input type="tel" id="fWhatsapp" placeholder="(11) 99999-9999"/>
-    </div>
-    <div class="field">
-      <label>Empresa / Organização</label>
-      <input type="text" id="fEmpresa" placeholder="Opcional — deixe em branco se for pessoa física"/>
-    </div>
-    <div class="field">
-      <label>Como conheceu o 9&amp;Self? *</label>
-      <select id="fComoConheceu">
-        <option value="">Selecione...</option>
-        <option value="Indicação de amigo ou familiar">Indicação de amigo ou familiar</option>
-        <option value="Redes sociais (Instagram, LinkedIn etc.)">Redes sociais (Instagram, LinkedIn etc.)</option>
-        <option value="Indicação de profissional de saúde">Indicação de profissional de saúde</option>
-        <option value="Contexto organizacional / empresa">Contexto organizacional / empresa</option>
-        <option value="Pesquisa no Google">Pesquisa no Google</option>
-        <option value="Evento, palestra ou workshop">Evento, palestra ou workshop</option>
-        <option value="Outro">Outro</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>O que você espera com o mapeamento? *</label>
-      <textarea id="fNecessidade" placeholder="Conte brevemente o que você busca com este processo de autoconhecimento..."></textarea>
-    </div>
+        html = f"""
+        <div style="font-family:sans-serif;max-width:500px;">
+          <h2 style="color:#3A1F5C;">📥 Nova Solicitação de Cadastro</h2>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px;color:#888;">Nome</td><td style="padding:8px;"><strong>{nome}</strong></td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">E-mail</td><td style="padding:8px;">{email}</td></tr>
+            <tr><td style="padding:8px;color:#888;">WhatsApp</td><td style="padding:8px;">{wpp}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">Tipo</td><td style="padding:8px;">{TIPO_LABEL.get(tipo,tipo)}</td></tr>
+            <tr><td style="padding:8px;color:#888;">Origem</td><td style="padding:8px;">{origem}</td></tr>
+          </table>
+          <p style="margin-top:16px;">
+            <a href="https://luciakratz-arch.github.io/9-Self/index.html"
+               style="background:#7B00C4;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;">
+              Abrir Painel 9&amp;Self
+            </a>
+          </p>
+        </div>
+        """
+        msg.attach(MIMEText(html, 'html'))
 
-    <div class="divider"></div>
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(gmail_user, gmail_pass)
+            server.sendmail(gmail_user, gmail_user, msg.as_string())
 
-    <button class="btn-submit" id="btnEnviar" onclick="enviarSolicitacao()">Enviar Solicitação</button>
-    <div id="formError"></div>
-  </div>
+        return jsonify({'ok':True}), 200, CORS_HEADERS
+    except Exception as e:
+        print(f'[notificar] Erro: {e}')
+        return jsonify({'ok':False,'error':str(e)}), 200, CORS_HEADERS
 
-  <!-- SUCESSO -->
-  <div id="successScreen">
-    <span class="success-icon">💜</span>
-    <div class="success-title">Solicitação enviada!</div>
-    <div class="success-msg">
-      Sua solicitação foi recebida com sucesso. A Dra. Lúcia Kratz entrará em contato pelo WhatsApp informado para liberar o seu código de acesso personalizado ao 9&amp;Self.
-    </div>
-    <span class="success-badge">Aguarde o contato em breve</span>
-  </div>
 
-  <!-- ERRO DE TOKEN OU JÁ PREENCHIDO -->
-  <div id="errorScreen">
-    <span class="error-icon">⚠️</span>
-    <div class="error-title">Link inválido ou já utilizado</div>
-    <div class="error-msg">
-      Este link de solicitação não é válido ou já foi utilizado anteriormente.<br><br>
-      Entre em contato diretamente com a Dra. Lúcia Kratz para obter um novo link.
-    </div>
-  </div>
-
-</div>
-
-<div class="page-footer">
-  Desenvolvido por Dra. Lúcia Kratz · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade
-</div>
-
-<!-- ── FIREBASE ── -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, getDocs, query, where, updateDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDnrgaY8R0Zetkr18uHQJAZXIUa4EwDnv4",
-  authDomain: "entrevista-inicial.firebaseapp.com",
-  projectId: "entrevista-inicial",
-  storageBucket: "entrevista-inicial.firebasestorage.app",
-  messagingSenderId: "437375609844",
-  appId: "1:437375609844:web:36082771a32d262b2e27a1"
-};
-
-const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
-
-// ── LER TOKEN DA URL ──
-const params = new URLSearchParams(window.location.search);
-const token  = params.get('token') || '';
-
-let solicitacaoDocId = null;
-
-// ── VALIDAR TOKEN ──
-async function init() {
-  if (!token) {
-    showScreen('errorScreen');
-    return;
-  }
-  try {
-    const q    = query(collection(db, 'nself_solicitacoes'), where('token', '==', token));
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-      showScreen('errorScreen');
-      return;
-    }
-
-    const docSnap = snap.docs[0];
-    const data    = docSnap.data();
-    solicitacaoDocId = docSnap.id;
-
-    // Se já foi preenchido, mostrar sucesso direto
-    if (data.status === 'preenchido' || data.status === 'convertido') {
-      showScreen('successScreen');
-      return;
-    }
-
-    showScreen('formScreen');
-  } catch (e) {
-    console.error('Erro ao validar token:', e);
-    showScreen('errorScreen');
-  }
-}
-
-// ── ENVIAR SOLICITAÇÃO ──
-window.enviarSolicitacao = async function() {
-  const nome         = document.getElementById('fNome').value.trim();
-  const email        = document.getElementById('fEmail').value.trim();
-  const whatsapp     = document.getElementById('fWhatsapp').value.trim();
-  const empresa      = document.getElementById('fEmpresa').value.trim();
-  const comoConheceu = document.getElementById('fComoConheceu').value;
-  const necessidade  = document.getElementById('fNecessidade').value.trim();
-  const errEl        = document.getElementById('formError');
-  errEl.textContent  = '';
-
-  if (!nome)         { errEl.textContent = 'Por favor, informe seu nome completo.'; return; }
-  if (!email)        { errEl.textContent = 'Por favor, informe seu e-mail.'; return; }
-  if (!whatsapp)     { errEl.textContent = 'Por favor, informe seu WhatsApp.'; return; }
-  if (!comoConheceu) { errEl.textContent = 'Por favor, selecione como conheceu o 9&Self.'; return; }
-  if (!necessidade)  { errEl.textContent = 'Por favor, descreva o que você espera com o mapeamento.'; return; }
-
-  const btn = document.getElementById('btnEnviar');
-  btn.disabled    = true;
-  btn.textContent = 'Enviando...';
-
-  try {
-    await updateDoc(doc(db, 'nself_solicitacoes', solicitacaoDocId), {
-      status: 'preenchido',
-      preenchidoEm: serverTimestamp(),
-      dados: { nome, email, whatsapp, empresa, comoConheceu, necessidade }
-    });
-    showScreen('successScreen');
-  } catch (e) {
-    console.error('Erro ao salvar solicitação:', e);
-    errEl.textContent = 'Erro ao enviar. Verifique sua conexão e tente novamente.';
-    btn.disabled    = false;
-    btn.textContent = 'Enviar Solicitação';
-  }
-};
-
-function showScreen(id) {
-  ['loadingScreen','formScreen','successScreen','errorScreen'].forEach(s => {
-    document.getElementById(s).style.display = s === id ? 'block' : 'none';
-  });
-}
-
-init();
-</script>
-</body>
-</html>
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
