@@ -5415,8 +5415,46 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
 
+    } else if(tipo === 'parceiro') {
+      // Criar parceiro com senha padrão
+      const senhaPadrao = '123456';
+      let uid = '';
+      try {
+        const { createUserWithEmailAndPassword: cu } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        const cred = await cu(auth, email, senhaPadrao);
+        uid = cred.user.uid;
+      } catch(authErr) { console.warn('Auth:', authErr.message); }
+
+      await addDoc(collection(db,'nself_parceiros'), {
+        nome, email, uid, whatsapp,
+        area: solData.area||'',
+        comoConheceu: solData.comoConheceu||'',
+        creditos: 0, ativo: true, criadoEm: serverTimestamp()
+      });
+
+      await updateDoc(doc(db,'nself_solicitacoes',solId), {
+        status:'convertido', convertidoEm:serverTimestamp()
+      });
+
+      showToast(`Parceiro ${nome} aprovado!`, 'success');
+
+      if(whatsapp) {
+        const num = whatsapp.replace(/\D/g,'');
+        const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
+        const msg = encodeURIComponent(
+          `Olá, ${nome}! 🎉 Seu acesso ao painel de parceiros 9&Self foi criado!\n\n` +
+          `📧 E-mail: *${email}*\n` +
+          `🔒 Senha inicial: *123456*\n\n` +
+          `⚠️ Troque sua senha no primeiro acesso.\n\n` +
+          `Acesse: ${linkLogin}\n\n` +
+          `💜 Dra. Lúcia Kratz`
+        );
+        window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+      }
+
+      loadParceirosAdmin();
+
     } else {
-      // PF normal
       await addDoc(collection(db,'nself_codigos'), {
         codigo:c, nomeDestinatario:nome, email, whatsapp,
         tipoPF:tipo, status:'disponivel', linkTeste:link,
