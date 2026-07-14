@@ -5633,7 +5633,7 @@ async function loadCulturaPage() {
   // Carregar empresas no select
   try {
     const { collection: col, getDocs: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snap = await gd(col(db, 'empresas'));
+    const snap = await gd(col(db, 'nself_empresas'));
     const sel = document.getElementById('culturaEmpresaSel');
     sel.innerHTML = '<option value="">Selecione uma empresa...</option>';
     snap.forEach(d => {
@@ -5652,7 +5652,7 @@ async function previewCultura(empresaId) {
   if(!empresaId) { document.getElementById('culturaPodio').style.display='none'; return; }
   try {
     const { collection: col, query, where, getDocs: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const empSnap = await gd(col(db,'empresas'));
+    const empSnap = await gd(col(db,'nself_empresas'));
     let nomeEmp = '';
     empSnap.forEach(d => { if(d.id===empresaId) nomeEmp = d.data().nome||''; });
 
@@ -5742,7 +5742,7 @@ async function loadCulturaHist() {
     const { collection: col, getDocs: gd, orderBy, query, limit } =
       await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
 
-    const empSnap = await gd(col(db,'empresas'));
+    const empSnap = await gd(col(db,'nself_empresas'));
     const tbody = document.getElementById('culturaHistTable');
     const rows = [];
 
