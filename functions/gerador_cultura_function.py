@@ -105,7 +105,7 @@ def gerarLaudoCultura(req: https_fn.Request) -> https_fn.Response:
 
         # ── 5. Buscar perfis dos colaboradores da empresa ─────────────────────
         laudos = db.collection('nself_laudos') \
-            .where('empresa', '==', nome_empresa).get()
+            .where('empresaId', '==', empresa_id).get()
 
         perfis = []
         for laudo in laudos:
