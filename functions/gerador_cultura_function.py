@@ -9,7 +9,7 @@ import json
 import firebase_admin
 from firebase_admin import firestore, auth
 from firebase_functions import https_fn
-from firebase_functions.params import StringParam
+
 import urllib.request
 import tempfile
 import os
@@ -22,7 +22,7 @@ db = firestore.client()
 # Roles com permissão para gerar relatório de cultura
 ROLES_PERMITIDOS = {'admin', 'rh', 'parceiro', 'rh_empresa'}
 
-STORAGE_BUCKET = StringParam("STORAGE_BUCKET")  # ex: entrevista-inicial.appspot.com
+from params_config import STORAGE_BUCKET
 
 def verificar_role(uid: str) -> str | None:
     """
@@ -43,12 +43,7 @@ def verificar_role(uid: str) -> str | None:
         return None
 
 
-@https_fn.on_request(
-    cors=https_fn.options.CorsOptions(
-        cors_origins=["*"],
-        cors_methods=["POST", "OPTIONS"],
-    )
-)
+@https_fn.on_request()
 def gerarLaudoCultura(req: https_fn.Request) -> https_fn.Response:
     if req.method == 'OPTIONS':
         return https_fn.Response('', status=204)
@@ -105,7 +100,7 @@ def gerarLaudoCultura(req: https_fn.Request) -> https_fn.Response:
 
         # ── 5. Buscar perfis dos colaboradores da empresa ─────────────────────
         laudos = db.collection('nself_laudos') \
-            .where('empresaId', '==', empresa_id).get()
+            .where('empresa', '==', nome_empresa).get()
 
         perfis = []
         for laudo in laudos:

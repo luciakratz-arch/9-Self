@@ -1,9 +1,6 @@
-# Dependências existentes (não remova)
-firebase-functions>=0.1.0
 firebase-admin>=6.0.0
+firebase-functions>=0.1.0
+google-cloud-storage>=2.0.0
 reportlab>=4.0.0
-
-# Novas dependências para o webhook (já vêm no Python padrão, listadas para clareza)
-# smtplib — built-in Python
-# urllib.request — built-in Python
-# json — built-in Python
+qrcode>=7.0
+Pillow>=10.0.0
