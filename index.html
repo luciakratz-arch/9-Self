@@ -3214,6 +3214,35 @@ async function salvarResultadoFinal() {
         criadoEm: serverTimestamp(),
       });
       window._state.laudoDocId = laudoRef.id;
+
+      // Gerar PDF automaticamente em background (não bloqueia a tela do colaborador)
+      try {
+        const ASAS_VALIDAS = {1:[2,9],2:[1,3],3:[2,4],4:[3,5],5:[4,6],6:[5,7],7:[6,8],8:[7,9],9:[8,1]};
+        const asaFinal = ASAS_VALIDAS[TS.tipoFinal]?.includes(TS.asaDom) ? TS.asaDom : ASAS_VALIDAS[TS.tipoFinal][0];
+        const CF_AUTO = 'https://gerar-laudo-pdf-437375609844.us-central1.run.app';
+        const respAuto = await fetch(CF_AUTO, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            tipo: TS.tipoFinal, asa: asaFinal,
+            subDom: TS.subDom, subInt: TS.subInt, subRem: TS.subRem,
+            nome: cod.nomeDestinatario || 'Participante',
+            cargo: cod.cargo || '',
+            codigoId: laudoRef.id,
+          }),
+        });
+        if(respAuto.ok) {
+          const dataAuto = await respAuto.json();
+          if(dataAuto.url) {
+            window._state.laudoUrl = dataAuto.url;
+            await updateDoc(doc(db,'nself_laudos', laudoRef.id), {
+              pdfUrl: dataAuto.url,
+              pdfPath: dataAuto.path || '',
+              geradoEm: serverTimestamp(),
+            });
+          }
+        }
+      } catch(ePdf){ console.warn('Geração automática PDF:', ePdf); }
     }
   } catch(e){ console.warn('Salvar resultado:',e); }
 
