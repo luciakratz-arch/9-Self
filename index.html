@@ -1973,6 +1973,25 @@ tr:hover td{background:#FAFAFE;}
 <div id="toast"></div>
 
 <!-- MINI-MODAL: digitar WhatsApp -->
+<div class="modal-overlay" id="modalCadastroCliente">
+  <div class="modal" style="max-width:480px;">
+    <h3 style="color:#3A1F5C;margin-bottom:16px;">📋 Dados do Cliente</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:8px;color:#888;width:40%;">Nome</td><td id="ccNome" style="padding:8px;font-weight:600;"></td></tr>
+      <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">E-mail</td><td id="ccEmail" style="padding:8px;"></td></tr>
+      <tr><td style="padding:8px;color:#888;">WhatsApp</td><td id="ccWhatsapp" style="padding:8px;"></td></tr>
+      <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">Código</td><td id="ccCodigo" style="padding:8px;letter-spacing:2px;font-weight:600;"></td></tr>
+      <tr><td style="padding:8px;color:#888;">Tipo</td><td id="ccTipo" style="padding:8px;"></td></tr>
+      <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">Status</td><td id="ccStatus" style="padding:8px;"></td></tr>
+      <tr><td style="padding:8px;color:#888;">Criado em</td><td id="ccCriadoEm" style="padding:8px;"></td></tr>
+      <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">Empresa</td><td id="ccEmpresa" style="padding:8px;"></td></tr>
+    </table>
+    <div style="margin-top:20px;text-align:right;">
+      <button class="btn btn-outline" onclick="closeModal('modalCadastroCliente')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalWhatsAppInput" style="z-index:9999;">
   <div class="modal" style="max-width:380px;">
     <h3 id="modalWaTitle">Enviar por WhatsApp</h3>
@@ -3737,6 +3756,21 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
   }
 };
 
+// ── WHATSAPP MODAL ──
+// ── VER CADASTRO CLIENTE ──
+window.verCadastroCliente = function(btn) {
+  const d = btn.dataset;
+  document.getElementById('ccNome').textContent     = d.nome     || '—';
+  document.getElementById('ccEmail').textContent    = d.email    || '—';
+  document.getElementById('ccWhatsapp').textContent = d.whatsapp || '—';
+  document.getElementById('ccCodigo').textContent   = d.codigo   || '—';
+  document.getElementById('ccTipo').textContent     = d.tipo     || '—';
+  document.getElementById('ccStatus').textContent   = d.status   || '—';
+  document.getElementById('ccCriadoEm').textContent = d.criado   || '—';
+  document.getElementById('ccEmpresa').textContent  = d.empresa  || 'Pessoa Física';
+  openModal('modalCadastroCliente');
+};
+
 // ── EXCLUIR LAUDO ──
 window.excluirLaudo = async function(laudoId) {
   if(!confirm('Excluir este laudo? Esta ação não pode ser desfeita.')) return;
@@ -3752,7 +3786,6 @@ window.excluirLaudo = async function(laudoId) {
   }
 };
 
-// ── WHATSAPP MODAL ──
 window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
   const num = (whatsappSalvo || '').trim();
   const msg = encodeURIComponent(
@@ -4309,7 +4342,17 @@ function _renderCodPF(tipo) {
     const link = c.linkTeste || gerarLinkTeste(c.codigo||'');
     return `<tr>
       <td><strong style="letter-spacing:2px;">${c.codigo}</strong></td>
-      <td>${c.nomeDestinatario||'—'}</td>
+      <td><button class="btn btn-sm" style="background:none;border:none;padding:0;color:#3A1F5C;font-weight:600;cursor:pointer;text-decoration:underline;text-align:left;"
+          onclick="verCadastroCliente(this)"
+          data-nome="${(c.nomeDestinatario||'').replace(/"/g,'&quot;')}"
+          data-email="${(c.email||'').replace(/"/g,'&quot;')}"
+          data-whatsapp="${(c.whatsapp||'').replace(/"/g,'&quot;')}"
+          data-codigo="${c.codigo||''}"
+          data-tipo="${(c.tipoPF||c.tipo||'—').replace(/"/g,'&quot;')}"
+          data-status="${c.status||'Pendente'}"
+          data-criado="${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}"
+          data-empresa="${(c.empresa||'').replace(/"/g,'&quot;')}"
+        >${c.nomeDestinatario||'—'}</button></td>
       <td style="font-size:11px;"><a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
       <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
       <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
