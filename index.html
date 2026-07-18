@@ -3737,7 +3737,6 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
   }
 };
 
-// ── WHATSAPP MODAL ──
 // ── EXCLUIR LAUDO ──
 window.excluirLaudo = async function(laudoId) {
   if(!confirm('Excluir este laudo? Esta ação não pode ser desfeita.')) return;
@@ -3753,6 +3752,7 @@ window.excluirLaudo = async function(laudoId) {
   }
 };
 
+// ── WHATSAPP MODAL ──
 window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
   const num = (whatsappSalvo || '').trim();
   const msg = encodeURIComponent(
