@@ -3613,8 +3613,10 @@ window.filtrarLaudos = function() {
                 .map(s => NS[s]||s||'—').join(' · ');
     const btnPdf = l.pdfUrl
       ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
-         <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}', true)" title="Gerar nova versão">🔄</button>`
-      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>`;
+         <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}', true)" title="Gerar nova versão">🔄</button>
+         <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${lid}')" title="Excluir laudo">🗑</button>`
+      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>
+         <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${lid}')" title="Excluir laudo">🗑</button>`;
     return `<tr>
       <td>${l.nome||'—'}</td>
       <td>${l.empresa||'PF'}</td>
@@ -3736,6 +3738,21 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
 };
 
 // ── WHATSAPP MODAL ──
+// ── EXCLUIR LAUDO ──
+window.excluirLaudo = async function(laudoId) {
+  if(!confirm('Excluir este laudo? Esta ação não pode ser desfeita.')) return;
+  try {
+    const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await deleteDoc(doc(db, 'nself_laudos', laudoId));
+    const cell = document.getElementById(`pdfcell_${laudoId}`);
+    if(cell) cell.closest('tr').remove();
+    showToast('Laudo excluído.', 'success');
+  } catch(e) {
+    console.error('[excluirLaudo]', e);
+    showToast('Erro ao excluir laudo: ' + e.message, 'error');
+  }
+};
+
 window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
   const num = (whatsappSalvo || '').trim();
   const msg = encodeURIComponent(
@@ -4333,8 +4350,10 @@ function _renderLaudosPF(tipo) {
   tbody.innerHTML = lista.map(l => {
     const btnPdf = l.pdfUrl
       ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
-         <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}', true)" title="Regenerar">🔄</button>`
-      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')" title="Gerar PDF">🔄 Gerar</button>`;
+         <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}', true)" title="Regenerar">🔄</button>
+         <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${l.id}')" title="Excluir laudo">🗑</button>`
+      : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')" title="Gerar PDF">🔄 Gerar</button>
+         <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${l.id}')" title="Excluir laudo">🗑</button>`;
     return `<tr>
       <td>${l.nome||'—'}</td>
       <td>${l.tipoNome||l.tipo||'—'}</td>
@@ -5089,8 +5108,10 @@ window.loadParceiroPF = async function(tipo) {
     } else {
       laudoTbl.innerHTML = window._laudosParcPF[tipo].map(l => {
         const btnPdf = l.pdfUrl
-          ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>`
-          : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')">🔄 Gerar</button>`;
+          ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
+             <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${l.id}')" title="Excluir laudo">🗑</button>`
+          : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')">🔄 Gerar</button>
+             <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${l.id}')" title="Excluir laudo">🗑</button>`;
         return `<tr>
           <td>${l.nome||'—'}</td>
           <td>${l.tipoNome||l.tipo||'—'}</td>
