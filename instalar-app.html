@@ -4,53 +4,101 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Instalar 9&Self no celular</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f5f0ff; color: #1a1a2e; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #0d0618;
+      color: #e8d8ff;
+      min-height: 100vh;
+    }
 
     /* NAVBAR */
     nav {
-      background: #3A1F5C;
-      padding: 14px 24px;
+      background: rgba(13,6,24,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(196,166,232,0.12);
+      padding: 14px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
     }
-    nav img { height: 36px; }
-    nav a {
-      color: #e0c8ff;
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      color: #e8d8ff;
+      text-decoration: none;
+    }
+    .nav-logo span { color: #b39ddb; }
+    nav a.back {
+      color: rgba(196,166,232,0.6);
       text-decoration: none;
       font-size: 13px;
-      opacity: .85;
+      transition: color .2s;
     }
-    nav a:hover { opacity: 1; }
+    nav a.back:hover { color: #e8d8ff; }
 
     /* HERO */
     .hero {
-      background: linear-gradient(135deg, #3A1F5C 0%, #7B00C4 100%);
-      color: #fff;
+      background: linear-gradient(160deg, #1a0a2e 0%, #3A1F5C 50%, #7B00C4 100%);
       text-align: center;
-      padding: 56px 24px 48px;
+      padding: 64px 24px 80px;
+      position: relative;
+      overflow: hidden;
     }
-    .hero h1 { font-size: 2rem; margin-bottom: 12px; letter-spacing: -0.5px; }
-    .hero p  { font-size: 1.05rem; opacity: .88; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(123,0,196,0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(196,166,232,0.55);
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    .hero p {
+      font-size: 1rem;
+      color: rgba(232,216,255,0.7);
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
 
     /* CARDS */
     .cards {
       display: flex;
-      gap: 24px;
+      gap: 20px;
       max-width: 780px;
-      margin: -28px auto 0;
-      padding: 0 20px 40px;
+      margin: -40px auto 0;
+      padding: 0 20px 48px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
     }
     .card {
       flex: 1;
       min-width: 280px;
-      background: #fff;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(196,166,232,0.15);
       border-radius: 16px;
       padding: 28px 24px;
-      box-shadow: 0 4px 20px rgba(123,0,196,.12);
+      backdrop-filter: blur(8px);
     }
     .card-header {
       display: flex;
@@ -61,67 +109,81 @@
     .card-icon {
       width: 44px; height: 44px;
       border-radius: 10px;
+      background: rgba(123,0,196,0.2);
+      border: 1px solid rgba(196,166,232,0.2);
       display: flex; align-items: center; justify-content: center;
       font-size: 22px;
     }
-    .android .card-icon { background: #e8f5e9; }
-    .iphone  .card-icon { background: #f0e6ff; }
-    .card-header h2 { font-size: 1.05rem; color: #3A1F5C; }
-    .card-header small { font-size: 12px; color: #888; }
+    .card-header h2 {
+      font-size: 1rem;
+      color: #e8d8ff;
+      font-weight: 600;
+    }
+    .card-header small {
+      font-size: 11px;
+      color: rgba(196,166,232,0.45);
+    }
 
-    ol { padding-left: 20px; }
+    ol { padding-left: 18px; }
     ol li {
-      padding: 7px 0;
-      font-size: 14px;
+      padding: 8px 0;
+      font-size: 13.5px;
       line-height: 1.5;
-      color: #333;
-      border-bottom: 1px solid #f0e6ff;
+      color: rgba(232,216,255,0.75);
+      border-bottom: 1px solid rgba(196,166,232,0.08);
     }
     ol li:last-child { border-bottom: none; }
-    ol li strong { color: #7B00C4; }
+    ol li strong { color: #c4a6e8; }
 
-    /* BOTÃO */
-    .cta-wrap { text-align: center; padding: 8px 20px 48px; }
+    /* BOTÃO CTA */
+    .cta-wrap { text-align: center; padding: 8px 20px 56px; }
     .cta-btn {
       display: inline-block;
-      background: #7B00C4;
+      background: linear-gradient(135deg, #7B00C4, #9c27b0);
       color: #fff;
-      padding: 16px 40px;
+      padding: 16px 44px;
       border-radius: 50px;
       text-decoration: none;
       font-size: 1rem;
       font-weight: 600;
-      box-shadow: 0 4px 16px rgba(123,0,196,.35);
-      transition: transform .15s;
+      box-shadow: 0 4px 24px rgba(123,0,196,0.45);
+      transition: transform .15s, box-shadow .15s;
     }
-    .cta-btn:hover { transform: translateY(-2px); }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(123,0,196,0.6);
+    }
 
     /* RODAPÉ */
     footer {
-      background: #3A1F5C;
-      color: #c8a8ff;
+      border-top: 1px solid rgba(196,166,232,0.1);
       text-align: center;
-      padding: 20px;
-      font-size: 13px;
+      padding: 24px 20px;
+      font-size: 12px;
+      color: rgba(196,166,232,0.35);
     }
-    footer a { color: #e0c8ff; text-decoration: none; }
+    footer a {
+      color: rgba(196,166,232,0.5);
+      text-decoration: none;
+    }
+    footer a:hover { color: #c4a6e8; }
   </style>
 </head>
 <body>
 
   <nav>
-    <img src="9Self logo.png" alt="9&Self"/>
-    <a href="https://luciakratz-arch.github.io/9-Self/index.html">← Voltar ao site</a>
+    <a href="index.html" class="nav-logo">9<span>&</span>Self</a>
+    <a href="https://luciakratz-arch.github.io/9-Self/index.html" class="back">← Voltar ao app</a>
   </nav>
 
   <div class="hero">
-    <h1>Instale o 9&Self no seu celular</h1>
-    <p>Acesse sua plataforma de mapeamento comportamental como um app — sem precisar da loja de aplicativos.</p>
+    <p class="hero-label">PWA · Sem loja de aplicativos</p>
+    <h1>Instale o 9&Self<br/>no seu celular</h1>
+    <p>Acesse sua plataforma de mapeamento comportamental como um app — direto da tela inicial do seu celular.</p>
   </div>
 
   <div class="cards">
-
-    <div class="card android">
+    <div class="card">
       <div class="card-header">
         <div class="card-icon">🤖</div>
         <div>
@@ -138,7 +200,7 @@
       </ol>
     </div>
 
-    <div class="card iphone">
+    <div class="card">
       <div class="card-header">
         <div class="card-icon">🍎</div>
         <div>
@@ -154,7 +216,6 @@
         <li>O ícone do 9&Self aparecerá na sua tela inicial 🎉</li>
       </ol>
     </div>
-
   </div>
 
   <div class="cta-wrap">
