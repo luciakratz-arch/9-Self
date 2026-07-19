@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instalar 9&Self no celular</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f0ff; color: #1a1a2e; }
+
+    /* NAVBAR */
+    nav {
+      background: #3A1F5C;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    nav img { height: 36px; }
+    nav a {
+      color: #e0c8ff;
+      text-decoration: none;
+      font-size: 13px;
+      opacity: .85;
+    }
+    nav a:hover { opacity: 1; }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #3A1F5C 0%, #7B00C4 100%);
+      color: #fff;
+      text-align: center;
+      padding: 56px 24px 48px;
+    }
+    .hero h1 { font-size: 2rem; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .hero p  { font-size: 1.05rem; opacity: .88; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+    /* CARDS */
+    .cards {
+      display: flex;
+      gap: 24px;
+      max-width: 780px;
+      margin: -28px auto 0;
+      padding: 0 20px 40px;
+      flex-wrap: wrap;
+    }
+    .card {
+      flex: 1;
+      min-width: 280px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 20px rgba(123,0,196,.12);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .android .card-icon { background: #e8f5e9; }
+    .iphone  .card-icon { background: #f0e6ff; }
+    .card-header h2 { font-size: 1.05rem; color: #3A1F5C; }
+    .card-header small { font-size: 12px; color: #888; }
+
+    ol { padding-left: 20px; }
+    ol li {
+      padding: 7px 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #333;
+      border-bottom: 1px solid #f0e6ff;
+    }
+    ol li:last-child { border-bottom: none; }
+    ol li strong { color: #7B00C4; }
+
+    /* BOTÃO */
+    .cta-wrap { text-align: center; padding: 8px 20px 48px; }
+    .cta-btn {
+      display: inline-block;
+      background: #7B00C4;
+      color: #fff;
+      padding: 16px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(123,0,196,.35);
+      transition: transform .15s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); }
+
+    /* RODAPÉ */
+    footer {
+      background: #3A1F5C;
+      color: #c8a8ff;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+    }
+    footer a { color: #e0c8ff; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <img src="9Self logo.png" alt="9&Self"/>
+    <a href="https://luciakratz-arch.github.io/9-Self/index.html">← Voltar ao site</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Instale o 9&Self no seu celular</h1>
+    <p>Acesse sua plataforma de mapeamento comportamental como um app — sem precisar da loja de aplicativos.</p>
+  </div>
+
+  <div class="cards">
+
+    <div class="card android">
+      <div class="card-header">
+        <div class="card-icon">🤖</div>
+        <div>
+          <h2>Android</h2>
+          <small>Navegador Chrome</small>
+        </div>
+      </div>
+      <ol>
+        <li>Abra este link no <strong>Chrome</strong></li>
+        <li>Toque nos <strong>3 pontinhos</strong> no canto superior direito</li>
+        <li>Selecione <strong>"Adicionar à tela inicial"</strong></li>
+        <li>Confirme tocando em <strong>"Adicionar"</strong></li>
+        <li>O ícone do 9&Self aparecerá na sua tela inicial 🎉</li>
+      </ol>
+    </div>
+
+    <div class="card iphone">
+      <div class="card-header">
+        <div class="card-icon">🍎</div>
+        <div>
+          <h2>iPhone</h2>
+          <small>Navegador Safari</small>
+        </div>
+      </div>
+      <ol>
+        <li>Abra este link no <strong>Safari</strong> (não no Chrome)</li>
+        <li>Toque no ícone de <strong>compartilhar</strong> (quadrado com seta ↑)</li>
+        <li>Role para baixo e toque em <strong>"Adicionar à Tela de Início"</strong></li>
+        <li>Confirme tocando em <strong>"Adicionar"</strong></li>
+        <li>O ícone do 9&Self aparecerá na sua tela inicial 🎉</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <div class="cta-wrap">
+    <a class="cta-btn" href="https://luciakratz-arch.github.io/9-Self/index.html">
+      Abrir o 9&Self agora →
+    </a>
+  </div>
+
+  <footer>
+    <p>9&Self — Mapeamento Comportamental por Eneagrama</p>
+    <p style="margin-top:6px;">
+      <a href="https://luciakratz-arch.github.io/9-Self/index.html">luciakratz-arch.github.io/9-Self</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:luciakratz@gmail.com">luciakratz@gmail.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>

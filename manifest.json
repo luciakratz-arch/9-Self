@@ -1,0 +1,25 @@
+{
+  "name": "9&Self — Mapeamento Comportamental",
+  "short_name": "9&Self",
+  "description": "Plataforma de avaliação comportamental baseada no Eneagrama. Descubra seu perfil com o 9&Self.",
+  "start_url": "/9-Self/index.html",
+  "scope": "/9-Self/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3A1F5C",
+  "theme_color": "#7B00C4",
+  "icons": [
+    {
+      "src": "9Self logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "9Self logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
