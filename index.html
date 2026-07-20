@@ -1486,10 +1486,6 @@ tr:hover td{background:#FAFAFE;}
       <div class="modal-overlay" id="modalNovoParceiro">
         <div class="modal">
           <h3>Novo Parceiro</h3>
-          <div style="background:#f5f0ff;border:1px solid rgba(123,0,196,.2);border-radius:8px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-            <span style="font-size:12px;color:#7B00C4;">🔗 Link para o parceiro se cadastrar sozinho:</span>
-            <button class="btn btn-sm" style="background:#7B00C4;color:#fff;font-size:12px;padding:6px 14px;border-radius:6px;" onclick="copiarLinkParceiro()">📋 Copiar link</button>
-          </div>
           <div class="form-row"><label>Nome completo *</label><input type="text" id="parcNome" placeholder="Nome do parceiro"/></div>
           <div class="form-row"><label>E-mail de acesso *</label><input type="email" id="parcEmail" placeholder="parceiro@email.com" autocomplete="username"/></div>
           <div class="form-row"><label>Senha de acesso *</label><input type="password" id="parcSenha" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/></div>
@@ -1579,10 +1575,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-title">Parceiros</div>
               <div class="page-subtitle">Gerencie os parceiros credenciados e seus saldos</div>
             </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn btn-outline" onclick="copiarLinkParceiro()" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Link de Cadastro</button>
-              <button class="btn btn-primary" onclick="openModal('modalNovoParceiro')">＋ Novo Parceiro</button>
-            </div>
+            <button class="btn btn-primary" onclick="openModal('modalNovoParceiro')">＋ Novo Parceiro</button>
           </div>
           <div class="table-card">
             <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0;align-items:center;">
@@ -3830,16 +3823,6 @@ window.verCadastroCliente = function(btn) {
   openModal('modalCadastroCliente');
 };
 
-// ── LINK CADASTRO PARCEIRO ──
-window.copiarLinkParceiro = function() {
-  const link = 'https://luciakratz-arch.github.io/9-Self/representantes.html';
-  navigator.clipboard.writeText(link).then(() => {
-    showToast('Link copiado! Cole no WhatsApp para o parceiro se cadastrar.', 'success');
-  }).catch(() => {
-    prompt('Copie o link abaixo:', link);
-  });
-};
-
 // ── EXCLUIR LAUDO ──
 window.excluirLaudo = async function(laudoId) {
   if(!confirm('Excluir este laudo? Esta ação não pode ser desfeita.')) return;
@@ -5095,7 +5078,7 @@ window.filtrarParceiros = function() {
       ? `<span class="pill pill-yellow">⏳ Pendente</span>`
       : `<span class="pill pill-green">✅ Aprovado</span>`;
     const acoes = isPendente
-      ? `<button class="btn btn-primary btn-sm" onclick="aprovarParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}')">✅ Aprovar</button>`
+      ? `<button class="btn btn-primary btn-sm" onclick="aprovarParceiro('${p.id}','${(p.nome||'').replace(/'/g,"\\'")}','${(p.email||'').replace(/'/g,"\\'")}','${(p.whatsapp||'').replace(/'/g,"\\'")}')">✅ Aprovar</button>`
       : `<div style="display:flex;gap:6px;">
         <button class="btn btn-outline btn-sm" onclick="abrirModalWhatsAppParceiro(this)" data-id="${p.id}" data-nome="${p.nome||''}" data-wpp="${p.whatsapp||''}">💬</button>
         <button class="btn btn-teal btn-sm" onclick="verParceiro(this)" data-id="${p.id}" data-nome="${p.nome||''}" data-email="${p.email||''}" data-area="${p.area||''}" data-cred="${p.creditos||0}">👁 Ver</button>
@@ -5114,7 +5097,7 @@ window.filtrarParceiros = function() {
   }).join('');
 };
 
-window.aprovarParceiro = async function(solId, nome, email) {
+window.aprovarParceiro = async function(solId, nome, email, whatsapp) {
   const senha = prompt(`Defina uma senha para ${nome}:`);
   if(!senha || senha.length < 6) { showToast('Senha deve ter mínimo 6 caracteres.', 'error'); return; }
   try {
@@ -5132,6 +5115,19 @@ window.aprovarParceiro = async function(solId, nome, email) {
       status: 'aprovado', aprovadoEm: serverTimestamp(), parceiroId: parRef.id
     });
     showToast(`${nome} aprovado!`, 'success');
+    if(whatsapp) {
+      const num = whatsapp.replace(/\D/g,'');
+      const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
+      const msg = encodeURIComponent(
+        `Olá, ${nome}! 🎉 Seu acesso ao painel de parceiros 9&Self foi criado!\n\n` +
+        `📧 E-mail: *${email}*\n` +
+        `🔒 Senha inicial: *${senha}*\n\n` +
+        `⚠️ Troque sua senha no primeiro acesso.\n\n` +
+        `Acesse: ${linkLogin}\n\n` +
+        `💜 Dra. Lúcia Kratz`
+      );
+      window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+    }
     loadParceirosAdmin();
   } catch(e) { showToast('Erro: ' + e.message, 'error'); }
 };
