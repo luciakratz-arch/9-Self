@@ -5108,7 +5108,7 @@ window.aprovarParceiro = async function(solId, nome, email, whatsapp) {
     } catch(e) { console.warn('Auth:', e.message); }
 
     const parRef = await addDoc(collection(db,'nself_parceiros'), {
-      nome, email, uid, creditos: 0,
+      nome, email, uid, whatsapp: whatsapp||'', creditos: 0,
       criadoEm: serverTimestamp(), ativo: true
     });
     await updateDoc(doc(db,'nself_parceiros_solicitacoes', solId), {
