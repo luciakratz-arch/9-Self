@@ -27,7 +27,10 @@ db = firestore.client()
 # ── PARÂMETROS ──
 GMAIL_PASS  = StringParam("GMAIL_PASS")
 GMAIL_USER  = "luciakratz@gmail.com"
-APP_URL     = "https://luciakratz.github.io/app-eneagrama/index.html"
+APP_URL     = "https://luciakratz-arch.github.io/9-Self/index.html"
+
+# IDs dos produtos 9&Self na Hotmart que devem gerar código
+PRODUTOS_9SELF = {'8032417'}  # Mapeamento de Perfil Avançado - 9&Self
 
 # Token secreto opcional para validar chamadas da Hotmart
 # Configure via: firebase functions:config:set hotmart.token="SEU_HOTMART_TOKEN"
@@ -117,6 +120,13 @@ def webhookHotmart(req: https_fn.Request) -> https_fn.Response:
 
         purchase = data.get('purchase', {})
         buyer    = data.get('buyer', {})
+        product  = data.get('product', {})
+
+        # ── Filtrar apenas produtos 9&Self ──
+        produto_id = str(product.get('id', ''))
+        if produto_id not in PRODUTOS_9SELF:
+            print(f"[hotmart] Produto {produto_id} ignorado — não é 9&Self")
+            return https_fn.Response('produto ignorado', status=200)
 
         status_compra = purchase.get('status', '').upper()
         if status_compra not in ('APPROVED', 'COMPLETE'):
