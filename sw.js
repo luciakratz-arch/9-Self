@@ -1,13 +1,14 @@
-const CACHE_NAME = '9self-v1';
+const CACHE_NAME = '9self-v2';
 const ASSETS = [
   './index.html',
   './cadastro.html',
   './instalar-app.html',
+  './offline.html',
   './manifest.json',
   './9Self logo.png',
+  './9Self logo 512.png',
 ];
 
-// Instalação — cacheia os assets principais
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).catch(() => {})
@@ -15,7 +16,6 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Ativação — limpa caches antigos
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -25,9 +25,7 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch — serve do cache quando offline, atualiza em background
 self.addEventListener('fetch', e => {
-  // Não intercepta Firebase, Mercado Pago, Cloud Run ou CDNs externos
   if (
     e.request.url.includes('firestore') ||
     e.request.url.includes('firebase') ||
@@ -35,9 +33,8 @@ self.addEventListener('fetch', e => {
     e.request.url.includes('mercadopago') ||
     e.request.url.includes('run.app') ||
     e.request.url.includes('gstatic')
-  ) {
-    return;
-  }
+  ) { return; }
+
   e.respondWith(
     caches.match(e.request).then(cached => {
       const network = fetch(e.request).then(res => {
@@ -46,13 +43,15 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
         }
         return res;
-      }).catch(() => cached);
+      }).catch(() => {
+        if (e.request.mode === 'navigate') return caches.match('./offline.html');
+        return cached;
+      });
       return cached || network;
     })
   );
 });
 
-// Notificações push
 self.addEventListener('push', e => {
   const data = e.data ? e.data.json() : {};
   const title = data.title || '9&Self';
@@ -66,10 +65,7 @@ self.addEventListener('push', e => {
   e.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Clique na notificação — abre o app
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(
-    clients.openWindow(e.notification.data.url || './index.html')
-  );
+  e.waitUntil(clients.openWindow(e.notification.data.url || './index.html'));
 });
