@@ -2512,10 +2512,18 @@ window.confirmarRenovarCodigo = async function() {
     if(whatsapp) {
       const numLimpo = whatsapp.replace(/\D/g,'');
       const msg = encodeURIComponent(
-        `Olá, ${nome}! 🔄 Seu código de acesso ao 9&Self foi renovado!\n\n`+
-        `Novo código: *${novoCod}*\n\n`+
-        `Acesse: ${linkTeste}\n\n`+
-        `Qualquer dúvida, estou à disposição. 💜`
+        `Olá, ${nome}! 🔄
+
+Seu código de acesso ao 9&Self foi renovado.
+
+🔑 *Novo código:* *${novoCod}*
+
+👉 Acesse: ${linkTeste}
+
+Na tela inicial, clique na aba *Usuário* e insira o novo código.
+
+Qualquer dúvida, estou aqui. 💜
+Dra. Lúcia Kratz · CRP 09/20590`
       );
       window.open(`https://wa.me/55${numLimpo}?text=${msg}`,'_blank');
     }
@@ -3422,8 +3430,22 @@ function gerarLinkTeste(codigo) {
 }
 function gerarLinkWhatsApp(whatsapp, nome, codigo) {
   const msg = encodeURIComponent(
-    `Olá, ${nome}! Seu link exclusivo para o teste 9&Self está pronto:\n` +
-    `${gerarLinkTeste(codigo)}\n\nAcesse e responda com calma. 🌟`
+    `Olá, ${nome}! 🌟
+
+Ficamos muito felizes com o seu interesse e cadastro no 9&Self!
+
+Seu código de acesso exclusivo está pronto:
+
+🔑 *${codigo}*
+
+👉 Acesse agora: ${gerarLinkTeste(codigo)}
+
+Na tela inicial, clique na aba *Usuário* e insira o seu código para começar.
+
+O mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade — quanto mais genuínas suas respostas, mais preciso será o seu laudo. 💜
+
+Qualquer dúvida, estou aqui.
+Dra. Lúcia Kratz · CRP 09/20590`
   );
   const num = whatsapp.replace(/\D/g,'');
   return `https://wa.me/55${num}?text=${msg}`;
@@ -3463,6 +3485,7 @@ window.salvarCodigo = async function() {
     closeModal('modalNovoCodigo');
     window.open(gerarLinkWhatsApp(whatsapp, nome, codigo), '_blank');
     showToast(`Código ${codigo} gerado! Abrindo WhatsApp...`,'success');
+    if(email) enviarEmailAcesso(nome, email, 'pf_std', {codigo, link: gerarLinkTeste(codigo), mensagem:`Seu código de acesso ao 9&Self: ${codigo} | Acesse: ${gerarLinkTeste(codigo)}`});
     if(window._state.profile==='admin') loadCodigos();
   } catch(e) { showToast('Erro ao salvar código.','error'); }
 };
@@ -3572,6 +3595,7 @@ window.salvarEmpresa = async function() {
     closeModal('modalNovaEmpresa');
     showToast('Empresa cadastrada!','success');
     loadEmpresas();
+    enviarEmailAcesso(resp||nome, email, 'empresa', {senha:'123456', mensagem:`Seu acesso ao painel RH do 9&Self foi criado. E-mail: ${email} | Senha provisória: 123456`});
   } catch(e) {
     console.error('salvarEmpresa:', e);
     if(e.code==='auth/email-already-in-use') {
@@ -3841,11 +3865,7 @@ window.excluirLaudo = async function(laudoId) {
 window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
   const num = (whatsappSalvo || '').trim();
   const msg = encodeURIComponent(
-    `Olá ${nome}! 🎉 Seu código de acesso ao 9&Self chegou!\n\n` +
-    `Código: *${codigo}*\n\n` +
-    `Acesse: https://luciakratz-arch.github.io/9-Self/index.html\n` +
-    `e insira seu código na aba *Usuário*.\n\n` +
-    `Dúvidas? Responda esta mensagem. 💜`
+    `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: https://luciakratz-arch.github.io/9-Self/index.html\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
   );
   if(num) {
     const numLimpo = num.replace(/\D/g,'');
@@ -4027,11 +4047,7 @@ window.converterEmCodigo = async function() {
     if (whatsapp) {
       const numLimpo = whatsapp.replace(/\D/g, '');
       const msg = encodeURIComponent(
-        `Olá, ${nome}! 🎉 Seu código de acesso ao 9&Self foi liberado!\n\n` +
-        `Código: *${codigo}*\n\n` +
-        `Acesse o link abaixo e insira o código na aba *Usuário*:\n` +
-        `${linkTeste}\n\n` +
-        `Qualquer dúvida, estou à disposição. 💜`
+        `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: ${linkTeste}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade — quanto mais genuínas suas respostas, mais preciso será o seu laudo. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
       );
       window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
     }
@@ -4173,7 +4189,7 @@ window.parceiroWhatsappCodigo = function() {
   const d = window._ultimoCodParceiro||{};
   if(!d.whats){ showToast('WhatsApp não informado.','error'); return; }
   const num = d.whats.replace(/\D/g,'');
-  const msg = encodeURIComponent(`Olá, ${d.nome}! 🎉 Seu código de acesso ao 9&Self foi gerado!\n\nCódigo: *${d.c}*\n\nAcesse: ${d.link}\n\nQualquer dúvida, estou à disposição. 💜`);
+  const msg = encodeURIComponent(`Olá, ${d.nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${d.c}*\n\n👉 Acesse agora: ${d.link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
   window.open(`https://wa.me/55${num}?text=${msg}`,'_blank');
 };
 
@@ -4941,6 +4957,7 @@ window.salvarNovoParceiro = async function() {
     closeModal('modalNovoParceiro');
     showToast('Parceiro cadastrado!','success');
     loadParceirosAdmin();
+    enviarEmailAcesso(nome, email, 'parceiro', {senha: document.getElementById('parcSenha').value, mensagem:`Seu acesso ao painel de parceiros do 9&Self foi criado. E-mail: ${email} | Senha provisória: ${document.getElementById('parcSenha').value}`});
   } catch(e) {
     console.error(e);
     if(e.code==='auth/email-already-in-use') {
@@ -5115,16 +5132,12 @@ window.aprovarParceiro = async function(solId, nome, email, whatsapp) {
       status: 'aprovado', aprovadoEm: serverTimestamp(), parceiroId: parRef.id
     });
     showToast(`${nome} aprovado!`, 'success');
+    enviarEmailAcesso(nome, email, 'parceiro', {senha:'123456', mensagem:`Seu acesso ao painel de parceiros do 9&Self foi aprovado. E-mail: ${email} | Senha provisória: 123456`});
     if(whatsapp) {
       const num = whatsapp.replace(/\D/g,'');
       const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
       const msg = encodeURIComponent(
-        `Olá, ${nome}! 🎉 Seu acesso ao painel de parceiros 9&Self foi criado!\n\n` +
-        `📧 E-mail: *${email}*\n` +
-        `🔒 Senha inicial: *${senha}*\n\n` +
-        `⚠️ Troque sua senha no primeiro acesso.\n\n` +
-        `Acesse: ${linkLogin}\n\n` +
-        `💜 Dra. Lúcia Kratz`
+        `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9&Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* ${senha}\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
       );
       window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
     }
@@ -5422,7 +5435,7 @@ window.parceiroWhatsappCod = function(btn) {
   const {nome, wpp, cod, link} = btn.dataset;
   if(!wpp){ showToast('WhatsApp não cadastrado.','error'); return; }
   const num = wpp.replace(/\D/g,'');
-  const msg = encodeURIComponent(`Olá, ${nome}! 🎉 Seu código 9&Self:\n\nCódigo: *${cod}*\n\nAcesse: ${link}`);
+  const msg = encodeURIComponent(`Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${cod}*\n\n👉 Acesse agora: ${link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
   window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
 };
 
@@ -5558,19 +5571,14 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
       });
 
       showToast(`Empresa criada! Código ${c} gerado.`, 'success');
+      enviarEmailAcesso(nome, email, 'empresa', {senha:'123456', codigo:c, link, mensagem:`Seu acesso ao 9&Self foi criado. E-mail: ${email} | Senha: 123456 | Código: ${c} | Acesse: ${link}`});
 
       // WhatsApp com senha e link de troca
       if(whatsapp) {
         const num = whatsapp.replace(/\D/g,'');
         const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
         const msg = encodeURIComponent(
-          `Olá, ${nome}! 🎉 Seu acesso ao 9&Self foi criado!\n\n` +
-          `🔑 Código da avaliação: *${c}*\n` +
-          `📧 E-mail de acesso: *${email}*\n` +
-          `🔒 Senha inicial: *123456*\n\n` +
-          `⚠️ Por segurança, troque sua senha ao fazer o primeiro login.\n\n` +
-          `Acesse: ${linkLogin}\n\n` +
-          `💜 Dra. Lúcia Kratz`
+          `Olá, ${nome}! 🎉\n\nFicamos muito felizes em ter você como cliente 9&Self — seja muito bem-vindo(a)!\n\nSeu acesso ao painel de RH foi criado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* 123456\n🔑 *Código de avaliação:* ${c}\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos à disposição! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
@@ -5602,12 +5610,7 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
         const num = whatsapp.replace(/\D/g,'');
         const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
         const msg = encodeURIComponent(
-          `Olá, ${nome}! 🎉 Seu acesso ao painel de parceiros 9&Self foi criado!\n\n` +
-          `📧 E-mail: *${email}*\n` +
-          `🔒 Senha inicial: *123456*\n\n` +
-          `⚠️ Troque sua senha no primeiro acesso.\n\n` +
-          `Acesse: ${linkLogin}\n\n` +
-          `💜 Dra. Lúcia Kratz`
+          `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9&Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* 123456\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
@@ -5626,7 +5629,7 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
       showToast(`Código ${c} gerado para ${nome}!`, 'success');
       if(whatsapp) {
         const num = whatsapp.replace(/\D/g,'');
-        const msg = encodeURIComponent(`Olá, ${nome}! 🎉 Seu código de acesso ao 9&Self:\n\nCódigo: *${c}*\n\nAcesse: ${link}\n\n💜 Dra. Lúcia Kratz`);
+        const msg = encodeURIComponent(`Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${c}*\n\n👉 Acesse agora: ${link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade — quanto mais genuínas suas respostas, mais preciso será o seu laudo. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
     }
@@ -5736,6 +5739,19 @@ window.confirmarTrocarSenha = async function() {
     msg.style.color = '#c00';
   }
 };
+
+
+// ── ENVIO DE E-MAIL VIA CLOUD RUN ──
+async function enviarEmailAcesso(nome, email, tipo, extra={}) {
+  const CF_NOTIF = 'https://gerar-laudo-pdf-437375609844.us-central1.run.app/notificar-solicitacao';
+  try {
+    await fetch(CF_NOTIF, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ nome, email, tipo, origem: '9&Self Sistema', ...extra })
+    });
+  } catch(e) { console.warn('[email]', e); }
+}
 
 window.doLogout = async function() {
   try{ await signOut(auth); }catch(e){}
