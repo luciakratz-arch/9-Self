@@ -757,6 +757,7 @@ window.enviarSolicitacao = async function() {
   try {
     await addDoc(collection(db, 'nself_parceiros_solicitacoes'), {
       nome, email, whatsapp, registro, area, cidade, volume, comoConheceu, mensagem,
+      tipoPF: 'parceiro',
       status: 'pendente',
       criadoEm: serverTimestamp()
     });
