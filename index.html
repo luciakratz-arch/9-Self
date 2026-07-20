@@ -139,6 +139,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);
 .nav-item:hover{color:#fff;background:rgba(255,255,255,0.05);}
 .nav-item.active{color:#fff;background:rgba(123,0,196,0.2);border-left-color:var(--purple);}
 .nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
+.nav-badge{
+  margin-left:auto;
+  background:#ef4444;
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  min-width:18px;
+  height:18px;
+  border-radius:9px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 5px;
+}
 .sidebar-footer{
   padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07);
 }
@@ -2148,9 +2162,9 @@ const NAVS = {
   admin: [
     {icon:'📊', label:'Painel', page:'dashboard'},
     {icon:'🏢', label:'Empresas / RH', page:'empresas'},
-    {icon:'🤝', label:'Parceiros', page:'parceiros-admin'},
-    {icon:'👤', label:'PF com Devolutiva', page:'pf-devolutiva'},
-    {icon:'🎫', label:'PF sem Devolutiva', page:'pf-standard'},
+    {icon:'🤝', label:'Parceiros', page:'parceiros-admin', badge:true},
+    {icon:'👤', label:'PF com Devolutiva', page:'pf-devolutiva', badge:true},
+    {icon:'🎫', label:'PF sem Devolutiva', page:'pf-standard', badge:true},
     {icon:'💰', label:'Financeiro', page:'financeiro'},
   ],
   rh: [
@@ -2181,10 +2195,39 @@ function buildSidebar(profile) {
     const d = document.createElement('div');
     d.className='nav-item';
     d.dataset.page=item.page;
-    d.innerHTML=`<span class="nav-icon">${item.icon}</span><span>${item.label}</span>`;
+    const badgeHtml = item.badge ? `<span class="nav-badge" id="badge_${item.page}" style="display:none;">0</span>` : '';
+    d.innerHTML=`<span class="nav-icon">${item.icon}</span><span>${item.label}</span>${badgeHtml}`;
     d.onclick=()=>navigateTo(item.page);
     nav.appendChild(d);
   });
+  if(profile==='admin') atualizarBadgesPendentes();
+}
+
+async function atualizarBadgesPendentes() {
+  try {
+    const { getDocs, collection, query, where } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    // Solicitacoes PF pendentes
+    const [snapPF, snapParc] = await Promise.all([
+      getDocs(query(collection(db,'nself_solicitacoes'), where('status','==','pendente'))),
+      getDocs(query(collection(db,'nself_parceiros_solicitacoes'), where('status','==','pendente'))),
+    ]);
+    const pfCount   = snapPF.size;
+    const parcCount = snapParc.size;
+    const total     = pfCount + parcCount;
+    // Badges PF
+    ['pf-devolutiva','pf-standard'].forEach(page=>{
+      const el = document.getElementById('badge_'+page);
+      if(!el) return;
+      if(pfCount > 0){ el.textContent=pfCount; el.style.display='inline-flex'; }
+      else { el.style.display='none'; }
+    });
+    // Badge Parceiros
+    const elParc = document.getElementById('badge_parceiros-admin');
+    if(elParc){
+      if(parcCount > 0){ elParc.textContent=parcCount; elParc.style.display='inline-flex'; }
+      else { elParc.style.display='none'; }
+    }
+  } catch(e){ console.warn('[badge]',e); }
 }
 
 window.navigateTo = function(page) {
