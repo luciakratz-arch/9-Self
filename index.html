@@ -915,7 +915,7 @@ tr:hover td{background:#FAFAFE;}
             <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;width:100%;max-width:320px;" onclick="baixarLaudo()">
               ⬇ Baixar Laudo PDF
             </button>
-            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
+            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;display:none;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
               🔄 Gerar / Regenerar Laudo
             </button>
           </div>
@@ -1122,34 +1122,34 @@ tr:hover td{background:#FAFAFE;}
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;">
             <div class="lote-card" onclick="">
               <div class="lote-qtd">5 créditos</div>
-              <div class="lote-unit">R$ 71,00/crédito</div>
-              <div class="lote-total">R$ 355,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_5',5,355.00)">Comprar</button>
+              <div class="lote-unit">R$ 247,00/crédito</div>
+              <div class="lote-total">R$ 1.235,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_5',5,1235.00)">Comprar</button>
             </div>
             <div class="lote-card">
               <div class="lote-qtd">10 créditos</div>
-              <div class="lote-unit">R$ 69,00/crédito</div>
-              <div class="lote-total">R$ 690,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_10',10,690.00)">Comprar</button>
+              <div class="lote-unit">R$ 247,00/crédito</div>
+              <div class="lote-total">R$ 2.470,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_10',10,2470.00)">Comprar</button>
             </div>
             <div class="lote-card">
               <div class="lote-qtd">20 créditos</div>
-              <div class="lote-unit">R$ 65,00/crédito</div>
-              <div class="lote-total">R$ 1.300,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_20',20,1300.00)">Comprar</button>
+              <div class="lote-unit">R$ 230,00/crédito</div>
+              <div class="lote-total">R$ 4.600,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_20',20,4600.00)">Comprar</button>
             </div>
             <div class="lote-card">
               <div class="lote-qtd">50 créditos</div>
-              <div class="lote-unit">R$ 62,00/crédito</div>
-              <div class="lote-total">R$ 3.100,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_50',50,3100.00)">Comprar</button>
+              <div class="lote-unit">R$ 210,00/crédito</div>
+              <div class="lote-total">R$ 10.500,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_50',50,10500.00)">Comprar</button>
             </div>
             <div class="lote-card destaque">
               <div style="font-size:10px;color:#7B00C4;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
               <div class="lote-qtd">100 créditos</div>
-              <div class="lote-unit">R$ 58,00/crédito</div>
-              <div class="lote-total">R$ 5.800,00</div>
-              <button class="btn btn-primary btn-sm" onclick="rhComprarCreditos('lote_rh_100',100,5800.00)">Comprar</button>
+              <div class="lote-unit">R$ 190,00/crédito</div>
+              <div class="lote-total">R$ 19.000,00</div>
+              <button class="btn btn-primary btn-sm" onclick="rhComprarCreditos('lote_rh_100',100,19000.00)">Comprar</button>
             </div>
           </div>
           <div id="rhLoteStatus" style="font-size:13px;color:#888;min-height:18px;text-align:center;"></div>
@@ -3321,7 +3321,12 @@ async function salvarResultadoFinal() {
             });
           }
         }
-      } catch(ePdf){ console.warn('Geração automática PDF:', ePdf); }
+      } catch(ePdf){
+        console.warn('Geração automática PDF:', ePdf);
+        // Mostrar botão manual só se falhou
+        const btnG = document.getElementById('btnGerarLaudo');
+        if(btnG) btnG.style.display = 'block';
+      }
     }
   } catch(e){ console.warn('Salvar resultado:',e); }
 
@@ -3386,7 +3391,9 @@ async function salvarResultadoFinal() {
 
     // CASO 3: Chamar Cloud Function para gerar PDF
     if(!window.TS || !window.TS.tipoFinal) {
-      showToast('Dados do teste não encontrados. Refaça o teste.','error');
+      const btnG = document.getElementById('btnGerarLaudo');
+      if(btnG) btnG.style.display = 'block';
+      showToast('Seu laudo está sendo gerado. Aguarde um momento e tente baixar novamente.','info');
       return;
     }
 
@@ -4632,11 +4639,11 @@ window.renderFinanceiro = function() {
     'lote_rep_200': {creditos:200, preco:22.00, canal:'parceiro'},
     'lote_rep_300': {creditos:300, preco:19.00, canal:'parceiro'},
     'lote_rep_500': {creditos:500, preco:15.90, canal:'parceiro'},
-    'lote_rh_5':    {creditos:5,   preco:71.00, canal:'rh'},
-    'lote_rh_10':   {creditos:10,  preco:69.00, canal:'rh'},
-    'lote_rh_20':   {creditos:20,  preco:65.00, canal:'rh'},
-    'lote_rh_50':   {creditos:50,  preco:62.00, canal:'rh'},
-    'lote_rh_100':  {creditos:100, preco:58.00, canal:'rh'},
+    'lote_rh_5':    {creditos:5,   preco:247.00, canal:'rh'},
+    'lote_rh_10':   {creditos:10,  preco:247.00, canal:'rh'},
+    'lote_rh_20':   {creditos:20,  preco:230.00, canal:'rh'},
+    'lote_rh_50':   {creditos:50,  preco:210.00, canal:'rh'},
+    'lote_rh_100':  {creditos:100, preco:190.00, canal:'rh'},
   };
 
   // Enriquecer receitas
@@ -5301,7 +5308,7 @@ window.loadParceiroFinanceiro = async function() {
   const mes   = document.getElementById('parcFinMes')?.value || '';
   const fmt   = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 65 }; // média RH sugerida
+  const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 247 };
   const creditos = window._state.parceiro?.creditos || 0;
   const FAIXAS = [{max:10,preco:40},{max:50,preco:32},{max:100,preco:26},{max:200,preco:22},{max:300,preco:19},{max:999,preco:15.90}];
   const custoUnit = FAIXAS.find(f => creditos <= f.max)?.preco || 15.90;
