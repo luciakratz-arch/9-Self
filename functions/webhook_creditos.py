@@ -29,7 +29,7 @@ db = firestore.client()
 GMAIL_PASS = StringParam("GMAIL_PASS")
 MP_TOKEN   = StringParam("MP_TOKEN")
 GMAIL_USER = "luciakratz@gmail.com"
-APP_URL    = "https://luciakratz.github.io/app-eneagrama/index.html"
+APP_URL    = "https://luciakratz-arch.github.io/9-Self/index.html"
 
 # ── TABELA DE LOTES (external_reference → créditos) ──
 # Configure o campo "Referência externa" ao criar o link no Mercado Pago
@@ -44,6 +44,12 @@ LOTES = {
   "lote_rep_200": {"creditos": 200, "faixa": 4,  "preco_unit": 22.00},
   "lote_rep_300": {"creditos": 300, "faixa": 5,  "preco_unit": 19.00},
   "lote_rep_500": {"creditos": 500, "faixa": 7,  "preco_unit": 15.90},
+  # Lotes RH/Empresa
+  "lote_rh_5":    {"creditos": 5,   "faixa": 1,  "preco_unit": 71.00},
+  "lote_rh_10":   {"creditos": 10,  "faixa": 2,  "preco_unit": 69.00},
+  "lote_rh_20":   {"creditos": 20,  "faixa": 3,  "preco_unit": 65.00},
+  "lote_rh_50":   {"creditos": 50,  "faixa": 4,  "preco_unit": 62.00},
+  "lote_rh_100":  {"creditos": 100, "faixa": 5,  "preco_unit": 58.00},
 }
 
 def calcular_creditos_por_titulo(titulo: str) -> int:
