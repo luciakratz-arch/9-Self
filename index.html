@@ -1122,34 +1122,34 @@ tr:hover td{background:#FAFAFE;}
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;">
             <div class="lote-card" onclick="">
               <div class="lote-qtd">5 créditos</div>
-              <div class="lote-unit">R$ 247,00/crédito</div>
-              <div class="lote-total">R$ 1.235,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_5',5,1235.00)">Comprar</button>
+              <div class="lote-unit">R$ 71,00/crédito</div>
+              <div class="lote-total">R$ 355,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_5',5,355.00)">Comprar</button>
             </div>
             <div class="lote-card">
               <div class="lote-qtd">10 créditos</div>
-              <div class="lote-unit">R$ 247,00/crédito</div>
-              <div class="lote-total">R$ 2.470,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_10',10,2470.00)">Comprar</button>
+              <div class="lote-unit">R$ 69,00/crédito</div>
+              <div class="lote-total">R$ 690,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_10',10,690.00)">Comprar</button>
             </div>
             <div class="lote-card">
               <div class="lote-qtd">20 créditos</div>
-              <div class="lote-unit">R$ 230,00/crédito</div>
-              <div class="lote-total">R$ 4.600,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_20',20,4600.00)">Comprar</button>
+              <div class="lote-unit">R$ 65,00/crédito</div>
+              <div class="lote-total">R$ 1.300,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_20',20,1300.00)">Comprar</button>
             </div>
             <div class="lote-card">
               <div class="lote-qtd">50 créditos</div>
-              <div class="lote-unit">R$ 210,00/crédito</div>
-              <div class="lote-total">R$ 10.500,00</div>
-              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_50',50,10500.00)">Comprar</button>
+              <div class="lote-unit">R$ 62,00/crédito</div>
+              <div class="lote-total">R$ 3.100,00</div>
+              <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_50',50,3100.00)">Comprar</button>
             </div>
             <div class="lote-card destaque">
               <div style="font-size:10px;color:#7B00C4;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
               <div class="lote-qtd">100 créditos</div>
-              <div class="lote-unit">R$ 190,00/crédito</div>
-              <div class="lote-total">R$ 19.000,00</div>
-              <button class="btn btn-primary btn-sm" onclick="rhComprarCreditos('lote_rh_100',100,19000.00)">Comprar</button>
+              <div class="lote-unit">R$ 58,00/crédito</div>
+              <div class="lote-total">R$ 5.800,00</div>
+              <button class="btn btn-primary btn-sm" onclick="rhComprarCreditos('lote_rh_100',100,5800.00)">Comprar</button>
             </div>
           </div>
           <div id="rhLoteStatus" style="font-size:13px;color:#888;min-height:18px;text-align:center;"></div>
@@ -5301,7 +5301,7 @@ window.loadParceiroFinanceiro = async function() {
   const mes   = document.getElementById('parcFinMes')?.value || '';
   const fmt   = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 69 };
+  const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 65 }; // média RH sugerida
   const creditos = window._state.parceiro?.creditos || 0;
   const FAIXAS = [{max:10,preco:40},{max:50,preco:32},{max:100,preco:26},{max:200,preco:22},{max:300,preco:19},{max:999,preco:15.90}];
   const custoUnit = FAIXAS.find(f => creditos <= f.max)?.preco || 15.90;
