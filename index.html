@@ -4632,11 +4632,11 @@ window.renderFinanceiro = function() {
     'lote_rep_200': {creditos:200, preco:22.00, canal:'parceiro'},
     'lote_rep_300': {creditos:300, preco:19.00, canal:'parceiro'},
     'lote_rep_500': {creditos:500, preco:15.90, canal:'parceiro'},
-    'lote_rh_5':    {creditos:5,   preco:247.00, canal:'rh'},
-    'lote_rh_10':   {creditos:10,  preco:247.00, canal:'rh'},
-    'lote_rh_20':   {creditos:20,  preco:230.00, canal:'rh'},
-    'lote_rh_50':   {creditos:50,  preco:210.00, canal:'rh'},
-    'lote_rh_100':  {creditos:100, preco:190.00, canal:'rh'},
+    'lote_rh_5':    {creditos:5,   preco:71.00, canal:'rh'},
+    'lote_rh_10':   {creditos:10,  preco:69.00, canal:'rh'},
+    'lote_rh_20':   {creditos:20,  preco:65.00, canal:'rh'},
+    'lote_rh_50':   {creditos:50,  preco:62.00, canal:'rh'},
+    'lote_rh_100':  {creditos:100, preco:58.00, canal:'rh'},
   };
 
   // Enriquecer receitas
@@ -5301,7 +5301,7 @@ window.loadParceiroFinanceiro = async function() {
   const mes   = document.getElementById('parcFinMes')?.value || '';
   const fmt   = v => 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 247 };
+  const PRECO_SUGERIDO = { pf_dev: 597, pf_std: 247, empresa: 69 };
   const creditos = window._state.parceiro?.creditos || 0;
   const FAIXAS = [{max:10,preco:40},{max:50,preco:32},{max:100,preco:26},{max:200,preco:22},{max:300,preco:19},{max:999,preco:15.90}];
   const custoUnit = FAIXAS.find(f => creditos <= f.max)?.preco || 15.90;
