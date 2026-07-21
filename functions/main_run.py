@@ -24,11 +24,11 @@ LOTES = {
     "lote_rep_200": {"creditos": 200, "total": 4400.00},
     "lote_rep_300": {"creditos": 300, "total": 5700.00},
     "lote_rep_500": {"creditos": 500, "total": 7950.00},
-    "lote_rh_5":    {"creditos": 5,   "total": 1235.00},
-    "lote_rh_10":   {"creditos": 10,  "total": 2470.00},
-    "lote_rh_20":   {"creditos": 20,  "total": 4600.00},
-    "lote_rh_50":   {"creditos": 50,  "total": 10500.00},
-    "lote_rh_100":  {"creditos": 100, "total": 19000.00},
+    "lote_rh_5":    {"creditos": 5,   "total": 355.00},
+    "lote_rh_10":   {"creditos": 10,  "total": 690.00},
+    "lote_rh_20":   {"creditos": 20,  "total": 1300.00},
+    "lote_rh_50":   {"creditos": 50,  "total": 3100.00},
+    "lote_rh_100":  {"creditos": 100, "total": 5800.00},
 }
 
 @app.route('/', methods=['POST', 'OPTIONS'])
