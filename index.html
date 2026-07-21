@@ -3368,7 +3368,7 @@ async function salvarResultadoFinal() {
     if(window._state.laudoUrl) {
       const a = document.createElement('a');
       a.href     = window._state.laudoUrl;
-      a.download = `Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+      a.download = `9Self_Laudo_${nome.replace(/\s+/g,'_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`;
       a.target   = '_blank';
       document.body.appendChild(a);
       a.click();
@@ -3417,7 +3417,7 @@ async function salvarResultadoFinal() {
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;
-      a.download = `Laudo_9Self_${(payload.nome||'participante').replace(/\s+/g,'_')}.pdf`;
+      a.download = `9Self_Laudo_${(payload.nome||'participante').replace(/\s+/g,'_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
       status.textContent = '✅ Laudo baixado!';
@@ -3714,7 +3714,7 @@ window.filtrarLaudos = function() {
     const sub = [l.subtipoDominante,l.subtipoIntermediario,l.subtipoRemissivo]
                 .map(s => NS[s]||s||'—').join(' · ');
     const btnPdf = l.pdfUrl
-      ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
+      ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
          <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}', true)" title="Gerar nova versão">🔄</button>
          <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${lid}')" title="Excluir laudo">🗑</button>`
       : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${lid}')" title="Gerar PDF">🔄 Gerar PDF</button>
@@ -3767,7 +3767,7 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
 
     // 2. Se já tem URL e NÃO é regeneração forçada — baixar direto
     if(l.pdfUrl && !forcar) {
-      setCell(`<a href="${l.pdfUrl}" target="_blank" download="${(nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
+      setCell(`<a href="${l.pdfUrl}" target="_blank" download="${(nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
                 <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`);
       window.open(l.pdfUrl, '_blank');
       return;
@@ -3819,10 +3819,10 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
     });
 
     // 7. Atualizar célula e baixar
-    setCell(`<a href="${data.url}" target="_blank" download="${nome.replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
+    setCell(`<a href="${data.url}" target="_blank" download="${nome.replace(/\s+/g,'_')}_9Self_Laudo_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
               <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${laudoId}', true)" title="Gerar nova versão com conteúdo atualizado">🔄</button>`);
     const a = document.createElement('a');
-    a.href=data.url; a.download=`Laudo_9Self_${nome.replace(/\s+/g,'_')}.pdf`;
+    a.href=data.url; a.download=`9Self_Laudo_${nome.replace(/\s+/g,'_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`;
     a.target='_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
   } catch(e) {
@@ -4467,7 +4467,7 @@ function _renderLaudosPF(tipo) {
 
   tbody.innerHTML = lista.map(l => {
     const btnPdf = l.pdfUrl
-      ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
+      ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'participante').replace(/\s+/g,'_')}_9Self_Laudo_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
          <button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}', true)" title="Regenerar">🔄</button>
          <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${l.id}')" title="Excluir laudo">🗑</button>`
       : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')" title="Gerar PDF">🔄 Gerar</button>
@@ -5236,7 +5236,7 @@ window.loadParceiroPF = async function(tipo) {
     } else {
       laudoTbl.innerHTML = window._laudosParcPF[tipo].map(l => {
         const btnPdf = l.pdfUrl
-          ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'').replace(/\s+/g,'_')}_9Self_Laudo.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
+          ? `<a href="${l.pdfUrl}" target="_blank" download="${(l.nome||'').replace(/\s+/g,'_')}_9Self_Laudo_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf" class="btn btn-teal btn-sm">⬇ PDF</a>
              <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${l.id}')" title="Excluir laudo">🗑</button>`
           : `<button class="btn btn-outline btn-sm" onclick="gerarPdfLaudo('${l.id}')">🔄 Gerar</button>
              <button class="btn btn-sm" style="background:#fee2e2;color:#c00;border:1px solid #fca5a5;" onclick="excluirLaudo('${l.id}')" title="Excluir laudo">🗑</button>`;
