@@ -304,7 +304,7 @@ footer p { font-size: 12px; color: rgba(255,255,255,.3); line-height: 1.8; }
       Psicólogos, coaches e consultores credenciados: agregue o 9&Self ao seu portfólio, atenda clientes individuais e empresas com margem livre — e construa renda recorrente com cada avaliação.
     </p>
     <div class="hero-cta">
-      <a href="https://wa.me/5562991546757?text=Olá%2C%20Dra.%20Lúcia!%20Tenho%20interesse%20em%20ser%20Parceiro(a)%20do%209%26Self.%20Já%20acessei%20a%20página%20de%20parceiros%3A%20https%3A%2F%2Fluciakratz-arch.github.io%2F9-Self%2Frepresentantes.html%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20programa%20de%20credenciamento%20e%20os%20preços%20exclusivos.%20Pode%20me%20ajudar%3F" target="_blank" class="btn-primary">Quero ser Parceiro →</a>
+      <a href="#formulario" class="btn-primary">Quero ser Parceiro →</a>
       <a href="#simulador" class="btn-secondary">Ver simulador de ganhos</a>
     </div>
     <div class="destaque-badge">
@@ -782,24 +782,9 @@ footer p { font-size: 12px; color: rgba(255,255,255,.3); line-height: 1.8; }
   </p>
 </footer>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDnrgaY8R0Zetkr18uHQJAZXIUa4EwDnv4",
-  authDomain: "entrevista-inicial.firebaseapp.com",
-  projectId: "entrevista-inicial",
-  storageBucket: "entrevista-inicial.firebasestorage.app",
-  messagingSenderId: "437375609844",
-  appId: "1:437375609844:web:36082771a32d262b2e27a1"
-};
-const fbApp = initializeApp(firebaseConfig);
-const db    = getFirestore(fbApp);
-
-// ── SIMULADOR ──
+<!-- SIMULADOR — script normal para acesso global -->
+<script>
 const FAIXAS = [
   { min:1,   max:10,  preco:40.00 },
   { min:11,  max:50,  preco:32.00 },
@@ -817,16 +802,17 @@ function fmt(v) {
   return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-window.calcSim = function() {
-  const qtd   = parseInt(document.getElementById('sliderCreditos').value);
-  const preco = parseInt(document.getElementById('sliderPreco').value);
+function calcSim() {
+  const slC = document.getElementById('sliderCreditos');
+  const slP = document.getElementById('sliderPreco');
+  if(!slC || !slP) return;
+  const qtd   = parseInt(slC.value);
+  const preco = parseInt(slP.value);
   const faixa = getFaixa(qtd);
-
   const custo   = qtd * faixa.preco;
   const receita = qtd * preco;
   const margem  = receita - custo;
   const pct     = ((margem / receita) * 100).toFixed(0);
-
   document.getElementById('simCreditos').textContent = qtd + ' crédito' + (qtd>1?'s':'');
   document.getElementById('simPreco').textContent    = fmt(preco);
   document.getElementById('simCusto').textContent    = fmt(custo);
@@ -836,10 +822,29 @@ window.calcSim = function() {
   document.getElementById('simFaixa').textContent    =
     'Faixa aplicada: ' + qtd + ' créditos × R$ ' + faixa.preco.toFixed(2).replace('.',',') +
     '/crédito = custo total de ' + fmt(custo) + ' · Você vende a ' + fmt(preco) + '/cliente';
-};
+}
 
-calcSim();
 document.addEventListener('DOMContentLoaded', calcSim);
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDnrgaY8R0Zetkr18uHQJAZXIUa4EwDnv4",
+  authDomain: "entrevista-inicial.firebaseapp.com",
+  projectId: "entrevista-inicial",
+  storageBucket: "entrevista-inicial.firebasestorage.app",
+  messagingSenderId: "437375609844",
+  appId: "1:437375609844:web:36082771a32d262b2e27a1"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db    = getFirestore(fbApp);
+
+
 
 // ── FORMULÁRIO ──
 window.enviarSolicitacao = async function() {
