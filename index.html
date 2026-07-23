@@ -2009,7 +2009,8 @@ tr:hover td{background:#FAFAFE;}
       <tr><td style="padding:8px;color:#888;">Criado em</td><td id="ccCriadoEm" style="padding:8px;"></td></tr>
       <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">Empresa</td><td id="ccEmpresa" style="padding:8px;"></td></tr>
     </table>
-    <div style="margin-top:20px;text-align:right;">
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modalCadastroCliente');editarCodigo(window._ccDocId,window._ccNome,window._ccEmail,window._ccWhatsapp,window._ccCodigo,window._ccEmpresa)">✏️ Editar</button>
       <button class="btn btn-outline" onclick="closeModal('modalCadastroCliente')">Fechar</button>
     </div>
   </div>
@@ -2481,13 +2482,31 @@ window.confirmarRenovarCodigo = async function() {
   const nome     = window._renovarNome || '';
   const whatsapp = window._renovarWhatsapp || '';
 
+  if(!origId) { showToast('ID do código original não encontrado.','error'); return; }
+
   try {
     // Buscar dados do original — primeiro no cache, depois no Firestore
     let origData = window._todosCodigos?.find(c=>c.id===origId);
     if(!origData) {
-      const snap = await getDoc(doc(db,'nself_codigos',origId));
-      if(!snap.exists()) { showToast('Código original não encontrado.','error'); return; }
-      origData = { id: snap.id, ...snap.data() };
+      try {
+        const snap = await getDoc(doc(db,'nself_codigos',origId));
+        if(snap.exists()) {
+          origData = { id: snap.id, ...snap.data() };
+        }
+      } catch(eGet) {
+        console.warn('[renovar] getDoc falhou:', eGet);
+      }
+    }
+
+    // Se não encontrou, usar dados mínimos do modal
+    if(!origData) {
+      origData = {
+        nomeDestinatario: nome,
+        email: '',
+        whatsapp: whatsapp,
+        empresa: null,
+        tipo: 'PF'
+      };
     }
 
     // Marcar original como revogado
@@ -3858,6 +3877,12 @@ window.verCadastroCliente = function(btn) {
   document.getElementById('ccStatus').textContent   = d.status   || '—';
   document.getElementById('ccCriadoEm').textContent = d.criado   || '—';
   document.getElementById('ccEmpresa').textContent  = d.empresa  || 'Pessoa Física';
+  window._ccDocId    = d.docid    || '';
+  window._ccNome     = d.nome     || '';
+  window._ccEmail    = d.email    || '';
+  window._ccWhatsapp = d.whatsapp || '';
+  window._ccCodigo   = d.codigo   || '';
+  window._ccEmpresa  = d.empresa  || 'pf';
   openModal('modalCadastroCliente');
 };
 
@@ -4430,6 +4455,7 @@ function _renderCodPF(tipo) {
           data-email="${(c.email||'').replace(/"/g,'&quot;')}"
           data-whatsapp="${(c.whatsapp||'').replace(/"/g,'&quot;')}"
           data-codigo="${c.codigo||''}"
+          data-docid="${c.id||''}"
           data-tipo="${(c.tipoPF||c.tipo||'—').replace(/"/g,'&quot;')}"
           data-status="${c.status||'Pendente'}"
           data-criado="${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}"
