@@ -2035,7 +2035,7 @@ tr:hover td{background:#FAFAFE;}
 <!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment }
+import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -2482,9 +2482,13 @@ window.confirmarRenovarCodigo = async function() {
   const whatsapp = window._renovarWhatsapp || '';
 
   try {
-    // Buscar dados do original
-    const orig = window._todosCodigos.find(c=>c.id===origId);
-    if(!orig) { showToast('Código original não encontrado.','error'); return; }
+    // Buscar dados do original — primeiro no cache, depois no Firestore
+    let origData = window._todosCodigos?.find(c=>c.id===origId);
+    if(!origData) {
+      const snap = await getDoc(doc(db,'nself_codigos',origId));
+      if(!snap.exists()) { showToast('Código original não encontrado.','error'); return; }
+      origData = { id: snap.id, ...snap.data() };
+    }
 
     // Marcar original como revogado
     await updateDoc(doc(db,'nself_codigos',origId), {status:'revogado', renovadoEm: serverTimestamp()});
@@ -2493,11 +2497,11 @@ window.confirmarRenovarCodigo = async function() {
     const linkTeste = gerarLinkTeste(novoCod);
     await addDoc(collection(db,'nself_codigos'), {
       codigo: novoCod,
-      nomeDestinatario: orig.nomeDestinatario,
-      email: orig.email||'',
-      whatsapp: orig.whatsapp||'',
-      empresa: orig.empresa||null,
-      tipo: orig.tipo||'PF',
+      nomeDestinatario: origData.nomeDestinatario,
+      email: origData.email||'',
+      whatsapp: origData.whatsapp||'',
+      empresa: origData.empresa||null,
+      tipo: origData.tipo||'PF',
       status: 'disponivel',
       linkTeste,
       renovadoDe: origId,
