@@ -3047,6 +3047,9 @@ function validarTipoAtual() {
   const pct     = Math.round((score/5)*100);
   const hipotese = TS.prioIdx + 1;
 
+  // Salvar score do tipo atual
+  TS.scoresM1[tipo] = score;
+
   document.getElementById('progressBar').style.width = (35 + TS.prioIdx*10) + '%';
   document.getElementById('testeSubtitle').textContent = 'Confirmação do Perfil';
 
