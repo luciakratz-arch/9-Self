@@ -32,12 +32,7 @@ LOTES = {
     "lote_rep_500": {"creditos": 500, "preco_unit": 15.90, "total": 7950.00},
 }
 
-@https_fn.on_request(
-    cors=https_fn.options.CorsOptions(
-        cors_origins=["*"],
-        cors_methods=["GET", "POST", "OPTIONS"],
-    )
-)
+@https_fn.on_request()
 def gerarCheckoutCreditos(req: https_fn.Request) -> https_fn.Response:
     headers = {
         'Access-Control-Allow-Origin': '*',
