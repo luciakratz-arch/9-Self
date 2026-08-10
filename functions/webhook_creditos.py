@@ -95,12 +95,7 @@ def enviar_email_creditos(email, nome, creditos, saldo_atual):
         server.login(GMAIL_USER, GMAIL_PASS.value)
         server.sendmail(GMAIL_USER, email, msg.as_string())
 
-@https_fn.on_request(
-    cors=https_fn.options.CorsOptions(
-        cors_origins=["*"],
-        cors_methods=["GET", "POST", "OPTIONS"],
-    )
-)
+@https_fn.on_request()
 def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
     if req.method == 'GET':
         return https_fn.Response('OK', status=200)
