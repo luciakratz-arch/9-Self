@@ -84,12 +84,7 @@ def enviar_email(destinatario, nome, codigo):
         server.sendmail(GMAIL_USER, destinatario, msg.as_string())
 
 # ── WEBHOOK HOTMART ──
-@https_fn.on_request(
-    cors=https_fn.options.CorsOptions(
-        cors_origins=["*"],
-        cors_methods=["GET", "POST", "OPTIONS"],
-    )
-)
+@https_fn.on_request()
 def webhookHotmart(req: https_fn.Request) -> https_fn.Response:
     # Hotmart pode validar o endpoint com GET
     if req.method == 'GET':
