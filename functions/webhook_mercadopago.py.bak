@@ -30,7 +30,7 @@ db = firestore.client()
 GMAIL_PASS    = StringParam("GMAIL_PASS")
 MP_TOKEN      = StringParam("MP_TOKEN")
 GMAIL_USER    = "luciakratz@gmail.com"
-APP_URL       = "https://luciakratz.github.io/app-eneagrama/index.html"
+APP_URL       = "https://luciakratz-arch.github.io/9-Self/index.html"
 
 # ── GERAR CÓDIGO ÚNICO ──
 def gerar_codigo():
@@ -81,12 +81,7 @@ def enviar_email(destinatario, nome, codigo):
         server.sendmail(GMAIL_USER, destinatario, msg.as_string())
 
 # ── WEBHOOK MERCADO PAGO ──
-@https_fn.on_request(
-    cors=https_fn.options.CorsOptions(
-        cors_origins=["*"],
-        cors_methods=["GET", "POST", "OPTIONS"],
-    )
-)
+@https_fn.on_request()
 def webhookMercadoPago(req: https_fn.Request) -> https_fn.Response:
     # Mercado Pago valida o endpoint com GET
     if req.method == 'GET':
