@@ -6387,13 +6387,19 @@ async function pdiCarregarEmpresas() {
       const uid = window._state?.uid;
       snap = await getDocs(query(collection(db,'nself_empresas'), where('rhUid','==',uid)));
     }
+    console.log('[PDI empresas] profile:', profile, '| total:', snap.size);
     snap.forEach(d=>{
+      console.log('[PDI empresa]', d.id, d.data().nome);
       const o = document.createElement('option');
       o.value = d.id;
       o.textContent = d.data().nome || d.id;
       sel.appendChild(o);
     });
-  } catch(e){ console.warn('[PDI empresas]',e); }
+    if(snap.size===0) sel.innerHTML += '<option disabled>⚠️ Nenhuma empresa encontrada (profile:'+profile+')</option>';
+  } catch(e){
+    console.error('[PDI empresas ERRO]',e);
+    document.getElementById('pdiEmpresaFiltro').innerHTML += '<option disabled>Erro: '+e.message+'</option>';
+  }
 }
 
 window.pdiCarregarColaboradores = async function() {
