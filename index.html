@@ -1940,7 +1940,10 @@ tr:hover td{background:#FAFAFE;}
           <div class="pdi-section" id="pdiSec-skills">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
               <div style="font-weight:700;color:#3A1F5C;font-size:14px;">Matriz de Competências</div>
-              <button class="btn btn-primary" onclick="pdiModalSkill()">+ Nova Competência</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-outline" onclick="pdiSeedSkills()" style="font-size:12px;">🔮 Popular com Matriz Eneagrama</button>
+                <button class="btn btn-primary" onclick="pdiModalSkill()">+ Nova Competência</button>
+              </div>
             </div>
             <div id="pdiSkillsLista"><div class="pdi-empty">Carregando competências...</div></div>
           </div>
@@ -6222,17 +6225,147 @@ const _pdi = {
 const PDI_DIMENSOES = ['Pessoal','Departamental / Funcional','Organizacional / Empresarial'];
 const PDI_CATEGORIAS = ['Liderança','Comunicação','Saúde Ocupacional / Prevenção de Assédio','Feedback','Operacional','Comercial'];
 
-// Categorias prioritárias de desenvolvimento por tipo Eneagrama
+// Mapa de desenvolvimento por tipo Eneagrama — baseado em Liderança com Eneagrama (Dra. Lúcia Kratz)
 const PDI_ENEA_FOCO = {
-  1: { categorias: ['Feedback','Saúde Ocupacional / Prevenção de Assédio'], descricao: 'Tipo 1 — O Perfeccionista: desenvolvimento em flexibilidade, autocrítica saudável e comunicação não-julgadora.' },
-  2: { categorias: ['Comunicação','Saúde Ocupacional / Prevenção de Assédio'], descricao: 'Tipo 2 — O Prestativo: desenvolvimento em limites saudáveis, autopromoção e gestão das próprias necessidades.' },
-  3: { categorias: ['Feedback','Liderança'], descricao: 'Tipo 3 — O Realizador: desenvolvimento em autenticidade, escuta ativa e liderança colaborativa vs. competitiva.' },
-  4: { categorias: ['Comunicação','Operacional'], descricao: 'Tipo 4 — O Individualista: desenvolvimento em consistência, entrega prática e regulação emocional no trabalho.' },
-  5: { categorias: ['Comunicação','Liderança'], descricao: 'Tipo 5 — O Investigador: desenvolvimento em presença, compartilhamento de conhecimento e liderança participativa.' },
-  6: { categorias: ['Liderança','Feedback'], descricao: 'Tipo 6 — O Leal: desenvolvimento em autonomia decisória, confiança na própria percepção e gestão da ansiedade.' },
-  7: { categorias: ['Operacional','Feedback'], descricao: 'Tipo 7 — O Entusiasta: desenvolvimento em foco, conclusão de projetos e feedback estruturado.' },
-  8: { categorias: ['Saúde Ocupacional / Prevenção de Assédio','Comunicação'], descricao: 'Tipo 8 — O Desafiador: desenvolvimento em escuta empática, moderação do impacto e liderança sem intimidação.' },
-  9: { categorias: ['Liderança','Comercial'], descricao: 'Tipo 9 — O Pacificador: desenvolvimento em posicionamento, assertividade e presença executiva.' },
+  1: {
+    nome: 'O Perfeccionista',
+    paradigma: 'Estabelecer metas claras e inspirar os outros para atingirem a maior qualidade possível.',
+    forças: ['Busca da excelência','Lidera pelo exemplo','Organizado e consistente','Honesto e perceptivo'],
+    desafios: ['Excessivamente crítico','Defensivo quando criticado','Controlador','Impaciente'],
+    comunicacao: 'Preciso, direto e detalhista. Usa palavras como "deve", "precisa", "tem que". Defensivo se criticado.',
+    feedback: 'Recebe melhor com elogio sincero, linguagem não julgadora e sendo deixado no controle do resultado.',
+    categorias: ['Feedback','Saúde Ocupacional / Prevenção de Assédio'],
+    descricao: 'Tipo 1 — O Perfeccionista: desenvolvimento prioritário em flexibilidade crítica, comunicação não-julgadora e gestão da impaciência. Risco de liderança: linguagem avaliativa que inibe a equipe.',
+  },
+  2: {
+    nome: 'O Prestativo',
+    paradigma: 'Acessar os pontos fortes e fracos do time e motivá-los, facilitando o alcance das metas organizacionais.',
+    forças: ['Motivação e atendimento dos outros','Desenvolve excelentes relacionamentos','Empático e apoiador','Atento às necessidades da equipe'],
+    desafios: ['Não fala não','Tem raiva quando não é apreciado','Não reconhece suas próprias necessidades','Contemporizador e indireto'],
+    comunicacao: 'Faz perguntas, elogia, foco no outro. Voz suave. Fica bravo quando não ouvido.',
+    feedback: 'Recebe melhor em ambiente privado, com atenção validada, reforçando seu valor nos relacionamentos.',
+    categorias: ['Comunicação','Saúde Ocupacional / Prevenção de Assédio'],
+    descricao: 'Tipo 2 — O Prestativo: desenvolvimento prioritário em limites saudáveis, assertividade e reconhecimento das próprias necessidades. Risco: dinâmica de "dar para receber" que gera ressentimento.',
+  },
+  3: {
+    nome: 'O Realizador',
+    paradigma: 'Criar um ambiente que atinja resultados porque as pessoas entendem a estrutura e as metas organizacionais.',
+    forças: ['Orientado pelo sucesso','Alta energia','Empreendedor e confiante','Supera problemas com otimismo'],
+    desafios: ['Competitivo','Esconde sentimentos profundos','Pouco tempo para relacionamento','Impaciente com sentimentos dos outros'],
+    comunicacao: 'Claro, eficiente, lógico. Rápido. Impaciente com conversas longas. Olha em volta para checar reações.',
+    feedback: 'Recebe melhor com feedback posicionado como "caminho para mais sucesso", abordagem racional e confiança na sua competência.',
+    categorias: ['Feedback','Liderança'],
+    descricao: 'Tipo 3 — O Realizador: desenvolvimento prioritário em autenticidade, escuta ativa e liderança colaborativa. Risco: competitividade que fragiliza o clima e imagem que se sobrepõe à identidade real.',
+  },
+  4: {
+    nome: 'O Individualista',
+    paradigma: 'Criar organizações que deem significado e propósito para as pessoas, para que fiquem inspiradas a fazer um trabalho excelente.',
+    forças: ['Busca a paixão de cada um','Inspirador e criativo','Intuitivo e introspectivo','Tem compaixão'],
+    desafios: ['Intenso e autocentrado','Entedia-se facilmente','Dificuldade de aceitar críticas','Guiado pela culpa'],
+    comunicacao: 'Usa "eu" com frequência. Compartilha sentimentos e histórias pessoais. Escolha deliberada de palavras.',
+    feedback: 'Recebe melhor com rapport, palavras pessoais, escuta completa e espaço para expressar sentimentos sem julgamento.',
+    categorias: ['Comunicação','Operacional'],
+    descricao: 'Tipo 4 — O Individualista: desenvolvimento prioritário em consistência, entrega prática e regulação emocional. Risco: autorreferência que desvia o foco da equipe e oscilações que afetam a produtividade.',
+  },
+  5: {
+    nome: 'O Investigador',
+    paradigma: 'Desenvolver uma organização eficaz por meio de pesquisa, deliberação e planejamento, para que as pessoas trabalhem com missão comum.',
+    forças: ['Analítico e objetivo','Sistemático e perceptivo','Planeja de forma abrangente','Excelente em crises'],
+    desafios: ['Desconectado e reservado','Excessivamente independente','Não compartilha informações','Pouco assertivo'],
+    comunicacao: 'Fala pouco. Escolha seletiva de palavras. Compartilha mais pensamentos do que emoções. Parece contido.',
+    feedback: 'Recebe melhor com aviso prévio, espaço físico, prazo claro, abordagem racional e tempo para reflexão solo.',
+    categorias: ['Comunicação','Liderança'],
+    descricao: 'Tipo 5 — O Investigador: desenvolvimento prioritário em presença, compartilhamento de conhecimento e liderança participativa. Risco: isolamento intelectual que reduz influência e engajamento da equipe.',
+  },
+  6: {
+    nome: 'O Leal',
+    paradigma: 'Resolver questões organizacionais, desenvolvendo um ambiente criativo de resolução de problemas, no qual cada pessoa sinta que é parte da situação.',
+    forças: ['Leal à empresa e aos colaboradores','Estratégico e antecipa problemas','Responsável e colaborador','Mente aguçada'],
+    desafios: ['Excessivamente comprometido ou desafiador','Imobilizado pelo excesso de análise','Projeta pensamentos nos outros','Defensivo'],
+    comunicacao: 'Analítico, alterna entre hesitação e ousadia. Discute preocupações e "e se...". Olhar pode mover-se em busca de perigo.',
+    feedback: 'Recebe melhor com sugestões antecipadas, atmosfera empática, reconstrução de confiança e múltiplas revisões.',
+    categorias: ['Liderança','Feedback'],
+    descricao: 'Tipo 6 — O Leal: desenvolvimento prioritário em autonomia decisória, confiança na própria percepção e gestão da ansiedade. Risco: pessimismo projetado que contamina o clima e paralisa decisões.',
+  },
+  7: {
+    nome: 'O Entusiasta',
+    paradigma: 'Tomar as pessoas animadas e criar soluções inovadoras para que a organização aproveite novas oportunidades de negócios.',
+    forças: ['Imaginativo e criativo','Entusiástico e curioso','Conecta dados diferentes','Pensa rápido'],
+    desafios: ['Impulsivo e não focado','Evita situações dolorosas','Reativo a feedback crítico','Não gosta da rotina'],
+    comunicacao: 'Rápido e espontâneo. Muda de tópico. Evita negatividade. Distrai-se facilmente.',
+    feedback: 'Recebe melhor com feedback entre dois positivos, deixando-o dar ideias primeiro, mantendo atitude otimista.',
+    categorias: ['Operacional','Feedback'],
+    descricao: 'Tipo 7 — O Entusiasta: desenvolvimento prioritário em foco, conclusão de projetos e presença no desconforto. Risco: dispersão que compromete entregas e racionalização que evita o feedback real.',
+  },
+  8: {
+    nome: 'O Desafiador',
+    paradigma: 'Mover a organização adiante, liderando de forma decidida, colocando pessoas capazes e confiáveis nos postos certos.',
+    forças: ['Direto e autoconfiante','Altamente estratégico','Supera obstáculos','Protetor dos outros'],
+    desafios: ['Controlador com excesso de demandas','Desdenha das fraquezas','Excessivo até a exaustão','Não gosta de ritmo lento'],
+    comunicacao: 'Ousado e imponente. Afirmações para estruturar/controlar. Aumenta intensidade até obter resposta. Presença física forte.',
+    feedback: 'Recebe melhor com diretividade, honestidade, sem tom emocional fraco, fazendo-o sentir no controle.',
+    categorias: ['Saúde Ocupacional / Prevenção de Assédio','Comunicação'],
+    descricao: 'Tipo 8 — O Desafiador: desenvolvimento prioritário em escuta empática, moderação do impacto e liderança sem intimidação. Risco: clima de medo que inibe a equipe e confunde energia com violência psicológica.',
+  },
+  9: {
+    nome: 'O Pacificador',
+    paradigma: 'Ajudar a atingir a missão coletiva, criando um ambiente de trabalho claramente estruturado e harmonioso.',
+    forças: ['Inclusão e consenso','Diplomático e paciente','Desenvolve relacionamentos duradouros','Assimila perspectiva ampla'],
+    desafios: ['Evita conflitos','Não assertivo','Procrastina','Agressivo-passivo quando mandado'],
+    comunicacao: 'Detalhado e sequencial. Apresenta todos os lados. Pode falar "sim" que significa "não". Poucas emoções negativas visíveis.',
+    feedback: 'Recebe melhor com rapport, sem julgamento, extraindo sua própria reflexão, sem exigir ação específica.',
+    categorias: ['Liderança','Comercial'],
+    descricao: 'Tipo 9 — O Pacificador: desenvolvimento prioritário em posicionamento, assertividade e presença executiva. Risco: harmonia como evitação que impede decisões e anula a influência legítima do líder.',
+  },
+};
+
+// Competências-semente derivadas da matriz Liderança com Eneagrama
+const PDI_SKILLS_SEED = [
+  // PESSOAL
+  {nome:'Autoconsciência emocional', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Pessoal'},
+  {nome:'Gestão da autocrítica e perfeccionismo', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Pessoal'},
+  {nome:'Regulação emocional sob pressão', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Pessoal'},
+  {nome:'Assertividade e posicionamento pessoal', categoria:'Comunicação', tipo:'Soft', dimensao:'Pessoal'},
+  {nome:'Reconhecimento e gestão das próprias necessidades', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Pessoal'},
+  {nome:'Abertura e receptividade ao feedback', categoria:'Feedback', tipo:'Soft', dimensao:'Pessoal'},
+  {nome:'Foco e conclusão de tarefas', categoria:'Operacional', tipo:'Hard', dimensao:'Pessoal'},
+  {nome:'Tolerância à frustração e ao ritmo alheio', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Pessoal'},
+  // DEPARTAMENTAL / FUNCIONAL
+  {nome:'Comunicação não-julgadora com a equipe', categoria:'Comunicação', tipo:'Soft', dimensao:'Departamental / Funcional'},
+  {nome:'Escuta ativa e presença nas conversas', categoria:'Comunicação', tipo:'Soft', dimensao:'Departamental / Funcional'},
+  {nome:'Clareza e objetividade na transmissão de informações', categoria:'Comunicação', tipo:'Hard', dimensao:'Departamental / Funcional'},
+  {nome:'Dar feedback com estrutura e sem julgamento', categoria:'Feedback', tipo:'Hard', dimensao:'Departamental / Funcional'},
+  {nome:'Receber feedback com abertura e sem defensividade', categoria:'Feedback', tipo:'Soft', dimensao:'Departamental / Funcional'},
+  {nome:'Gestão e resolução de conflitos interpessoais', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Departamental / Funcional'},
+  {nome:'Estabelecimento de limites saudáveis no trabalho', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Departamental / Funcional'},
+  {nome:'Delegação com clareza e acompanhamento', categoria:'Liderança', tipo:'Hard', dimensao:'Departamental / Funcional'},
+  {nome:'Tomada de decisão com autonomia', categoria:'Liderança', tipo:'Hard', dimensao:'Departamental / Funcional'},
+  {nome:'Gestão do tempo e prioridades', categoria:'Operacional', tipo:'Hard', dimensao:'Departamental / Funcional'},
+  {nome:'Planejamento e antecipação de riscos', categoria:'Operacional', tipo:'Hard', dimensao:'Departamental / Funcional'},
+  // ORGANIZACIONAL / EMPRESARIAL
+  {nome:'Liderança pelo exemplo e coerência', categoria:'Liderança', tipo:'Soft', dimensao:'Organizacional / Empresarial'},
+  {nome:'Criação de clima psicológico seguro', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Soft', dimensao:'Organizacional / Empresarial'},
+  {nome:'Motivação e engajamento de equipes', categoria:'Liderança', tipo:'Soft', dimensao:'Organizacional / Empresarial'},
+  {nome:'Liderança colaborativa vs. competitiva', categoria:'Liderança', tipo:'Soft', dimensao:'Organizacional / Empresarial'},
+  {nome:'Construção de consenso e inclusão', categoria:'Liderança', tipo:'Soft', dimensao:'Organizacional / Empresarial'},
+  {nome:'Visão estratégica e leitura do contexto', categoria:'Liderança', tipo:'Hard', dimensao:'Organizacional / Empresarial'},
+  {nome:'Comunicação de metas e resultados esperados', categoria:'Comercial', tipo:'Hard', dimensao:'Organizacional / Empresarial'},
+  {nome:'Influência e posicionamento institucional', categoria:'Comercial', tipo:'Soft', dimensao:'Organizacional / Empresarial'},
+  {nome:'Prevenção e manejo de assédio moral e sexual', categoria:'Saúde Ocupacional / Prevenção de Assédio', tipo:'Hard', dimensao:'Organizacional / Empresarial'},
+  {nome:'Inovação e abertura a mudanças', categoria:'Operacional', tipo:'Soft', dimensao:'Organizacional / Empresarial'},
+];
+
+window.pdiSeedSkills = async function() {
+  if(!confirm(`Isso vai popular a Matriz de Competências com ${PDI_SKILLS_SEED.length} competências-base derivadas da metodologia Eneagrama.\n\nDeseja continuar?`)) return;
+  try {
+    const { addDoc, collection, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    for(const s of PDI_SKILLS_SEED) {
+      await addDoc(collection(db,'pdi_skills'), {...s, criadoEm: serverTimestamp()});
+    }
+    await pdiCarregarSkills();
+    pdiRenderSkills();
+    alert(`✅ ${PDI_SKILLS_SEED.length} competências cadastradas com sucesso.`);
+  } catch(e){ alert('Erro ao popular competências: '+e.message); }
 };
 
 // ── PDI: Inicialização da página ───────────────────────────
