@@ -6213,6 +6213,7 @@ const _pdi = {
   empresaId: null,
   colabId: null,
   colabNome: null,
+  tipoEnea: null,  // tipo Eneagrama do colaborador (1-9)
   skills: [],
   avalAuto: {},   // skillId -> nota
   avalChefia: {}, // skillId -> nota
@@ -6220,6 +6221,19 @@ const _pdi = {
 
 const PDI_DIMENSOES = ['Pessoal','Departamental / Funcional','Organizacional / Empresarial'];
 const PDI_CATEGORIAS = ['Liderança','Comunicação','Saúde Ocupacional / Prevenção de Assédio','Feedback','Operacional','Comercial'];
+
+// Categorias prioritárias de desenvolvimento por tipo Eneagrama
+const PDI_ENEA_FOCO = {
+  1: { categorias: ['Feedback','Saúde Ocupacional / Prevenção de Assédio'], descricao: 'Tipo 1 — O Perfeccionista: desenvolvimento em flexibilidade, autocrítica saudável e comunicação não-julgadora.' },
+  2: { categorias: ['Comunicação','Saúde Ocupacional / Prevenção de Assédio'], descricao: 'Tipo 2 — O Prestativo: desenvolvimento em limites saudáveis, autopromoção e gestão das próprias necessidades.' },
+  3: { categorias: ['Feedback','Liderança'], descricao: 'Tipo 3 — O Realizador: desenvolvimento em autenticidade, escuta ativa e liderança colaborativa vs. competitiva.' },
+  4: { categorias: ['Comunicação','Operacional'], descricao: 'Tipo 4 — O Individualista: desenvolvimento em consistência, entrega prática e regulação emocional no trabalho.' },
+  5: { categorias: ['Comunicação','Liderança'], descricao: 'Tipo 5 — O Investigador: desenvolvimento em presença, compartilhamento de conhecimento e liderança participativa.' },
+  6: { categorias: ['Liderança','Feedback'], descricao: 'Tipo 6 — O Leal: desenvolvimento em autonomia decisória, confiança na própria percepção e gestão da ansiedade.' },
+  7: { categorias: ['Operacional','Feedback'], descricao: 'Tipo 7 — O Entusiasta: desenvolvimento em foco, conclusão de projetos e feedback estruturado.' },
+  8: { categorias: ['Saúde Ocupacional / Prevenção de Assédio','Comunicação'], descricao: 'Tipo 8 — O Desafiador: desenvolvimento em escuta empática, moderação do impacto e liderança sem intimidação.' },
+  9: { categorias: ['Liderança','Comercial'], descricao: 'Tipo 9 — O Pacificador: desenvolvimento em posicionamento, assertividade e presença executiva.' },
+};
 
 // ── PDI: Inicialização da página ───────────────────────────
 async function pdiInit() {
@@ -6288,11 +6302,18 @@ window.pdiCarregarCiclos = async function() {
   _pdi.colabNome = document.getElementById('pdiColabFiltro').selectedOptions[0]?.textContent || '';
   _pdi.avalAuto = {};
   _pdi.avalChefia = {};
+  _pdi.tipoEnea = null;
   if(!colabId) {
     document.getElementById('pdiAutoGrid').innerHTML = '<div class="pdi-empty">Selecione empresa e colaborador</div>';
     document.getElementById('pdiChefiaGrid').innerHTML = '<div class="pdi-empty">Selecione empresa e colaborador</div>';
     return;
   }
+  // Busca tipo Eneagrama do colaborador via nself_laudos
+  try {
+    const { getDocs, collection, query, where, limit: lim } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snapL = await getDocs(query(collection(db,'nself_laudos'), where('codigoId','==',colabId), lim(1)));
+    if(!snapL.empty) { _pdi.tipoEnea = snapL.docs[0].data().tipo || null; }
+  } catch(e){ console.warn('[PDI enea]',e); }
   pdiRenderGradeAvaliacao('auto');
   pdiRenderGradeAvaliacao('chefia');
   // Carrega último ciclo salvo se existir
@@ -6329,7 +6350,20 @@ function pdiRenderGradeAvaliacao(tipo) {
     const el = document.getElementById(ids[i]);
     return !el || el.checked;
   });
-  let html = '';
+
+  // Banner Eneagrama (só no painel auto para não duplicar)
+  let bannerEnea = '';
+  if(tipo==='auto' && _pdi.tipoEnea && PDI_ENEA_FOCO[_pdi.tipoEnea]) {
+    const foco = PDI_ENEA_FOCO[_pdi.tipoEnea];
+    bannerEnea = `<div style="background:#f3e8ff;border:1px solid #c084fc;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#6d28d9;">
+      <strong>🔮 Foco de desenvolvimento — Tipo ${_pdi.tipoEnea}</strong><br>${foco.descricao}
+    </div>`;
+  }
+
+  const catsFoco = (_pdi.tipoEnea && PDI_ENEA_FOCO[_pdi.tipoEnea])
+    ? PDI_ENEA_FOCO[_pdi.tipoEnea].categorias : [];
+
+  let html = bannerEnea;
   dims.forEach(dim=>{
     const skills = _pdi.skills.filter(s=>s.dimensao===dim);
     if(!skills.length) return;
@@ -6339,8 +6373,11 @@ function pdiRenderGradeAvaliacao(tipo) {
       const stars = [1,2,3,4,5].map(n=>
         `<span class="pdi-star ${nota>=n?'on':''}" onclick="pdiSetNota('${tipo}','${s.id}',${n},this)">${nota>=n?'★':'☆'}</span>`
       ).join('');
-      html += `<div class="pdi-skill-row">
-        <div class="pdi-skill-name">${s.nome} <span class="pdi-skill-cat">${s.categoria}</span></div>
+      const isFoco = catsFoco.includes(s.categoria);
+      const focoBadge = isFoco ? `<span style="font-size:10px;background:#ede9fe;color:#6d28d9;padding:1px 7px;border-radius:10px;margin-left:4px;">★ Foco Eneagrama</span>` : '';
+      const rowStyle = isFoco ? 'background:#faf5ff;border-radius:8px;padding:8px 6px;' : '';
+      html += `<div class="pdi-skill-row" style="${rowStyle}">
+        <div class="pdi-skill-name">${s.nome}${focoBadge} <span class="pdi-skill-cat">${s.categoria}</span></div>
         <div class="pdi-rating" data-tipo="${tipo}" data-skill="${s.id}">${stars}</div>
       </div>`;
     });
