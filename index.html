@@ -6190,6 +6190,9 @@ async function loadCulturaHist() {
     }
   }
 })();
+
+// Expõe Firestore para uso fora do módulo (PDI e outros scripts externos)
+window._fs = { db, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, orderBy, limit, serverTimestamp, increment };
 </script>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -6198,6 +6201,10 @@ async function loadCulturaHist() {
      Não altera nenhuma outra coleção ou módulo existente.
 ══════════════════════════════════════════════════════════ -->
 <script>
+// ── PDI: Firestore via window._fs (exposto pelo module) ────
+const { db, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc,
+        setDoc, query, where, orderBy, limit, serverTimestamp, increment } = window._fs || {};
+
 // ── PDI: Estado local ──────────────────────────────────────
 const _pdi = {
   empresaId: null,
