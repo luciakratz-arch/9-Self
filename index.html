@@ -6404,7 +6404,7 @@ window.pdiCarregarColaboradores = async function() {
   sel.innerHTML = '<option value="">Selecione o colaborador</option>';
   if(!empresaId) return;
   try {
-    const snap = await getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empresaId), where('usado','==',true)));
+    const snap = await getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empresaId), where('status','==','usado')));
     snap.forEach(d=>{
       const o = document.createElement('option');
       o.value = d.id;
