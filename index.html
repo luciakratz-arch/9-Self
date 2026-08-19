@@ -2198,7 +2198,7 @@ tr:hover td{background:#FAFAFE;}
 <!-- ══════════════════ FIREBASE + LÓGICA ══════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment }
+import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, orderBy, limit, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -2375,7 +2375,6 @@ function buildSidebar(profile) {
 
 async function pdiVerificarFlagEInjetar(profile) {
   try {
-    const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const empresaId = window._state?.empresaId || window._state?.rh?.empresaId || null;
     if(!empresaId && profile!=='admin') return;
     // Admin sempre vê PDI; RH só se flag ativa na empresa
@@ -2398,7 +2397,6 @@ async function pdiVerificarFlagEInjetar(profile) {
 
 async function atualizarBadgesPendentes() {
   try {
-    const { getDocs, collection, query, where } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     // Solicitacoes PF pendentes
     const [snapPF, snapParc] = await Promise.all([
       getDocs(query(collection(db,'nself_solicitacoes'), where('status','==','pendente'))),
@@ -2568,7 +2566,6 @@ window.abrirDetalheEmpresa = async function(id, nome, responsavel, email, credit
 
   // Carregar estado do módulo PDI
   try {
-    const { getDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const empSnap = await getDoc(fsDoc(db,'nself_empresas',id));
     const moduloPdi = empSnap.exists() ? (empSnap.data().modulo_pdi === true) : false;
     const tog = document.getElementById('toggleModuloPDI');
@@ -3610,8 +3607,7 @@ async function salvarResultadoFinal() {
     // CASO 2: Buscar URL no Firestore (laudo já gerado em sessão anterior)
     if(window._state.laudoDocId) {
       try {
-        const { getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-        const snap = await getDoc(doc(db,'nself_laudos', window._state.laudoDocId));
+            const snap = await getDoc(doc(db,'nself_laudos', window._state.laudoDocId));
         if(snap.exists() && snap.data().pdfUrl) {
           window._state.laudoUrl = snap.data().pdfUrl;
           window.baixarLaudo();
@@ -3991,7 +3987,6 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
 
   try {
     // 1. Buscar dados do laudo
-    const { getDoc: _getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await _getDoc(doc(db,'nself_laudos', laudoId));
     if(!snap.exists()) throw new Error('Registro não encontrado no banco');
     const l = snap.data();
@@ -4095,7 +4090,6 @@ window.verCadastroCliente = function(btn) {
 window.excluirLaudo = async function(laudoId) {
   if(!confirm('Excluir este laudo? Esta ação não pode ser desfeita.')) return;
   try {
-    const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await deleteDoc(doc(db, 'nself_laudos', laudoId));
     const cell = document.getElementById(`pdfcell_${laudoId}`);
     if(cell) cell.closest('tr').remove();
@@ -5110,7 +5104,6 @@ window.excluirParceiro = async function(id, nome) {
 
 window.abrirEditarEmpresa = async function(id) {
   try {
-    const { getDoc: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await gd(doc(db,'nself_empresas',id));
     if(!snap.exists()) { showToast('Empresa não encontrada.','error'); return; }
     const e = snap.data();
@@ -5148,7 +5141,6 @@ window.salvarEdicaoEmpresa = async function() {
 
 window.abrirEditarParceiro = async function(id) {
   try {
-    const { getDoc: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await gd(doc(db,'nself_parceiros',id));
     if(!snap.exists()) { showToast('Parceiro não encontrado.','error'); return; }
     const p = snap.data();
@@ -5773,7 +5765,6 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
     const link = gerarLinkTeste(c);
 
     // Buscar dados completos da solicitação
-    const { getDoc: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const solSnap = await gd(doc(db,'nself_solicitacoes',solId));
     const solData = solSnap.data()?.dados || {};
 
@@ -6053,7 +6044,6 @@ const NOMES_INST = {AP:'Autopreservação',SOC:'Social','1A1':'Um a Um'};
 async function loadCulturaPage() {
   // Carregar empresas no select
   try {
-    const { collection: col, getDocs: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await gd(col(db, 'nself_empresas'));
     const sel = document.getElementById('culturaEmpresaSel');
     sel.innerHTML = '<option value="">Selecione uma empresa...</option>';
@@ -6072,7 +6062,6 @@ async function loadCulturaPage() {
 async function previewCultura(empresaId) {
   if(!empresaId) { document.getElementById('culturaPodio').style.display='none'; return; }
   try {
-    const { collection: col, query, where, getDocs: gd } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const laudoSnap = await gd(query(col(db,'nself_laudos'), where('empresaId','==',empresaId)));
     const perfis = [];
     laudoSnap.forEach(d => {
@@ -6156,8 +6145,6 @@ window.gerarRelatorioCultura = async function() {
 
 async function loadCulturaHist() {
   try {
-    const { collection: col, getDocs: gd, orderBy, query, limit } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
 
     const empSnap = await gd(col(db,'nself_empresas'));
     const tbody = document.getElementById('culturaHistTable');
@@ -6358,7 +6345,6 @@ const PDI_SKILLS_SEED = [
 window.pdiSeedSkills = async function() {
   if(!confirm(`Isso vai popular a Matriz de Competências com ${PDI_SKILLS_SEED.length} competências-base derivadas da metodologia Eneagrama.\n\nDeseja continuar?`)) return;
   try {
-    const { addDoc, collection, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     for(const s of PDI_SKILLS_SEED) {
       await addDoc(collection(db,'pdi_skills'), {...s, criadoEm: serverTimestamp()});
     }
@@ -6391,7 +6377,6 @@ window.pdiAba = function(aba) {
 // ── Empresas ──────────────────────────────────────────────
 async function pdiCarregarEmpresas() {
   try {
-    const { getDocs, collection, query, where, orderBy } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const profile = window._state?.profile;
     const sel = document.getElementById('pdiEmpresaFiltro');
     sel.innerHTML = '<option value="">Selecione a empresa</option>';
@@ -6418,7 +6403,6 @@ window.pdiCarregarColaboradores = async function() {
   sel.innerHTML = '<option value="">Selecione o colaborador</option>';
   if(!empresaId) return;
   try {
-    const { getDocs, collection, query, where } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empresaId), where('usado','==',true)));
     snap.forEach(d=>{
       const o = document.createElement('option');
@@ -6443,15 +6427,13 @@ window.pdiCarregarCiclos = async function() {
   }
   // Busca tipo Eneagrama do colaborador via nself_laudos
   try {
-    const { getDocs, collection, query, where, limit: lim } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snapL = await getDocs(query(collection(db,'nself_laudos'), where('codigoId','==',colabId), lim(1)));
+    const snapL = await getDocs(query(collection(db,'nself_laudos'), where('codigoId','==',colabId), limit(1)));
     if(!snapL.empty) { _pdi.tipoEnea = snapL.docs[0].data().tipo || null; }
   } catch(e){ console.warn('[PDI enea]',e); }
   pdiRenderGradeAvaliacao('auto');
   pdiRenderGradeAvaliacao('chefia');
   // Carrega último ciclo salvo se existir
   try {
-    const { getDocs, collection, query, where, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await getDocs(query(
       collection(db,'pdi_avaliacoes'),
       where('colabId','==',colabId),
@@ -6532,8 +6514,6 @@ window.pdiSetNota = function(tipo, skillId, nota, el) {
 window.pdiSalvarAvaliacao = async function(tipo) {
   if(!_pdi.colabId || !_pdi.empresaId) { alert('Selecione empresa e colaborador.'); return; }
   try {
-    const { addDoc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, updateDoc, doc } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     // Busca doc do ciclo atual (aberto)
     const snap = await getDocs(query(
       collection(db,'pdi_avaliacoes'),
@@ -6570,8 +6550,6 @@ window.pdiFecharCiclo = async function() {
   if(!_pdi.colabId || !_pdi.empresaId) { alert('Selecione empresa e colaborador.'); return; }
   if(!confirm('Fechar o ciclo atual e salvar o histórico?')) return;
   try {
-    const { addDoc, collection, serverTimestamp, getDocs, query, where, limit, updateDoc, doc, getDoc } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const cicloSnap = await getDoc(doc(db,'pdi_config',_pdi.empresaId));
     const cicloTipo = cicloSnap.exists() ? cicloSnap.data().ciclo : (document.getElementById('pdiCicloTipo').value || 'trimestral');
     const obs = document.getElementById('pdiObs').value;
@@ -6601,8 +6579,6 @@ async function pdiCarregarHistorico() {
   const container = document.getElementById('pdiHistoricoContainer');
   container.innerHTML = '<div class="pdi-empty">Carregando...</div>';
   try {
-    const { getDocs, collection, query, where, orderBy } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await getDocs(query(
       collection(db,'pdi_avaliacoes'),
       where('colabId','==',_pdi.colabId),
@@ -6643,8 +6619,6 @@ function calcMedia(obj) {
 // ── Skills CRUD ────────────────────────────────────────────
 async function pdiCarregarSkills() {
   try {
-    const { getDocs, collection, orderBy, query } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await getDocs(query(collection(db,'pdi_skills'), orderBy('dimensao')));
     _pdi.skills = snap.docs.map(d=>({id:d.id,...d.data()}));
   } catch(e){ console.warn('[PDI skills]',e); }
@@ -6734,11 +6708,10 @@ window.pdiSalvarSkill = async function(skillId) {
     tipo: document.getElementById('pdiSkillTipo').value.replace(' Skill',''),
   };
   try {
-    const mod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     if(skillId) {
-      await mod.updateDoc(mod.doc(db,'pdi_skills',skillId), payload);
+      await updateDoc(doc(db,'pdi_skills',skillId), payload);
     } else {
-      await mod.addDoc(mod.collection(db,'pdi_skills'), {...payload, criadoEm: mod.serverTimestamp()});
+      await addDoc(collection(db,'pdi_skills'), {...payload, criadoEm: serverTimestamp()});
     }
     closeModal('modalPDISkill');
     await pdiCarregarSkills();
@@ -6749,7 +6722,6 @@ window.pdiSalvarSkill = async function(skillId) {
 window.pdiExcluirSkill = async function(skillId) {
   if(!confirm('Excluir esta competência? Avaliações já salvas não serão afetadas.')) return;
   try {
-    const { deleteDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await deleteDoc(doc(db,'pdi_skills',skillId));
     await pdiCarregarSkills();
     pdiRenderSkills();
@@ -6762,7 +6734,6 @@ window.pdiAdicionarAcao = async function() {
   const texto = prompt('Descreva a ação de desenvolvimento:');
   if(!texto||!texto.trim()) return;
   try {
-    const { addDoc, collection, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await addDoc(collection(db,'pdi_acoes'), {
       colabId:_pdi.colabId, colabNome:_pdi.colabNome,
       empresaId:_pdi.empresaId, texto:texto.trim(),
@@ -6776,7 +6747,6 @@ async function pdiCarregarAcoes() {
   const c = document.getElementById('pdiPlanoContainer');
   if(!_pdi.colabId){ c.innerHTML='<div class="pdi-empty">Selecione empresa e colaborador</div>'; return; }
   try {
-    const { getDocs, collection, query, where, orderBy } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap = await getDocs(query(collection(db,'pdi_acoes'), where('colabId','==',_pdi.colabId), where('empresaId','==',_pdi.empresaId), orderBy('criadoEm','desc')));
     if(snap.empty){ c.innerHTML='<div class="pdi-empty">Nenhuma ação cadastrada. Use o botão acima para adicionar.</div>'; return; }
     let html='';
@@ -6799,7 +6769,6 @@ async function pdiCarregarAcoes() {
 
 window.pdiAtualizarStatusAcao = async function(id, status) {
   try {
-    const { updateDoc, doc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await updateDoc(doc(db,'pdi_acoes',id), {status, atualizadoEm:serverTimestamp()});
   } catch(e){ alert('Erro ao atualizar.'); }
 };
@@ -6809,7 +6778,6 @@ window.pdiSalvarConfig = async function() {
   if(!_pdi.empresaId){ alert('Selecione uma empresa primeiro.'); return; }
   const ciclo = document.getElementById('pdiCicloTipo').value;
   try {
-    const { setDoc, doc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await setDoc(doc(db,'pdi_config',_pdi.empresaId), {ciclo, atualizadoEm:serverTimestamp()}, {merge:true});
     alert('Configurações salvas ✓');
   } catch(e){ alert('Erro ao salvar configurações.'); }
@@ -6819,7 +6787,6 @@ window.pdiSalvarConfig = async function() {
 window.pdiToggleModulo = async function(empresaId, ativo) {
   if(!empresaId){ alert('Empresa não identificada.'); return; }
   try {
-    const { updateDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await updateDoc(doc(db,'nself_empresas',empresaId), {modulo_pdi: ativo});
     const lbl = document.getElementById('toggleModuloPDILabel');
     if(lbl){ lbl.textContent = ativo ? 'Habilitado' : 'Desabilitado'; lbl.style.color = ativo ? '#16a34a' : '#888'; }
