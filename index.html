@@ -3987,7 +3987,7 @@ window.gerarPdfLaudo = async function(laudoId, forcar) {
 
   try {
     // 1. Buscar dados do laudo
-    const snap = await _getDoc(doc(db,'nself_laudos', laudoId));
+    const snap = await getDoc(doc(db,'nself_laudos', laudoId));
     if(!snap.exists()) throw new Error('Registro não encontrado no banco');
     const l = snap.data();
 
@@ -6191,31 +6191,7 @@ async function loadCulturaHist() {
   }
 })();
 
-// Expõe Firestore para uso fora do módulo (PDI e outros scripts externos)
-window._fs = { db, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, orderBy, limit, serverTimestamp, increment };
-</script>
-
-<!-- ══════════════════════════════════════════════════════════
-     MÓDULO PDI & AVALIAÇÃO DE DESEMPENHO
-     Coleções Firestore isoladas: pdi_avaliacoes / pdi_skills / pdi_config
-     Não altera nenhuma outra coleção ou módulo existente.
-══════════════════════════════════════════════════════════ -->
-<script>
-// ── PDI: helpers Firestore (lidos em runtime após module carregar) ──
-function _db()           { return window._fs?.db; }
-function _col(...)       { return window._fs?.collection(...arguments); }
-function _getDocs(...)   { return window._fs?.getDocs(...arguments); }
-function _getDoc(...)    { return window._fs?.getDoc(...arguments); }
-function _addDoc(...)    { return window._fs?.addDoc(...arguments); }
-function _doc(...)       { return window._fs?.doc(...arguments); }
-function _updateDoc(...) { return window._fs?.updateDoc(...arguments); }
-function _deleteDoc(...) { return window._fs?.deleteDoc(...arguments); }
-function _setDoc(...)    { return window._fs?.setDoc(...arguments); }
-function _query(...)     { return window._fs?.query(...arguments); }
-function _where(...)     { return window._fs?.where(...arguments); }
-function _orderBy(...)   { return window._fs?.orderBy(...arguments); }
-function _limit(...)     { return window._fs?.limit(...arguments); }
-function _sts()          { return window._fs?.serverTimestamp(); }
+// ──────────── MÓDULO PDI ────────────
 
 // ── PDI: Estado local ──────────────────────────────────────
 const _pdi = {
@@ -6365,7 +6341,7 @@ window.pdiSeedSkills = async function() {
   if(!confirm(`Isso vai popular a Matriz de Competências com ${PDI_SKILLS_SEED.length} competências-base derivadas da metodologia Eneagrama.\n\nDeseja continuar?`)) return;
   try {
     for(const s of PDI_SKILLS_SEED) {
-      await _addDoc(_col(_db(),'pdi_skills'), {...s, criadoEm: _sts()});
+      await addDoc(collection(db,'pdi_skills'), {...s, criadoEm: serverTimestamp()});
     }
     await pdiCarregarSkills();
     pdiRenderSkills();
@@ -6401,10 +6377,10 @@ async function pdiCarregarEmpresas() {
     sel.innerHTML = '<option value="">Selecione a empresa</option>';
     let snap;
     if(profile==='admin') {
-      snap = await _getDocs(_col(_db(),'nself_empresas'));
+      snap = await getDocs(collection(db,'nself_empresas'));
     } else {
       const uid = window._state?.uid;
-      snap = await _getDocs(_query(_col(_db(),'nself_empresas'), _where('rhUid','==',uid)));
+      snap = await getDocs(query(collection(db,'nself_empresas'), where('rhUid','==',uid)));
     }
     console.log('[PDI empresas] profile:', profile, '| total:', snap.size);
     snap.forEach(d=>{
@@ -6428,7 +6404,7 @@ window.pdiCarregarColaboradores = async function() {
   sel.innerHTML = '<option value="">Selecione o colaborador</option>';
   if(!empresaId) return;
   try {
-    const snap = await _getDocs(_query(_col(_db(),'nself_codigos'), _where('empresaId','==',empresaId), _where('usado','==',true)));
+    const snap = await getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empresaId), where('usado','==',true)));
     snap.forEach(d=>{
       const o = document.createElement('option');
       o.value = d.id;
@@ -6452,19 +6428,19 @@ window.pdiCarregarCiclos = async function() {
   }
   // Busca tipo Eneagrama do colaborador via nself_laudos
   try {
-    const snapL = await _getDocs(_query(_col(_db(),'nself_laudos'), _where('codigoId','==',colabId), _limit(1)));
+    const snapL = await getDocs(query(collection(db,'nself_laudos'), where('codigoId','==',colabId), limit(1)));
     if(!snapL.empty) { _pdi.tipoEnea = snapL.docs[0].data().tipo || null; }
   } catch(e){ console.warn('[PDI enea]',e); }
   pdiRenderGradeAvaliacao('auto');
   pdiRenderGradeAvaliacao('chefia');
   // Carrega último ciclo salvo se existir
   try {
-    const snap = await _getDocs(_query(
-      _col(_db(),'pdi_avaliacoes'),
-      _where('colabId','==',colabId),
-      _where('empresaId','==',_pdi.empresaId),
-      _orderBy('criadoEm','desc'),
-      _limit(1)
+    const snap = await getDocs(query(
+      collection(db,'pdi_avaliacoes'),
+      where('colabId','==',colabId),
+      where('empresaId','==',_pdi.empresaId),
+      orderBy('criadoEm','desc'),
+      limit(1)
     ));
     if(!snap.empty) {
       const d = snap.docs[0].data();
@@ -6540,21 +6516,21 @@ window.pdiSalvarAvaliacao = async function(tipo) {
   if(!_pdi.colabId || !_pdi.empresaId) { alert('Selecione empresa e colaborador.'); return; }
   try {
     // Busca doc do ciclo atual (aberto)
-    const snap = await _getDocs(_query(
-      _col(_db(),'pdi_avaliacoes'),
-      _where('colabId','==',_pdi.colabId),
-      _where('empresaId','==',_pdi.empresaId),
-      _where('fechado','==',false),
-      _limit(1)
+    const snap = await getDocs(query(
+      collection(db,'pdi_avaliacoes'),
+      where('colabId','==',_pdi.colabId),
+      where('empresaId','==',_pdi.empresaId),
+      where('fechado','==',false),
+      limit(1)
     ));
     const payload = {
       [tipo]: tipo==='auto'?_pdi.avalAuto:_pdi.avalChefia,
-      atualizadoEm: _sts()
+      atualizadoEm: serverTimestamp()
     };
     if(!snap.empty) {
-      await _updateDoc(_doc(_db(),'pdi_avaliacoes',snap.docs[0].id), payload);
+      await updateDoc(_doc(db,'pdi_avaliacoes',snap.docs[0].id), payload);
     } else {
-      await _addDoc(_col(_db(),'pdi_avaliacoes'), {
+      await addDoc(collection(db,'pdi_avaliacoes'), {
         colabId: _pdi.colabId,
         colabNome: _pdi.colabNome,
         empresaId: _pdi.empresaId,
@@ -6562,8 +6538,8 @@ window.pdiSalvarAvaliacao = async function(tipo) {
         chefia: _pdi.avalChefia,
         obs: '',
         fechado: false,
-        criadoEm: _sts(),
-        atualizadoEm: _sts()
+        criadoEm: serverTimestamp(),
+        atualizadoEm: serverTimestamp()
       });
     }
     alert(`${tipo==='auto'?'Autoavaliação':'Avaliação da chefia'} salva ✓`);
@@ -6575,21 +6551,21 @@ window.pdiFecharCiclo = async function() {
   if(!_pdi.colabId || !_pdi.empresaId) { alert('Selecione empresa e colaborador.'); return; }
   if(!confirm('Fechar o ciclo atual e salvar o histórico?')) return;
   try {
-    const cicloSnap = await _getDoc(_doc(_db(),'pdi_config',_pdi.empresaId));
+    const cicloSnap = await getDoc(_doc(db,'pdi_config',_pdi.empresaId));
     const cicloTipo = cicloSnap.exists() ? cicloSnap.data().ciclo : (document.getElementById('pdiCicloTipo').value || 'trimestral');
     const obs = document.getElementById('pdiObs').value;
-    const snap = await _getDocs(_query(
-      _col(_db(),'pdi_avaliacoes'),
-      _where('colabId','==',_pdi.colabId),
-      _where('empresaId','==',_pdi.empresaId),
-      _where('fechado','==',false),
-      _limit(1)
+    const snap = await getDocs(query(
+      collection(db,'pdi_avaliacoes'),
+      where('colabId','==',_pdi.colabId),
+      where('empresaId','==',_pdi.empresaId),
+      where('fechado','==',false),
+      limit(1)
     ));
-    const data = { auto:_pdi.avalAuto, chefia:_pdi.avalChefia, obs, fechado:true, ciclo:cicloTipo, fechadoEm:_sts(), atualizadoEm:_sts() };
+    const data = { auto:_pdi.avalAuto, chefia:_pdi.avalChefia, obs, fechado:true, ciclo:cicloTipo, fechadoEm:serverTimestamp(), atualizadoEm:serverTimestamp() };
     if(!snap.empty) {
-      await _updateDoc(_doc(_db(),'pdi_avaliacoes',snap.docs[0].id), data);
+      await updateDoc(_doc(db,'pdi_avaliacoes',snap.docs[0].id), data);
     } else {
-      await _addDoc(_col(_db(),'pdi_avaliacoes'), { colabId:_pdi.colabId, colabNome:_pdi.colabNome, empresaId:_pdi.empresaId, criadoEm:_sts(), ...data });
+      await addDoc(collection(db,'pdi_avaliacoes'), { colabId:_pdi.colabId, colabNome:_pdi.colabNome, empresaId:_pdi.empresaId, criadoEm:serverTimestamp(), ...data });
     }
     alert('Ciclo fechado e salvo no histórico ✓');
     _pdi.avalAuto={}; _pdi.avalChefia={};
@@ -6604,11 +6580,11 @@ async function pdiCarregarHistorico() {
   const container = document.getElementById('pdiHistoricoContainer');
   container.innerHTML = '<div class="pdi-empty">Carregando...</div>';
   try {
-    const snap = await _getDocs(_query(
-      _col(_db(),'pdi_avaliacoes'),
-      _where('colabId','==',_pdi.colabId),
-      _where('empresaId','==',_pdi.empresaId),
-      _orderBy('criadoEm','desc')
+    const snap = await getDocs(query(
+      collection(db,'pdi_avaliacoes'),
+      where('colabId','==',_pdi.colabId),
+      where('empresaId','==',_pdi.empresaId),
+      orderBy('criadoEm','desc')
     ));
     if(snap.empty){ container.innerHTML='<div class="pdi-empty">Nenhum ciclo registrado.</div>'; return; }
     let html='';
@@ -6644,7 +6620,7 @@ function calcMedia(obj) {
 // ── Skills CRUD ────────────────────────────────────────────
 async function pdiCarregarSkills() {
   try {
-    const snap = await _getDocs(_query(_col(_db(),'pdi_skills'), _orderBy('dimensao')));
+    const snap = await getDocs(query(collection(db,'pdi_skills'), orderBy('dimensao')));
     _pdi.skills = snap.docs.map(d=>({id:d.id,...d.data()}));
   } catch(e){ console.warn('[PDI skills]',e); }
 }
@@ -6734,9 +6710,9 @@ window.pdiSalvarSkill = async function(skillId) {
   };
   try {
     if(skillId) {
-      await _updateDoc(_doc(_db(),'pdi_skills',skillId), payload);
+      await updateDoc(_doc(db,'pdi_skills',skillId), payload);
     } else {
-      await _addDoc(_col(_db(),'pdi_skills'), {...payload, criadoEm: _sts()});
+      await addDoc(collection(db,'pdi_skills'), {...payload, criadoEm: serverTimestamp()});
     }
     closeModal('modalPDISkill');
     await pdiCarregarSkills();
@@ -6747,7 +6723,7 @@ window.pdiSalvarSkill = async function(skillId) {
 window.pdiExcluirSkill = async function(skillId) {
   if(!confirm('Excluir esta competência? Avaliações já salvas não serão afetadas.')) return;
   try {
-    await _deleteDoc(_doc(_db(),'pdi_skills',skillId));
+    await deleteDoc(_doc(db,'pdi_skills',skillId));
     await pdiCarregarSkills();
     pdiRenderSkills();
   } catch(e){ alert('Erro ao excluir.'); }
@@ -6759,10 +6735,10 @@ window.pdiAdicionarAcao = async function() {
   const texto = prompt('Descreva a ação de desenvolvimento:');
   if(!texto||!texto.trim()) return;
   try {
-    await _addDoc(_col(_db(),'pdi_acoes'), {
+    await addDoc(collection(db,'pdi_acoes'), {
       colabId:_pdi.colabId, colabNome:_pdi.colabNome,
       empresaId:_pdi.empresaId, texto:texto.trim(),
-      status:'pendente', criadoEm:_sts()
+      status:'pendente', criadoEm:serverTimestamp()
     });
     pdiCarregarAcoes();
   } catch(e){ alert('Erro ao salvar ação.'); }
@@ -6772,7 +6748,7 @@ async function pdiCarregarAcoes() {
   const c = document.getElementById('pdiPlanoContainer');
   if(!_pdi.colabId){ c.innerHTML='<div class="pdi-empty">Selecione empresa e colaborador</div>'; return; }
   try {
-    const snap = await _getDocs(_query(_col(_db(),'pdi_acoes'), _where('colabId','==',_pdi.colabId), _where('empresaId','==',_pdi.empresaId), _orderBy('criadoEm','desc')));
+    const snap = await getDocs(query(collection(db,'pdi_acoes'), where('colabId','==',_pdi.colabId), where('empresaId','==',_pdi.empresaId), orderBy('criadoEm','desc')));
     if(snap.empty){ c.innerHTML='<div class="pdi-empty">Nenhuma ação cadastrada. Use o botão acima para adicionar.</div>'; return; }
     let html='';
     snap.forEach(d=>{
@@ -6794,7 +6770,7 @@ async function pdiCarregarAcoes() {
 
 window.pdiAtualizarStatusAcao = async function(id, status) {
   try {
-    await _updateDoc(_doc(_db(),'pdi_acoes',id), {status, atualizadoEm:_sts()});
+    await updateDoc(_doc(db,'pdi_acoes',id), {status, atualizadoEm:serverTimestamp()});
   } catch(e){ alert('Erro ao atualizar.'); }
 };
 
@@ -6803,7 +6779,7 @@ window.pdiSalvarConfig = async function() {
   if(!_pdi.empresaId){ alert('Selecione uma empresa primeiro.'); return; }
   const ciclo = document.getElementById('pdiCicloTipo').value;
   try {
-    await _setDoc(_doc(_db(),'pdi_config',_pdi.empresaId), {ciclo, atualizadoEm:_sts()}, {merge:true});
+    await setDoc(_doc(db,'pdi_config',_pdi.empresaId), {ciclo, atualizadoEm:serverTimestamp()}, {merge:true});
     alert('Configurações salvas ✓');
   } catch(e){ alert('Erro ao salvar configurações.'); }
 };
@@ -6812,11 +6788,13 @@ window.pdiSalvarConfig = async function() {
 window.pdiToggleModulo = async function(empresaId, ativo) {
   if(!empresaId){ alert('Empresa não identificada.'); return; }
   try {
-    await _updateDoc(_doc(_db(),'nself_empresas',empresaId), {modulo_pdi: ativo});
+    await updateDoc(_doc(db,'nself_empresas',empresaId), {modulo_pdi: ativo});
     const lbl = document.getElementById('toggleModuloPDILabel');
     if(lbl){ lbl.textContent = ativo ? 'Habilitado' : 'Desabilitado'; lbl.style.color = ativo ? '#16a34a' : '#888'; }
   } catch(e){ console.error('[PDI toggle]',e); alert('Erro ao atualizar módulo.'); }
 };
+
+// ── Fim módulo PDI ──
 </script>
 
 <script>
