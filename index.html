@@ -957,7 +957,7 @@ tr:hover td{background:#FAFAFE;}
             <button class="btn btn-primary" id="btnDownloadPdf" style="font-size:15px;padding:14px 32px;width:100%;max-width:320px;" onclick="baixarLaudo()">
               ⬇ Baixar Laudo PDF
             </button>
-            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;display:none;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
+            <button class="btn btn-outline" id="btnGerarLaudo" style="font-size:13px;padding:10px 24px;width:100%;max-width:320px;" onclick="gerarLaudoManual()" title="Gera um novo PDF com os dados desta avaliação">
               🔄 Gerar / Regenerar Laudo
             </button>
           </div>
@@ -2126,8 +2126,18 @@ tr:hover td{background:#FAFAFE;}
       <tr><td style="padding:8px;color:#888;">Criado em</td><td id="ccCriadoEm" style="padding:8px;"></td></tr>
       <tr style="background:#f9f9f9;"><td style="padding:8px;color:#888;">Empresa</td><td id="ccEmpresa" style="padding:8px;"></td></tr>
     </table>
-    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+    <div id="ccVincularArea" style="margin-top:12px;display:none;background:#f3e8ff;border-radius:8px;padding:10px 12px;">
+      <div style="font-size:12px;font-weight:600;color:#6d28d9;margin-bottom:8px;">🏢 Vincular a uma empresa</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="ccEmpresaVincular" style="flex:1;padding:7px;border:1px solid #c084fc;border-radius:6px;font-size:13px;">
+          <option value="">Selecione a empresa...</option>
+        </select>
+        <button class="btn btn-primary" style="font-size:12px;padding:7px 12px;" onclick="pdiVincularPFEmpresa()">Vincular</button>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn btn-outline" onclick="closeModal('modalCadastroCliente');editarCodigo(window._ccDocId,window._ccNome,window._ccEmail,window._ccWhatsapp,window._ccCodigo,window._ccEmpresa)">✏️ Editar</button>
+      <button class="btn btn-outline" style="background:#f3e8ff;color:#6d28d9;border-color:#c084fc;" onclick="pdiMostrarVincular()">🏢 Vincular à Empresa</button>
       <button class="btn btn-outline" onclick="closeModal('modalCadastroCliente')">Fechar</button>
     </div>
   </div>
@@ -3680,7 +3690,7 @@ window.salvarCodigo = async function() {
 };
 
 // ── EDITAR CÓDIGO ──
-window.editarCodigo = function(id, nome, email, whatsapp, codigo, empresa) {
+window.editarCodigo = async function(id, nome, email, whatsapp, codigo, empresa) {
   document.getElementById('editCodId').value            = id;
   document.getElementById('editCodCodigo').value        = codigo;
   document.getElementById('editCodNome').value          = nome;
@@ -3688,9 +3698,18 @@ window.editarCodigo = function(id, nome, email, whatsapp, codigo, empresa) {
   document.getElementById('editCodWhatsapp').value      = whatsapp;
   document.getElementById('editCodCodigoDisplay').value = codigo;
   document.getElementById('editPreviewLink').textContent = gerarLinkTeste(codigo);
-  // Preencher empresa no select
+  // Carrega empresas no select
   const sel = document.getElementById('editCodEmpresa');
-  // Manter opção correta selecionada
+  sel.innerHTML = '<option value="pf">\u2014 Pessoa F\u00edsica (direto)</option>';
+  try {
+    const snap = await getDocs(collection(db,'nself_empresas'));
+    snap.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.id;
+      o.textContent = d.data().nome || d.id;
+      sel.appendChild(o);
+    });
+  } catch(e){ console.warn('[editarCodigo empresas]',e); }
   [...sel.options].forEach(o => { o.selected = (o.value === (empresa||'pf')); });
   openModal('modalEditarCodigo');
 };
@@ -4038,7 +4057,44 @@ window.verCadastroCliente = function(btn) {
   window._ccWhatsapp = d.whatsapp || '';
   window._ccCodigo   = d.codigo   || '';
   window._ccEmpresa  = d.empresa  || 'pf';
+  const va = document.getElementById('ccVincularArea');
+  if(va) va.style.display='none';
   openModal('modalCadastroCliente');
+};
+
+window.pdiMostrarVincular = async function() {
+  const area = document.getElementById('ccVincularArea');
+  area.style.display = 'block';
+  const sel = document.getElementById('ccEmpresaVincular');
+  sel.innerHTML = '<option value="">Selecione a empresa...</option>';
+  try {
+    const snap = await getDocs(collection(db,'nself_empresas'));
+    snap.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.id;
+      o.textContent = d.data().nome || d.id;
+      if(d.id === window._ccEmpresa) o.selected = true;
+      sel.appendChild(o);
+    });
+  } catch(e){ console.warn('[vincular empresas]',e); }
+};
+
+window.pdiVincularPFEmpresa = async function() {
+  const empresaId = document.getElementById('ccEmpresaVincular').value;
+  if(!empresaId) { showToast('Selecione uma empresa.','error'); return; }
+  if(!window._ccDocId) { showToast('Codigo nao identificado.','error'); return; }
+  try {
+    const empSnap = await getDoc(doc(db,'nself_empresas',empresaId));
+    const empresaNome = empSnap.exists() ? empSnap.data().nome : '';
+    await updateDoc(doc(db,'nself_codigos',window._ccDocId), { empresa: empresaId, empresaNome });
+    try {
+      const laudoSnap = await getDocs(query(collection(db,'nself_laudos'), where('codigoId','==',window._ccDocId), limit(1)));
+      if(!laudoSnap.empty) await updateDoc(laudoSnap.docs[0].ref, { empresaId, empresaNome });
+    } catch(e){ console.warn('[vincular laudo]',e); }
+    showToast('Vinculado com sucesso a '+empresaNome,'success');
+    closeModal('modalCadastroCliente');
+    if(window.loadCodigos) loadCodigos();
+  } catch(e){ showToast('Erro: '+e.message,'error'); }
 };
 
 // ── EXCLUIR LAUDO ──
