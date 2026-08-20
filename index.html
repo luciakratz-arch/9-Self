@@ -3586,10 +3586,61 @@ async function salvarResultadoFinal() {
     }
 
     // CASO 3: Chamar Cloud Function para gerar PDF
+    // Se TS não está disponível (sessão nova), busca dados do laudo no Firestore
     if(!window.TS || !window.TS.tipoFinal) {
-      const btnG = document.getElementById('btnGerarLaudo');
-      if(btnG) btnG.style.display = 'block';
-      showToast('Seu laudo está sendo gerado. Aguarde um momento e tente baixar novamente.','info');
+      // Tenta buscar pelo codigoId
+      const codId = window._state?.codigoAtivo?.id || window._state?.laudoDocId;
+      if(codId) {
+        try {
+          btn.disabled = true; btn.textContent = '⏳ Buscando laudo...';
+          // Busca pelo codigoId no laudo
+          let laudoData = null;
+          let laudoId = null;
+          // Tenta pelo laudoDocId direto
+          if(window._state.laudoDocId) {
+            const snapD = await getDoc(doc(db,'nself_laudos', window._state.laudoDocId));
+            if(snapD.exists()) { laudoData = snapD.data(); laudoId = snapD.id; }
+          }
+          // Se não, busca pelo codigoId
+          if(!laudoData) {
+            const snapQ = await getDocs(query(collection(db,'nself_laudos'), where('codigoId','==',codId), limit(1)));
+            if(!snapQ.empty) { laudoData = snapQ.docs[0].data(); laudoId = snapQ.docs[0].id; }
+          }
+          if(laudoData) {
+            // Se já tem PDF salvo, baixa direto
+            if(laudoData.pdfUrl) {
+              window._state.laudoUrl = laudoData.pdfUrl;
+              btn.disabled = false; btn.textContent = '⬇ Baixar Laudo PDF';
+              window.baixarLaudo(); return;
+            }
+            // Gera PDF com dados do Firestore
+            const ASAS_VALIDAS = {1:[2,9],2:[1,3],3:[2,4],4:[3,5],5:[4,6],6:[5,7],7:[6,8],8:[7,9],9:[8,1]};
+            const tipoN = laudoData.tipo;
+            const asaN = ASAS_VALIDAS[tipoN]?.includes(laudoData.asaDominante) ? laudoData.asaDominante : ASAS_VALIDAS[tipoN]?.[0];
+            const CF = 'https://gerar-laudo-pdf-437375609844.us-central1.run.app';
+            const resp = await fetch(CF, {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({
+                tipo: tipoN, asa: asaN,
+                subDom: laudoData.subtipoDominante, subInt: laudoData.subtipoIntermediario, subRem: laudoData.subtipoRemissivo,
+                nome: laudoData.nome || cod.nomeDestinatario || 'Participante',
+                cargo: cod.cargo || '', codigoId: laudoId || codId,
+              }),
+            });
+            if(resp.ok) {
+              const data = await resp.json();
+              if(data.url) {
+                window._state.laudoUrl = data.url;
+                await updateDoc(doc(db,'nself_laudos', laudoId), { pdfUrl: data.url, geradoEm: serverTimestamp() });
+                btn.disabled = false; btn.textContent = '⬇ Baixar Laudo PDF';
+                window.baixarLaudo(); return;
+              }
+            }
+          }
+        } catch(eB){ console.warn('[gerar laudo fallback]',eB); }
+        btn.disabled = false; btn.textContent = '🔄 Gerar / Regenerar Laudo';
+      }
+      showToast('Não foi possível gerar o laudo. Tente novamente.','error');
       return;
     }
 
