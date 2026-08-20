@@ -3492,8 +3492,11 @@ async function salvarResultadoFinal() {
         const ASAS_VALIDAS = {1:[2,9],2:[1,3],3:[2,4],4:[3,5],5:[4,6],6:[5,7],7:[6,8],8:[7,9],9:[8,1]};
         const asaFinal = ASAS_VALIDAS[TS.tipoFinal]?.includes(TS.asaDom) ? TS.asaDom : ASAS_VALIDAS[TS.tipoFinal][0];
         const CF_AUTO = 'https://gerar-laudo-pdf-437375609844.us-central1.run.app';
+        const _ctrl = new AbortController();
+        const _timer = setTimeout(() => _ctrl.abort(), 10000); // timeout 10s
         const respAuto = await fetch(CF_AUTO, {
           method: 'POST',
+          signal: _ctrl.signal,
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({
             tipo: TS.tipoFinal, asa: asaFinal,
@@ -3503,6 +3506,7 @@ async function salvarResultadoFinal() {
             codigoId: laudoRef.id,
           }),
         });
+        clearTimeout(_timer);
         if(respAuto.ok) {
           const dataAuto = await respAuto.json();
           if(dataAuto.url) {
