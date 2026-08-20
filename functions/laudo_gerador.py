@@ -95,14 +95,20 @@ NOMES_TIPO = {
 NOMES_SUBTIPO = {
     'AP':  'Autopreservação',
     '1A1': '1 a 1',
+    'SEX': '1 a 1',
     'SOC': 'Social',
 }
 
 LABELS_SUBTIPO_LONGO = {
     'AP':  'Autopreservação',
     '1A1': 'Um a Um',
+    'SEX': 'Um a Um',
     'SOC': 'Social',
 }
+
+def _normalizar_subtipo(s):
+    ALIASES = {'SEX':'1A1','SEXUAL':'1A1','AUTO':'AP','SOCIAL':'SOC'}
+    return ALIASES.get((s or '').upper().strip(), (s or 'AP').upper().strip())
 
 
 def asas_do_tipo(tipo):
@@ -473,13 +479,18 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
                 nome, cargo, output_path, mes_ano='Junho de 2026'):
     """
     tipo:           1-9
-    asa_dominante:  número da asa dominante (deve ser uma das duas adjacentes ao tipo)
-    subtipo_dom/int/rem: 'AP', '1A1' ou 'SOC' (cada um usado uma vez)
+    asa_dominante:  numero da asa dominante (deve ser uma das duas adjacentes ao tipo)
+    subtipo_dom/int/rem: 'AP', '1A1'/'SEX' ou 'SOC' (cada um usado uma vez)
     nome, cargo:    dados do colaborador
-    output_path:    caminho do PDF de saída
+    output_path:    caminho do PDF de saida
     """
+    # Normaliza subtipos — converte aliases (SEX->1A1 etc.) defensivamente
+    subtipo_dom = _normalizar_subtipo(subtipo_dom)
+    subtipo_int = _normalizar_subtipo(subtipo_int)
+    subtipo_rem = _normalizar_subtipo(subtipo_rem)
+
     sec = carregar_secoes(tipo)
-    nome_tipo = NOMES_TIPO[tipo]
+    nome_tipo = NOMES_TIPO.get(tipo, f'Tipo {tipo}')
 
     asa_ant, asa_seg = asas_do_tipo(tipo)
     if asa_dominante not in (asa_ant, asa_seg):
@@ -489,8 +500,8 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     chave_sub = chave_subtipo(subtipo_dom, subtipo_int, subtipo_rem)
     texto_subtipo = sec.get(chave_sub, '')
-    label_subtipo = (f"{NOMES_SUBTIPO[subtipo_dom]} "
-                     f"({LABELS_SUBTIPO_LONGO[subtipo_int]} e {LABELS_SUBTIPO_LONGO[subtipo_rem]} reprimidos)")
+    label_subtipo = (f"{NOMES_SUBTIPO.get(subtipo_dom, subtipo_dom)} "
+                     f"({LABELS_SUBTIPO_LONGO.get(subtipo_int, subtipo_int)} e {LABELS_SUBTIPO_LONGO.get(subtipo_rem, subtipo_rem)} reprimidos)")
 
     HDR = f'| {nome}  |  {cargo} |'
 
@@ -781,8 +792,8 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         story.append(p(linha))
 
     story += subsection(
-        f'Interação Social | {NOMES_SUBTIPO[subtipo_dom]} · {LABELS_SUBTIPO_LONGO[subtipo_int]} · '
-        f'{LABELS_SUBTIPO_LONGO[subtipo_rem]} Reprimido |',
+        f'Interação Social | {NOMES_SUBTIPO.get(subtipo_dom, subtipo_dom)} · {LABELS_SUBTIPO_LONGO.get(subtipo_int, subtipo_int)} · '
+        f'{LABELS_SUBTIPO_LONGO.get(subtipo_rem, subtipo_rem)} Reprimido |',
         p(texto_subtipo),
     )
 
