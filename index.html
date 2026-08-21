@@ -2562,7 +2562,7 @@ window.filtrarLaudosEmpresa = function() {
   const tbody = document.getElementById('detalheLaudosTable');
   const count = document.getElementById('detalheLaudosCount');
 
-  const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+  const NS = {'AP':'Autopreservação','1A1':'1 a 1','SEX':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
   let lista = [...window._laudosEmpresa];
   if(nome) lista = lista.filter(l=>(l.nome||'').toLowerCase().includes(nome));
   if(tipo) lista = lista.filter(l=>String(l.tipo||'')===tipo);
@@ -3583,6 +3583,36 @@ async function salvarResultadoFinal() {
           return;
         }
       } catch(_) {}
+    }
+
+    // CASO 2b: TS reconstituído mas sem pdfUrl — gera direto com TS
+    if(window.TS && window.TS.tipoFinal && window._state.laudoDocId) {
+      try {
+        btn.disabled = true; btn.textContent = '⏳ Gerando laudo...';
+        const cod2 = window._state.codigoAtivo || {};
+        const CF2 = 'https://gerar-laudo-pdf-437375609844.us-central1.run.app';
+        const resp2 = await fetch(CF2, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            tipo: TS.tipoFinal, asa: TS.asaDom,
+            subDom: TS.subDom, subInt: TS.subInt, subRem: TS.subRem,
+            nome: cod2.nomeDestinatario || 'Participante',
+            cargo: cod2.cargo || '', codigoId: window._state.laudoDocId,
+          }),
+        });
+        if(resp2.ok) {
+          const data2 = await resp2.json();
+          if(data2.url) {
+            window._state.laudoUrl = data2.url;
+            await updateDoc(doc(db,'nself_laudos', window._state.laudoDocId), { pdfUrl: data2.url, geradoEm: serverTimestamp() });
+            btn.disabled = false; btn.textContent = '⬇ Baixar Laudo PDF';
+            window.baixarLaudo(); return;
+          }
+        }
+        btn.disabled = false; btn.textContent = '🔄 Gerar / Regenerar Laudo';
+        showToast('Erro ao gerar laudo. Tente novamente.','error');
+        return;
+      } catch(e2){ console.warn('[gerar laudo caso 2b]',e2); }
     }
 
     // CASO 3: Chamar Cloud Function para gerar PDF
