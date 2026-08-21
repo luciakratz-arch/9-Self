@@ -3739,7 +3739,17 @@ window.salvarCodigo = async function() {
     closeModal('modalNovoCodigo');
     window.open(gerarLinkWhatsApp(whatsapp, nome, codigo), '_blank');
     showToast(`Código ${codigo} gerado! Abrindo WhatsApp...`,'success');
-    if(email) enviarEmailAcesso(nome, email, 'pf_std', {codigo, link: gerarLinkTeste(codigo), mensagem:`Seu código de acesso ao 9&Self: ${codigo} | Acesse: ${gerarLinkTeste(codigo)}`});
+    if(email) enviarEmailAcesso(nome, email, 'pf_std', {
+      codigo,
+      link: gerarLinkTeste(codigo),
+      bonusLink: 'https://drive.google.com/file/d/1idgsYLODKhnAB6-aI4uB8J_8jJR896Ge/view?usp=sharing',
+      mensagem: `Seu código de acesso ao 9&Self: ${codigo} | Acesse: ${gerarLinkTeste(codigo)}
+
+🎁 Seus Bônus Exclusivos:
+Para aprofundar ainda mais a sua jornada de autoconhecimento, preparamos materiais especiais para você: Momento de Autoconhecimento, Plano de Desenvolvimento Pessoal e Mapa do Propósito de Vida.
+
+👉 Acesse seus bônus aqui: https://drive.google.com/file/d/1idgsYLODKhnAB6-aI4uB8J_8jJR896Ge/view?usp=sharing`
+    });
     if(window._state.profile==='admin') loadCodigos();
   } catch(e) { showToast('Erro ao salvar código.','error'); }
 };
