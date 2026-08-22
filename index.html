@@ -6531,12 +6531,12 @@ window.pdiCarregarFormulario = function() {
   // Autoavaliação
   html += `<div class="pdi-card">
     <div class="pdi-card-title">🙋 Autoavaliação</div>
-    <div style="background:#f5f3ff;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#6d28d9;display:flex;flex-wrap:wrap;gap:6px 16px;">
-      <span>⭐⭐⭐⭐⭐ <strong>5</strong> — Muita frequência</span>
-      <span>⭐⭐⭐⭐ <strong>4</strong> — Alguma frequência</span>
-      <span>⭐⭐⭐ <strong>3</strong> — Frequência média</span>
-      <span>⭐⭐ <strong>2</strong> — Quase nunca</span>
-      <span>⭐ <strong>1</strong> — Não faz isso</span>
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+      <span style="flex:1;min-width:80px;text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 4px;font-size:11px;color:#166534;"><div style="font-size:16px;">★★★★★</div><strong>5</strong><div>Muita<br>frequência</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 4px;font-size:11px;color:#166534;"><div style="font-size:16px;">★★★★☆</div><strong>4</strong><div>Alguma<br>frequência</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#fefce8;border:1px solid #fef08a;border-radius:8px;padding:6px 4px;font-size:11px;color:#854d0e;"><div style="font-size:16px;">★★★☆☆</div><strong>3</strong><div>Frequência<br>média</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:6px 4px;font-size:11px;color:#9a3412;"><div style="font-size:16px;">★★☆☆☆</div><strong>2</strong><div>Quase<br>nunca</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:6px 4px;font-size:11px;color:#991b1b;"><div style="font-size:16px;">★☆☆☆☆</div><strong>1</strong><div>Não faz<br>isso</div></span>
     </div>
     <div id="pdiAutoGrid">${pdiRenderCriterios(criterios,'auto')}</div>
     <div style="margin-top:16px;display:flex;justify-content:flex-end;">
@@ -6547,12 +6547,12 @@ window.pdiCarregarFormulario = function() {
   // Avaliação da chefia
   html += `<div class="pdi-card">
     <div class="pdi-card-title">👔 Avaliação da Chefia</div>
-    <div style="background:#f5f3ff;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#6d28d9;display:flex;flex-wrap:wrap;gap:6px 16px;">
-      <span>⭐⭐⭐⭐⭐ <strong>5</strong> — Muita frequência</span>
-      <span>⭐⭐⭐⭐ <strong>4</strong> — Alguma frequência</span>
-      <span>⭐⭐⭐ <strong>3</strong> — Frequência média</span>
-      <span>⭐⭐ <strong>2</strong> — Quase nunca</span>
-      <span>⭐ <strong>1</strong> — Não faz isso</span>
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+      <span style="flex:1;min-width:80px;text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 4px;font-size:11px;color:#166534;"><div style="font-size:16px;">★★★★★</div><strong>5</strong><div>Muita<br>frequência</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 4px;font-size:11px;color:#166534;"><div style="font-size:16px;">★★★★☆</div><strong>4</strong><div>Alguma<br>frequência</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#fefce8;border:1px solid #fef08a;border-radius:8px;padding:6px 4px;font-size:11px;color:#854d0e;"><div style="font-size:16px;">★★★☆☆</div><strong>3</strong><div>Frequência<br>média</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:6px 4px;font-size:11px;color:#9a3412;"><div style="font-size:16px;">★★☆☆☆</div><strong>2</strong><div>Quase<br>nunca</div></span>
+      <span style="flex:1;min-width:80px;text-align:center;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:6px 4px;font-size:11px;color:#991b1b;"><div style="font-size:16px;">★☆☆☆☆</div><strong>1</strong><div>Não faz<br>isso</div></span>
     </div>
     <div id="pdiChefiaGrid">${pdiRenderCriterios(criterios,'chefia')}</div>
     <div style="margin-top:16px;display:flex;justify-content:flex-end;">
