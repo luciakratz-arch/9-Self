@@ -6553,8 +6553,12 @@ window.pdiCarregarFormulario = function() {
   // Observações e fechar ciclo
   html += `<div class="pdi-card" style="margin-top:16px;">
     <div class="pdi-card-title">📝 Observações do Ciclo</div>
-    <textarea id="pdiObs" placeholder="Registre observações, pontos de atenção e combinados da devolutiva..."
-      style="width:100%;min-height:80px;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+    <div style="position:relative;">
+      <textarea id="pdiObs" placeholder="Registre observações, pontos de atenção e combinados da devolutiva..."
+        style="width:100%;min-height:80px;border:1px solid var(--border);border-radius:8px;padding:10px 44px 10px 10px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+      <button id="pdiMicBtn" onclick="pdiToggleMic()" title="Ditado por voz"
+        style="position:absolute;right:8px;top:8px;background:none;border:none;cursor:pointer;font-size:20px;padding:4px;border-radius:50%;transition:background 0.2s;">🎤</button>
+    </div>
     <div style="margin-top:10px;display:flex;justify-content:flex-end;">
       <button class="btn btn-primary" onclick="pdiFecharCiclo()">✅ Fechar Ciclo e Gerar PDI</button>
     </div>
@@ -6854,6 +6858,60 @@ window.pdiToggleModulo = async function(empresaId, ativo) {
     const lbl = document.getElementById('pdiModuloLabel_'+empresaId);
     if(lbl){ lbl.textContent = ativo ? 'Habilitado' : 'Desabilitado'; lbl.style.color = ativo ? '#16a34a' : '#888'; }
   } catch(e){ console.error('[PDI toggle]',e); alert('Erro ao atualizar módulo.'); }
+};
+
+// ── Microfone / Ditado por voz ──
+let _pdiMicRecognition = null;
+let _pdiMicAtivo = false;
+
+window.pdiToggleMic = function() {
+  const btn = document.getElementById('pdiMicBtn');
+  const obs = document.getElementById('pdiObs');
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Seu navegador não suporta reconhecimento de voz. Use o Chrome.'); return;
+  }
+  if(_pdiMicAtivo) {
+    _pdiMicRecognition?.stop();
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  _pdiMicRecognition = new SR();
+  _pdiMicRecognition.lang = 'pt-BR';
+  _pdiMicRecognition.continuous = true;
+  _pdiMicRecognition.interimResults = true;
+  let textoBase = obs.value;
+  let textoInterim = '';
+  _pdiMicRecognition.onstart = () => {
+    _pdiMicAtivo = true;
+    btn.style.background = '#fee2e2';
+    btn.textContent = '🔴';
+    btn.title = 'Clique para parar';
+  };
+  _pdiMicRecognition.onresult = (e) => {
+    textoInterim = '';
+    for(let i = e.resultIndex; i < e.results.length; i++) {
+      if(e.results[i].isFinal) {
+        textoBase += e.results[i][0].transcript + ' ';
+      } else {
+        textoInterim += e.results[i][0].transcript;
+      }
+    }
+    obs.value = textoBase + textoInterim;
+  };
+  _pdiMicRecognition.onend = () => {
+    _pdiMicAtivo = false;
+    btn.style.background = 'none';
+    btn.textContent = '🎤';
+    btn.title = 'Ditado por voz';
+    obs.value = textoBase;
+  };
+  _pdiMicRecognition.onerror = (e) => {
+    _pdiMicAtivo = false;
+    btn.style.background = 'none';
+    btn.textContent = '🎤';
+    if(e.error !== 'aborted') showToast('Erro no microfone: ' + e.error, 'error');
+  };
+  _pdiMicRecognition.start();
 };
 
 // ── Fim módulo PDI ──
