@@ -3591,14 +3591,18 @@ async function salvarResultadoFinal() {
         btn.disabled = true; btn.textContent = '⏳ Gerando laudo...';
         const cod2 = window._state.codigoAtivo || {};
         const CF2 = 'https://gerar-laudo-pdf-437375609844.us-central1.run.app';
+        const _normSub = s => ({'sex':'1A1','SEX':'1A1','1a1':'1A1','soc':'SOC','ap':'AP','auto':'AP'}[s]||s||'AP');
         const payload2 = {
-            tipo: TS.tipoFinal, asa: TS.asaDom,
-            subDom: TS.subDom || 'AP', subInt: TS.subInt || 'SOC', subRem: TS.subRem || '1A1',
+            tipo: parseInt(TS.tipoFinal)||3,
+            asa: parseInt(TS.asaDom)||2,
+            subDom: _normSub(TS.subDom),
+            subInt: _normSub(TS.subInt),
+            subRem: _normSub(TS.subRem),
             nome: cod2.nomeDestinatario || 'Participante',
             cargo: cod2.cargo || '',
             codigoId: cod2.id || window._state.laudoDocId,
         };
-        console.log('[PDI gerar laudo 2b] payload:', JSON.stringify(payload2));
+        console.log('[LAUDO payload2b]', JSON.stringify(payload2));
         const resp2 = await fetch(CF2, {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify(payload2),
@@ -3681,12 +3685,13 @@ async function salvarResultadoFinal() {
     btn.textContent = '⏳ Gerando laudo...';
     status.textContent = 'Aguarde, preparando seu laudo personalizado...';
 
+    const _ns = s => ({'sex':'1A1','SEX':'1A1','1a1':'1A1','soc':'SOC','ap':'AP','auto':'AP'}[s]||s||'AP');
     const payload = {
-      tipo:     TS.tipoFinal,
-      asa:      TS.asaDom,
-      subDom:   TS.subDom,
-      subInt:   TS.subInt,
-      subRem:   TS.subRem,
+      tipo:     parseInt(TS.tipoFinal)||1,
+      asa:      parseInt(TS.asaDom)||2,
+      subDom:   _ns(TS.subDom),
+      subInt:   _ns(TS.subInt),
+      subRem:   _ns(TS.subRem),
       nome:     cod.nomeDestinatario || 'Participante',
       cargo:    cod.cargo || '',
       codigoId: cod.id   || '',
