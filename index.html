@@ -3597,7 +3597,8 @@ async function salvarResultadoFinal() {
             tipo: TS.tipoFinal, asa: TS.asaDom,
             subDom: TS.subDom, subInt: TS.subInt, subRem: TS.subRem,
             nome: cod2.nomeDestinatario || 'Participante',
-            cargo: cod2.cargo || '', codigoId: window._state.laudoDocId,
+            cargo: cod2.cargo || '',
+            codigoId: cod2.id || window._state.laudoDocId,
           }),
         });
         if(resp2.ok) {
