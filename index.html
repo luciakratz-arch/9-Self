@@ -2340,7 +2340,7 @@ function buildSidebar(profile) {
 
 async function pdiVerificarFlagEInjetar(profile) {
   try {
-    const empresaId = window._state?.empresaId || window._state?.rh?.empresaId || null;
+    const empresaId = window._state?.empresa?.id || window._state?.empresaId || null;
     if(!empresaId && profile!=='admin') return;
     // Admin sempre vê PDI; RH só se flag ativa na empresa
     let mostrar = (profile==='admin');
@@ -2733,6 +2733,33 @@ async function loadRHDashboard() {
     <div class="stat-card"><div class="sc-label">Créditos</div><div class="sc-value">${emp.creditos||0}</div><div class="sc-sub">disponíveis</div></div>
     <div class="stat-card"><div class="sc-label">Laudos</div><div class="sc-value">${emp.laudosGerados||0}</div><div class="sc-sub">gerados</div></div>
   `;
+  // Carrega colaboradores da empresa
+  const tbody = document.getElementById('rhColabTable');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Carregando...</td></tr>';
+  try {
+    const empId = emp.id;
+    if(!empId || empId==='teste') { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum colaborador ainda</td></tr>'; return; }
+    const snap = await getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empId), where('status','==','usado')));
+    if(snap.empty) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum colaborador ainda</td></tr>'; return; }
+    const NOMES_TIPO = {'1':'Tipo 1','2':'Tipo 2','3':'Tipo 3','4':'Tipo 4','5':'Tipo 5','6':'Tipo 6','7':'Tipo 7','8':'Tipo 8','9':'Tipo 9'};
+    let rows = '';
+    const laudoSnaps = await Promise.all(snap.docs.map(d => getDocs(query(collection(db,'nself_laudos'), where('codigoId','==',d.id), limit(1)))));
+    snap.docs.forEach((d,i) => {
+      const v = d.data();
+      const ls = laudoSnaps[i];
+      const laudo = ls.empty ? null : ls.docs[0].data();
+      const tipo = laudo ? `${laudo.tipoNome||'Tipo '+laudo.tipo}` : '—';
+      const pdfBtn = laudo?.pdfUrl ? `<a href="${laudo.pdfUrl}" target="_blank" class="btn btn-sm" style="font-size:11px;padding:4px 10px;">⬇ PDF</a>` : '—';
+      rows += `<tr>
+        <td>${v.nomeDestinatario||v.nome||'—'}</td>
+        <td style="font-family:monospace;letter-spacing:2px;">${v.codigo||d.id}</td>
+        <td>${tipo}</td>
+        <td><span class="badge badge-success">Concluído</span></td>
+        <td>${pdfBtn}</td>
+      </tr>`;
+    });
+    tbody.innerHTML = rows;
+  } catch(e){ console.warn('[RH colabs]',e); tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Erro ao carregar</td></tr>'; }
 }
 
 // ── VALIDAR CÓDIGO (COLABORADOR) ──
