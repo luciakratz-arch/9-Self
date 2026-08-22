@@ -2739,7 +2739,14 @@ async function loadRHDashboard() {
   try {
     const empId = emp.id;
     if(!empId || empId==='teste') { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum colaborador ainda</td></tr>'; return; }
-    const snap = await getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empId), where('status','==','usado')));
+    // Busca por empresaId (campo novo) ou empresa (campo antigo)
+    const [snapA, snapB] = await Promise.all([
+      getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empId), where('status','==','usado'))),
+      getDocs(query(collection(db,'nself_codigos'), where('empresa','==',empId), where('status','==','usado'))),
+    ]);
+    const vistos = new Set();
+    const docsUnicos = [...snapA.docs, ...snapB.docs].filter(d => vistos.has(d.id) ? false : vistos.add(d.id));
+    const snap = { docs: docsUnicos, empty: docsUnicos.length===0 };
     if(snap.empty) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum colaborador ainda</td></tr>'; return; }
     const NOMES_TIPO = {'1':'Tipo 1','2':'Tipo 2','3':'Tipo 3','4':'Tipo 4','5':'Tipo 5','6':'Tipo 6','7':'Tipo 7','8':'Tipo 8','9':'Tipo 9'};
     let rows = '';
