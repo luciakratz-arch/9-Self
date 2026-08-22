@@ -6404,7 +6404,23 @@ const PDI_ESCALA = ['','Não faz isso','Quase nunca','Frequência média','Algum
 
 // ── Init ──
 async function pdiInit() {
-  await pdiCarregarEmpresas();
+  const profile = window._state?.profile;
+  if(profile === 'rh') {
+    // RH: pré-seleciona a própria empresa e esconde o dropdown
+    const empId = window._state?.empresa?.id;
+    const empNome = window._state?.empresa?.nome || '';
+    const sel = document.getElementById('pdiEmpresaFiltro');
+    if(sel && empId) {
+      sel.innerHTML = `<option value="${empId}">${empNome}</option>`;
+      sel.value = empId;
+      sel.disabled = true;
+      sel.style.display = 'none';
+      _pdi.empresaId = empId;
+      await pdiCarregarColaboradores();
+    }
+  } else {
+    await pdiCarregarEmpresas();
+  }
   await pdiCarregarSkills();
   pdiAba('avaliacao');
 }
