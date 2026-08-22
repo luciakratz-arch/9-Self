@@ -6531,7 +6531,13 @@ window.pdiCarregarFormulario = function() {
   // Autoavaliação
   html += `<div class="pdi-card">
     <div class="pdi-card-title">🙋 Autoavaliação</div>
-    <div style="font-size:11px;color:#888;margin-bottom:12px;">5 = Muita frequência &nbsp;|&nbsp; 1 = Não faz isso</div>
+    <div style="background:#f5f3ff;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#6d28d9;display:flex;flex-wrap:wrap;gap:6px 16px;">
+      <span>⭐⭐⭐⭐⭐ <strong>5</strong> — Muita frequência</span>
+      <span>⭐⭐⭐⭐ <strong>4</strong> — Alguma frequência</span>
+      <span>⭐⭐⭐ <strong>3</strong> — Frequência média</span>
+      <span>⭐⭐ <strong>2</strong> — Quase nunca</span>
+      <span>⭐ <strong>1</strong> — Não faz isso</span>
+    </div>
     <div id="pdiAutoGrid">${pdiRenderCriterios(criterios,'auto')}</div>
     <div style="margin-top:16px;display:flex;justify-content:flex-end;">
       <button class="btn btn-outline" onclick="pdiSalvarAvaliacao('auto')">💾 Salvar Autoavaliação</button>
@@ -6541,7 +6547,13 @@ window.pdiCarregarFormulario = function() {
   // Avaliação da chefia
   html += `<div class="pdi-card">
     <div class="pdi-card-title">👔 Avaliação da Chefia</div>
-    <div style="font-size:11px;color:#888;margin-bottom:12px;">5 = Muita frequência &nbsp;|&nbsp; 1 = Não faz isso</div>
+    <div style="background:#f5f3ff;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#6d28d9;display:flex;flex-wrap:wrap;gap:6px 16px;">
+      <span>⭐⭐⭐⭐⭐ <strong>5</strong> — Muita frequência</span>
+      <span>⭐⭐⭐⭐ <strong>4</strong> — Alguma frequência</span>
+      <span>⭐⭐⭐ <strong>3</strong> — Frequência média</span>
+      <span>⭐⭐ <strong>2</strong> — Quase nunca</span>
+      <span>⭐ <strong>1</strong> — Não faz isso</span>
+    </div>
     <div id="pdiChefiaGrid">${pdiRenderCriterios(criterios,'chefia')}</div>
     <div style="margin-top:16px;display:flex;justify-content:flex-end;">
       <button class="btn btn-outline" onclick="pdiSalvarAvaliacao('chefia')">💾 Salvar Avaliação da Chefia</button>
