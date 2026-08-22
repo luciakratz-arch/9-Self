@@ -6470,11 +6470,15 @@ window.pdiCarregarColaboradores = async function() {
   pdiResetFormulario();
   if(!empresaId) return;
   try {
-    const snap = await getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empresaId), where('status','==','usado')));
-    snap.forEach(d=>{
+    const [snapA, snapB] = await Promise.all([
+      getDocs(query(collection(db,'nself_codigos'), where('empresaId','==',empresaId), where('status','==','usado'))),
+      getDocs(query(collection(db,'nself_codigos'), where('empresa','==',empresaId), where('status','==','usado'))),
+    ]);
+    const vistos = new Set();
+    [...snapA.docs, ...snapB.docs].filter(d => vistos.has(d.id) ? false : vistos.add(d.id)).forEach(d=>{
       const o = document.createElement('option');
       o.value = d.id;
-      o.textContent = d.data().nomeColaborador || d.data().nome || d.id;
+      o.textContent = d.data().nomeColaborador || d.data().nomeDestinatario || d.data().nome || d.id;
       sel.appendChild(o);
     });
   } catch(e){ console.warn('[PDI colabs]',e); }
