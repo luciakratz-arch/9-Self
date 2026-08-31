@@ -1247,7 +1247,7 @@ tr:hover td{background:#FAFAFE;}
             </div>
             <div id="countPFDev" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
             <table>
-              <thead><tr><th>Código</th><th>Destinatário</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th>Código</th><th onclick="sortCodPF('pf_dev','nome')" style="cursor:pointer;user-select:none;">Destinatário <span id="sortCodPFDev_nome"></span></th><th>Link</th><th onclick="sortCodPF('pf_dev','data')" style="cursor:pointer;user-select:none;">Criado em <span id="sortCodPFDev_data">↓</span></th><th onclick="sortCodPF('pf_dev','status')" style="cursor:pointer;user-select:none;">Status <span id="sortCodPFDev_status"></span></th><th></th></tr></thead>
               <tbody id="codPFDevTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
             </table>
           </div>
@@ -1278,7 +1278,7 @@ tr:hover td{background:#FAFAFE;}
               </div>
               <div id="countLaudosPFDev" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
               <table>
-                <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+                <thead><tr><th onclick="sortLaudoPF('pf_dev','nome')" style="cursor:pointer;user-select:none;">Nome <span id="sortLaudoPFDev_nome"></span></th><th onclick="sortLaudoPF('pf_dev','tipo')" style="cursor:pointer;user-select:none;">Tipo <span id="sortLaudoPFDev_tipo"></span></th><th onclick="sortLaudoPF('pf_dev','data')" style="cursor:pointer;user-select:none;">Data <span id="sortLaudoPFDev_data">↓</span></th><th>Laudo</th></tr></thead>
                 <tbody id="laudosPFDevTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
               </table>
             </div>
@@ -1333,7 +1333,7 @@ tr:hover td{background:#FAFAFE;}
             </div>
             <div id="countPFStd" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
             <table>
-              <thead><tr><th>Código</th><th>Destinatário</th><th>Link</th><th>Criado em</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th>Código</th><th onclick="sortCodPF('pf_std','nome')" style="cursor:pointer;user-select:none;">Destinatário <span id="sortCodPFStd_nome"></span></th><th>Link</th><th onclick="sortCodPF('pf_std','data')" style="cursor:pointer;user-select:none;">Criado em <span id="sortCodPFStd_data">↓</span></th><th onclick="sortCodPF('pf_std','status')" style="cursor:pointer;user-select:none;">Status <span id="sortCodPFStd_status"></span></th><th></th></tr></thead>
               <tbody id="codPFStdTable"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Nenhum código gerado</td></tr></tbody>
             </table>
           </div>
@@ -1364,7 +1364,7 @@ tr:hover td{background:#FAFAFE;}
               </div>
               <div id="countLaudosPFStd" style="padding:6px 16px;font-size:12px;color:#aaa;"></div>
               <table>
-                <thead><tr><th>Nome</th><th>Tipo</th><th>Data</th><th>Laudo</th></tr></thead>
+                <thead><tr><th onclick="sortLaudoPF('pf_std','nome')" style="cursor:pointer;user-select:none;">Nome <span id="sortLaudoPFStd_nome"></span></th><th onclick="sortLaudoPF('pf_std','tipo')" style="cursor:pointer;user-select:none;">Tipo <span id="sortLaudoPFStd_tipo"></span></th><th onclick="sortLaudoPF('pf_std','data')" style="cursor:pointer;user-select:none;">Data <span id="sortLaudoPFStd_data">&#8595;</span></th><th>Laudo</th></tr></thead>
                 <tbody id="laudosPFStdTable"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo ainda</td></tr></tbody>
               </table>
             </div>
@@ -4787,7 +4787,12 @@ function _renderCodPF(tipo) {
     const dt = c.criadoEm?.toDate?.();
     return dt && String(dt.getMonth()+1).padStart(2,'0')===mes;
   });
-  lista.sort((a,b)=>(b.criadoEm?.toMillis?.()??0)-(a.criadoEm?.toMillis?.()??0));
+  const sc = window._sortCod[tipo]||{col:'data',dir:-1};
+  lista.sort((a,b)=>{
+    if(sc.col==='nome')   return sc.dir*(a.nomeDestinatario||'').localeCompare(b.nomeDestinatario||'');
+    if(sc.col==='status') return sc.dir*(a.status||'').localeCompare(b.status||'');
+    return sc.dir*((a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0));
+  });
 
   if(count) count.textContent = lista.length ? `${lista.length} código(s)` : '';
 
@@ -4840,7 +4845,12 @@ function _renderLaudosPF(tipo) {
   if(nome)  lista = lista.filter(l=>(l.nome||'').toLowerCase().includes(nome));
   if(tipoF) lista = lista.filter(l=>String(l.tipo||'')===tipoF);
   if(mes)   lista = lista.filter(l=>{ const dt=l.criadoEm?.toDate?.(); return dt&&String(dt.getMonth()+1).padStart(2,'0')===mes; });
-  lista.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+  const sl = window._sortLaudo[tipo]||{col:'data',dir:-1};
+  lista.sort((a,b)=>{
+    if(sl.col==='nome') return sl.dir*(a.nome||'').localeCompare(b.nome||'');
+    if(sl.col==='tipo') return sl.dir*(a.tipoNome||a.tipo||'').localeCompare(b.tipoNome||b.tipo||'');
+    return sl.dir*((a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0));
+  });
 
   if(count) count.textContent = lista.length ? `${lista.length} laudo(s)` : '';
   if(!lista.length){ tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Nenhum laudo encontrado</td></tr>`; return; }
@@ -4864,6 +4874,42 @@ function _renderLaudosPF(tipo) {
 window.filtrarLaudosPF = function(tipo) { _renderLaudosPF(tipo); };
 
 window.limparFiltrosCodPF = function(tipo) { limparFiltrosPF(tipo); };
+
+// ── Sort state para tabelas PF ──────────────────────────────
+window._sortCod   = { pf_dev: {col:'data', dir:-1}, pf_std: {col:'data', dir:-1} };
+window._sortLaudo = { pf_dev: {col:'data', dir:-1}, pf_std: {col:'data', dir:-1} };
+
+function _atualizarSetasCod(tipo) {
+  const s = window._sortCod[tipo];
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  ['nome','data','status'].forEach(c => {
+    const el = document.getElementById(`sortCod${suffix}_${c}`);
+    if(el) el.textContent = s.col===c ? (s.dir===1?'↑':'↓') : '';
+  });
+}
+function _atualizarSetasLaudo(tipo) {
+  const s = window._sortLaudo[tipo];
+  const suffix = tipo === 'pf_dev' ? 'PFDev' : 'PFStd';
+  ['nome','tipo','data'].forEach(c => {
+    const el = document.getElementById(`sortLaudo${suffix}_${c}`);
+    if(el) el.textContent = s.col===c ? (s.dir===1?'↑':'↓') : '';
+  });
+}
+
+window.sortCodPF = function(tipo, col) {
+  const s = window._sortCod[tipo];
+  if(s.col === col) s.dir *= -1;
+  else { s.col = col; s.dir = col==='data' ? -1 : 1; }
+  _atualizarSetasCod(tipo);
+  _renderCodPF(tipo);
+};
+window.sortLaudoPF = function(tipo, col) {
+  const s = window._sortLaudo[tipo];
+  if(s.col === col) s.dir *= -1;
+  else { s.col = col; s.dir = col==='data' ? -1 : 1; }
+  _atualizarSetasLaudo(tipo);
+  _renderLaudosPF(tipo);
+};
 
 window.loadPFDevolutiva = async function() { await _loadPFPage('pf_dev'); };
 window.loadPFStandard   = async function() { await _loadPFPage('pf_std'); };
