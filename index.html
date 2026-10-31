@@ -4010,8 +4010,17 @@ window.excluirCodigo = async function(id, status, pdfPath) {
         await deleteObject(ref(getStorage(), pdfPath));
       } catch(_) {}
     }
+    let _devolvido = false;
+    try {
+      const _s = await getDoc(doc(db,'nself_codigos', id)); const _v = _s.exists() ? _s.data() : {};
+      if(_v.creditoDescontado && !_v.creditoDevolvido && _v.empresa && ['disponivel','Pendente'].includes(_v.status||'Pendente')) {
+        await updateDoc(doc(db,'nself_empresas', _v.empresa), { creditos: increment(1) });
+        _devolvido = true;
+        if(window._state.profile === 'rh' && window._state.empresa) window._state.empresa.creditos = (Number(window._state.empresa.creditos)||0) + 1;
+      }
+    } catch(_) {}
     await deleteDoc(doc(db,'nself_codigos', id));
-    showToast('Registro excluído.','success');
+    showToast(_devolvido ? 'Registro excluído. 1 crédito devolvido.' : 'Registro excluído.','success');
     loadCodigos();
   } catch(e) { showToast('Erro ao excluir.','error'); }
 };
@@ -5070,15 +5079,32 @@ window.reenviarCodigo = async function(id) {
 window.arquivarCodigo = async function(id) {
   if(!confirm('Arquivar este código? Ele sai da lista e deixa de funcionar. Você pode desarquivar depois.')) return;
   try {
-    await updateDoc(doc(db,'nself_codigos', id), { status: 'arquivado', arquivadoEm: serverTimestamp() });
-    showToast('Código arquivado.','success');
+    const _s = await getDoc(doc(db,'nself_codigos', id)); const _v = _s.exists() ? _s.data() : {};
+    let _devolvido = false;
+    if(_v.creditoDescontado && !_v.creditoDevolvido && _v.empresa && ['disponivel','Pendente'].includes(_v.status||'Pendente')) {
+      await updateDoc(doc(db,'nself_empresas', _v.empresa), { creditos: increment(1) });
+      _devolvido = true;
+    }
+    await updateDoc(doc(db,'nself_codigos', id), Object.assign({ status: 'arquivado', arquivadoEm: serverTimestamp() }, _devolvido ? { creditoDevolvido: true } : {}));
+    if(_devolvido && window._state.profile === 'rh' && window._state.empresa) window._state.empresa.creditos = (Number(window._state.empresa.creditos)||0) + 1;
+    showToast(_devolvido ? 'Código arquivado. 1 crédito devolvido.' : 'Código arquivado.','success');
     loadCodigos();
   } catch(e) { showToast('Erro ao arquivar.','error'); }
 };
 window.desarquivarCodigo = async function(id) {
   try {
-    await updateDoc(doc(db,'nself_codigos', id), { status: 'disponivel' });
-    showToast('Código desarquivado.','success');
+    const _s = await getDoc(doc(db,'nself_codigos', id)); const _v = _s.exists() ? _s.data() : {};
+    let _cobrado = false;
+    if(_v.creditoDevolvido && _v.empresa) {
+      const _e = await getDoc(doc(db,'nself_empresas', _v.empresa));
+      const _saldo = _e.exists() ? (Number(_e.data().creditos)||0) : 0;
+      if(_saldo < 1) { showToast('Saldo insuficiente para desarquivar: o crédito já foi devolvido.','error'); return; }
+      await updateDoc(doc(db,'nself_empresas', _v.empresa), { creditos: increment(-1) });
+      _cobrado = true;
+    }
+    await updateDoc(doc(db,'nself_codigos', id), Object.assign({ status: 'disponivel' }, _cobrado ? { creditoDevolvido: false } : {}));
+    if(_cobrado && window._state.profile === 'rh' && window._state.empresa) window._state.empresa.creditos = (Number(window._state.empresa.creditos)||0) - 1;
+    showToast(_cobrado ? 'Código desarquivado. 1 crédito descontado de novo.' : 'Código desarquivado.','success');
     loadCodigos();
   } catch(e) { showToast('Erro ao desarquivar.','error'); }
 };
@@ -5655,6 +5681,7 @@ window.confirmarGerarCodigoEmpresa = async function() {
       codigo: c, nomeDestinatario: nome, email, whatsapp,
       empresa: empId, empresaNome: empNome,
       tipo: 'B2B', status: 'disponivel', linkTeste: link,
+      creditoDescontado: true,
       criadoEm: serverTimestamp()
     });
     await updateDoc(doc(db,'nself_empresas', empId), { creditos: increment(-1) });
