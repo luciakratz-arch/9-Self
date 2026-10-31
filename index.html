@@ -708,10 +708,12 @@ tr:hover td{background:#FAFAFE;}
               <select id="filtroStatus" onchange="filtrarCodigos()"
                 style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
                 <option value="">Todos os status</option>
+                <option value="__aguardando">Aguardando o teste (não usados)</option>
                 <option value="disponivel">Disponível</option>
                 <option value="usado">Usado</option>
                 <option value="Pendente">Pendente</option>
                 <option value="revogado">Revogado</option>
+                <option value="arquivado">Arquivado</option>
               </select>
               <select id="filtroMes" onchange="filtrarCodigos()"
                 style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;">
@@ -2924,6 +2926,7 @@ window.validarCodigo = async function() {
       return;
     }
     if(data.status==='revogado'){errEl.textContent='Este código foi revogado.';btn.textContent='Entrar';btn.disabled=false;return;}
+    if(data.status==='arquivado'){errEl.textContent='Este código foi arquivado. Fale com quem enviou.';btn.textContent='Entrar';btn.disabled=false;return;}
     window._state.codigoAtivo = {id:docRef.id,...data};
     enterApp('colaborador', data.nomeDestinatario||'Colaborador', 'Acesso por Código');
     setTimeout(()=>{ navigateTo('colab-teste'); iniciarTeste(); }, 100);
@@ -5021,6 +5024,65 @@ window.sortLaudoPF = function(tipo, col) {
 window.loadPFDevolutiva = async function() { await _loadPFPage('pf_dev'); };
 window.loadPFStandard   = async function() { await _loadPFPage('pf_std'); };
 
+// ── CÓDIGOS AGUARDANDO: destaque e ações (Reenviar, Arquivar, Excluir) ──
+function _diasCodigo(c) {
+  const ms = c.criadoEm && c.criadoEm.toMillis ? c.criadoEm.toMillis() : 0;
+  return ms ? Math.floor((Date.now() - ms) / 86400000) : null;
+}
+function _acoesDestaque(c, pdf) {
+  const id = c.id;
+  if(c.status === 'arquivado') {
+    return `<button class="btn btn-outline btn-sm" onclick="desarquivarCodigo('${id}')">Desarquivar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCodigo('${id}','${c.status}','${pdf}')">Excluir</button>`;
+  }
+  return `<button class="btn btn-sm" style="background:#E0A526;color:#2c1810;font-weight:600;" onclick="reenviarCodigo('${id}')">Reenviar</button>
+        <button class="btn btn-outline btn-sm" onclick="arquivarCodigo('${id}')">Arquivar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCodigo('${id}','${c.status||'Pendente'}','${pdf}')">Excluir</button>`;
+}
+
+// Reenviar: abre o WhatsApp com a mensagem pronta e, se houver e-mail, também envia por e-mail.
+window.reenviarCodigo = async function(id) {
+  try {
+    const s = await getDoc(doc(db,'nself_codigos', id));
+    if(!s.exists()) { showToast('Código não encontrado.','error'); return; }
+    const v = s.data();
+    if(v.status === 'usado') { showToast('Esta pessoa já concluiu o teste.','info'); return; }
+    const num = String(v.whatsapp||'').replace(/\D/g,'');
+    const email = String(v.email||'').trim();
+    if(!num && !email) { showToast('Sem WhatsApp nem e-mail cadastrados. Edite o código e informe um deles.','error'); return; }
+    const nome = (v.nomeDestinatario||v.nome||'').split(' ')[0] || 'tudo bem';
+    const link = gerarLinkTeste(v.codigo);
+    if(num) {
+      const msg = encodeURIComponent('Olá, ' + nome + '! Reenviando o seu acesso ao teste 9&Self.\n\nSeu código: ' + (v.codigo||'') + '\nAcesse: ' + link + '\n\nQualquer dúvida, é só falar.');
+      window.open('https://wa.me/' + (num.length <= 11 ? '55' + num : num) + '?text=' + msg, '_blank');
+    }
+    if(email) {
+      const html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#2c1810;line-height:1.6;max-width:560px"><p>Olá, ' + nome + '!</p><p>Reenviando o seu acesso ao teste 9&amp;Self.</p><p><b>Seu código:</b> ' + (v.codigo||'') + '<br><b>Acesse:</b> <a href="' + link + '">' + link + '</a></p><p style="margin-top:24px">Dra. Lucia Kratz<br>Gestora do 9&amp;Self</p></div>';
+      await addDoc(collection(db,'nr1map_emails'), { to: email, message: { subject: 'Seu acesso ao teste 9&Self', html } });
+    }
+    await updateDoc(doc(db,'nself_codigos', id), { ultimoReenvioEm: serverTimestamp(), reenvios: increment(1) });
+    showToast(num && email ? 'Reenviado pelo WhatsApp e por e-mail.' : (num ? 'Reenviado pelo WhatsApp.' : 'Reenviado por e-mail.'),'success');
+    loadCodigos();
+  } catch(e) { console.warn('reenviar:', e); showToast('Não foi possível reenviar agora.','error'); }
+};
+
+// Arquivar: tira da lista principal e o código deixa de funcionar. Dá para desarquivar.
+window.arquivarCodigo = async function(id) {
+  if(!confirm('Arquivar este código? Ele sai da lista e deixa de funcionar. Você pode desarquivar depois.')) return;
+  try {
+    await updateDoc(doc(db,'nself_codigos', id), { status: 'arquivado', arquivadoEm: serverTimestamp() });
+    showToast('Código arquivado.','success');
+    loadCodigos();
+  } catch(e) { showToast('Erro ao arquivar.','error'); }
+};
+window.desarquivarCodigo = async function(id) {
+  try {
+    await updateDoc(doc(db,'nself_codigos', id), { status: 'disponivel' });
+    showToast('Código desarquivado.','success');
+    loadCodigos();
+  } catch(e) { showToast('Erro ao desarquivar.','error'); }
+};
+
 window.filtrarCodigos = function(tipo) {
   if(tipo) { _renderCodPF(tipo); return; }
   const nome   = (document.getElementById('filtroNome')?.value||'').toLowerCase().trim();
@@ -5031,7 +5093,9 @@ window.filtrarCodigos = function(tipo) {
   const count  = document.getElementById('codigosCount');
   let lista = [...(window._todosCodigos||[])];
   if(nome)   lista = lista.filter(c=>(c.nomeDestinatario||'').toLowerCase().includes(nome));
-  if(status) lista = lista.filter(c=>(c.status||'Pendente')===status);
+  if(status==='__aguardando') lista = lista.filter(c=>['disponivel','Pendente'].includes(c.status||'Pendente'));
+  else if(status) lista = lista.filter(c=>(c.status||'Pendente')===status);
+  if(status!=='arquivado') lista = lista.filter(c=>c.status!=='arquivado');
   if(mes)    lista = lista.filter(c=>{ const dt=c.criadoEm?.toDate?.(); return dt&&String(dt.getMonth()+1).padStart(2,'0')===mes; });
   lista.sort((a,b)=>{
     if(ordem==='nome') return (a.nomeDestinatario||'').localeCompare(b.nomeDestinatario||'');
@@ -5040,25 +5104,29 @@ window.filtrarCodigos = function(tipo) {
     if(ordem==='data_asc')  return (a.criadoEm?.toMillis?.()??0)-(b.criadoEm?.toMillis?.()??0);
     return 0;
   });
-  if(count) count.textContent = lista.length ? `${lista.length} código(s)` : '';
+  const _nAguard = lista.filter(c=>['disponivel','Pendente'].includes(c.status||'Pendente')).length;
+  if(count) count.innerHTML = lista.length ? `${lista.length} código(s)` + (_nAguard ? ` · <b style="color:#B7791F;">${_nAguard} aguardando o teste</b>` : '') : '';
   if(!lista.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:24px;">Nenhum código encontrado</td></tr>'; return; }
-  const statusCls={'Pendente':'pill-gray','disponivel':'pill-green','revogado':'pill-red','usado':'pill-gray'};
+  const statusCls={'Pendente':'pill-gray','disponivel':'pill-green','revogado':'pill-red','usado':'pill-gray','arquivado':'pill-gray'};
   tbody.innerHTML=lista.map(c=>{
     const link=c.linkTeste||gerarLinkTeste(c.codigo||'');
     const pdf=c.pdfPath||'';
+    const naoUsado=['disponivel','Pendente'].includes(c.status||'Pendente');
+    const arq=c.status==='arquivado';
+    const _d=_diasCodigo(c);
     const wbtn=`<button class="btn btn-outline btn-sm" onclick="abrirModalWhatsApp('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${c.codigo||''}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">💬</button>`;
-    return `<tr>
+    return `<tr style="${naoUsado ? 'background:#FFF9EA;box-shadow:inset 4px 0 0 #E0A526;' : (arq ? 'opacity:.6;' : '')}">
       <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
       <td>${c.nomeDestinatario||'—'}</td>
       <td>${c.empresa||'Pessoa Física'}</td>
       <td style="font-size:11px;max-width:140px;word-break:break-all;"><a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
       <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
-      <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
+      <td>${naoUsado ? `<span class="pill" style="background:#FFF1CC;color:#8A6200;">Aguardando</span><div style="font-size:11px;color:#8a7a99;margin-top:4px;">${_d===null?'':(_d<=0?'enviado hoje':'há '+_d+(_d===1?' dia':' dias'))}${c.reenvios?' · reenviado '+c.reenvios+'x':''}</div>` : `<span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span>`}</td>
       <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-        ${wbtn}
-        <button class="btn btn-outline btn-sm" onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>
+        ${(naoUsado||arq) ? _acoesDestaque(c, pdf) : wbtn}
+        ${(naoUsado||arq)?'':`<button class="btn btn-outline btn-sm" onclick="abrirRenovarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}')">🔄</button>`}
         <button class="btn btn-outline btn-sm" onclick="editarCodigo('${c.id}','${(c.nomeDestinatario||'').replace(/'/g,"\\'")}','${(c.email||'').replace(/'/g,"\\'")}','${(c.whatsapp||'').replace(/'/g,"\\'")}','${c.codigo||''}','${c.empresa||'pf'}')">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="excluirCodigo('${c.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>
+        ${(naoUsado||arq)?'':`<button class="btn btn-danger btn-sm" onclick="excluirCodigo('${c.id}','${c.status||'Pendente'}','${pdf}')">🗑</button>`}
       </td></tr>`;
   }).join('');
 };
