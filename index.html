@@ -424,12 +424,10 @@ tr:hover td{background:#FAFAFE;}
 
     <div id="loginAdmin" style="display:none;">
       <div class="login-field">
-        <label>Senha de Acesso</label>
-        <input type="password" id="adminPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <label>Acesso da administradora</label>
+        <p style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;margin:4px 0 0;">Entre com a conta Google autorizada. Não há senha para digitar.</p>
       </div>
-      <div style="text-align:right;margin-top:6px;">
-        <a href="#" onclick="abrirRecuperarSenha('admin');return false;" style="font-size:12px;color:rgba(255,255,255,0.6);">Esqueceu a senha?</a>
-      </div>
+      <input type="hidden" id="adminPass" value=""/>
     </div>
 
     <div id="loginRH" style="display:none;">
@@ -2165,7 +2163,7 @@ tr:hover td{background:#FAFAFE;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, orderBy, limit, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider }
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, GoogleAuthProvider, signInWithPopup, reauthenticateWithCredential, EmailAuthProvider }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -2192,6 +2190,7 @@ window._state = {
 // ── PERFIL DE LOGIN ──
 window.setLoginProfile = function(p) {
   window._state.profile = p;
+  { const b = document.getElementById('loginBtnEl'); if(b) b.textContent = (p==='admin') ? 'Entrar com o Google' : 'Entrar'; }
   document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',['admin','parceiro','rh','colaborador'][i]===p));
   document.getElementById('loginAdmin').style.display    = p==='admin'?'block':'none';
   document.getElementById('loginRH').style.display      = p==='rh'?'block':'none';
@@ -2209,16 +2208,19 @@ window.doLogin = async function() {
   const p = window._state.profile || 'admin';
   try {
     if(p==='admin') {
-      const pass = document.getElementById('adminPass').value;
-      if(pass==='1234') { enterApp('admin','Lucia Kratz','Administradora'); }
-      else { err.textContent='Senha incorreta.'; }
+      const ADMINS = ['luciakratz@gmail.com','contato@luciakratz.com.br'];
+      try {
+        const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+        const u = cred.user, em = String(u.email||'').toLowerCase();
+        if(u.emailVerified && ADMINS.indexOf(em) >= 0) { enterApp('admin','Lucia Kratz','Administradora'); }
+        else { try{ await signOut(auth); }catch(_){} err.textContent='Esta conta Google não tem acesso de administradora.'; }
+      } catch(e) {
+        err.textContent = (e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request') ? 'Entrada cancelada.' : 'Não foi possível entrar com o Google. Tente de novo.';
+      }
     } else if(p==='parceiro') {
       const email = document.getElementById('parceiroEmail').value;
       const pass  = document.getElementById('parceiroPass').value;
-      if(email==='parceiro@9self.com' && pass==='9self2025') {
-        window._state.parceiro = {id:'teste', nome:'Parceiro Teste', email};
-        enterApp('parceiro','Parceiro Teste','Parceiro');
-      } else {
+      {
         try {
           await signInWithEmailAndPassword(auth, email, pass);
           const q    = query(collection(db,'nself_parceiros'), where('email','==',email));
@@ -2237,10 +2239,7 @@ window.doLogin = async function() {
     } else if(p==='rh') {
       const email = document.getElementById('rhEmail').value;
       const pass  = document.getElementById('rhPass').value;
-      if(email==='rh@9self.com' && pass==='9self2025') {
-        window._state.empresa = {id:'teste', responsavel:'RH Teste', nome:'Empresa Teste'};
-        enterApp('rh','RH Teste','RH / Empresa');
-      } else {
+      {
         try {
           const cred = await signInWithEmailAndPassword(auth, email, pass);
           const uid  = cred.user.uid;
@@ -2266,7 +2265,7 @@ window.doLogin = async function() {
   } catch(e) {
     err.textContent = e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Erro ao entrar. Tente novamente.';
   }
-  btn.textContent='Entrar';btn.disabled=false;
+  btn.textContent=(window._state.profile==='admin')?'Entrar com o Google':'Entrar';btn.disabled=false;
 };
 
 function enterApp(profile, name, role) {
