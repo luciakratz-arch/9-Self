@@ -2212,6 +2212,13 @@ async function criarContaSegura(email, senhaEscolhida) {
 }
 
 // ── PERFIL DE LOGIN ──
+// A aba Admin fica oculta para o público: a administradora entra pela Central (endereço com ?admin=1).
+(function(){
+  const ehAdmin = new URLSearchParams(location.search).get('admin') === '1';
+  if(ehAdmin) setTimeout(function(){ try{ window.setLoginProfile('admin'); }catch(e){} }, 0);
+  if(!ehAdmin) { const css = document.createElement('style'); css.textContent = '.login-tab:first-child{display:none!important}'; document.head.appendChild(css); }
+})();
+
 window.setLoginProfile = function(p) {
   window._state.profile = p;
   { const b = document.getElementById('loginBtnEl'); if(b) b.textContent = (p==='admin') ? 'Entrar com o Google' : 'Entrar'; }
