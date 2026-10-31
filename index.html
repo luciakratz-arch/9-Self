@@ -2351,6 +2351,18 @@ window.doLoginGoogle = async function(perfil) {
   }
 };
 
+// Entrada automática da administradora: se a sessão do Google já existe e a pessoa veio pela Central (?admin=1), entra direto no painel.
+(function() {
+  if(new URLSearchParams(location.search).get('admin') !== '1') return;
+  const ADMINS_AUTO = ['luciakratz@gmail.com','contato@luciakratz.com.br'];
+  onAuthStateChanged(auth, (u) => {
+    const shell = document.getElementById('appShell');
+    if(!u || (shell && shell.style.display === 'block')) return;
+    const em = String(u.email||'').toLowerCase();
+    if(u.emailVerified && ADMINS_AUTO.indexOf(em) >= 0) enterApp('admin','Lucia Kratz','Administradora');
+  });
+})();
+
 function enterApp(profile, name, role) {
   if(profile==='rh' || profile==='parceiro') marcarMinhaConta();
   window._state.profile = profile;
