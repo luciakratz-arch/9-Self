@@ -442,6 +442,10 @@ tr:hover td{background:#FAFAFE;}
       <div style="text-align:right;margin-top:6px;">
         <a href="#" onclick="abrirRecuperarSenha('rh');return false;" style="font-size:12px;color:rgba(255,255,255,0.6);">Esqueceu a senha?</a>
       </div>
+      <div style="margin-top:12px;text-align:center;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">ou</div>
+        <button type="button" onclick="doLoginGoogle('rh')" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.08);color:#fff;font-weight:600;font-size:14px;cursor:pointer;">Entrar com o Google</button>
+      </div>
     </div>
 
     <div id="loginParceiro" style="display:none;">
@@ -455,6 +459,10 @@ tr:hover td{background:#FAFAFE;}
       </div>
       <div style="text-align:right;margin-top:6px;">
         <a href="#" onclick="abrirRecuperarSenha('parceiro');return false;" style="font-size:12px;color:rgba(255,255,255,0.6);">Esqueceu a senha?</a>
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">ou</div>
+        <button type="button" onclick="doLoginGoogle('parceiro')" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.08);color:#fff;font-weight:600;font-size:14px;cursor:pointer;">Entrar com o Google</button>
       </div>
     </div>
 
@@ -2187,6 +2195,22 @@ window._state = {
   codigoAtivo: null,
 };
 
+// ── CONTAS NOVAS (canal separado: não troca a sessão de quem está logada) ──
+function gerarSenhaForte() {
+  const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
+  const b = new Uint32Array(18); crypto.getRandomValues(b);
+  return Array.from(b, n => abc[n % abc.length]).join('') + 'aA1!';
+}
+let _authAux = null;
+async function criarContaSegura(email, senhaEscolhida) {
+  if(!_authAux) _authAux = getAuth(initializeApp(firebaseConfig, 'aux'));
+  const senha = senhaEscolhida || gerarSenhaForte();
+  const cred = await createUserWithEmailAndPassword(_authAux, email, senha);
+  if(!senhaEscolhida) { try { await sendPasswordResetEmail(_authAux, email); } catch(e) { console.warn('reset:', e.message); } }
+  try { await signOut(_authAux); } catch(e) {}
+  return cred.user.uid;
+}
+
 // ── PERFIL DE LOGIN ──
 window.setLoginProfile = function(p) {
   window._state.profile = p;
@@ -2266,6 +2290,31 @@ window.doLogin = async function() {
     err.textContent = e.code==='auth/invalid-credential'?'E-mail ou senha inválidos.':'Erro ao entrar. Tente novamente.';
   }
   btn.textContent=(window._state.profile==='admin')?'Entrar com o Google':'Entrar';btn.disabled=false;
+};
+
+window.doLoginGoogle = async function(perfil) {
+  const err = document.getElementById('loginError'); err.textContent = '';
+  try {
+    const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+    const u = cred.user, em = String(u.email||'').toLowerCase();
+    if(!u.emailVerified) { try{ await signOut(auth); }catch(_){} err.textContent = 'O e-mail desta conta Google não está verificado.'; return; }
+    if(perfil === 'rh') {
+      let snap = await getDocs(query(collection(db,'nself_empresas'), where('email','==',em)));
+      if(snap.empty) snap = await getDocs(query(collection(db,'nself_empresas'), where('uid','==',u.uid)));
+      if(snap.empty) { try{ await signOut(auth); }catch(_){} err.textContent = 'Este e-mail não está cadastrado como empresa. Fale com a administradora.'; return; }
+      const emp = snap.docs[0].data();
+      window._state.empresa = {id:snap.docs[0].id,...emp};
+      enterApp('rh', emp.responsavel||emp.nome, emp.nome);
+    } else {
+      const snap = await getDocs(query(collection(db,'nself_parceiros'), where('email','==',em)));
+      if(snap.empty) { try{ await signOut(auth); }catch(_){} err.textContent = 'Este e-mail não está cadastrado como parceiro. Fale com a administradora.'; return; }
+      const par = snap.docs[0].data();
+      window._state.parceiro = {id:snap.docs[0].id,...par};
+      enterApp('parceiro', par.nome, 'Parceiro');
+    }
+  } catch(e) {
+    err.textContent = (e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request') ? 'Entrada cancelada.' : 'Não foi possível entrar com o Google. Tente de novo.';
+  }
 };
 
 function enterApp(profile, name, role) {
@@ -3927,8 +3976,7 @@ window.salvarEmpresa = async function() {
   try {
     // Criar usuário no Firebase Auth PRIMEIRO
     let uid = '';
-    const userCred = await createUserWithEmailAndPassword(auth, email, senha);
-    uid = userCred.user.uid;
+    uid = await criarContaSegura(email, senha);
     
     // Só salva no Firestore se Auth funcionou
     await addDoc(collection(db,'nself_empresas'),{
@@ -3939,7 +3987,7 @@ window.salvarEmpresa = async function() {
     closeModal('modalNovaEmpresa');
     showToast('Empresa cadastrada!','success');
     loadEmpresas();
-    enviarEmailAcesso(resp||nome, email, 'empresa', {senha:'123456', mensagem:`Seu acesso ao painel RH do 9&Self foi criado. E-mail: ${email} | Senha provisória: 123456`});
+    enviarEmailAcesso(resp||nome, email, 'empresa', {mensagem:`Seu acesso ao painel RH do 9&Self foi criado. E-mail: ${email}. Entre com a senha que a administradora combinou com você, ou use o Google, ou toque em Esqueceu a senha? para criar uma nova.`});
   } catch(e) {
     console.error('salvarEmpresa:', e);
     if(e.code==='auth/email-already-in-use') {
@@ -5378,8 +5426,7 @@ window.salvarNovoParceiro = async function() {
   if(!nome||!email||!senha){ showToast('Preencha nome, e-mail e senha.','error'); return; }
   if(senha.length < 6){ showToast('Senha deve ter mínimo 6 caracteres.','error'); return; }
   try {
-    const cred = await createUserWithEmailAndPassword(auth, email, senha);
-    const uid = cred.user.uid;
+    const uid = await criarContaSegura(email, senha);
     await addDoc(collection(db,'nself_parceiros'), {
       nome, email, uid, whatsapp, area, comoConheceu,
       colaboradores, creditos: 0, ativo: true, criadoEm: serverTimestamp()
@@ -5550,8 +5597,7 @@ window.aprovarParceiro = async function(solId, nome, email, whatsapp) {
   try {
     let uid = '';
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, senha);
-      uid = cred.user.uid;
+      uid = await criarContaSegura(email, senha);
     } catch(e) { console.warn('Auth:', e.message); }
 
     const parRef = await addDoc(collection(db,'nself_parceiros'), {
@@ -5562,7 +5608,7 @@ window.aprovarParceiro = async function(solId, nome, email, whatsapp) {
       status: 'aprovado', aprovadoEm: serverTimestamp(), parceiroId: parRef.id
     });
     showToast(`${nome} aprovado!`, 'success');
-    enviarEmailAcesso(nome, email, 'parceiro', {senha:'123456', mensagem:`Seu acesso ao painel de parceiros do 9&Self foi aprovado. E-mail: ${email} | Senha provisória: 123456`});
+    enviarEmailAcesso(nome, email, 'parceiro', {mensagem:`Seu acesso ao painel de parceiros do 9&Self foi aprovado. E-mail: ${email}. Entre com a senha que a administradora combinou com você, ou use o Google, ou toque em Esqueceu a senha? para criar uma nova.`});
     if(whatsapp) {
       const num = whatsapp.replace(/\D/g,'');
       const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
@@ -5963,12 +6009,9 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
 
     if(tipo === 'empresa') {
       // Criar usuário no Firebase Auth com senha padrão
-      const senhaPadrao = '123456';
       let uid = '';
       try {
-        const { createUserWithEmailAndPassword: cu } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const cred = await cu(auth, email, senhaPadrao);
-        uid = cred.user.uid;
+        uid = await criarContaSegura(email);
       } catch(authErr) {
         // Usuário já existe
         console.warn('Auth:', authErr.message);
@@ -6000,27 +6043,22 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
       });
 
       showToast(`Empresa criada! Código ${c} gerado.`, 'success');
-      enviarEmailAcesso(nome, email, 'empresa', {senha:'123456', codigo:c, link, mensagem:`Seu acesso ao 9&Self foi criado. E-mail: ${email} | Senha: 123456 | Código: ${c} | Acesse: ${link}`});
+      enviarEmailAcesso(nome, email, 'empresa', {codigo:c, link, mensagem:`Seu acesso ao 9&Self foi criado. E-mail: ${email} | Código: ${c} | Enviamos outro e-mail com o link para você criar a sua senha, ou entre com o Google | Acesse: ${link}`});
 
       // WhatsApp com senha e link de troca
       if(whatsapp) {
         const num = whatsapp.replace(/\D/g,'');
         const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
         const msg = encodeURIComponent(
-          `Olá, ${nome}! 🎉\n\nFicamos muito felizes em ter você como cliente 9&Self — seja muito bem-vindo(a)!\n\nSeu acesso ao painel de RH foi criado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* 123456\n🔑 *Código de avaliação:* ${c}\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos à disposição! 💜\nDra. Lúcia Kratz · CRP 09/20590`
+          `Olá, ${nome}! 🎉\n\nFicamos muito felizes em ter você como cliente 9&Self — seja muito bem-vindo(a)!\n\nSeu acesso ao painel de RH foi criado:\n\n📧 *E-mail:* ${email}\n🔑 *Código de avaliação:* ${c}\n\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos à disposição! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
 
     } else if(tipo === 'parceiro') {
       // Criar parceiro com senha padrão
-      const senhaPadrao = '123456';
       let uid = '';
-      try {
-        const { createUserWithEmailAndPassword: cu } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const cred = await cu(auth, email, senhaPadrao);
-        uid = cred.user.uid;
-      } catch(authErr) { console.warn('Auth:', authErr.message); }
+      try { uid = await criarContaSegura(email); } catch(authErr) { console.warn('Auth:', authErr.message); }
 
       await addDoc(collection(db,'nself_parceiros'), {
         nome, email, uid, whatsapp,
@@ -6039,7 +6077,7 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
         const num = whatsapp.replace(/\D/g,'');
         const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
         const msg = encodeURIComponent(
-          `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9&Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* 123456\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
+          `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9&Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
