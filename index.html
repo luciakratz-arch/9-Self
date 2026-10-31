@@ -676,7 +676,7 @@ tr:hover td{background:#FAFAFE;}
               <button class="btn btn-outline" onclick="gerarLinkSolicitacao()" style="border-color:rgba(123,0,196,0.5);color:#7B00C4;">
                 🔗 Gerar Link de Cadastro
               </button>
-              <button class="btn btn-primary" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+              <button class="btn btn-primary" onclick="abrirNovoCodigo()">＋ Gerar Código</button>
             </div>
           </div>
 
@@ -869,7 +869,7 @@ tr:hover td{background:#FAFAFE;}
           <div class="table-card">
             <div class="table-header">
               <h3>Colaboradores</h3>
-              <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoCodigo')">＋ Gerar Código</button>
+              <button class="btn btn-primary btn-sm" onclick="abrirNovoCodigo()">＋ Gerar Código</button>
             </div>
             <table>
               <thead><tr><th>Nome</th><th>Código</th><th>Tipo</th><th>Status</th><th>Laudo</th></tr></thead>
@@ -5520,6 +5520,19 @@ window.salvarCreditosGratuitos = async function() {
 // ══════════════════════════════════════════
 // GERAR CÓDIGO PARA EMPRESA
 // ══════════════════════════════════════════
+window.abrirNovoCodigo = async function() {
+  if(window._state.profile === 'rh' && window._state.empresa && window._state.empresa.id) {
+    try {
+      const snap = await getDoc(doc(db,'nself_empresas', window._state.empresa.id));
+      const e = snap.exists() ? snap.data() : window._state.empresa;
+      window._empresaDetalhe = { id: window._state.empresa.id, nome: e.nome || window._state.empresa.nome, creditos: Number(e.creditos)||0 };
+    } catch(err) { window._empresaDetalhe = { id: window._state.empresa.id, nome: window._state.empresa.nome, creditos: Number(window._state.empresa.creditos)||0 }; }
+    window.abrirGerarCodigoEmpresa();
+  } else {
+    openModal('modalNovoCodigo');
+  }
+};
+
 window.abrirGerarCodigoEmpresa = function() {
   const creditos = window._empresaDetalhe?.creditos || 0;
   document.getElementById('empresaSaldoAviso').textContent = `Saldo: ${creditos} crédito(s) disponível(is)`;
@@ -5553,6 +5566,7 @@ window.confirmarGerarCodigoEmpresa = async function() {
     window._empresaDetalhe.creditos = creditos - 1;
     closeModal('modalGerarCodigoEmpresa');
     showToast(`Código ${c} gerado!`, 'success');
+    if(window._state.profile === 'rh') { try { if(typeof loadCodigos === 'function') loadCodigos(); } catch(_){} try { if(typeof loadRHDashboard === 'function') loadRHDashboard(); } catch(_){} }
     if(whatsapp) {
       const num = whatsapp.replace(/\D/g,'');
       const msg = encodeURIComponent(`Olá, ${nome}! 🎉 Seu código de acesso ao 9&Self foi gerado!\n\nCódigo: *${c}*\n\nAcesse: ${link}\n\n💜`);
