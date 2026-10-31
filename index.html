@@ -2171,6 +2171,7 @@ tr:hover td{background:#FAFAFE;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, orderBy, limit, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, GoogleAuthProvider, signInWithPopup, reauthenticateWithCredential, EmailAuthProvider }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -2195,6 +2196,29 @@ window._state = {
   codigoAtivo: null,
 };
 
+// ── ETIQUETA DA CONTA (empresa / parceiro), colocada no servidor ──
+// Nunca atrapalha o cadastro ou o login: se falhar, só registra no console.
+const _fn = getFunctions(app, 'southamerica-east1');
+async function marcarMinhaConta() {
+  try {
+    if(!auth.currentUser) return;
+    await httpsCallable(_fn, 'marcarPapel')({});
+    await auth.currentUser.getIdToken(true);
+  } catch(e) { console.warn('marcarMinhaConta:', e.code || e.message); }
+}
+// A administradora marca a conta de quem acabou de ser cadastrado (tenta de novo enquanto o cadastro termina de gravar).
+function marcarContaDe(email) {
+  const esperas = [3000, 7000, 15000];
+  (async () => {
+    for (const ms of esperas) {
+      await new Promise(r => setTimeout(r, ms));
+      try { await httpsCallable(_fn, 'marcarPapel')({ email }); return; }
+      catch(e) { if(e.code !== 'functions/permission-denied' && e.code !== 'functions/not-found') { console.warn('marcarContaDe:', e.code || e.message); return; } }
+    }
+    console.warn('marcarContaDe: conta não marcada (marque de novo pela administração)');
+  })();
+}
+
 // ── CONTAS NOVAS (canal separado: não troca a sessão de quem está logada) ──
 function gerarSenhaForte() {
   const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
@@ -2208,6 +2232,7 @@ async function criarContaSegura(email, senhaEscolhida) {
   const cred = await createUserWithEmailAndPassword(_authAux, email, senha);
   if(!senhaEscolhida) { try { await sendPasswordResetEmail(_authAux, email); } catch(e) { console.warn('reset:', e.message); } }
   try { await signOut(_authAux); } catch(e) {}
+  marcarContaDe(email);
   return cred.user.uid;
 }
 
@@ -2325,6 +2350,7 @@ window.doLoginGoogle = async function(perfil) {
 };
 
 function enterApp(profile, name, role) {
+  if(profile==='rh' || profile==='parceiro') marcarMinhaConta();
   window._state.profile = profile;
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
