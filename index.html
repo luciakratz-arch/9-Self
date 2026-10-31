@@ -4751,7 +4751,8 @@ window.calcSimPainel = function() {
 
 window.loadRHCreditosPage = async function() {
   const empId = window._state.empresa?.id || 'teste';
-  const creditos = window._state.empresa?.creditos ?? 0;
+  let creditos = window._state.empresa?.creditos ?? 0;
+  try { if(empId && empId !== 'teste') { const s = await getDoc(doc(db,'nself_empresas', empId)); if(s.exists()) { creditos = Number(s.data().creditos)||0; window._state.empresa.creditos = creditos; } } } catch(_) {}
   document.getElementById('rhCreditosCards').innerHTML = `
     <div class="stat-card"><div class="sc-label">Saldo atual</div><div class="sc-value">${creditos}</div><div class="sc-sub">créditos disponíveis</div></div>
   `;
@@ -5564,6 +5565,7 @@ window.confirmarGerarCodigoEmpresa = async function() {
     });
     await updateDoc(doc(db,'nself_empresas', empId), { creditos: increment(-1) });
     window._empresaDetalhe.creditos = creditos - 1;
+    if(window._state.profile === 'rh' && window._state.empresa) window._state.empresa.creditos = creditos - 1;
     closeModal('modalGerarCodigoEmpresa');
     showToast(`Código ${c} gerado!`, 'success');
     if(window._state.profile === 'rh') { try { if(typeof loadCodigos === 'function') loadCodigos(); } catch(_){} try { if(typeof loadRHDashboard === 'function') loadRHDashboard(); } catch(_){} }
