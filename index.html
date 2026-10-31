@@ -2843,13 +2843,38 @@ async function loadRHDashboard() {
         <td>${v.nomeDestinatario||v.nome||'—'}</td>
         <td style="font-family:monospace;letter-spacing:2px;">${v.codigo||d.id}</td>
         <td>${tipo}</td>
-        <td>${v.status==='usado' ? '<span class="badge badge-success">Concluído</span>' : '<span class="badge" style="background:#FFF4DC;color:#8A6200;">Aguardando</span>'}</td>
-        <td>${pdfBtn}</td>
+        <td>${v.status==='usado' ? '<span class="badge badge-success">Concluído</span>' : '<span class="badge" style="background:#FFF4DC;color:#8A6200;">Aguardando</span><div style="font-size:11px;color:#8a7a99;margin-top:4px;">' + diasDesde(v.criadoEm) + (v.ultimoLembreteEm ? ' · lembrado ' + diasDesde(v.ultimoLembreteEm, true) : '') + '</div>'}</td>
+        <td>${v.status==='usado' ? pdfBtn : (v.whatsapp ? '<button class="btn btn-sm" style="font-size:11px;padding:4px 10px;" onclick="lembrarColaborador(\'' + d.id + '\')">Lembrar</button>' : '—')}</td>
       </tr>`;
     });
     tbody.innerHTML = rows;
   } catch(e){ console.warn('[RH colabs]',e); tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">Erro ao carregar</td></tr>'; }
 }
+
+function diasDesde(ts, curto) {
+  if(!ts || !ts.seconds) return '';
+  const dias = Math.floor((Date.now() - ts.seconds*1000) / 86400000);
+  if(curto) return dias <= 0 ? 'hoje' : (dias === 1 ? 'há 1 dia' : 'há ' + dias + ' dias');
+  return dias <= 0 ? 'enviado hoje' : (dias === 1 ? 'enviado há 1 dia' : 'enviado há ' + dias + ' dias');
+}
+
+// Lembrete manual: abre o WhatsApp com a mensagem pronta e registra a data do lembrete.
+window.lembrarColaborador = async function(id) {
+  try {
+    const s = await getDoc(doc(db,'nself_codigos', id));
+    if(!s.exists()) { showToast('Código não encontrado.','error'); return; }
+    const v = s.data();
+    if(v.status === 'usado') { showToast('Esta pessoa já concluiu o teste.','info'); return; }
+    const num = String(v.whatsapp||'').replace(/\D/g,'');
+    if(!num) { showToast('Esta pessoa não tem WhatsApp cadastrado.','error'); return; }
+    const nome = (v.nomeDestinatario||v.nome||'').split(' ')[0] || 'tudo bem';
+    const msg = encodeURIComponent('Olá, ' + nome + '! Passando para lembrar do seu teste 9&Self, que ainda não foi feito. Ele leva poucos minutos.\n\nSeu código: ' + (v.codigo||'') + '\nAcesse: ' + gerarLinkTeste(v.codigo) + '\n\nQualquer dúvida, é só falar.');
+    window.open('https://wa.me/' + (num.length <= 11 ? '55' + num : num) + '?text=' + msg, '_blank');
+    await updateDoc(doc(db,'nself_codigos', id), { ultimoLembreteEm: serverTimestamp(), lembretes: increment(1) });
+    showToast('Lembrete aberto no WhatsApp.','success');
+    if(typeof loadRHDashboard === 'function') loadRHDashboard();
+  } catch(e) { console.warn('lembrar:', e); showToast('Não foi possível lembrar agora.','error'); }
+};
 
 // ── VALIDAR CÓDIGO (COLABORADOR) ──
 window.validarCodigo = async function() {
