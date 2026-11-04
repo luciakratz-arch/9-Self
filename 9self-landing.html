@@ -983,5 +983,15 @@ function _pixPayload({chave,nome,valor,cidade,txid}){
   return base+(crc&0xFFFF).toString(16).toUpperCase().padStart(4,'0');
 }
 </script>
+<!-- botão voltar (padrão das páginas de produto) -->
+<style>
+  #voltar-produtos{position:fixed;left:14px;bottom:14px;z-index:9998;display:inline-flex;align-items:center;gap:6px;
+    background:#2A0A45;color:#F1E4C8;border:1px solid #C9A25B;border-radius:999px;padding:9px 16px;
+    font:600 13px/1 'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-decoration:none;
+    box-shadow:0 4px 16px rgba(0,0,0,.35);transition:transform .15s,background .2s}
+  #voltar-produtos:hover{background:#7B00C4;transform:translateY(-2px)}
+  @media(max-width:480px){#voltar-produtos{left:10px;bottom:10px;padding:8px 13px;font-size:12px}}
+</style>
+<a id="voltar-produtos" href="https://luciakratz.com.br/#produtos" aria-label="Voltar aos produtos">&larr; Voltar aos produtos</a>
 </body>
 </html>
