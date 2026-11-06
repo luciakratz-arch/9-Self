@@ -1,4 +1,4 @@
-const CACHE_NAME = '9self-v8';
+const CACHE_NAME = '9self-v9';
 const ASSETS = [
   './index.html',
   './cadastro.html',

@@ -2172,7 +2172,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, setDoc, query, where, orderBy, limit, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, GoogleAuthProvider, signInWithPopup, reauthenticateWithCredential, EmailAuthProvider }
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, reauthenticateWithCredential, EmailAuthProvider }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -2348,6 +2348,16 @@ window.doLoginGoogle = async function(perfil) {
     err.textContent = (e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request') ? 'Entrada cancelada.' : 'Não foi possível entrar com o Google. Tente de novo.';
   }
 };
+
+// Entrada única vinda da Central: a Central entrega uma chave temporária no endereço (#sso=...).
+// Usamos a chave uma vez, limpamos o endereço e o bloco abaixo abre o painel da administradora.
+(function() {
+  const m = /[#&]sso=([^&]+)/.exec(location.hash);
+  if(!m) return;
+  const chave = decodeURIComponent(m[1]);
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(_) {}
+  signInWithCustomToken(auth, chave).catch(function(e) { console.warn('entrada única não funcionou:', e && e.code); });
+})();
 
 // Entrada automática da administradora: se a sessão do Google já existe e a pessoa veio pela Central (?admin=1), entra direto no painel.
 (function() {
