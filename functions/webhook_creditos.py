@@ -62,14 +62,14 @@ def calcular_creditos_por_titulo(titulo: str) -> int:
 
 def enviar_email_creditos(email, nome, creditos, saldo_atual):
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = f'✅ {creditos} crédito(s) adicionado(s) ao seu perfil 9&Self'
-    msg['From']    = f'"9&Self | Lúcia Kratz" <{GMAIL_USER}>'
+    msg['Subject'] = f'✅ {creditos} crédito(s) adicionado(s) ao seu perfil 9Self'
+    msg['From']    = f'"9Self | Lúcia Kratz" <{GMAIL_USER}>'
     msg['To']      = email
 
     html = f"""
     <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#1a0a2e;color:#fff;border-radius:16px;overflow:hidden;">
       <div style="background:linear-gradient(135deg,#3d0a5e,#7B1D6B);padding:32px;text-align:center;">
-        <h1 style="font-size:32px;margin:0;">9&amp;Self</h1>
+        <h1 style="font-size:32px;margin:0;">9Self</h1>
         <p style="opacity:.7;margin:8px 0 0;font-size:12px;letter-spacing:2px;">REPRESENTANTE OFICIAL</p>
       </div>
       <div style="padding:32px;">

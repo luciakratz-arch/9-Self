@@ -61,7 +61,7 @@ def gerarCheckoutCreditos(req: https_fn.Request) -> https_fn.Response:
         # Criar preferência no Mercado Pago
         preference = {
             "items": [{
-                "title": f"9&Self — {creditos} créditos para parceiros",
+                "title": f"9Self — {creditos} créditos para parceiros",
                 "quantity": 1,
                 "unit_price": total,
                 "currency_id": "BRL",

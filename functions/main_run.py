@@ -83,7 +83,7 @@ def gerarCheckout():
 
         preference = {
             "items": [{
-                "title": f"9&Self — {lote['creditos']} créditos",
+                "title": f"9Self — {lote['creditos']} créditos",
                 "quantity": 1,
                 "unit_price": lote['total'],
                 "currency_id": "BRL",
@@ -145,8 +145,8 @@ def notificarSolicitacao():
             return jsonify({'ok':False,'msg':'GMAIL_PASS não configurado'}), 200, CORS_HEADERS
 
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = f'[9&Self] Nova solicitação — {nome}'
-        msg['From']    = f'"9&Self Sistema" <{gmail_user}>'
+        msg['Subject'] = f'[9Self] Nova solicitação — {nome}'
+        msg['From']    = f'"9Self Sistema" <{gmail_user}>'
         msg['To']      = gmail_user
 
         html = f"""
@@ -162,7 +162,7 @@ def notificarSolicitacao():
           <p style="margin-top:16px;">
             <a href="https://luciakratz-arch.github.io/9-Self/index.html"
                style="background:#7B00C4;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;">
-              Abrir Painel 9&amp;Self
+              Abrir Painel 9Self
             </a>
           </p>
         </div>

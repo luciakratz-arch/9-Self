@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-9&Self — Gerador de Laudo de Cultura Organizacional
+9Self — Gerador de Laudo de Cultura Organizacional
 Dra. Lucia Kratz · CRP 09/20590
 
 Motor que:
@@ -40,6 +40,11 @@ from reportlab.platypus import (
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT, TA_JUSTIFY, TA_CENTER, TA_LEFT
 from reportlab.platypus.flowables import Flowable
+from reportlab.platypus import Image as _ImgC
+_LOGO_PNG = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo_9self.png')
+from reportlab.lib.utils import ImageReader as _IR
+_iw, _ih = _IR(_LOGO_PNG).getSize()
+_LOGO_PROP = _ih / _iw
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
@@ -58,7 +63,7 @@ except Exception:
 
 # ── CORES ─────────────────────────────────────────────────────────────────────
 PURP     = HexColor('#3D0A5E')
-MAG      = HexColor('#7B1D6B')
+MAG      = HexColor('#5A1B7A')
 LAVANDA  = HexColor('#D9C7F5')
 DARK     = HexColor('#1A0030')
 BRANCO   = white
@@ -336,7 +341,7 @@ def _capa_cb(canvas, doc):
     # ── Degradê diagonal igual ao laudo_gerador aprovado ──
     c1 = HexColor('#26093F')
     c2 = HexColor('#4D2971')
-    c3 = HexColor('#7B1D6B')
+    c3 = HexColor('#5A1B7A')
     n_steps = 80
     for i in range(n_steps):
         t = i / (n_steps - 1)
@@ -373,7 +378,7 @@ def _capa_cb(canvas, doc):
     c.saveState()
     c.setFont('Helvetica-Bold', 6.5)
     c.setFillColorRGB(1, 1, 1, alpha=0.7)
-    c.drawCentredString(PW/2, 0.85*cm, 'RELATÓRIO DE FIT CULTURAL E PEOPLE ANALYTICS – 9&SELF')
+    c.drawCentredString(PW/2, 0.85*cm, 'RELATÓRIO DE FIT CULTURAL E PEOPLE ANALYTICS – 9SELF')
     c.drawCentredString(PW/2, 0.50*cm, 'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES · USO RESTRITO — CONFIDENCIAL')
     c.restoreState()
 
@@ -392,7 +397,7 @@ def _pagina_cb(canvas, doc):
     canvas.setFont('Helvetica', 7)
     canvas.setFillColor(HexColor('#888888'))
     canvas.drawCentredString(PW/2, 1.0*cm,
-        'RELATÓRIO DE FIT CULTURAL E PEOPLE ANALYTICS – 9&SELF')
+        'RELATÓRIO DE FIT CULTURAL E PEOPLE ANALYTICS – 9SELF')
     canvas.drawCentredString(PW/2, 0.65*cm,
         'DESENVOLVIDO POR LÚ CIA KRATZ E RYUZA GONÇALVES · USO RESTRITO — CONFIDENCIAL')
     canvas.drawRightString(PW - MARGIN, 1.0*cm, str(canvas.getPageNumber()))
@@ -485,9 +490,7 @@ def gerar_laudo_cultura(
 
     story += [
         sp(3.6),
-        Paragraph('9&amp;Self',
-            ParagraphStyle('LogoC', fontName=LOGO_FONT, fontSize=50, leading=56,
-                           textColor=LAVANDA_C, alignment=TA_CENTER)),
+        _ImgC(_LOGO_PNG, 7.0 * cm, 7.0 * cm * _LOGO_PROP, hAlign='CENTER'),
         sp(0.6),
         Paragraph('People Analytics &amp; Cultura Organizacional',
             ParagraphStyle('CTCultura', fontName='Helvetica-Bold', fontSize=18,
@@ -778,7 +781,7 @@ def gerar_laudo_cultura(
             Paragraph(
                 'Este relatório é confidencial e de uso exclusivo para Administradores, '
                 'RH e Parceiros credenciados. A divulgação não autorizada é vedada. '
-                'Gerado automaticamente pelo sistema 9&Self.',
+                'Gerado automaticamente pelo sistema 9Self.',
                 sSeloRodape
             ),
             sp(0.3),

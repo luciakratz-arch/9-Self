@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║        9&Self — MOTOR DE GERAÇÃO DE LAUDO + PLANO DE AÇÃO (v2)             ║
+║        9Self — MOTOR DE GERAÇÃO DE LAUDO + PLANO DE AÇÃO (v2)             ║
 ║        Dra. Lucia Kratz · CRP 09/20590                                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -630,7 +630,7 @@ def criar_template_tipo(tipo: int, pasta: str):
 
     linhas = [
         f"# ARQUIVO DE CONTEÚDO — {TRACOS_TIPO[tipo]}",
-        f"# Banco de Dados 9&Self · Dra. Lucia Kratz · CRP 09/20590",
+        f"# Banco de Dados 9Self · Dra. Lucia Kratz · CRP 09/20590",
         "",
     ]
     for chave, placeholder in secoes:
@@ -653,7 +653,7 @@ if __name__ == "__main__":
     os.makedirs(PASTA_BANCO,  exist_ok=True)
     os.makedirs(PASTA_OUTPUT, exist_ok=True)
 
-    parser = argparse.ArgumentParser(description="9&Self — Gerador de Laudo")
+    parser = argparse.ArgumentParser(description="9Self — Gerador de Laudo")
     parser.add_argument("--criar-templates", action="store_true")
     parser.add_argument("--tipo",    type=int, default=7)
     parser.add_argument("--asa",     type=int, default=8)
@@ -668,7 +668,7 @@ if __name__ == "__main__":
         print("\nTemplates criados! Preencha os arquivos em ./banco_dados/")
         exit(0)
 
-    print(f"\n=== 9&Self — Motor de Laudo v2 ===")
+    print(f"\n=== 9Self — Motor de Laudo v2 ===")
     banco = carregar_banco_dados(PASTA_BANCO)
 
     ordem = [s.strip().lower() for s in args.subtipo.split("_")]

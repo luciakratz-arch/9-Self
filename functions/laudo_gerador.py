@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-9&Self — Gerador de Laudo PDF (parametrizado)
+9Self — Gerador de Laudo PDF (parametrizado)
 Dra. Lucia Kratz · CRP 09/20590
 
 Lê o conteúdo de /home/claude/banco_dados_final/tipo_N.txt e monta o PDF
@@ -35,6 +35,7 @@ from reportlab.platypus import (
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT, TA_JUSTIFY
 from reportlab.platypus.flowables import Flowable
+from reportlab.platypus import Image as _Img
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import io
@@ -43,6 +44,16 @@ try:
     _QRCODE_OK = True
 except ImportError:
     _QRCODE_OK = False
+
+_LOGO_PNG = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo_9self.png')
+
+
+def _logo_dims(largura):
+    """Largura e altura da logo mantendo a proporção."""
+    from reportlab.lib.utils import ImageReader
+    iw, ih = ImageReader(_LOGO_PNG).getSize()
+    return largura, largura * ih / iw
+
 
 _FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
 try:
@@ -60,7 +71,7 @@ except Exception:
 # ══════════════════════════════════════════════════════════════════════════
 # CORES DA MARCA (roxo/violeta)
 # ══════════════════════════════════════════════════════════════════════════
-MAG   = HexColor('#7B04B4')
+MAG   = HexColor('#39044F')
 TEAL  = HexColor('#403071')
 DARK  = HexColor('#2C2C2C')
 GMID  = HexColor('#666666')
@@ -373,21 +384,20 @@ def _draw_playlist_back(canvas, doc):
         t = i / steps
         if t < 0.5:
             t2 = t * 2
-            r = int(0x0E + (0x3D - 0x0E) * t2)
-            g = int(0x08 + (0x0A - 0x08) * t2)
-            b = int(0x18 + (0x5E - 0x18) * t2)
+            r = int(0x24 + (0x39 - 0x24) * t2)
+            g = int(0x02 + (0x04 - 0x02) * t2)
+            b = int(0x32 + (0x4F - 0x32) * t2)
         else:
             t2 = (t - 0.5) * 2
-            r = int(0x3D + (0x7B - 0x3D) * t2)
-            g = int(0x0A + (0x1D - 0x0A) * t2)
-            b = int(0x5E + (0x6B - 0x5E) * t2)
+            r = int(0x39 + (0x5A - 0x39) * t2)
+            g = int(0x04 + (0x1B - 0x04) * t2)
+            b = int(0x4F + (0x7A - 0x4F) * t2)
         canvas.setFillColorRGB(r/255, g/255, b/255)
         stripe_h = ph / steps
         canvas.rect(0, ph - (i + 1) * stripe_h, pw, stripe_h + 1, fill=1, stroke=0)
 
-    canvas.setFillColorRGB(1, 1, 1)
-    canvas.setFont(LOGO_FONT, 72)
-    canvas.drawCentredString(pw / 2, ph * 0.62, '9&Self')
+    lw, lh = _logo_dims(7.5 * cm)
+    canvas.drawImage(_LOGO_PNG, pw / 2 - lw / 2, ph * 0.62 - 0.4 * cm, width=lw, height=lh, mask='auto')
 
     canvas.setFont('Helvetica', 13)
     canvas.setFillColorRGB(0.77, 0.65, 0.91)
@@ -419,7 +429,7 @@ def _draw_playlist_back(canvas, doc):
 
     canvas.setFont('Helvetica', 8.5)
     canvas.setFillColorRGB(0.77, 0.65, 0.91)
-    canvas.drawCentredString(pw / 2, qr_y - 0.5 * cm, 'Acesse o sistema 9&Self')
+    canvas.drawCentredString(pw / 2, qr_y - 0.5 * cm, 'Acesse o sistema 9Self')
 
     canvas.setFont('Helvetica', 7.5)
     canvas.setFillColorRGB(0.6, 0.5, 0.75)
@@ -506,20 +516,20 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     HDR = f'| {nome}  |  {cargo} |'
 
     # ── Page templates ──────────────────────────────────────────────────
-    FOOTER_COLOR = HexColor('#7B1D6B')  # mesma cor do canto da capa
+    FOOTER_COLOR = HexColor('#5A1B7A')  # mesma cor do canto da capa
 
     def footer_mag(c):
         c.setFillColor(FOOTER_COLOR); c.rect(0,0,PW,1.4*cm,fill=1,stroke=0)
         c.setFont('Helvetica-Bold',6.5); c.setFillColor(WHITE)
-        c.drawCentredString(PW/2,0.85*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF')
+        c.drawCentredString(PW/2,0.85*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9SELF')
         c.drawCentredString(PW/2,0.50*cm,'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES')
 
     def cover_cb(c, doc):
         c.saveState()
         # Degradê diagonal (canto superior-esq escuro -> inferior-dir magenta)
-        c1 = HexColor('#26093F')  # roxo bem escuro (topo-esquerda)
-        c2 = HexColor('#4D2971')  # roxo médio (meio)
-        c3 = HexColor('#7B1D6B')  # magenta (canto inferior-direita)
+        c1 = HexColor('#240232')  # roxo bem escuro (topo-esquerda)
+        c2 = HexColor('#39044F')  # roxo médio (meio)
+        c3 = HexColor('#5A1B7A')  # magenta (canto inferior-direita)
         n_steps = 80
         for i in range(n_steps):
             t = i / (n_steps - 1)
@@ -547,15 +557,15 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
                 c.setFillColorRGB(color[0], color[1], color[2], alpha=alpha)
                 c.circle(cx, cy, rad, fill=1, stroke=0)
 
-        mancha(PW*0.92, PH*0.78, 7.5*cm, (0.85, 0.35, 0.75), 0.10)
+        mancha(PW*0.92, PH*0.78, 7.5*cm, (0.94, 0.72, 0.32), 0.07)
         mancha(PW*0.06, PH*0.35, 8.5*cm, (0.45, 0.20, 0.65), 0.08)
-        mancha(PW*0.85, PH*0.15, 5.5*cm, (1.0, 0.5, 0.85), 0.07)
+        mancha(PW*0.85, PH*0.15, 5.5*cm, (0.94, 0.72, 0.32), 0.05)
         mancha(PW*0.15, PH*0.85, 6*cm, (0.35, 0.15, 0.55), 0.07)
         c.restoreState()
 
         c.saveState()
         c.setFont('Helvetica-Bold',6.5); c.setFillColorRGB(1,1,1,alpha=0.7)
-        c.drawCentredString(PW/2,0.85*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9&SELF')
+        c.drawCentredString(PW/2,0.85*cm,'TESTE DE PERFIL COMPORTAMENTAL COM BASE NA PERSONALIDADE – 9SELF')
         c.drawCentredString(PW/2,0.50*cm,'DESENVOLVIDO POR LÚCIA KRATZ E RYUZA GONÇALVES')
         c.setFont('Helvetica',8)
         c.drawRightString(PW-1.5*cm,0.55*cm,'1')
@@ -594,8 +604,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     story += [
         sp(3.6),
-        Paragraph('9&amp;Self',
-            ParagraphStyle('Logo', fontName=LOGO_FONT, fontSize=50, leading=56, textColor=LAVANDA, alignment=1)),
+        _Img(_LOGO_PNG, *_logo_dims(7.0 * cm), hAlign='CENTER'),
         sp(0.6),
         Paragraph('Relatório Eneagrama',
             ParagraphStyle('CT', fontName='Helvetica-Bold', fontSize=26, textColor=BRANCO_SF, alignment=1, spaceAfter=0)),
@@ -630,7 +639,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
     # ══════════════════════════════════════════════════ INTRODUÇÃO
     story.append(KeepTogether([
         Paragraph('Introdução', sSecT), SecLine(), sp(0.15),
-        p('O <b>9&Self</b> é um instrumento de identificação de características pessoais e profissionais '
+        p('O <b>9Self</b> é um instrumento de identificação de características pessoais e profissionais '
           'desenvolvido pelas especialistas <b>Dra. Lúcia Kratz</b> e <b>Ryuza Gonçalves</b>. '
           'O teste fundamenta-se nos traços de personalidade do Eneagrama — a partir dos estudos '
           'pioneiros de George Ivanovich Gurdjieff, Helen Palmer, David Daniels, Claudio Naranjo, '
@@ -643,7 +652,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
           'Excelência, Prestativo e Relacional, Performance e Imagem, Autêntico e Profundo, Observador e '
           'Privacidade, Precavido e Questionador, Visionário e Otimista, Desafiador e Controlador, '
           'Harmônico e Diplomático.</b>'),
-        p('Um dos objetivos do 9&Self é oferecer demonstrações e argumentos que facilitem o caminho para '
+        p('Um dos objetivos do 9Self é oferecer demonstrações e argumentos que facilitem o caminho para '
           'maior respeito e tolerância consigo mesmo e com os outros, auxiliando na apreciação de dons, '
           'talentos e competências. Compreender a própria tipologia de personalidade provoca uma '
           'transformação favorável na vida das pessoas em uma grande variedade de situações pessoais e profissionais.'),
@@ -651,7 +660,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
           'os indivíduos preferem observar o mundo e fazer julgamentos. As tipologias de personalidade '
           'são profundas e estruturantes no caráter de cada indivíduo. Não podemos alterar a base da '
           'nossa personalidade, mas podemos desenvolvê-la e ganhar maturidade.'),
-        p('O <b>9&Self</b> está organizado da seguinte forma:'),
+        p('O <b>9Self</b> está organizado da seguinte forma:'),
     ]
     for item in ['<b>Tipologia da Personalidade</b>','<b>Subtipo da Personalidade</b>',
                  '<b>Influência das Personalidades</b>','<b>Interação Social</b>',
@@ -1147,7 +1156,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
          'sobrevivência, uma estratégia psíquica refinada que aprendemos a estruturar ainda '
          'na infância para garantir afeto, segurança e pertencimento no mundo. Ao longo dos '
          'anos, passamos a confundir quem nós realmente somos com o peso dessa engrenagem '
-         'defensiva. O ecossistema 9&Self nasce justamente para iluminar essas barreiras '
+         'defensiva. O ecossistema 9Self nasce justamente para iluminar essas barreiras '
          'invisíveis, oferecendo a lucidez necessária para que você possa liderar a si mesmo '
          'com maestria, integridade e clareza de propósito.')
     P2_DESENV = ('Evoluir exige, fundamentalmente, aprender a tolerar o desconforto de se enxergar '
@@ -1320,7 +1329,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
 
     dados_selo = [
         ['Aprovador:',        'Dra. Lúcia Kratz — CRP 09/20590'],
-        ['Instrumento:',      '9&Self — Perfil Comportamental por Eneagrama'],
+        ['Instrumento:',      '9Self — Perfil Comportamental por Eneagrama'],
         ['Avaliado(a):',      f'{nome} — {cargo}' if cargo else nome],
         ['Data de emissão:',  data_hora_fmt],
         ['Código do documento:', hash_doc],
@@ -1348,7 +1357,7 @@ def gerar_laudo(tipo, asa_dominante, subtipo_dom, subtipo_int, subtipo_rem,
         tabela_selo,
         sp(0.15),
         Paragraph(
-            'Este documento foi gerado eletronicamente pelo sistema 9&Self e possui validade '
+            'Este documento foi gerado eletronicamente pelo sistema 9Self e possui validade '
             'técnica e científica. O código acima identifica unicamente este laudo e pode ser '
             'utilizado para verificação de autenticidade.',
             sSeloRod

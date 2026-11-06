@@ -29,8 +29,8 @@ GMAIL_PASS  = StringParam("GMAIL_PASS")
 GMAIL_USER  = "luciakratz@gmail.com"
 APP_URL     = "https://luciakratz-arch.github.io/9-Self/index.html"
 
-# IDs dos produtos 9&Self na Hotmart que devem gerar código
-PRODUTOS_9SELF = {'8032417'}  # Mapeamento de Perfil Avançado - 9&Self
+# IDs dos produtos 9Self na Hotmart que devem gerar código
+PRODUTOS_9SELF = {'8032417'}  # Mapeamento de Perfil Avançado - 9Self
 
 # Token secreto opcional para validar chamadas da Hotmart
 # Configure via: firebase functions:config:set hotmart.token="SEU_HOTMART_TOKEN"
@@ -45,14 +45,14 @@ def gerar_codigo():
 def enviar_email(destinatario, nome, codigo):
     link = f"{APP_URL}?code={codigo}"
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = '🎉 Seu código de acesso ao 9&Self chegou!'
-    msg['From']    = f'"9&Self | Lúcia Kratz" <{GMAIL_USER}>'
+    msg['Subject'] = '🎉 Seu código de acesso ao 9Self chegou!'
+    msg['From']    = f'"9Self | Lúcia Kratz" <{GMAIL_USER}>'
     msg['To']      = destinatario
 
     html = f"""
     <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#1a0a2e;color:#fff;border-radius:16px;overflow:hidden;">
       <div style="background:linear-gradient(135deg,#3d0a5e,#7B1D6B);padding:32px;text-align:center;">
-        <h1 style="font-size:36px;margin:0;letter-spacing:-1px;">9&amp;Self</h1>
+        <h1 style="font-size:36px;margin:0;letter-spacing:-1px;">9Self</h1>
         <p style="opacity:.7;margin:8px 0 0;letter-spacing:2px;font-size:12px;">DESCUBRA SUA PERSONALIDADE</p>
       </div>
       <div style="padding:32px;">
@@ -117,10 +117,10 @@ def webhookHotmart(req: https_fn.Request) -> https_fn.Response:
         buyer    = data.get('buyer', {})
         product  = data.get('product', {})
 
-        # ── Filtrar apenas produtos 9&Self ──
+        # ── Filtrar apenas produtos 9Self ──
         produto_id = str(product.get('id', ''))
         if produto_id not in PRODUTOS_9SELF:
-            print(f"[hotmart] Produto {produto_id} ignorado — não é 9&Self")
+            print(f"[hotmart] Produto {produto_id} ignorado — não é 9Self")
             return https_fn.Response('produto ignorado', status=200)
 
         status_compra = purchase.get('status', '').upper()
