@@ -2655,7 +2655,7 @@ window.filtrarLaudosEmpresa = function() {
   const tbody = document.getElementById('detalheLaudosTable');
   const count = document.getElementById('detalheLaudosCount');
 
-  const NS = {'AP':'Autopreservação','1A1':'1 a 1','SEX':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+  const NS = {'AP':'Autopreservação','1A1':'1 a 1','1a1':'1 a 1','SEX':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
   let lista = [...window._laudosEmpresa];
   if(nome) lista = lista.filter(l=>(l.nome||'').toLowerCase().includes(nome));
   if(tipo) lista = lista.filter(l=>String(l.tipo||'')===tipo);
@@ -2915,7 +2915,7 @@ window.validarCodigo = async function() {
           const laudoId = ls.docs[0].id;
           // Preencher tela de resultado com dados do Firestore
           const NOMES = {'1':'Perfeição e Excelência','2':'Prestativo e Relacional','3':'Performance e Imagem','4':'Autêntico e Profundo','5':'Observador e Privacidade','6':'Precavido e Questionador','7':'Visionário e Otimista','8':'Desafiador e Controlador','9':'Harmônico e Diplomático'};
-          const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+          const NS = {'AP':'Autopreservação','1A1':'1 a 1','1a1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
           document.getElementById('resultTipoCircle').textContent = laudo.tipo;
           document.getElementById('resultTipoNome').textContent   = laudo.tipoNome || NOMES[laudo.tipo] || '—';
           document.getElementById('resultAsa').textContent        = `Asa ${laudo.asaDominante} (dominante) · Asa ${laudo.asaSecundaria} (secundária)`;
@@ -3137,7 +3137,7 @@ const PERGUNTAS_SUBTIPO = [
 
 // ── NOMES ──
 const NOMES_TIPO = {1:'Perfeição e Excelência (Traço Tipo 1)',2:'Prestativo e Relacional (Traço Tipo 2)',3:'Performance e Imagem (Traço Tipo 3)',4:'Autêntico e Profundo (Traço Tipo 4)',5:'Observador e Privacidade (Traço Tipo 5)',6:'Precavido e Questionador (Traço Tipo 6)',7:'Visionário e Otimista (Traço Tipo 7)',8:'Desafiador e Controlador (Traço Tipo 8)',9:'Harmônico e Diplomático (Traço Tipo 9)'};
-const NOMES_SUB = {sp:'Autopreservação',sx:'1 a 1',so:'Social'};
+const NOMES_SUB = {ap:'Autopreservação','1a1':'1 a 1',soc:'Social'};
 
 // ── GRUPO I TEXTOS ──
 const GRUPO_I = {
@@ -3174,7 +3174,7 @@ function iniciarTeste() {
     asaVotos: {A:0,B:0},
     asaIdx: 0,
     asaDom: null, asaSec: null,
-    subScores: {sp:0,sx:0,so:0},
+    subScores: {ap:0,'1a1':0,soc:0},
     subIdx: 0,
   };
   renderTeste();
@@ -3194,7 +3194,7 @@ function renderTeste() {
 let _giSel = [], _giiSel = [];
 
 function renderGrupos() {
-  _giSel=[]; _giiSel=[];
+  _giSel=[]; _giiSel=[]; window._barrasMexidas = {};
   document.getElementById('progressBar').style.width='5%';
   document.getElementById('testeSubtitle').textContent='Fase 1 — Identificação Inicial';
   document.getElementById('testeContent').innerHTML=`
@@ -3301,18 +3301,24 @@ function renderGrupos() {
   `;
 }
 
+window._barrasMexidas = {};
 window.updateSliderLabel = function(l) {
+  window._barrasMexidas[l] = true;
   const val = document.getElementById('sl_'+l).value;
   document.getElementById('lbl_'+l).textContent = val+'%';
   document.getElementById('lbl_'+l).style.color = val>60?'var(--purple)':val<40?'var(--gray)':'var(--teal)';
 };
 
 window.confirmarGrupoI = function() {
+  const faltam = ['A','B','C'].filter(l => !window._barrasMexidas[l]);
+  if(faltam.length) { alert('Mova cada barra para o ponto que combina com você, mesmo que seja 50%. Faltam: ' + faltam.join(', ') + '.'); return; }
   document.getElementById('cardGrupoII').style.display='block';
   setTimeout(()=>document.getElementById('cardGrupoII').scrollIntoView({behavior:'smooth'}),100);
 };
 
 window.confirmarGrupos = function() {
+  const faltam = ['X','Y','Z'].filter(l => !window._barrasMexidas[l]);
+  if(faltam.length) { alert('Mova cada barra para o ponto que combina com você, mesmo que seja 50%. Faltam: ' + faltam.join(', ') + '.'); return; }
   // Ler percentuais
   const pctGI  = { A: parseInt(document.getElementById('sl_A').value), B: parseInt(document.getElementById('sl_B').value), C: parseInt(document.getElementById('sl_C').value) };
   const pctGII = { X: parseInt(document.getElementById('sl_X').value), Y: parseInt(document.getElementById('sl_Y').value), Z: parseInt(document.getElementById('sl_Z').value) };
@@ -3505,47 +3511,47 @@ function calcularAsa() {
 // Textos dos subtipos por tipo (Pergunta 2 do PDF, redação melhorada)
 const SUBTIPOS_TEXTOS = {
   1: {
-    sex: "Tem padrões elevados para si e para quem ama. Busca relações intensas e idealizadas, esperando que o parceiro compartilhe os mesmos valores. Tende a se decepcionar quando as pessoas não correspondem às suas expectativas. É emotivo e exigente nas relações próximas.",
+    '1a1': "Tem padrões elevados para si e para quem ama. Busca relações intensas e idealizadas, esperando que o parceiro compartilhe os mesmos valores. Tende a se decepcionar quando as pessoas não correspondem às suas expectativas. É emotivo e exigente nas relações próximas.",
     ap:  "É detalhista e perfeccionista nas coisas do cotidiano. Preocupa-se com saúde, finanças e bem-estar material. Cobra-se muito por não fazer o suficiente. Pode oscilar entre satisfazer todos os desejos e suprimi-los completamente.",
     soc: "Mantém postura rígida e impecável socialmente. Tem regras claras sobre como as pessoas devem se comportar e se incomoda quando não são seguidas. Evita espontaneidade e tende a criticar quem não segue seus princípios.",
   },
   2: {
-    sex: "Tem uma forma sedutora de falar e de se conectar com as pessoas. Investe energia em conquistar quem admira, especialmente quando percebe resistência ou desafio. Age pelo impulso de se aproximar emocional e fisicamente dos outros.",
+    '1a1': "Tem uma forma sedutora de falar e de se conectar com as pessoas. Investe energia em conquistar quem admira, especialmente quando percebe resistência ou desafio. Age pelo impulso de se aproximar emocional e fisicamente dos outros.",
     ap:  "Teme ser esquecido e não ter suas necessidades atendidas. Por isso, foca em satisfazer as necessidades alheias antes das próprias. Aparenta se sacrificar pelos outros, mas espera reconhecimento e reciprocidade em troca.",
     soc: "Tem muito 'pé na terra' e ambição por espaço social, profissional e material. Precisa ser querido, admirado e aceito em seu círculo. Tem agenda cheia, gosta de fazer contatos e ser o centro das atenções para evitar ser esquecido.",
   },
   3: {
-    sex: "Valoriza pertencer a grupos próximos e se preocupa genuinamente com essas pessoas. Essa conexão o ajuda a perceber o impacto negativo que causa quando está focado apenas em suas metas.",
+    '1a1': "Valoriza pertencer a grupos próximos e se preocupa genuinamente com essas pessoas. Essa conexão o ajuda a perceber o impacto negativo que causa quando está focado apenas em suas metas.",
     ap:  "Aprecia rituais exclusivos e grupos seletivos que o façam sentir diferenciado. É nessa dimensão que encontra criatividade e conceitos para superar desafios. Manifesta emotividade e compaixão sem se deixar envolver emocionalmente.",
     soc: "Mede seu valor pelo êxito que obtém, pelo aplauso e pelos resultados. Acredita que precisa de uma imagem prestigiosa para se relacionar. Títulos, cargos e reconhecimento são muito importantes — identifica-se com seu papel social.",
   },
   4: {
-    sex: "Competitivo e intenso emocionalmente. Sua vida afetiva gira em torno de quem o atrai. Luta por realizações que o tornem aceitável aos olhos do outro, quer ser uma estrela, mas sente rancor de quem atinge os mesmos objetivos.",
+    '1a1': "Competitivo e intenso emocionalmente. Sua vida afetiva gira em torno de quem o atrai. Luta por realizações que o tornem aceitável aos olhos do outro, quer ser uma estrela, mas sente rancor de quem atinge os mesmos objetivos.",
     ap:  "É o mais prático e materialista deste tipo. Ama as coisas boas da vida e é muito sensível à sensualidade do mundo. Tende a manter um estilo de vida além de suas possibilidades quando está emocionalmente envolvido.",
     soc: "Sente vergonha do próprio desejo e de si mesmo. Tem sentimento de não-merecimento e pessimismo. É o mais sensível, refinado e artístico. Acredita que existe um jeito certo de ser e sente que nunca consegue se encaixar.",
   },
   5: {
-    sex: "Gosta de compartilhar segredos com pessoas íntimas. Sente-se impelido a se aproximar dos outros, mas com ansiedade e tendência a recuar de repente. Vive entre o distanciamento e o desejo de intensa proximidade.",
+    '1a1': "Gosta de compartilhar segredos com pessoas íntimas. Sente-se impelido a se aproximar dos outros, mas com ansiedade e tendência a recuar de repente. Vive entre o distanciamento e o desejo de intensa proximidade.",
     ap:  "É o mais caseiro e solitário. Precisa de um refúgio pessoal para se isolar do mundo e se recarregar. Monta guarda sobre seu espaço e privacidade. Tende a acumular recursos, especialmente dinheiro, como forma de segurança.",
     soc: "É o mais intelectual e comunicativo deste tipo. Conquista pelo saber e qualificação. Gosta de ser visto como mestre da sabedoria e tornar-se indispensável. Sua interação social se pauta pelo debate de ideias e análise de tendências.",
   },
   6: {
-    sex: "Mascara inseguranças com autoafirmação ostensiva. Parece corajoso e confrontador — usa força, intimidação ou sedução para se proteger. Desafia a autoridade e busca ser visível e reconhecido como alguém forte.",
+    '1a1': "Mascara inseguranças com autoafirmação ostensiva. Parece corajoso e confrontador — usa força, intimidação ou sedução para se proteger. Desafia a autoridade e busca ser visível e reconhecido como alguém forte.",
     ap:  "É o mais tímido e dependente deste tipo. Por baixo da aparente fragilidade, há doçura. Oferece compromisso e solicitude esperando receber o mesmo em troca. Faz amizades devagar, observando longamente se pode confiar.",
     soc: "Conquista pelo saber e qualificação, gosta de ser referência intelectual em seu grupo. Usa sua área de domínio para se tornar indispensável. Sua interação social é pautada pelo debate de ideias e pela análise crítica.",
   },
   7: {
-    sex: "Tem capacidade especial de convencer e vender suas ideias. Vive intensamente em todas as interações. Demonstra curiosidade ampla, raciocínio rápido e capacidade de fascinar os outros com seu entusiasmo.",
+    '1a1': "Tem capacidade especial de convencer e vender suas ideias. Vive intensamente em todas as interações. Demonstra curiosidade ampla, raciocínio rápido e capacidade de fascinar os outros com seu entusiasmo.",
     ap:  "É o mais ligado à família e ao prático. Cheio de energia e determinação. Ambicioso e trabalhador, faz questão de garantir que nunca falte nada para si e para os seus. Teme depender dos outros e ter privações.",
     soc: "Dedica-se a causas nobres e ideais sociais. Abre mão de liberdade pessoal em nome do coletivo. Cultiva grupos de amigos que compartilham seus entusiasmos. É idealista e gosta de se envolver em causas sociais.",
   },
   8: {
-    sex: "Marca território com intensidade e carisma. Reage com paixão ao que lhe interessa e quer causar impacto na vida das pessoas. Pode ser ríspido com os mais íntimos. Encara relacionamentos como conquista.",
+    '1a1': "Marca território com intensidade e carisma. Reage com paixão ao que lhe interessa e quer causar impacto na vida das pessoas. Pode ser ríspido com os mais íntimos. Encara relacionamentos como conquista.",
     ap:  "Tem intolerância à frustração e quer satisfação a qualquer custo. Protege suas posses e investimentos com zelo. Faz questão de ter controle total. Tende a se viciar no trabalho para garantir renda e poder.",
     soc: "Trata a amizade como um pacto profundo de lealdade e fraternidade. O abuso de confiança é algo que não consegue perdoar. Honra e lealdade são valores centrais — age com força para proteger seu grupo.",
   },
   9: {
-    sex: "Busca fusão total com o outro. Vive através da pessoa amada, que se torna o centro de sua identidade. A fusão com o outro parece ser a chave da felicidade — precisa que o outro se integre completamente a ele.",
+    '1a1': "Busca fusão total com o outro. Vive através da pessoa amada, que se torna o centro de sua identidade. A fusão com o outro parece ser a chave da felicidade — precisa que o outro se integre completamente a ele.",
     ap:  "Prefere os prazeres simples e de fácil obtenção. Acomodado e de trato fácil, não pede muito da vida. Lida com a ansiedade envolvendo-se em rotinas e afazeres corriqueiros para evitar enfrentar desafios.",
     soc: "Funde-se com o grupo e defende causas coletivas, não pessoais. Muito abnegado e autêntico. Tem vontade de fazer parte de um grupo mas não tem certeza de que pertence. Promove a paz e cumpre as expectativas do seu círculo.",
   },
@@ -3565,12 +3571,12 @@ function renderSubtipos() {
       </div>
     </div>
     <div id="subtipo-lista" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
-      ${['sex','ap','soc'].map((sub,i) => `
+      ${['1a1','ap','soc'].map((sub,i) => `
         <div class="subtipo-card" id="sub_${sub}" data-sub="${sub}" data-pos="${i}">
           <div class="subtipo-pos" id="pos_${sub}">${i+1}º</div>
           <div style="flex:1;">
             <div style="font-weight:700;font-size:12px;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">
-              ${ sub==='sex'?'1 a 1':sub==='ap'?'Autopreservação':'Social' }
+              ${ sub==='1a1'?'1 a 1':sub==='ap'?'Autopreservação':'Social' }
             </div>
             <div style="font-size:13px;line-height:1.65;color:var(--dark);">${textos[sub]}</div>
           </div>
@@ -3587,7 +3593,7 @@ function renderSubtipos() {
   `;
 
   // Estado da ordem
-  TS.subOrdem = ['sex','ap','soc'];
+  TS.subOrdem = ['1a1','ap','soc'];
 }
 
 window.moverSub = function(sub, dir) {
@@ -3683,7 +3689,7 @@ async function salvarResultadoFinal() {
 
   // Mostrar resultado
   const nomeSub = {
-    'sex':'1 a 1','ap':'Autopreservação','so':'Social','soc':'Social',
+    '1a1':'1 a 1','sex':'1 a 1','ap':'Autopreservação','so':'Social','soc':'Social',
     'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social',
     'SEX':'1 a 1','SO':'Social'
   };
@@ -4149,7 +4155,7 @@ window.filtrarLaudos = function() {
   const tbody = document.getElementById('laudosTable');
   const count = document.getElementById('laudosCount');
 
-  const NS = {'AP':'Autopreservação','1A1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
+  const NS = {'AP':'Autopreservação','1A1':'1 a 1','1a1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
 
   let lista = [...window._todosLaudos];
 
