@@ -1,10 +1,11 @@
-const CACHE_NAME = '9self-v5';
+const CACHE_NAME = '9self-v6';
 const ASSETS = [
   './index.html',
   './cadastro.html',
   './instalar-app.html',
   './offline.html',
   './manifest.json',
+  './instalar-faixa.js',
   './marca/icone-192.png',
   './marca/logo-escuro.png',
   './marca/icone-512.png',
