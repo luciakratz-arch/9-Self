@@ -3366,10 +3366,10 @@ function renderM1() {
   if(idx >= pergs.length) { validarTipoAtual(); return; }
 
   const hipotese = TS.prioIdx + 1;
-  const pct = 20 + Math.round((TS.prioIdx/3)*20) + Math.round((idx/5)*15);
+  const pct = 20 + Math.round((TS.prioIdx/3)*30) + Math.round((idx/5)*10);
   document.getElementById('progressBar').style.width = pct + '%';
   document.getElementById('testeSubtitle').textContent =
-    `Hipótese ${hipotese} — Pergunta ${idx+1} de 5`;
+    `Bloco ${hipotese} de 3 — Pergunta ${idx+1} de 5`;
 
   const p = pergs[idx];
   document.getElementById('testeContent').innerHTML = `
@@ -3391,25 +3391,33 @@ window.responderM1 = function(v) {
 };
 
 function validarTipoAtual() {
-  const score   = TS.m1RespostasAtual.reduce((a,b)=>a+b, 0);
-  const tipo    = TS.tipoTentado;
-  const validado = score >= 3;
-  const pct     = Math.round((score/5)*100);
-  const hipotese = TS.prioIdx + 1;
-
-  // Salvar score do tipo atual
+  // Opção A: os 3 tipos mais prováveis são sempre testados (5 perguntas cada).
+  // No fim, vence o que teve mais acertos; em empate, vence o que veio melhor nas barras do começo.
+  const tipo  = TS.tipoTentado;
+  const score = TS.m1RespostasAtual.reduce((x,y)=>x+y, 0);
   TS.scoresM1[tipo] = score;
 
-  document.getElementById('progressBar').style.width = (35 + TS.prioIdx*10) + '%';
+  if(TS.prioIdx < TS.filaValidacao.length - 1) { proximaHipotese(); return; }
+
+  // todos testados: escolhe o melhor
+  let melhor = TS.filaValidacao[0];
+  for(const t of TS.filaValidacao) {
+    if((TS.scoresM1[t] || 0) > (TS.scoresM1[melhor] || 0)) melhor = t;   // ">" mantém a ordem das barras no empate
+  }
+  const sc  = TS.scoresM1[melhor] || 0;
+  const pct = Math.round((sc/5)*100);
+  TS.tipoTentado = melhor;
+
+  document.getElementById('progressBar').style.width = '55%';
   document.getElementById('testeSubtitle').textContent = 'Confirmação do Perfil';
 
   document.getElementById('testeContent').innerHTML = `
     <div class="question-card" style="border-left:4px solid var(--purple);text-align:center;padding:32px;">
       <div class="q-num" style="color:var(--purple);font-size:12px;margin-bottom:8px;">
-        HIPÓTESE ${hipotese} — VERIFICANDO
+        PERFIL MAIS COMPATÍVEL
       </div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:6px;">
-        ${NOMES_TIPO[tipo]}
+        ${NOMES_TIPO[melhor]}
       </div>
       <div style="font-size:13px;color:var(--gray);margin-bottom:20px;">
         Compatibilidade: <strong style="color:var(--purple)">${pct}%</strong>
@@ -3418,26 +3426,19 @@ function validarTipoAtual() {
         <div style="width:${pct}%;height:100%;border-radius:4px;
           background:linear-gradient(90deg,var(--purple),var(--teal));"></div>
       </div>
-      ${validado
-        ? `<div style="color:#1a9460;font-weight:600;margin-bottom:20px;">✅ Perfil confirmado!</div>
+      ${sc >= 3
+        ? `<div style="color:#1a9460;font-weight:600;margin-bottom:20px;">Perfil confirmado</div>
            <button class="btn btn-primary" style="padding:14px 32px;" onclick="confirmarTipo()">
              Continuar →
            </button>`
-        : hipotese < 3
-          ? `<div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
-               Baixa compatibilidade com este perfil. Verificando a próxima hipótese...
-             </div>
-             <button class="btn btn-outline" style="padding:14px 32px;" onclick="proximaHipotese()">
-               Verificar próxima hipótese →
-             </button>`
-          : `<div style="color:var(--mag);font-weight:600;margin-bottom:8px;">⚠️ Resultado Inconclusivo</div>
-             <div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
-               Suas respostas variaram bastante entre os perfis testados.<br>
-               Para um resultado preciso, recomendamos refazer o teste com mais atenção.
-             </div>
-             <button class="btn btn-primary" style="padding:14px 32px;" onclick="reiniciarTeste()">
-               🔄 Refazer o teste
-             </button>`
+        : `<div style="color:var(--mag);font-weight:600;margin-bottom:8px;">Resultado inconclusivo</div>
+           <div style="color:var(--gray);font-size:13px;margin-bottom:20px;">
+             Suas respostas variaram bastante entre os perfis testados.<br>
+             Para um resultado preciso, recomendamos refazer o teste com mais atenção.
+           </div>
+           <button class="btn btn-primary" style="padding:14px 32px;" onclick="reiniciarTeste()">
+             Refazer o teste
+           </button>`
       }
     </div>
   `;
