@@ -1,0 +1,1 @@
+from gerador_laudo_function import gerarLaudoPDF
