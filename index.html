@@ -2908,21 +2908,37 @@ window.validarCodigo = async function() {
   if(!codigo){errEl.textContent='Insira seu código.';return;}
   btn.textContent='Verificando...'; btn.disabled=true;
   try {
-    const q = query(collection(db,'nself_codigos'), where('codigo','==',codigo));
-    const snap = await getDocs(q);
-    if(snap.empty){errEl.textContent='Código não encontrado.';btn.textContent='Entrar';btn.disabled=false;return;}
-    const docRef = snap.docs[0];
-    const data   = docRef.data();
+    // Caminho novo: o servidor confere o código e devolve só o necessário (e o laudo, se já foi feito).
+    let docRef, data, laudoServidor = null;
+    try {
+      const rs = await httpsCallable(_fn, 'nselfCodigoEntrar')({ codigo });
+      data = rs.data.codigo; laudoServidor = rs.data.laudo || null;
+      docRef = { id: data.id };
+    } catch(eSrv) {
+      const c = eSrv && eSrv.code;
+      if(c === 'functions/not-found' || c === 'functions/invalid-argument'){errEl.textContent='Código não encontrado.';btn.textContent='Entrar';btn.disabled=false;return;}
+      if(c === 'functions/resource-exhausted'){errEl.textContent='Muitas tentativas. Tente de novo mais tarde.';btn.textContent='Entrar';btn.disabled=false;return;}
+      console.warn('nselfCodigoEntrar falhou, usando caminho antigo:', c || eSrv);
+      const q = query(collection(db,'nself_codigos'), where('codigo','==',codigo));
+      const snap = await getDocs(q);
+      if(snap.empty){errEl.textContent='Código não encontrado.';btn.textContent='Entrar';btn.disabled=false;return;}
+      docRef = snap.docs[0]; data = docRef.data();
+    }
     if(data.status==='usado'){
       // Buscar laudo já gerado para mostrar resultado
       window._state.codigoAtivo = {id:docRef.id,...data};
       enterApp('colaborador', data.nomeDestinatario||'Colaborador', 'Acesso por Código');
       setTimeout(async ()=>{
-        const q2 = query(collection(db,'nself_laudos'), where('codigoId','==',docRef.id));
-        const ls  = await getDocs(q2);
-        if(!ls.empty){
-          const laudo = ls.docs[0].data();
-          const laudoId = ls.docs[0].id;
+        let laudo = null, laudoId = null;
+        if(laudoServidor){ laudo = laudoServidor; laudoId = laudoServidor.id; }
+        else {
+          try {
+            const q2 = query(collection(db,'nself_laudos'), where('codigoId','==',docRef.id));
+            const ls  = await getDocs(q2);
+            if(!ls.empty){ laudo = ls.docs[0].data(); laudoId = ls.docs[0].id; }
+          } catch(eL){ console.warn('laudo (caminho antigo):', eL.code || eL); }
+        }
+        if(laudo){
           // Preencher tela de resultado com dados do Firestore
           const NOMES = {'1':'Perfeição e Excelência','2':'Prestativo e Relacional','3':'Performance e Imagem','4':'Autêntico e Profundo','5':'Observador e Privacidade','6':'Precavido e Questionador','7':'Visionário e Otimista','8':'Desafiador e Controlador','9':'Harmônico e Diplomático'};
           const NS = {'AP':'Autopreservação','1A1':'1 a 1','1a1':'1 a 1','SOC':'Social','ap':'Autopreservação','sex':'1 a 1','so':'Social','soc':'Social'};
@@ -3635,8 +3651,24 @@ window.confirmarSubtipos = function() {
 async function salvarResultadoFinal() {
   document.getElementById('testeContent').innerHTML=`<div style="text-align:center;padding:48px;color:var(--gray);">Calculando seu perfil... 🔮</div>`;
   const cod = window._state.codigoAtivo;
+  let feitoNoServidor = false;
   try {
-    if(cod){
+    if(cod && cod.codigo){
+      const rs = await httpsCallable(_fn, 'nselfSalvarResultado')({ codigo: cod.codigo, resultado: {
+        tipo: TS.tipoFinal, asaDominante: TS.asaDom, asaSecundaria: TS.asaSec,
+        subtipoDominante: TS.subDom, subtipoIntermediario: TS.subInt, subtipoRemissivo: TS.subRem,
+        scoresM1: TS.scoresM1, grupoI: TS.gi, grupoII: TS.gii } });
+      window._state.laudoDocId = rs.data.laudoId;
+      if(rs.data.pdfUrl) window._state.laudoUrl = rs.data.pdfUrl;
+      else { const btnG = document.getElementById('btnGerarLaudo'); if(btnG) btnG.style.display = 'block'; }
+      feitoNoServidor = true;
+    }
+  } catch(eSrv){
+    console.warn('nselfSalvarResultado:', eSrv && (eSrv.code || eSrv.message));
+    if(eSrv && eSrv.code === 'functions/failed-precondition'){ showToast(eSrv.message || 'Este código já foi usado.','error'); feitoNoServidor = true; }
+  }
+  try {
+    if(cod && !feitoNoServidor){
       await updateDoc(doc(db,'nself_codigos',cod.id),{status:'usado',usadoEm:serverTimestamp()});
       const laudoRef = await addDoc(collection(db,'nself_laudos'),{
         nome: cod.nomeDestinatario||'Anônimo',
@@ -3742,6 +3774,20 @@ async function salvarResultadoFinal() {
       a.click();
       document.body.removeChild(a);
       return;
+    }
+
+    // CASO 1b: servidor devolve o PDF (gera de novo se ainda não existir)
+    if(cod.codigo) {
+      try {
+        btn.disabled = true; btn.textContent = '⏳ Preparando laudo...';
+        const rp = await httpsCallable(_fn, 'nselfGerarPdf')({ codigo: cod.codigo });
+        if(rp.data && rp.data.pdfUrl) {
+          window._state.laudoUrl = rp.data.pdfUrl;
+          btn.disabled = false; btn.textContent = '⬇ Baixar Laudo PDF';
+          window.baixarLaudo(); return;
+        }
+      } catch(eP){ console.warn('nselfGerarPdf:', eP && (eP.code || eP.message)); }
+      btn.disabled = false; btn.textContent = '⬇ Baixar Laudo PDF';
     }
 
     // CASO 2: Buscar URL no Firestore (laudo já gerado em sessão anterior)
