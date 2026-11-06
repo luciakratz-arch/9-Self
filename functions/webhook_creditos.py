@@ -26,8 +26,8 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
-GMAIL_PASS = StringParam("GMAIL_PASS")
-MP_TOKEN   = StringParam("MP_TOKEN")
+from params_config import GMAIL_PASS, MP_TOKEN  # antes so estavam comentados: sem o import, a funcao falhava a cada pagamento
+
 GMAIL_USER = "luciakratz@gmail.com"
 APP_URL    = "https://luciakratz-arch.github.io/9-Self/index.html"
 
@@ -44,12 +44,6 @@ LOTES = {
   "lote_rep_200": {"creditos": 200, "faixa": 4,  "preco_unit": 22.00},
   "lote_rep_300": {"creditos": 300, "faixa": 5,  "preco_unit": 19.00},
   "lote_rep_500": {"creditos": 500, "faixa": 7,  "preco_unit": 15.90},
-  # Lotes RH/Empresa
-  "lote_rh_5":    {"creditos": 5,   "faixa": 1,  "preco_unit": 71.00},
-  "lote_rh_10":   {"creditos": 10,  "faixa": 2,  "preco_unit": 69.00},
-  "lote_rh_20":   {"creditos": 20,  "faixa": 3,  "preco_unit": 65.00},
-  "lote_rh_50":   {"creditos": 50,  "faixa": 4,  "preco_unit": 62.00},
-  "lote_rh_100":  {"creditos": 100, "faixa": 5,  "preco_unit": 58.00},
 }
 
 def calcular_creditos_por_titulo(titulo: str) -> int:
@@ -62,14 +56,14 @@ def calcular_creditos_por_titulo(titulo: str) -> int:
 
 def enviar_email_creditos(email, nome, creditos, saldo_atual):
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = f'✅ {creditos} crédito(s) adicionado(s) ao seu perfil 9Self'
+    msg['Subject'] = f'{creditos} crédito(s) adicionado(s) ao seu perfil 9Self'
     msg['From']    = f'"9Self | Lúcia Kratz" <{GMAIL_USER}>'
     msg['To']      = email
 
     html = f"""
-    <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#1a0a2e;color:#fff;border-radius:16px;overflow:hidden;">
-      <div style="background:linear-gradient(135deg,#3d0a5e,#7B1D6B);padding:32px;text-align:center;">
-        <h1 style="font-size:32px;margin:0;">9Self</h1>
+    <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#240232;color:#fff;border-radius:16px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#240232,#39044F);padding:32px;text-align:center;">
+        <img src="https://luciakratz-arch.github.io/9-Self/marca/logo-escuro.png" alt="9Self" width="190" style="display:block;margin:0 auto;border:0;height:auto;">
         <p style="opacity:.7;margin:8px 0 0;font-size:12px;letter-spacing:2px;">REPRESENTANTE OFICIAL</p>
       </div>
       <div style="padding:32px;">
@@ -82,7 +76,7 @@ def enviar_email_creditos(email, nome, creditos, saldo_atual):
         </div>
         <p>Acesse o sistema para gerenciar seus créditos e gerar laudos para seus clientes.</p>
         <div style="text-align:center;margin:24px 0;">
-          <a href="{APP_URL}" style="background:linear-gradient(135deg,#7B00C4,#7B1D6B);color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:600;display:inline-block;">
+          <a href="{APP_URL}" style="background:#F0B851;color:#39044F;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:600;display:inline-block;">
             Acessar o sistema →
           </a>
         </div>
@@ -157,13 +151,6 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
         reps = db.collection('representantes') \
             .where('email', '==', email).get()
 
-        # Buscar também em nself_parceiros (novo sistema)
-        parceiros_novos = db.collection('nself_parceiros') \
-            .where('email', '==', email).get()
-
-        representante_id = ''
-        empresa_id = ''
-
         if len(reps) == 0:
             # Criar registro de representante se não existir
             novo_rep = {
@@ -181,7 +168,6 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
             # Adicionar créditos atomicamente ao representante existente
             rep_doc = reps[0]
             rep_ref = rep_doc.reference
-            representante_id = rep_doc.id
             saldo_anterior = rep_doc.to_dict().get('creditos', 0)
             saldo_atual = saldo_anterior + creditos
             nome = rep_doc.to_dict().get('nome', 'Representante')
@@ -189,26 +175,6 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
                 'creditos': firestore.Increment(creditos),
                 'ultimaRecarga': firestore.SERVER_TIMESTAMP,
             })
-
-        # Atualizar também nself_parceiros se existir
-        if len(parceiros_novos) > 0:
-            parc_doc = parceiros_novos[0]
-            representante_id = parc_doc.id
-            parc_doc.reference.update({
-                'creditos': firestore.Increment(creditos),
-                'ultimaRecarga': firestore.SERVER_TIMESTAMP,
-            })
-
-        # Identificar se é lote de empresa (RH)
-        if external_ref and external_ref.startswith('lote_rh_'):
-            rh_docs = db.collection('nself_empresas') \
-                .where('email', '==', email).get()
-            if len(rh_docs) > 0:
-                empresa_id = rh_docs[0].id
-                rh_docs[0].reference.update({
-                    'creditos': firestore.Increment(creditos),
-                    'ultimaRecarga': firestore.SERVER_TIMESTAMP,
-                })
 
         # Registrar log da transação
         db.collection('nself_creditos_log').add({
@@ -220,8 +186,6 @@ def webhookCreditos(req: https_fn.Request) -> https_fn.Response:
             'externalRef': external_ref,
             'tituloItem': titulo_item,
             'valorPago': payment.get('transaction_amount', 0),
-            'representanteId': representante_id,
-            'empresaId': empresa_id,
             'criadoEm': firestore.SERVER_TIMESTAMP,
         })
 
