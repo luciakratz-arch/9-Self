@@ -1,12 +1,13 @@
-const CACHE_NAME = '9self-v4';
+const CACHE_NAME = '9self-v5';
 const ASSETS = [
   './index.html',
   './cadastro.html',
   './instalar-app.html',
   './offline.html',
   './manifest.json',
-  './9Self logo.png',
-  './9Self logo 512.png',
+  './marca/icone-192.png',
+  './marca/logo-escuro.png',
+  './marca/icone-512.png',
 ];
 
 self.addEventListener('install', e => {
@@ -54,11 +55,11 @@ self.addEventListener('fetch', e => {
 
 self.addEventListener('push', e => {
   const data = e.data ? e.data.json() : {};
-  const title = data.title || '9&Self';
+  const title = data.title || '9Self';
   const options = {
     body: data.body || 'Você tem uma atualização.',
-    icon: './9Self logo.png',
-    badge: './9Self logo.png',
+    icon: './marca/icone-192.png',
+    badge: './marca/icone-64.png',
     vibrate: [200, 100, 200],
     data: { url: data.url || './index.html' }
   };

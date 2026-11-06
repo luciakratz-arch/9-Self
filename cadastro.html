@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>9&Self — Solicitar Acesso</title>
+<title>9Self — Solicitar Acesso</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --ink:    #0E0818;
   --deep:   #180A2E;
-  --plum:   #3D0A5E;
-  --violet: #7B00C4;
+  --plum:   #4A0A63;
+  --violet: #39044F;
   --lilac:  #C4A6E8;
   --mist:   #EDE8F7;
-  --rose:   #9B2589;
+  --rose:   #7B3A99;
   --cream:  #FAF8FF;
-  --teal:   #1A9BAF;
-  --mag:    #7B1D6B;
+  --teal:   #E39A35;
+  --mag:    #5B1A78;
 }
 body {
   font-family: 'DM Sans', sans-serif;
-  background: linear-gradient(150deg, #0E0818 0%, #1A0A2E 30%, #3D0A5E 65%, #7B1D6B 100%);
+  background: linear-gradient(150deg, #0E0818 0%, #240232 30%, #4A0A63 65%, #5B1A78 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -41,7 +41,7 @@ body {
   font-family: 'Cormorant Garamond', serif;
   font-size: 56px;
   font-weight: 300;
-  background: linear-gradient(135deg, #E8B4F8, #7DEBF7);
+  background: linear-gradient(135deg, #E8B4F8, #FED877);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -131,7 +131,7 @@ body {
   cursor: pointer;
 }
 .field select option {
-  background: #1A0A2E;
+  background: #240232;
   color: #fff;
 }
 .field textarea {
@@ -144,7 +144,7 @@ body {
   padding: 15px;
   border: none;
   border-radius: 13px;
-  background: linear-gradient(135deg, #7B00C4, #9B2589);
+  background: linear-gradient(135deg, #39044F, #7B3A99);
   color: #fff;
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
@@ -231,7 +231,7 @@ body {
 .spinner {
   width: 40px; height: 40px;
   border: 3px solid rgba(255,255,255,0.1);
-  border-top-color: #7B00C4;
+  border-top-color: #39044F;
   border-radius: 50%;
   animation: spin .8s linear infinite;
   margin: 0 auto 16px;
@@ -275,8 +275,7 @@ body {
 <body>
 
 <div class="brand">
-  <div class="brand-number">9&amp;Self</div>
-  <div class="brand-name">SELF</div>
+  <img src="marca/logo-escuro.png" alt="9Self" style="width:240px;max-width:78%;height:auto;margin:0 auto 8px;display:block">
   <div class="brand-tagline">Mapeamento de Perfil pelo Eneagrama</div>
 </div>
 
@@ -334,7 +333,7 @@ body {
     </div>
 
     <div class="field">
-      <label>Como conheceu o 9&amp;Self? *</label>
+      <label>Como conheceu o 9Self? *</label>
       <select id="fComoConheceu">
         <option value="">Selecione...</option>
         <option value="Indicação de amigo ou familiar">Indicação de amigo ou familiar</option>
@@ -362,7 +361,7 @@ body {
     <span class="success-icon">💜</span>
     <div class="success-title">Solicitação enviada!</div>
     <div class="success-msg">
-      Sua solicitação foi recebida com sucesso. A Dra. Lúcia Kratz entrará em contato pelo WhatsApp informado para liberar o seu código de acesso personalizado ao 9&amp;Self.
+      Sua solicitação foi recebida com sucesso. A Dra. Lúcia Kratz entrará em contato pelo WhatsApp informado para liberar o seu código de acesso personalizado ao 9Self.
     </div>
     <span class="success-badge">Aguarde o contato em breve</span>
   </div>
@@ -441,7 +440,7 @@ async function init() {
       document.getElementById('fNecessidade').placeholder = 'Ex: Desenvolvimento de equipe, processo seletivo, liderança...';
     } else if(solicitacaoTipo === 'pf_dev') {
       document.getElementById('formTitulo').textContent = 'Solicitar Acesso — Laudo + Devolutiva';
-      document.getElementById('formSubtitulo').textContent = 'Preencha seus dados para que a Dra. Lúcia Kratz possa liberar seu acesso ao 9&Self com sessão de devolutiva incluída.';
+      document.getElementById('formSubtitulo').textContent = 'Preencha seus dados para que a Dra. Lúcia Kratz possa liberar seu acesso ao 9Self com sessão de devolutiva incluída.';
     }
 
     // Se já foi preenchido, mostrar sucesso direto
@@ -479,7 +478,7 @@ window.enviarSolicitacao = async function() {
   if (!email)        { errEl.textContent = 'Por favor, informe seu e-mail.'; return; }
   if (!whatsapp)     { errEl.textContent = 'Por favor, informe seu WhatsApp.'; return; }
   if (solicitacaoTipo === 'empresa' && !empresaNome) { errEl.textContent = 'Por favor, informe o nome da empresa.'; return; }
-  if (!comoConheceu) { errEl.textContent = 'Por favor, selecione como conheceu o 9&Self.'; return; }
+  if (!comoConheceu) { errEl.textContent = 'Por favor, selecione como conheceu o 9Self.'; return; }
   if (!necessidade)  { errEl.textContent = 'Por favor, preencha o último campo.'; return; }
 
   const btn = document.getElementById('btnEnviar');

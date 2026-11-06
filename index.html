@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>9&Self — Conheça sua Personalidade</title>
+<title>9Self — Conheça sua Personalidade</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#7B00C4">
+<meta name="theme-color" content="#39044F">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="9&Self">
-<link rel="apple-touch-icon" href="9Self logo.png">
+<meta name="apple-mobile-web-app-title" content="9Self">
+<link rel="apple-touch-icon" href="marca/icone-64.png">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --mag:    #7B1D6B;
-  --mag2:   #9B2589;
-  --teal:   #1A9BAF;
-  --teal2:  #13B5CC;
-  --purple: #7B00C4;
-  --purple2:#9B10E4;
+  --mag:    #5B1A78;
+  --mag2:   #7B3A99;
+  --teal:   #E39A35;
+  --teal2:  #F0B851;
+  --purple: #39044F;
+  --purple2:#5A1B7A;
   --dark:   #2C2C2C;
   --gray:   #6B6B6B;
   --light:  #F7F4FB;
@@ -34,7 +34,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);
 #loginScreen{
   display:flex;align-items:center;justify-content:center;
   min-height:100vh;
-  background: linear-gradient(135deg, #1a0a2e 0%, #3d0a5e 40%, #7B1D6B 75%, #1A9BAF 100%);
+  background: linear-gradient(135deg, #240232 0%, #4A0A63 40%, #5B1A78 75%, #E39A35 100%);
   position:relative;overflow:hidden;
 }
 #loginScreen::before{
@@ -52,7 +52,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);
 .login-logo{text-align:center;margin-bottom:32px;}
 .login-logo .brand-number{
   font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;
-  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
+  background:linear-gradient(135deg,#E8B4F8,#FED877);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   line-height:1;letter-spacing:-2px;
 }
@@ -96,7 +96,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);
 
 /* SIDEBAR */
 .sidebar{
-  width:var(--sidebar-w);background:#1a0a2e;
+  width:var(--sidebar-w);background:#240232;
   display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;
   z-index:100;border-right:1px solid rgba(255,255,255,0.06);
   transition:transform .3s;
@@ -106,7 +106,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);
 }
 .sidebar-logo .s-number{
   font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;
-  background:linear-gradient(135deg,#E8B4F8,#7DEBF7);
+  background:linear-gradient(135deg,#E8B4F8,#FED877);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   line-height:1;letter-spacing:-1px;
 }
@@ -250,11 +250,11 @@ tr:hover td{background:#FAFAFE;}
 /* STATUS PILLS */
 .pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
 .lote-card{background:#fff;border:1.5px solid #E2D9EF;border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:4px;transition:border-color .2s;}
-.lote-card:hover{border-color:#7B00C4;}
-.lote-card.destaque{border-color:#7B00C4;background:linear-gradient(135deg,rgba(123,0,196,.04),rgba(155,37,137,.04));}
+.lote-card:hover{border-color:#39044F;}
+.lote-card.destaque{border-color:#39044F;background:linear-gradient(135deg,rgba(123,0,196,.04),rgba(155,37,137,.04));}
 .lote-qtd{font-weight:700;font-size:15px;color:#3A1F5C;}
 .lote-unit{font-size:12px;color:#888;}
-.lote-total{font-size:16px;font-weight:700;color:#7B00C4;margin:4px 0 10px;}
+.lote-total{font-size:16px;font-weight:700;color:#39044F;margin:4px 0 10px;}
 .pill-green{background:#e6f9f0;color:#1a9460;}
 .pill-yellow{background:#fff8e1;color:#b8860b;}
 .pill-red{background:#ffeaea;color:#c0392b;}
@@ -300,7 +300,7 @@ tr:hover td{background:#FAFAFE;}
 /* CÓDIGO DE ACESSO */
 .code-hero{
   text-align:center;padding:48px 20px;
-  background:linear-gradient(135deg, #1a0a2e, #3d0a5e);
+  background:linear-gradient(135deg, #240232, #4A0A63);
   border-radius:20px;color:#fff;margin-bottom:24px;
 }
 .code-hero h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;margin-bottom:8px;}
@@ -410,8 +410,7 @@ tr:hover td{background:#FAFAFE;}
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
-      <div class="brand-number">9&amp;Self</div>
-      <div class="brand-name">SELF</div>
+      <img src="marca/logo-escuro.png" alt="9Self" style="width:250px;max-width:78%;height:auto;margin:0 auto 8px;display:block">
       <div class="brand-tagline">Descubra sua personalidade</div>
     </div>
 
@@ -480,7 +479,7 @@ tr:hover td{background:#FAFAFE;}
     <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
     <div class="login-error" id="loginError"></div>
     <div style="text-align:center;margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-      <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html#" target="_blank" style="color:#b39ddb;font-size:12px;text-decoration:none;opacity:0.7;">🌐 Conheça o 9&Self</a>
+      <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html#" target="_blank" style="color:#b39ddb;font-size:12px;text-decoration:none;opacity:0.7;">🌐 Conheça o 9Self</a>
       <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html#planos" target="_blank" style="color:#b39ddb;font-size:13px;text-decoration:none;">🛒 Não tem um código? Adquira o seu aqui</a>
       <a href="https://luciakratz-arch.github.io/9-Self/instalar-app.html" target="_blank" style="color:#b39ddb;font-size:12px;text-decoration:none;opacity:0.75;">📲 Instalar o app no celular</a>
     </div>
@@ -495,7 +494,7 @@ tr:hover td{background:#FAFAFE;}
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
-        <div class="s-number">9&amp;Self</div>
+        <img src="marca/logo-escuro.png" alt="9Self" style="width:150px;height:auto;display:block">
         <div class="s-name">SELF</div>
       </div>
       <div class="sidebar-profile">
@@ -526,7 +525,7 @@ tr:hover td{background:#FAFAFE;}
       <div class="page active" id="page-dashboard">
         <div style="padding:28px;">
           <div class="page-title">Painel Geral</div>
-          <div class="page-subtitle">Visão consolidada do sistema 9&amp;Self</div>
+          <div class="page-subtitle">Visão consolidada do sistema 9Self</div>
           <div class="cards-grid" id="dashCards"></div>
 
           <!-- SOLICITAÇÕES PENDENTES -->
@@ -564,7 +563,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-subtitle">Gerencie contas de RH e pacotes de créditos</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('empresa')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('empresa')" style="border-color:rgba(123,0,196,.5);color:#39044F;">🔗 Gerar Link de Cadastro</button>
               <button class="btn btn-outline" onclick="navigateTo('cultura')" style="border-color:rgba(26,155,96,.5);color:#1A9460;">🧬 Cultura Organizacional</button>
               <button class="btn btn-primary" onclick="openModal('modalNovaEmpresa')">＋ Nova Empresa</button>
             </div>
@@ -673,7 +672,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-subtitle">Gere e gerencie códigos únicos por pessoa</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn btn-outline" onclick="gerarLinkSolicitacao()" style="border-color:rgba(123,0,196,0.5);color:#7B00C4;">
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao()" style="border-color:rgba(123,0,196,0.5);color:#39044F;">
                 🔗 Gerar Link de Cadastro
               </button>
               <button class="btn btn-primary" onclick="abrirNovoCodigo()">＋ Gerar Código</button>
@@ -773,7 +772,7 @@ tr:hover td{background:#FAFAFE;}
           </p>
           <div style="background:#F0F7FF;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
             <div style="font-size:11px;color:#888;margin-bottom:6px;">Link de Cadastro:</div>
-            <div id="linkCadastroGerado" style="font-size:12px;color:#7B1D6B;word-break:break-all;font-weight:500;"></div>
+            <div id="linkCadastroGerado" style="font-size:12px;color:#5B1A78;word-break:break-all;font-weight:500;"></div>
           </div>
           <div class="modal-actions">
             <button class="btn btn-outline" onclick="copiarLinkCadastro()">📋 Copiar Link</button>
@@ -797,7 +796,7 @@ tr:hover td{background:#FAFAFE;}
             <input type="text" id="convCodigo" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
           </div>
           <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
-            🔗 Link do teste: <span id="convPreviewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+            🔗 Link do teste: <span id="convPreviewLink" style="color:#5B1A78;word-break:break-all;font-size:11px;"></span>
           </div>
           <div class="form-row">
             <label>Empresa (opcional)</label>
@@ -906,8 +905,8 @@ tr:hover td{background:#FAFAFE;}
               <div style="font-weight:700;color:#3A1F5C;margin-bottom:12px;font-size:14px;">📊 Pódio de Personalidades</div>
               <div id="culturaPodioContent"></div>
               <div style="margin-top:12px;display:flex;gap:24px;flex-wrap:wrap;">
-                <div><span style="font-size:12px;color:#888;">Instinto Majoritário:</span><br><span id="culturaInstinto" style="font-weight:600;color:#7B00C4;font-size:13px;"></span></div>
-                <div><span style="font-size:12px;color:#888;">Termômetro das Asas:</span><br><span id="culturaAsas" style="font-weight:600;color:#7B1D6B;font-size:13px;"></span></div>
+                <div><span style="font-size:12px;color:#888;">Instinto Majoritário:</span><br><span id="culturaInstinto" style="font-weight:600;color:#39044F;font-size:13px;"></span></div>
+                <div><span style="font-size:12px;color:#888;">Termômetro das Asas:</span><br><span id="culturaAsas" style="font-weight:600;color:#5B1A78;font-size:13px;"></span></div>
                 <div><span style="font-size:12px;color:#888;">Total mapeado:</span><br><span id="culturaTotal" style="font-weight:600;color:#3A1F5C;font-size:13px;"></span></div>
               </div>
             </div>
@@ -970,10 +969,10 @@ tr:hover td{background:#FAFAFE;}
             </button>
           </div>
           <div id="pdfStatus" style="margin-top:10px;font-size:13px;color:var(--gray);min-height:20px;text-align:center;"></div>
-          <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #7B1D6B;border-radius:14px;padding:20px 22px;text-align:left;">
+          <div style="margin-top:24px;background:#FBF5F9;border:1.5px solid #5B1A78;border-radius:14px;padding:20px 22px;text-align:left;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
               <span style="font-size:20px;">⚠️</span>
-              <strong style="color:#7B1D6B;font-size:13px;letter-spacing:.5px;text-transform:uppercase;">ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</strong>
+              <strong style="color:#5B1A78;font-size:13px;letter-spacing:.5px;text-transform:uppercase;">ATENÇÃO: A JORNADA DO AUTOCONHECIMENTO</strong>
             </div>
             <p style="color:#2C2C2C;font-size:13px;line-height:1.7;margin:0;">Na filosofia do Eneagrama, não existe personalidade melhor ou pior. Este laudo não é um rótulo, mas um mapa para o seu autodesenvolvimento. As respostas refletem a sua autopercepção atual; a personalidade é o ponto de partida, mas a consciência de si se fortalece com a terapia e a vivência. O laudo é apenas um recorte do seu momento presente. Se, após o seu processo de expansão, perceber que sua autopercepção mudou, sinta-se à vontade para refazer o teste após um período de reflexão. Acolha o seu processo e veja o laudo como um companheiro de caminhada.</p>
           </div>
@@ -984,7 +983,7 @@ tr:hover td{background:#FAFAFE;}
       <div class="page" id="page-parceiro-dashboard">
         <div style="padding:28px;">
           <div class="page-title">Meu Painel</div>
-          <div class="page-subtitle">Bem-vindo ao seu espaço de gestão 9&Self</div>
+          <div class="page-subtitle">Bem-vindo ao seu espaço de gestão 9Self</div>
           <div id="parceiroDashCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px;"></div>
 
           <!-- SOLICITAÇÕES PENDENTES DO PARCEIRO -->
@@ -1007,14 +1006,14 @@ tr:hover td{background:#FAFAFE;}
             <div style="font-size:13px;color:#888;margin-bottom:20px;">Calcule sua margem antes de definir o preço ao cliente.</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
               <div>
-                <div style="font-size:11px;color:#7B00C4;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Créditos por mês</div>
+                <div style="font-size:11px;color:#39044F;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Créditos por mês</div>
                 <div id="simPainelCreditos" style="font-size:24px;font-weight:700;color:#3A1F5C;margin-bottom:6px;">50</div>
-                <input type="range" id="sliderPainelCreditos" min="1" max="500" value="50" style="width:100%;accent-color:#7B00C4;" oninput="calcSimPainel()"/>
+                <input type="range" id="sliderPainelCreditos" min="1" max="500" value="50" style="width:100%;accent-color:#39044F;" oninput="calcSimPainel()"/>
               </div>
               <div>
-                <div style="font-size:11px;color:#7B00C4;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Preço ao cliente (R$)</div>
+                <div style="font-size:11px;color:#39044F;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Preço ao cliente (R$)</div>
                 <div id="simPainelPreco" style="font-size:24px;font-weight:700;color:#3A1F5C;margin-bottom:6px;">R$ 247</div>
-                <input type="range" id="sliderPainelPreco" min="97" max="597" value="247" step="10" style="width:100%;accent-color:#7B00C4;" oninput="calcSimPainel()"/>
+                <input type="range" id="sliderPainelPreco" min="97" max="597" value="247" step="10" style="width:100%;accent-color:#39044F;" oninput="calcSimPainel()"/>
               </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px;">
@@ -1027,9 +1026,9 @@ tr:hover td{background:#FAFAFE;}
                 <div id="simPainelReceita" style="font-size:20px;font-weight:700;color:#3A1F5C;">—</div>
               </div>
               <div style="background:linear-gradient(135deg,rgba(123,0,196,.1),rgba(155,37,137,.08));border:1px solid rgba(123,0,196,.3);border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:10px;color:#7B00C4;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:4px;">Sua margem</div>
-                <div id="simPainelMargem" style="font-size:20px;font-weight:700;color:#7B00C4;">—</div>
-                <div id="simPainelPct" style="font-size:11px;color:#9B2589;margin-top:2px;">—</div>
+                <div style="font-size:10px;color:#39044F;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:4px;">Sua margem</div>
+                <div id="simPainelMargem" style="font-size:20px;font-weight:700;color:#39044F;">—</div>
+                <div id="simPainelPct" style="font-size:11px;color:#7B3A99;margin-top:2px;">—</div>
               </div>
             </div>
             <div id="simPainelFaixa" style="font-size:11px;color:#aaa;margin-top:12px;text-align:center;"></div>
@@ -1052,7 +1051,7 @@ tr:hover td{background:#FAFAFE;}
         <div style="padding:28px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;">
             <div><div class="page-title">Minhas Empresas</div><div class="page-subtitle">Organize seus clientes empresariais</div></div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('empresa')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button><button class="btn btn-primary" onclick="openModal('modalParceiroNovaEmpresa')">＋ Nova Empresa</button></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('empresa')" style="border-color:rgba(123,0,196,.5);color:#39044F;">🔗 Gerar Link de Cadastro</button><button class="btn btn-primary" onclick="openModal('modalParceiroNovaEmpresa')">＋ Nova Empresa</button></div>
           </div>
           <div class="table-card">
             <table>
@@ -1150,7 +1149,7 @@ tr:hover td{background:#FAFAFE;}
                 <button class="btn btn-outline btn-sm" onclick="parceiroComprarCreditos('lote_rep_300',300,5700.00)">Comprar</button>
               </div>
               <div class="lote-card destaque" data-ref="lote_rep_500" data-qtd="500" data-unit="15.90"  data-total="7950.00">
-                <div style="font-size:10px;color:#7B00C4;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
+                <div style="font-size:10px;color:#39044F;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
                 <div class="lote-qtd">500 créditos</div>
                 <div class="lote-unit">R$ 15,90/crédito</div>
                 <div class="lote-total">R$ 7.950,00</div>
@@ -1195,7 +1194,7 @@ tr:hover td{background:#FAFAFE;}
               <button class="btn btn-outline btn-sm" onclick="rhComprarCreditos('lote_rh_50',50,10500.00)">Comprar</button>
             </div>
             <div class="lote-card destaque">
-              <div style="font-size:10px;color:#7B00C4;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
+              <div style="font-size:10px;color:#39044F;font-weight:700;letter-spacing:.1em;margin-bottom:4px;">⭐ MELHOR CUSTO</div>
               <div class="lote-qtd">100 créditos</div>
               <div class="lote-unit">R$ 190,00/crédito</div>
               <div class="lote-total">R$ 19.000,00</div>
@@ -1215,7 +1214,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-subtitle">Laudo + Sessão de 1h — R$ 597 · Gerenciamento de clientes diretos com devolutiva clínica</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('pf_dev')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('pf_dev')" style="border-color:rgba(123,0,196,.5);color:#39044F;">🔗 Gerar Link de Cadastro</button>
               <button class="btn btn-primary" onclick="abrirModalNovoCodigoPF('pf_dev')">＋ Gerar Código</button>
             </div>
           </div>
@@ -1301,7 +1300,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-subtitle">Laudo Automatizado — R$ 297 · Acesso por código, laudo gerado automaticamente</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('pf_std')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacao('pf_std')" style="border-color:rgba(123,0,196,.5);color:#39044F;">🔗 Gerar Link de Cadastro</button>
               <button class="btn btn-primary" onclick="abrirModalNovoCodigoPF('pf_std')">＋ Gerar Código</button>
             </div>
           </div>
@@ -1471,7 +1470,7 @@ tr:hover td{background:#FAFAFE;}
           <div class="form-row"><label>WhatsApp</label><input type="tel" id="editEmpWhats"/></div>
           <div class="form-row"><label>Nº de colaboradores</label><input type="number" id="editEmpColab" min="1"/></div>
           <div class="form-row">
-            <label>Como conheceu o 9&Self?</label>
+            <label>Como conheceu o 9Self?</label>
             <select id="editEmpComoConheceu">
               <option value="">Selecione...</option>
               <option>Indicação de parceiro</option>
@@ -1555,7 +1554,7 @@ tr:hover td{background:#FAFAFE;}
             </select>
           </div>
           <div class="form-row">
-            <label>Como conheceu o 9&Self?</label>
+            <label>Como conheceu o 9Self?</label>
             <select id="parcComoConheceu">
               <option value="">Selecione...</option>
               <option>Indicação de colega</option>
@@ -1729,7 +1728,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-subtitle">Laudo + Sessão — Gerencie seus clientes individuais premium</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('pf_dev')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('pf_dev')" style="border-color:rgba(123,0,196,.5);color:#39044F;">🔗 Gerar Link de Cadastro</button>
               <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_dev')">🔑 Gerar Código</button>
             </div>
           </div>
@@ -1772,7 +1771,7 @@ tr:hover td{background:#FAFAFE;}
               <div class="page-subtitle">Laudo Automatizado — Gerencie seus clientes individuais padrão</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('pf_std')" style="border-color:rgba(123,0,196,.5);color:#7B00C4;">🔗 Gerar Link de Cadastro</button>
+              <button class="btn btn-outline" onclick="gerarLinkSolicitacaoParceiro('pf_std')" style="border-color:rgba(123,0,196,.5);color:#39044F;">🔗 Gerar Link de Cadastro</button>
               <button class="btn btn-primary" onclick="abrirGerarCodigoParceiroPF('pf_std')">🔑 Gerar Código</button>
             </div>
           </div>
@@ -2017,7 +2016,7 @@ tr:hover td{background:#FAFAFE;}
       <input type="number" id="empColaboradores" placeholder="Ex: 50" min="1"/>
     </div>
     <div class="form-row">
-      <label>Como conheceu o 9&Self?</label>
+      <label>Como conheceu o 9Self?</label>
       <select id="empComoConheceu">
         <option value="">Selecione...</option>
         <option>Indicação de parceiro</option>
@@ -2070,7 +2069,7 @@ tr:hover td{background:#FAFAFE;}
         style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
     </div>
     <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
-      🔗 Link: <span id="editPreviewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+      🔗 Link: <span id="editPreviewLink" style="color:#5B1A78;word-break:break-all;font-size:11px;"></span>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modalEditarCodigo')">Cancelar</button>
@@ -2107,7 +2106,7 @@ tr:hover td{background:#FAFAFE;}
       <input type="text" id="codGerado" readonly style="background:var(--light);letter-spacing:3px;font-weight:700;font-size:16px;"/>
     </div>
     <div style="background:#F0F7FF;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#555;">
-      🔗 Link: <span id="previewLink" style="color:#7B1D6B;word-break:break-all;font-size:11px;"></span>
+      🔗 Link: <span id="previewLink" style="color:#5B1A78;word-break:break-all;font-size:11px;"></span>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="gerarCodigoPreview()">🔄 Novo Código</button>
@@ -2799,7 +2798,7 @@ window.confirmarRenovarCodigo = async function() {
       const msg = encodeURIComponent(
         `Olá, ${nome}! 🔄
 
-Seu código de acesso ao 9&Self foi renovado.
+Seu código de acesso ao 9Self foi renovado.
 
 🔑 *Novo código:* *${novoCod}*
 
@@ -2882,7 +2881,7 @@ window.lembrarColaborador = async function(id) {
     const num = String(v.whatsapp||'').replace(/\D/g,'');
     if(!num) { showToast('Esta pessoa não tem WhatsApp cadastrado.','error'); return; }
     const nome = (v.nomeDestinatario||v.nome||'').split(' ')[0] || 'tudo bem';
-    const msg = encodeURIComponent('Olá, ' + nome + '! Passando para lembrar do seu teste 9&Self, que ainda não foi feito. Ele leva poucos minutos.\n\nSeu código: ' + (v.codigo||'') + '\nAcesse: ' + gerarLinkTeste(v.codigo) + '\n\nQualquer dúvida, é só falar.');
+    const msg = encodeURIComponent('Olá, ' + nome + '! Passando para lembrar do seu teste 9Self, que ainda não foi feito. Ele leva poucos minutos.\n\nSeu código: ' + (v.codigo||'') + '\nAcesse: ' + gerarLinkTeste(v.codigo) + '\n\nQualquer dúvida, é só falar.');
     window.open('https://wa.me/' + (num.length <= 11 ? '55' + num : num) + '?text=' + msg, '_blank');
     await updateDoc(doc(db,'nself_codigos', id), { ultimoLembreteEm: serverTimestamp(), lembretes: increment(1) });
     showToast('Lembrete aberto no WhatsApp.','success');
@@ -3880,7 +3879,7 @@ function gerarLinkWhatsApp(whatsapp, nome, codigo) {
   const msg = encodeURIComponent(
     `Olá, ${nome}! 🌟
 
-Ficamos muito felizes com o seu interesse e cadastro no 9&Self!
+Ficamos muito felizes com o seu interesse e cadastro no 9Self!
 
 Seu código de acesso exclusivo está pronto:
 
@@ -3937,7 +3936,7 @@ window.salvarCodigo = async function() {
       codigo,
       link: gerarLinkTeste(codigo),
       bonusLink: 'https://drive.google.com/file/d/1idgsYLODKhnAB6-aI4uB8J_8jJR896Ge/view?usp=sharing',
-      mensagem: `Seu código de acesso ao 9&Self: ${codigo} | Acesse: ${gerarLinkTeste(codigo)}
+      mensagem: `Seu código de acesso ao 9Self: ${codigo} | Acesse: ${gerarLinkTeste(codigo)}
 
 🎁 Seus Bônus Exclusivos:
 Para aprofundar ainda mais a sua jornada de autoconhecimento, preparamos materiais especiais para você: Momento de Autoconhecimento, Plano de Desenvolvimento Pessoal e Mapa do Propósito de Vida.
@@ -4070,7 +4069,7 @@ window.salvarEmpresa = async function() {
     closeModal('modalNovaEmpresa');
     showToast('Empresa cadastrada!','success');
     loadEmpresas();
-    enviarEmailAcesso(resp||nome, email, 'empresa', {mensagem:`Seu acesso ao painel RH do 9&Self foi criado. E-mail: ${email}. Entre com a senha que a administradora combinou com você, ou use o Google, ou toque em Esqueceu a senha? para criar uma nova.`});
+    enviarEmailAcesso(resp||nome, email, 'empresa', {mensagem:`Seu acesso ao painel RH do 9Self foi criado. E-mail: ${email}. Entre com a senha que a administradora combinou com você, ou use o Google, ou toque em Esqueceu a senha? para criar uma nova.`});
   } catch(e) {
     console.error('salvarEmpresa:', e);
     if(e.code==='auth/email-already-in-use') {
@@ -4381,7 +4380,7 @@ window.excluirLaudo = async function(laudoId) {
 window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
   const num = (whatsappSalvo || '').trim();
   const msg = encodeURIComponent(
-    `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: https://luciakratz-arch.github.io/9-Self/index.html\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
+    `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: https://luciakratz-arch.github.io/9-Self/index.html\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
   );
   if(num) {
     const numLimpo = num.replace(/\D/g,'');
@@ -4456,7 +4455,7 @@ window.enviarLinkCadastroWhatsApp = function() {
   window._waCallback = function(numero) {
     const numLimpo = numero.replace(/\D/g, '');
     const msg = encodeURIComponent(
-      `Olá! 🌟 A Dra. Lúcia Kratz convidou você para preencher seu cadastro no 9&Self.\n\n` +
+      `Olá! 🌟 A Dra. Lúcia Kratz convidou você para preencher seu cadastro no 9Self.\n\n` +
       `Acesse o link exclusivo abaixo para solicitar seu código de avaliação:\n` +
       `${_linkSolicitacaoAtual}\n\n` +
       `O preenchimento leva menos de 2 minutos. 💜`
@@ -4563,7 +4562,7 @@ window.converterEmCodigo = async function() {
     if (whatsapp) {
       const numLimpo = whatsapp.replace(/\D/g, '');
       const msg = encodeURIComponent(
-        `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: ${linkTeste}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade — quanto mais genuínas suas respostas, mais preciso será o seu laudo. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
+        `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: ${linkTeste}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade — quanto mais genuínas suas respostas, mais preciso será o seu laudo. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
       );
       window.open(`https://wa.me/55${numLimpo}?text=${msg}`, '_blank');
     }
@@ -4705,7 +4704,7 @@ window.parceiroWhatsappCodigo = function() {
   const d = window._ultimoCodParceiro||{};
   if(!d.whats){ showToast('WhatsApp não informado.','error'); return; }
   const num = d.whats.replace(/\D/g,'');
-  const msg = encodeURIComponent(`Olá, ${d.nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${d.c}*\n\n👉 Acesse agora: ${d.link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
+  const msg = encodeURIComponent(`Olá, ${d.nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${d.c}*\n\n👉 Acesse agora: ${d.link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
   window.open(`https://wa.me/55${num}?text=${msg}`,'_blank');
 };
 
@@ -4944,7 +4943,7 @@ function _renderCodPF(tipo) {
           data-criado="${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}"
           data-empresa="${(c.empresa||'').replace(/"/g,'&quot;')}"
         >${c.nomeDestinatario||'—'}</button></td>
-      <td style="font-size:11px;"><a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
+      <td style="font-size:11px;"><a href="${link}" target="_blank" style="color:#5B1A78;">${link}</a></td>
       <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
       <td><span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span></td>
       <td style="display:flex;gap:6px;">
@@ -5074,12 +5073,12 @@ window.reenviarCodigo = async function(id) {
     const nome = (v.nomeDestinatario||v.nome||'').split(' ')[0] || 'tudo bem';
     const link = gerarLinkTeste(v.codigo);
     if(num) {
-      const msg = encodeURIComponent('Olá, ' + nome + '! Reenviando o seu acesso ao teste 9&Self.\n\nSeu código: ' + (v.codigo||'') + '\nAcesse: ' + link + '\n\nQualquer dúvida, é só falar.');
+      const msg = encodeURIComponent('Olá, ' + nome + '! Reenviando o seu acesso ao teste 9Self.\n\nSeu código: ' + (v.codigo||'') + '\nAcesse: ' + link + '\n\nQualquer dúvida, é só falar.');
       window.open('https://wa.me/' + (num.length <= 11 ? '55' + num : num) + '?text=' + msg, '_blank');
     }
     if(email) {
-      const html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#2c1810;line-height:1.6;max-width:560px"><p>Olá, ' + nome + '!</p><p>Reenviando o seu acesso ao teste 9&amp;Self.</p><p><b>Seu código:</b> ' + (v.codigo||'') + '<br><b>Acesse:</b> <a href="' + link + '">' + link + '</a></p><p style="margin-top:24px">Dra. Lucia Kratz<br>Gestora do 9&amp;Self</p></div>';
-      await addDoc(collection(db,'nr1map_emails'), { to: email, message: { subject: 'Seu acesso ao teste 9&Self', html } });
+      const html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#2c1810;line-height:1.6;max-width:560px"><p>Olá, ' + nome + '!</p><p>Reenviando o seu acesso ao teste 9Self.</p><p><b>Seu código:</b> ' + (v.codigo||'') + '<br><b>Acesse:</b> <a href="' + link + '">' + link + '</a></p><p style="margin-top:24px">Dra. Lucia Kratz<br>Gestora do 9Self</p></div>';
+      await addDoc(collection(db,'nr1map_emails'), { to: email, message: { subject: 'Seu acesso ao teste 9Self', html } });
     }
     await updateDoc(doc(db,'nself_codigos', id), { ultimoReenvioEm: serverTimestamp(), reenvios: increment(1) });
     showToast(num && email ? 'Reenviado pelo WhatsApp e por e-mail.' : (num ? 'Reenviado pelo WhatsApp.' : 'Reenviado por e-mail.'),'success');
@@ -5157,7 +5156,7 @@ window.filtrarCodigos = function(tipo) {
       <td><strong style="letter-spacing:2px;font-size:14px;">${c.codigo}</strong></td>
       <td>${c.nomeDestinatario||'—'}</td>
       <td>${c.empresa||'Pessoa Física'}</td>
-      <td style="font-size:11px;max-width:140px;word-break:break-all;"><a href="${link}" target="_blank" style="color:#7B1D6B;">${link}</a></td>
+      <td style="font-size:11px;max-width:140px;word-break:break-all;"><a href="${link}" target="_blank" style="color:#5B1A78;">${link}</a></td>
       <td>${c.criadoEm?.toDate?.()?.toLocaleDateString('pt-BR')||'—'}</td>
       <td>${naoUsado ? `<span class="pill" style="background:#FFF1CC;color:#8A6200;">Aguardando</span><div style="font-size:11px;color:#8a7a99;margin-top:4px;">${_d===null?'':(_d<=0?'enviado hoje':'há '+_d+(_d===1?' dia':' dias'))}${c.reenvios?' · reenviado '+c.reenvios+'x':''}</div>` : `<span class="pill ${statusCls[c.status]||'pill-gray'}">${c.status||'Pendente'}</span>`}</td>
       <td style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
@@ -5322,17 +5321,17 @@ window.renderFinanceiro = function() {
       <div class="sc-value" style="font-size:28px;">${fmt(totalReceita)}</div>
       <div class="sc-sub">${lista.length} pagamento(s)</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #7B00C4;">
+    <div class="stat-card" style="border-top:3px solid #39044F;">
       <div class="sc-label">Parceiros</div>
       <div class="sc-value" style="font-size:28px;">${fmt(porCanal.parceiro)}</div>
       <div class="sc-sub">créditos atacado</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #1A9BAF;">
+    <div class="stat-card" style="border-top:3px solid #E39A35;">
       <div class="sc-label">RH / Empresas</div>
       <div class="sc-value" style="font-size:28px;">${fmt(porCanal.rh)}</div>
       <div class="sc-sub">pacotes corporativos</div>
     </div>
-    <div class="stat-card" style="border-top:3px solid #9B2589;">
+    <div class="stat-card" style="border-top:3px solid #7B3A99;">
       <div class="sc-label">Pessoa Física</div>
       <div class="sc-value" style="font-size:28px;">${fmt(porCanal.pf)}</div>
       <div class="sc-sub">vendas diretas</div>
@@ -5366,7 +5365,7 @@ window.renderFinanceiro = function() {
     const ativo = document.getElementById('finFiltroMes')?.value === m;
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;" onclick="document.getElementById('finFiltroMes').value='${m}';loadFinanceiro();">
       <div style="font-size:9px;color:#888;">${val>0?'R$'+Math.round(val/1000)+'k':''}</div>
-      <div style="width:100%;height:${h}px;background:${ativo?'#7B00C4':val>0?'#C4A6E8':'#E2D9EF'};border-radius:4px 4px 0 0;transition:all .2s;"></div>
+      <div style="width:100%;height:${h}px;background:${ativo?'#39044F':val>0?'#C4A6E8':'#E2D9EF'};border-radius:4px 4px 0 0;transition:all .2s;"></div>
     </div>`;
   }).join('');
   document.getElementById('finGraficoLabels').innerHTML = nomesMes.map((n,i) =>
@@ -5443,7 +5442,7 @@ window.abrirModalWhatsAppEmpresa = function(btn) {
   const whatsapp = btn.dataset.wpp;
   if(whatsapp) {
     const num = whatsapp.replace(/\D/g,'');
-    const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+    const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9Self.`);
     window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
   } else {
     document.getElementById('modalWaTitle').textContent = `WhatsApp — ${nome}`;
@@ -5452,7 +5451,7 @@ window.abrirModalWhatsAppEmpresa = function(btn) {
     window._waCallback = function(numero) {
       const num = numero.replace(/\D/g,'');
       updateDoc(doc(db,'nself_empresas',id), {whatsapp: numero}).catch(()=>{});
-      const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+      const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9Self.`);
       window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
     };
     openModal('modalWhatsAppInput');
@@ -5474,7 +5473,7 @@ window.abrirModalWhatsAppParceiro = function(btn) {
   const id = btn.dataset.id, nome = btn.dataset.nome, whatsapp = btn.dataset.wpp;
   if(whatsapp) {
     const num = whatsapp.replace(/\D/g,'');
-    const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+    const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9Self.`);
     window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
   } else {
     document.getElementById('modalWaTitle').textContent = `WhatsApp — ${nome}`;
@@ -5483,7 +5482,7 @@ window.abrirModalWhatsAppParceiro = function(btn) {
     window._waCallback = function(numero) {
       updateDoc(doc(db,'nself_parceiros',id), {whatsapp: numero}).catch(()=>{});
       const num = numero.replace(/\D/g,'');
-      const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9&Self.`);
+      const msg = encodeURIComponent(`Olá, ${nome}! 👋 Entrando em contato da equipe 9Self.`);
       window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
     };
     openModal('modalWhatsAppInput');
@@ -5600,7 +5599,7 @@ window.salvarNovoParceiro = async function() {
     closeModal('modalNovoParceiro');
     showToast('Parceiro cadastrado!','success');
     loadParceirosAdmin();
-    enviarEmailAcesso(nome, email, 'parceiro', {senha: document.getElementById('parcSenha').value, mensagem:`Seu acesso ao painel de parceiros do 9&Self foi criado. E-mail: ${email} | Senha provisória: ${document.getElementById('parcSenha').value}`});
+    enviarEmailAcesso(nome, email, 'parceiro', {senha: document.getElementById('parcSenha').value, mensagem:`Seu acesso ao painel de parceiros do 9Self foi criado. E-mail: ${email} | Senha provisória: ${document.getElementById('parcSenha').value}`});
   } catch(e) {
     console.error(e);
     if(e.code==='auth/email-already-in-use') {
@@ -5704,7 +5703,7 @@ window.confirmarGerarCodigoEmpresa = async function() {
     if(window._state.profile === 'rh') { try { if(typeof loadCodigos === 'function') loadCodigos(); } catch(_){} try { if(typeof loadRHDashboard === 'function') loadRHDashboard(); } catch(_){} }
     if(whatsapp) {
       const num = whatsapp.replace(/\D/g,'');
-      const msg = encodeURIComponent(`Olá, ${nome}! 🎉 Seu código de acesso ao 9&Self foi gerado!\n\nCódigo: *${c}*\n\nAcesse: ${link}\n\n💜`);
+      const msg = encodeURIComponent(`Olá, ${nome}! 🎉 Seu código de acesso ao 9Self foi gerado!\n\nCódigo: *${c}*\n\nAcesse: ${link}\n\n💜`);
       window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
     }
   } catch(e) { showToast('Erro: ' + e.message, 'error'); console.error(e); }
@@ -5790,12 +5789,12 @@ window.aprovarParceiro = async function(solId, nome, email, whatsapp) {
       status: 'aprovado', aprovadoEm: serverTimestamp(), parceiroId: parRef.id
     });
     showToast(`${nome} aprovado!`, 'success');
-    enviarEmailAcesso(nome, email, 'parceiro', {mensagem:`Seu acesso ao painel de parceiros do 9&Self foi aprovado. E-mail: ${email}. Entre com a senha que a administradora combinou com você, ou use o Google, ou toque em Esqueceu a senha? para criar uma nova.`});
+    enviarEmailAcesso(nome, email, 'parceiro', {mensagem:`Seu acesso ao painel de parceiros do 9Self foi aprovado. E-mail: ${email}. Entre com a senha que a administradora combinou com você, ou use o Google, ou toque em Esqueceu a senha? para criar uma nova.`});
     if(whatsapp) {
       const num = whatsapp.replace(/\D/g,'');
       const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
       const msg = encodeURIComponent(
-        `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9&Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* ${senha}\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
+        `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* ${senha}\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
       );
       window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
     }
@@ -5999,13 +5998,13 @@ window.loadParceiroFinanceiro = async function() {
         <div class="sc-value">${totalUsados}</div>
         <div class="sc-sub">no período</div>
       </div>
-      <div class="stat-card" style="border-top:3px solid #7B00C4;">
+      <div class="stat-card" style="border-top:3px solid #39044F;">
         <div class="sc-label">Receita estimada</div>
         <div class="sc-value" style="font-size:24px;">${fmt(receitaEst)}</div>
         <div class="sc-sub">pelo preço sugerido</div>
       </div>
       <div class="stat-card" style="border-top:3px solid #c0392b;">
-        <div class="sc-label">Custo (pago a 9&Self)</div>
+        <div class="sc-label">Custo (pago a 9Self)</div>
         <div class="sc-value" style="font-size:24px;color:#c0392b;">${fmt(custoTotal)}</div>
         <div class="sc-sub">total de créditos</div>
       </div>
@@ -6028,7 +6027,7 @@ window.loadParceiroFinanceiro = async function() {
         <td>${c.nomeDestinatario||'—'}</td>
         <td>${canal[c.tipoPF||'pf_std']||'—'}</td>
         <td style="font-size:11px;color:#888;">${empresaNome}</td>
-        <td style="color:#7B00C4;font-weight:600;">${fmt(preco)}</td>
+        <td style="color:#39044F;font-weight:600;">${fmt(preco)}</td>
         <td style="color:#c0392b;">${fmt(custoUnit)}</td>
         <td style="color:#1A9460;font-weight:600;">${fmt(margem)}</td>
       </tr>`;
@@ -6093,7 +6092,7 @@ window.parceiroWhatsappCod = function(btn) {
   const {nome, wpp, cod, link} = btn.dataset;
   if(!wpp){ showToast('WhatsApp não cadastrado.','error'); return; }
   const num = wpp.replace(/\D/g,'');
-  const msg = encodeURIComponent(`Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${cod}*\n\n👉 Acesse agora: ${link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
+  const msg = encodeURIComponent(`Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${cod}*\n\n👉 Acesse agora: ${link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
   window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
 };
 
@@ -6225,14 +6224,14 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
       });
 
       showToast(`Empresa criada! Código ${c} gerado.`, 'success');
-      enviarEmailAcesso(nome, email, 'empresa', {codigo:c, link, mensagem:`Seu acesso ao 9&Self foi criado. E-mail: ${email} | Código: ${c} | Enviamos outro e-mail com o link para você criar a sua senha, ou entre com o Google | Acesse: ${link}`});
+      enviarEmailAcesso(nome, email, 'empresa', {codigo:c, link, mensagem:`Seu acesso ao 9Self foi criado. E-mail: ${email} | Código: ${c} | Enviamos outro e-mail com o link para você criar a sua senha, ou entre com o Google | Acesse: ${link}`});
 
       // WhatsApp com senha e link de troca
       if(whatsapp) {
         const num = whatsapp.replace(/\D/g,'');
         const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
         const msg = encodeURIComponent(
-          `Olá, ${nome}! 🎉\n\nFicamos muito felizes em ter você como cliente 9&Self — seja muito bem-vindo(a)!\n\nSeu acesso ao painel de RH foi criado:\n\n📧 *E-mail:* ${email}\n🔑 *Código de avaliação:* ${c}\n\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos à disposição! 💜\nDra. Lúcia Kratz · CRP 09/20590`
+          `Olá, ${nome}! 🎉\n\nFicamos muito felizes em ter você como cliente 9Self — seja muito bem-vindo(a)!\n\nSeu acesso ao painel de RH foi criado:\n\n📧 *E-mail:* ${email}\n🔑 *Código de avaliação:* ${c}\n\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos à disposição! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
@@ -6259,7 +6258,7 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
         const num = whatsapp.replace(/\D/g,'');
         const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
         const msg = encodeURIComponent(
-          `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9&Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
+          `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
@@ -6278,7 +6277,7 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
       showToast(`Código ${c} gerado para ${nome}!`, 'success');
       if(whatsapp) {
         const num = whatsapp.replace(/\D/g,'');
-        const msg = encodeURIComponent(`Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9&Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${c}*\n\n👉 Acesse agora: ${link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade — quanto mais genuínas suas respostas, mais preciso será o seu laudo. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
+        const msg = encodeURIComponent(`Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${c}*\n\n👉 Acesse agora: ${link}\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade — quanto mais genuínas suas respostas, mais preciso será o seu laudo. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`);
         window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
       }
     }
@@ -6397,7 +6396,7 @@ async function enviarEmailAcesso(nome, email, tipo, extra={}) {
     await fetch(CF_NOTIF, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ nome, email, tipo, origem: '9&Self Sistema', ...extra })
+      body: JSON.stringify({ nome, email, tipo, origem: '9Self Sistema', ...extra })
     });
   } catch(e) { console.warn('[email]', e); }
 }
@@ -6569,7 +6568,7 @@ async function loadCulturaHist() {
         const dt = data.laudoCulturaGeradoEm?.toDate?.()?.toLocaleDateString('pt-BR') || '—';
         rows.push(`<tr>
           <td>${data.nome||'—'}</td>
-          <td style="font-size:12px;color:#7B00C4;">${data.triadeCultura||'—'}</td>
+          <td style="font-size:12px;color:#39044F;">${data.triadeCultura||'—'}</td>
           <td style="text-align:center;">${data.totalColaboradoresCultura||'—'}</td>
           <td>${dt}</td>
           <td><a href="${data.laudoCulturaUrl}" target="_blank" class="btn btn-teal btn-sm">⬇ PDF</a>
@@ -7198,8 +7197,8 @@ window.pdiToggleMic = function() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('[9&Self] SW registrado:', reg.scope))
-        .catch(err => console.warn('[9&Self] SW erro:', err));
+        .then(reg => console.log('[9Self] SW registrado:', reg.scope))
+        .catch(err => console.warn('[9Self] SW erro:', err));
     });
   }
 </script>
