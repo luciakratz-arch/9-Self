@@ -479,9 +479,9 @@ tr:hover td{background:#FAFAFE;}
     <button class="login-btn" onclick="doLogin()" id="loginBtnEl">Entrar</button>
     <div class="login-error" id="loginError"></div>
     <div style="text-align:center;margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-      <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html#" target="_blank" style="color:#b39ddb;font-size:12px;text-decoration:none;opacity:0.7;">🌐 Conheça o 9Self</a>
-      <a href="https://luciakratz-arch.github.io/9-Self/9self-landing.html#planos" target="_blank" style="color:#b39ddb;font-size:13px;text-decoration:none;">🛒 Não tem um código? Adquira o seu aqui</a>
-      <a href="https://luciakratz-arch.github.io/9-Self/instalar-app.html" target="_blank" style="color:#b39ddb;font-size:12px;text-decoration:none;opacity:0.75;">📲 Instalar o app no celular</a>
+      <a href="https://9self.com.br/9self-landing.html#" target="_blank" style="color:#b39ddb;font-size:12px;text-decoration:none;opacity:0.7;">🌐 Conheça o 9Self</a>
+      <a href="https://9self.com.br/9self-landing.html#planos" target="_blank" style="color:#b39ddb;font-size:13px;text-decoration:none;">🛒 Não tem um código? Adquira o seu aqui</a>
+      <a href="https://9self.com.br/instalar-app.html" target="_blank" style="color:#b39ddb;font-size:12px;text-decoration:none;opacity:0.75;">📲 Instalar o app no celular</a>
     </div>
   </div>
 </div>
@@ -502,7 +502,7 @@ tr:hover td{background:#FAFAFE;}
       </div>
       <nav class="sidebar-nav" id="sideNav"></nav>
       <div class="sidebar-footer">
-        <a href="https://luciakratz-arch.github.io/9-Self/instalar-app.html" target="_blank" style="display:block;text-align:center;padding:7px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.45);font-size:11px;text-decoration:none;transition:all .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">📲 Instalar app no celular</a>
+        <a href="https://9self.com.br/instalar-app.html" target="_blank" style="display:block;text-align:center;padding:7px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.45);font-size:11px;text-decoration:none;transition:all .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">📲 Instalar app no celular</a>
         <button onclick="openModal('modalTrocarSenha')" style="width:100%;padding:8px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:transparent;color:rgba(255,255,255,0.45);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;margin-bottom:8px;transition:all .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">🔒 Trocar Senha</button>
         <button class="logout-btn" onclick="doLogout()">↩ Sair</button>
       </div>
@@ -3932,7 +3932,7 @@ async function salvarResultadoFinal() {
       console.error('Erro PDF:', e);
     }
   };
-const BASE_URL = 'https://luciakratz-arch.github.io/9-Self';
+const BASE_URL = 'https://9self.com.br';
 function gerarLinkTeste(codigo) {
   // GitHub Pages: index.html explícito evita ambiguidade de roteamento
   return `${BASE_URL}/index.html?code=${codigo}`;
@@ -4442,7 +4442,7 @@ window.excluirLaudo = async function(laudoId) {
 window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
   const num = (whatsappSalvo || '').trim();
   const msg = encodeURIComponent(
-    `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: https://luciakratz-arch.github.io/9-Self/index.html\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
+    `Olá, ${nome}! 🌟\n\nFicamos muito felizes com o seu interesse e cadastro no 9Self!\n\nSeu código de acesso exclusivo está pronto:\n\n🔑 *${codigo}*\n\n👉 Acesse agora: https://9self.com.br/index.html\n\nNa tela inicial, clique na aba *Usuário* e insira o seu código para começar.\n\nO mapeamento leva cerca de 15 minutos. Responda com calma e sinceridade. 💜\n\nQualquer dúvida, estou aqui.\nDra. Lúcia Kratz · CRP 09/20590`
   );
   if(num) {
     const numLimpo = num.replace(/\D/g,'');
@@ -4466,7 +4466,7 @@ window.abrirModalWhatsApp = function(id, nome, codigo, whatsappSalvo) {
 // SOLICITAÇÕES DE CADASTRO (LINK GRATUITO)
 // ══════════════════════════════════════════
 
-const BASE_CADASTRO = 'https://luciakratz-arch.github.io/9-Self/cadastro.html';
+const BASE_CADASTRO = 'https://9self.com.br/cadastro.html';
 let _linkSolicitacaoAtual = '';
 
 function gerarTokenUUID() {
@@ -5854,7 +5854,7 @@ window.aprovarParceiro = async function(solId, nome, email, whatsapp) {
     enviarEmailAcesso(nome, email, 'parceiro', {mensagem:`Seu acesso ao painel de parceiros do 9Self foi aprovado. E-mail: ${email}. Entre com a senha que a administradora combinou com você, ou use o Google, ou toque em Esqueceu a senha? para criar uma nova.`});
     if(whatsapp) {
       const num = whatsapp.replace(/\D/g,'');
-      const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
+      const linkLogin = 'https://9self.com.br/index.html';
       const msg = encodeURIComponent(
         `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n🔒 *Senha provisória:* ${senha}\n\n👉 Acesse: ${linkLogin}\n\n⚠️ Troque sua senha no primeiro acesso (menu lateral → Trocar Senha).\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
       );
@@ -6291,7 +6291,7 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
       // WhatsApp com senha e link de troca
       if(whatsapp) {
         const num = whatsapp.replace(/\D/g,'');
-        const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
+        const linkLogin = 'https://9self.com.br/index.html';
         const msg = encodeURIComponent(
           `Olá, ${nome}! 🎉\n\nFicamos muito felizes em ter você como cliente 9Self — seja muito bem-vindo(a)!\n\nSeu acesso ao painel de RH foi criado:\n\n📧 *E-mail:* ${email}\n🔑 *Código de avaliação:* ${c}\n\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos à disposição! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
@@ -6318,7 +6318,7 @@ window.adminConverterSolicitacao = async function(solId, nome, email, whatsapp, 
 
       if(whatsapp) {
         const num = whatsapp.replace(/\D/g,'');
-        const linkLogin = 'https://luciakratz-arch.github.io/9-Self/index.html';
+        const linkLogin = 'https://9self.com.br/index.html';
         const msg = encodeURIComponent(
           `Olá, ${nome}! 🎉\n\nFicamos muito felizes com o seu interesse em ser parceiro 9Self — seja muito bem-vindo(a) à nossa rede!\n\nSeu acesso ao painel de parceiros foi aprovado:\n\n📧 *E-mail:* ${email}\n👉 Acesse: ${linkLogin}\n\n🔒 Enviamos um e-mail com o link para você criar a sua senha. Se preferir, entre com o Google.\n\nSalve nosso contato — estamos aqui para te apoiar! 💜\nDra. Lúcia Kratz · CRP 09/20590`
         );
