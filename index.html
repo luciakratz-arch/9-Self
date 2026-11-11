@@ -2187,6 +2187,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+// atalhos usados pelo painel (gd lê documento ou lista; col = collection; fsDoc = doc)
+const col = collection, fsDoc = doc;
+const gd = (ref) => (ref && ref.type === 'document') ? getDoc(ref) : getDocs(ref);
 
 // ── ESTADO GLOBAL ──
 window._state = {
