@@ -352,6 +352,10 @@ body {
 
     <div class="divider"></div>
 
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;margin:0 0 14px;cursor:pointer;">
+      <input type="checkbox" id="fAceite" style="margin-top:3px;flex:0 0 auto;width:auto;"/>
+      <span>Li e aceito a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
+    </label>
     <button class="btn-submit" id="btnEnviar" onclick="enviarSolicitacao()">Enviar Solicitação</button>
     <div id="formError"></div>
   </div>
@@ -379,7 +383,8 @@ body {
 </div>
 
 <div class="page-footer">
-  Desenvolvido por Dra. Lúcia Kratz · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade
+  Desenvolvido por Dra. Lúcia Kratz · CRP 09/20590 · Psicóloga &amp; Especialista em Personalidade<br/>
+  <a href="privacidade.html" style="color:inherit;">Política de Privacidade</a>
 </div>
 
 <!-- ── FIREBASE ── -->
@@ -475,6 +480,7 @@ window.enviarSolicitacao = async function() {
   if (solicitacaoTipo === 'empresa' && !empresaNome) { errEl.textContent = 'Por favor, informe o nome da empresa.'; return; }
   if (!comoConheceu) { errEl.textContent = 'Por favor, selecione como conheceu o 9Self.'; return; }
   if (!necessidade)  { errEl.textContent = 'Por favor, preencha o último campo.'; return; }
+  if (!document.getElementById('fAceite').checked) { errEl.textContent = 'Para continuar, aceite a Política de Privacidade.'; return; }
 
   const btn = document.getElementById('btnEnviar');
   btn.disabled    = true;

@@ -473,6 +473,10 @@ tr:hover td{background:#FAFAFE;}
           <input class="code-input" id="colabCode" placeholder="EX: A1B2C3" maxlength="8"
             onkeydown="if(event.key==='Enter')doLogin()" style="font-size:15px;letter-spacing:3px;"/>
         </div>
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:11.5px;line-height:1.5;margin-top:12px;text-align:left;cursor:pointer;opacity:.85;">
+          <input type="checkbox" id="colabAceite" style="margin-top:2px;flex:0 0 auto;"/>
+          <span>Li e aceito a <a href="privacidade.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Política de Privacidade</a>. Se este código foi enviado por uma empresa, entendo que ela terá acesso ao meu laudo.</span>
+        </label>
       </div>
     </div>
 
@@ -2909,6 +2913,8 @@ window.validarCodigo = async function() {
   const btn    = document.getElementById('loginBtnEl');
   errEl.textContent='';
   if(!codigo){errEl.textContent='Insira seu código.';return;}
+  const _ac = document.getElementById('colabAceite');
+  if(_ac && !_ac.checked){errEl.textContent='Para continuar, aceite a Política de Privacidade.';return;}
   btn.textContent='Verificando...'; btn.disabled=true;
   try {
     // Caminho novo: o servidor confere o código e devolve só o necessário (e o laudo, se já foi feito).
